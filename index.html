@@ -3,71 +3,90 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Haslun.online — Arcade</title>
+  <title>HASLUN.ONLINE — ARCADE</title>
   <meta name="description" content="Haslun.online — a small arcade of weird, beautiful web toys.">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
     :root{
-      --bg:#060a10;
-      --panel:rgba(10,18,28,.72);
-      --line:rgba(90,255,200,.22);
-      --glow:rgba(90,255,200,.35);
-      --text:#dff7ff;
-      --muted:rgba(223,247,255,.72);
-      --accent:#5affc8;
-      --accent2:#ff6bd6;
-      --accent3:#ffd86b;
-      --radius:14px;
+      --black:#0a0008;
+      --dark:#120010;
+      --panel:rgba(20,5,18,.85);
+      --hot:#ff0066;
+      --pink:#ff3399;
+      --magenta:#cc0055;
+      --cyan:#00ffcc;
+      --lime:#aaff00;
+      --orange:#ff6600;
+      --yellow:#ffcc00;
+      --text:#fff0f8;
+      --muted:rgba(255,180,220,.6);
+      --grit:rgba(255,0,102,.15);
     }
 
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
+
     body{
-      margin:0;
-      background: radial-gradient(1200px 800px at 50% 30%, #0c1a2a 0%, var(--bg) 65%);
+      background: var(--black);
       color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: 'VT323', monospace;
       overflow:hidden;
+      cursor: crosshair;
     }
 
-    /* starfield layers */
-    .stars, .stars2, .stars3{
-      position:fixed; inset:-50%;
-      background-repeat:repeat;
-      pointer-events:none;
-      filter: drop-shadow(0 0 8px rgba(90,255,200,.08));
-      opacity:.55;
-      transform:translateZ(0);
-      animation: drift 28s linear infinite;
-    }
-    .stars{ background-image: radial-gradient(#cfffff 1px, transparent 1px); background-size: 120px 120px; opacity:.25; }
-    .stars2{ background-image: radial-gradient(#9fffe6 1px, transparent 1px); background-size: 180px 180px; opacity:.18; animation-duration: 44s; }
-    .stars3{ background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 260px 260px; opacity:.12; animation-duration: 70s; }
-
-    @keyframes drift{
-      from{ transform: translate3d(0,0,0) }
-      to{ transform: translate3d(6%, 10%, 0) }
-    }
-
-    /* CRT scanlines + vignette */
-    .crt::before{
+    /* VHS noise overlay */
+    body::before{
       content:"";
-      position:fixed; inset:0;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,.03),
-        rgba(255,255,255,.03) 1px,
-        rgba(0,0,0,0) 3px,
-        rgba(0,0,0,0) 6px
-      );
-      mix-blend-mode: overlay;
-      opacity:.35;
+      position:fixed;
+      inset:0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(255,0,102,.03) 2px,
+          rgba(255,0,102,.03) 4px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 1px,
+          rgba(0,0,0,.1) 1px,
+          rgba(0,0,0,.1) 2px
+        );
       pointer-events:none;
+      z-index:1000;
+      animation: vhs-jitter 0.1s steps(3) infinite;
     }
-    .crt::after{
+
+    @keyframes vhs-jitter{
+      0%,100%{ transform: translateX(0); }
+      25%{ transform: translateX(-1px); }
+      75%{ transform: translateX(1px); }
+    }
+
+    /* Chromatic aberration on everything */
+    body::after{
       content:"";
-      position:fixed; inset:0;
-      background: radial-gradient(1200px 800px at 50% 40%, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 100%);
+      position:fixed;
+      inset:0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(255,0,102,.12), transparent 50%),
+                  radial-gradient(ellipse at 70% 80%, rgba(0,255,200,.08), transparent 50%);
       pointer-events:none;
+      z-index:999;
+    }
+
+    /* Blood/grime texture */
+    .grime{
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(ellipse at 15% 85%, rgba(80,0,20,.4) 0%, transparent 30%),
+        radial-gradient(ellipse at 85% 15%, rgba(60,0,30,.3) 0%, transparent 25%),
+        radial-gradient(ellipse at 50% 100%, rgba(100,0,40,.5) 0%, transparent 40%);
+      pointer-events:none;
+      z-index:1;
     }
 
     .wrap{
@@ -75,73 +94,147 @@
       height:100%;
       display:grid;
       place-items:center;
-      padding:24px;
+      padding:20px;
+      z-index:10;
     }
 
     .panel{
-      width:min(980px, 96vw);
-      background: linear-gradient(180deg, rgba(10,18,28,.76), rgba(10,18,28,.62));
-      border:1px solid var(--line);
-      border-radius: var(--radius);
+      width:min(1000px, 96vw);
+      background: 
+        linear-gradient(135deg, rgba(30,5,25,.95), rgba(15,0,12,.98)),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px,
+          transparent 3px,
+          rgba(255,0,102,.02) 3px,
+          rgba(255,0,102,.02) 4px
+        );
+      border: 3px solid var(--hot);
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.05) inset,
-        0 18px 60px rgba(0,0,0,.55),
-        0 0 60px rgba(90,255,200,.10);
+        0 0 0 1px var(--magenta),
+        0 0 60px rgba(255,0,102,.4),
+        0 0 120px rgba(255,0,102,.2),
+        inset 0 0 100px rgba(255,0,102,.05);
+      position:relative;
       overflow:hidden;
+    }
+
+    /* Corner cuts */
+    .panel::before{
+      content:"";
+      position:absolute;
+      top:-3px; right:-3px;
+      width:40px; height:40px;
+      background: var(--black);
+      transform: rotate(45deg) translate(50%, -50%);
+      border-bottom: 3px solid var(--hot);
+    }
+
+    .panel::after{
+      content:"";
+      position:absolute;
+      bottom:-3px; left:-3px;
+      width:40px; height:40px;
+      background: var(--black);
+      transform: rotate(45deg) translate(-50%, 50%);
+      border-top: 3px solid var(--hot);
+    }
+
+    /* Glitch bar */
+    .glitch-bar{
+      position:absolute;
+      top:0; left:0; right:0;
+      height:4px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--hot) 20%, 
+        var(--cyan) 40%, 
+        var(--hot) 60%, 
+        transparent 100%);
+      animation: glitch-scan 3s linear infinite;
+    }
+
+    @keyframes glitch-scan{
+      0%{ transform: translateY(0); opacity: 0; }
+      5%{ opacity: 1; }
+      15%{ transform: translateY(400px); opacity: 1; }
+      20%{ opacity: 0; }
+      100%{ opacity: 0; transform: translateY(400px); }
+    }
+
+    .header{
+      padding:24px 28px 20px;
+      border-bottom:2px solid var(--hot);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      background: linear-gradient(180deg, rgba(255,0,102,.08), transparent);
       position:relative;
     }
 
-    .panelTop{
-      padding:22px 22px 16px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
-      border-bottom:1px solid rgba(90,255,200,.12);
-      background:
-        radial-gradient(900px 300px at 10% 0%, rgba(90,255,200,.10), transparent 65%),
-        radial-gradient(900px 300px at 90% 0%, rgba(255,107,214,.10), transparent 65%);
-    }
-
-    .brand{
-      display:flex; flex-direction:column; gap:6px;
-    }
     .brand h1{
-      margin:0;
-      font-size: clamp(22px, 3vw, 30px);
-      letter-spacing:.06em;
-      text-transform: uppercase;
-    }
-    .brand p{
-      margin:0;
-      color:var(--muted);
-      font-size: 13px;
-      line-height:1.5;
-      max-width: 60ch;
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight:400;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      color: var(--hot);
+      text-shadow:
+        0 0 10px var(--hot),
+        0 0 30px var(--hot),
+        0 0 60px var(--magenta),
+        3px 3px 0 var(--magenta);
+      animation: title-flicker 4s ease-in-out infinite;
     }
 
-    .coin{
-      display:flex; align-items:center; gap:10px;
-      color:rgba(223,247,255,.86);
-      font-size:12px;
-      letter-spacing:.12em;
+    @keyframes title-flicker{
+      0%,100%{ opacity:1; }
+      92%{ opacity:1; }
+      93%{ opacity:0.7; }
+      94%{ opacity:1; }
+      96%{ opacity:0.8; }
+      97%{ opacity:1; }
+    }
+
+    .brand p{
+      margin-top:8px;
+      font-size:16px;
+      color: var(--muted);
+      letter-spacing:.1em;
       text-transform:uppercase;
-      user-select:none;
     }
-    .dot{
-      width:9px; height:9px;
-      border-radius:50%;
-      background: var(--accent3);
-      box-shadow: 0 0 18px rgba(255,216,107,.35);
-      animation: blink 1.2s steps(2,end) infinite;
+
+    .status{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 16px;
+      border:2px solid var(--lime);
+      background: rgba(170,255,0,.1);
+      color: var(--lime);
+      font-size:14px;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      animation: status-pulse 2s ease-in-out infinite;
     }
-    @keyframes blink{ 50%{ opacity:.25 } }
+
+    @keyframes status-pulse{
+      0%,100%{ box-shadow: 0 0 20px rgba(170,255,0,.3); }
+      50%{ box-shadow: 0 0 40px rgba(170,255,0,.6); }
+    }
+
+    .status-dot{
+      width:10px; height:10px;
+      background: var(--lime);
+      box-shadow: 0 0 10px var(--lime);
+      animation: blink 1s steps(2) infinite;
+    }
+
+    @keyframes blink{ 50%{ opacity:0.3; } }
 
     .grid{
       display:grid;
-      grid-template-columns: 1.25fr .75fr;
-      gap:18px;
-      padding:18px 22px 22px;
+      grid-template-columns: 1.3fr .7fr;
+      gap:0;
     }
 
     @media (max-width: 880px){
@@ -150,163 +243,183 @@
       .grid{ grid-template-columns: 1fr; }
     }
 
+    /* Main cabinet */
     .cabinet{
-      border:1px solid rgba(90,255,200,.16);
-      border-radius: var(--radius);
-      background: linear-gradient(135deg, rgba(6,10,16,.5), rgba(12,26,42,.45));
-      box-shadow: 0 0 0 1px rgba(255,255,255,.04) inset;
-      overflow:hidden;
+      padding:28px;
+      border-right:2px solid var(--hot);
       position:relative;
     }
 
-    .cabinetHeader{
-      padding:16px 16px 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      border-bottom:1px solid rgba(90,255,200,.10);
-    }
-    .cabinetTitle{
-      display:flex; flex-direction:column; gap:4px;
-    }
-    .cabinetTitle strong{
-      letter-spacing:.08em;
+    .cabinet-label{
+      position:absolute;
+      top:-1px; left:28px;
+      padding:6px 16px;
+      background: var(--hot);
+      color: var(--black);
+      font-size:12px;
+      letter-spacing:.2em;
       text-transform:uppercase;
-      font-size: 13px;
-    }
-    .cabinetTitle span{
-      color:var(--muted);
-      font-size: 12px;
+      font-weight:bold;
     }
 
-    .pill{
-      border:1px solid rgba(90,255,200,.22);
-      color: rgba(223,247,255,.88);
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:11px;
-      letter-spacing:.10em;
+    .game-title{
+      font-size:28px;
+      letter-spacing:.12em;
       text-transform:uppercase;
-      background: rgba(0,0,0,.12);
-      box-shadow: 0 0 18px rgba(90,255,200,.10);
+      color: var(--cyan);
+      text-shadow: 0 0 20px var(--cyan), 2px 2px 0 rgba(0,255,200,.3);
+      margin-bottom:4px;
     }
 
-    .cabinetBody{
-      padding:16px;
-      display:grid;
-      gap:12px;
+    .game-sub{
+      font-size:14px;
+      color: var(--muted);
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      margin-bottom:20px;
     }
 
-    .btnRow{
+    .game-desc{
+      padding:16px 20px;
+      border-left:3px solid var(--orange);
+      background: rgba(255,100,0,.08);
+      color: var(--text);
+      font-size:16px;
+      line-height:1.6;
+      letter-spacing:.05em;
+      margin-bottom:24px;
+    }
+
+    .btn-row{
       display:flex;
-      gap:10px;
+      gap:12px;
       flex-wrap:wrap;
     }
 
-    a.btn{
-      text-decoration:none;
+    .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:11px 14px;
-      border-radius: 12px;
-      border:1px solid rgba(90,255,200,.22);
-      color: var(--text);
-      background: linear-gradient(180deg, rgba(90,255,200,.14), rgba(90,255,200,.06));
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
-      transition: transform .14s ease, border-color .14s ease, filter .14s ease;
-      letter-spacing:.06em;
+      padding:14px 28px;
+      font-family: 'VT323', monospace;
+      font-size:18px;
+      letter-spacing:.15em;
       text-transform:uppercase;
-      font-size:12px;
-    }
-    a.btn:hover{
-      transform: translateY(-1px);
-      border-color: rgba(90,255,200,.38);
-      filter: drop-shadow(0 0 18px rgba(90,255,200,.18));
-    }
-
-    a.btn.alt{
-      border-color: rgba(255,107,214,.22);
-      background: linear-gradient(180deg, rgba(255,107,214,.14), rgba(255,107,214,.06));
-    }
-    a.btn.alt:hover{
-      border-color: rgba(255,107,214,.38);
-      filter: drop-shadow(0 0 18px rgba(255,107,214,.18));
-    }
-
-    .mini{
-      padding:14px 16px;
-      border:1px dashed rgba(223,247,255,.18);
-      border-radius: 12px;
-      color: rgba(223,247,255,.78);
-      font-size: 12px;
-      line-height:1.6;
-    }
-
-    .side{
-      display:grid;
-      gap:18px;
-    }
-
-    .list{
-      padding:16px;
-      border:1px solid rgba(90,255,200,.12);
-      border-radius: var(--radius);
-      background: rgba(0,0,0,.12);
-    }
-    .list h2{
-      margin:0 0 10px 0;
-      font-size:12px;
-      letter-spacing:.10em;
-      text-transform:uppercase;
-      color: rgba(223,247,255,.82);
-    }
-    .item{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:10px 10px;
-      border-radius: 12px;
-      border:1px solid transparent;
-      color: rgba(223,247,255,.86);
       text-decoration:none;
-      transition: border-color .14s ease, transform .14s ease;
-    }
-    .item:hover{
-      border-color: rgba(90,255,200,.18);
-      transform: translateX(2px);
-    }
-    .item small{
-      color: rgba(223,247,255,.55);
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-size:10px;
+      border:2px solid;
+      position:relative;
+      overflow:hidden;
+      transition: all 0.15s ease;
+      cursor: crosshair;
     }
 
-    .footer{
-      padding:12px 18px 16px;
-      border-top:1px solid rgba(90,255,200,.10);
+    .btn-primary{
+      background: var(--hot);
+      border-color: var(--hot);
+      color: var(--black);
+      box-shadow: 0 0 30px rgba(255,0,102,.5), inset 0 0 20px rgba(255,255,255,.1);
+    }
+
+    .btn-primary:hover{
+      background: var(--pink);
+      transform: translateY(-2px);
+      box-shadow: 0 0 50px rgba(255,0,102,.8), 0 5px 20px rgba(0,0,0,.5);
+    }
+
+    .btn-secondary{
+      background: transparent;
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 20px rgba(0,255,200,.2);
+    }
+
+    .btn-secondary:hover{
+      background: rgba(0,255,200,.15);
+      box-shadow: 0 0 40px rgba(0,255,200,.4);
+    }
+
+    /* Side panel */
+    .side{
+      padding:28px;
+      background: rgba(0,0,0,.3);
+    }
+
+    .section{
+      margin-bottom:24px;
+    }
+
+    .section:last-child{
+      margin-bottom:0;
+    }
+
+    .section-title{
+      font-size:14px;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      color: var(--hot);
+      margin-bottom:12px;
+      padding-bottom:8px;
+      border-bottom:1px solid rgba(255,0,102,.3);
+    }
+
+    .list-item{
       display:flex;
       justify-content:space-between;
-      gap:12px;
-      color: rgba(223,247,255,.55);
-      font-size: 11px;
+      align-items:center;
+      padding:10px 12px;
+      margin-bottom:4px;
+      border:1px solid transparent;
+      color: var(--text);
+      text-decoration:none;
+      font-size:16px;
+      letter-spacing:.08em;
+      transition: all 0.1s ease;
     }
 
-    /* ===============================
-       WARP TRANSITION
-    ================================ */
+    .list-item:hover{
+      border-color: var(--hot);
+      background: rgba(255,0,102,.1);
+      transform: translateX(4px);
+    }
 
+    .list-item small{
+      font-size:12px;
+      color: var(--muted);
+      letter-spacing:.15em;
+      text-transform:uppercase;
+    }
+
+    .list-item.wip small{
+      color: var(--orange);
+    }
+
+    /* Footer */
+    .footer{
+      padding:12px 28px;
+      border-top:2px solid var(--hot);
+      display:flex;
+      justify-content:space-between;
+      font-size:12px;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      color: var(--muted);
+      background: rgba(255,0,102,.05);
+    }
+
+    .footer span:first-child{
+      color: var(--lime);
+    }
+
+    /* Warp transition */
     #warp{
       position:fixed;
       inset:0;
-      background: radial-gradient(circle at center, #0b1624, #03070c 70%);
+      background: var(--black);
       z-index:9999;
       opacity:0;
       pointer-events:none;
       overflow:hidden;
-      transition: opacity .2s ease;
+      transition: opacity .15s ease;
     }
 
     #warp.active{
@@ -314,269 +427,211 @@
       pointer-events:auto;
     }
 
-    /* Star streak layers */
-    .warp-stars{
-      position:absolute;
-      inset:-100%;
-      background:
-        repeating-radial-gradient(circle,
-          rgba(180,255,255,.15) 0 1px,
-          transparent 2px 6px);
-      animation: warp-drift 1.2s linear infinite paused;
-      opacity:.35;
-    }
-
-    .warp-stars.fast{
-      animation-duration:.35s;
-      opacity:.55;
-    }
-
-    #warp.active .warp-stars{
-      animation-play-state: running;
-    }
-
-    @keyframes warp-drift{
-      from{ transform: scale(1) rotate(0deg); }
-      to{ transform: scale(2.8) rotate(0.001deg); }
-    }
-
-    /* Radial speed lines */
     .warp-lines{
       position:absolute;
       inset:0;
       background: 
         repeating-conic-gradient(
           from 0deg at 50% 50%,
-          transparent 0deg 8deg,
-          rgba(90,255,200,.08) 8deg 9deg
+          transparent 0deg 4deg,
+          rgba(255,0,102,.15) 4deg 5deg
         );
-      opacity:0;
-      animation: lines-in .6s ease-out forwards;
-      animation-play-state: paused;
+      animation: warp-spin 2s linear infinite paused;
     }
 
     #warp.active .warp-lines{
       animation-play-state: running;
     }
 
-    @keyframes lines-in{
-      from{ opacity:0; transform: scale(.8) rotate(0deg); }
-      to{ opacity:1; transform: scale(1.5) rotate(15deg); }
+    @keyframes warp-spin{
+      to{ transform: rotate(360deg) scale(3); }
     }
 
-    .warp-ui{
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      color:#dff7ff;
-      font-family: ui-sans-serif, system-ui;
-    }
-
-    .warp-content{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:8px;
-    }
-
-    .warp-title{
-      font-size: clamp(28px, 6vw, 56px);
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      text-shadow:
-        0 0 24px rgba(90,255,200,.55),
-        0 0 60px rgba(90,255,200,.25);
-      animation: flicker .8s steps(2,end) infinite;
-      opacity:0;
-      transform: scale(.9);
-    }
-
-    #warp.active .warp-title{
-      animation: title-in .3s ease-out forwards, flicker .8s steps(2,end) infinite .3s;
-    }
-
-    @keyframes title-in{
-      from{ opacity:0; transform: scale(.9); }
-      to{ opacity:1; transform: scale(1); }
-    }
-
-    .warp-sub{
-      font-size:12px;
-      letter-spacing:.28em;
-      opacity:0;
-      text-transform:uppercase;
-    }
-
-    #warp.active .warp-sub{
-      animation: sub-in .3s ease-out .15s forwards;
-    }
-
-    @keyframes sub-in{
-      from{ opacity:0; }
-      to{ opacity:.75; }
-    }
-
-    /* Ship silhouette */
-    .warp-ship{
-      width:80px;
-      height:80px;
-      margin-bottom:20px;
-      opacity:0;
-      filter: drop-shadow(0 0 20px rgba(90,255,200,.6));
-    }
-
-    #warp.active .warp-ship{
-      animation: ship-in .4s ease-out forwards;
-    }
-
-    @keyframes ship-in{
-      from{ opacity:0; transform: scale(.5) translateY(20px); }
-      to{ opacity:1; transform: scale(1) translateY(0); }
-    }
-
-    @keyframes flicker{
-      50%{ opacity:.55 }
-    }
-
-    /* Flash overlay */
     .warp-flash{
       position:absolute;
       inset:0;
-      background:#fff;
+      background: linear-gradient(45deg, var(--hot), var(--cyan));
       opacity:0;
-      pointer-events:none;
     }
 
     #warp.active .warp-flash{
-      animation: flash .3s ease-out .7s;
+      animation: flash 0.3s ease-out 0.6s;
     }
 
     @keyframes flash{
       0%{ opacity:0; }
-      30%{ opacity:.7; }
+      50%{ opacity:1; }
       100%{ opacity:0; }
+    }
+
+    .warp-text{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      font-size: clamp(36px, 8vw, 72px);
+      letter-spacing:.3em;
+      color: var(--hot);
+      text-shadow: 0 0 30px var(--hot), 0 0 60px var(--magenta);
+      opacity:0;
+    }
+
+    #warp.active .warp-text{
+      animation: warp-text-in .4s ease-out forwards;
+    }
+
+    @keyframes warp-text-in{
+      from{ opacity:0; transform: scale(0.5); }
+      to{ opacity:1; transform: scale(1); }
+    }
+
+    /* Decorative elements */
+    .deco-cross{
+      position:absolute;
+      width:20px; height:20px;
+      opacity:0.3;
+    }
+
+    .deco-cross::before,
+    .deco-cross::after{
+      content:"";
+      position:absolute;
+      background: var(--hot);
+    }
+
+    .deco-cross::before{
+      width:100%; height:2px;
+      top:50%; transform: translateY(-50%);
+    }
+
+    .deco-cross::after{
+      width:2px; height:100%;
+      left:50%; transform: translateX(-50%);
+    }
+
+    .deco-cross.tl{ top:20px; left:20px; }
+    .deco-cross.tr{ top:20px; right:20px; }
+    .deco-cross.bl{ bottom:20px; left:20px; }
+    .deco-cross.br{ bottom:20px; right:20px; }
+
+    /* Kill count decoration */
+    .kill-marks{
+      position:absolute;
+      bottom:28px; left:28px;
+      display:flex;
+      gap:6px;
+      opacity:0.4;
+    }
+
+    .kill-mark{
+      width:3px; height:16px;
+      background: var(--hot);
+    }
+
+    .kill-mark:nth-child(5n){
+      transform: rotate(-30deg);
+      margin-left:4px;
     }
   </style>
 </head>
-<body class="crt">
-  <div class="stars"></div>
-  <div class="stars2"></div>
-  <div class="stars3"></div>
+<body>
+  <div class="grime"></div>
 
   <div class="wrap">
-    <section class="panel" role="application" aria-label="Haslun Online Arcade">
-      <div class="panelTop">
+    <section class="panel">
+      <div class="glitch-bar"></div>
+      <div class="deco-cross tl"></div>
+      <div class="deco-cross tr"></div>
+      <div class="deco-cross bl"></div>
+      <div class="deco-cross br"></div>
+
+      <div class="header">
         <div class="brand">
-          <h1>Haslun.online</h1>
-          <p>An arcade hub for interactive projects. One cabinet live. More incoming.</p>
+          <h1>HASLUN.ONLINE</h1>
+          <p>Web arcade — experimental projects</p>
         </div>
-        <div class="coin">
-          <span class="dot"></span>
-          <span>INSERT COIN</span>
+        <div class="status">
+          <div class="status-dot"></div>
+          <span>ONLINE</span>
         </div>
       </div>
 
       <div class="grid">
         <div class="cabinet">
-          <div class="cabinetHeader">
-            <div class="cabinetTitle">
-              <strong>Space Capital</strong>
-              <span>Fleet command dashboard · web game</span>
-            </div>
-            <div class="pill">LIVE</div>
+          <div class="cabinet-label">CABINET 01</div>
+          <div class="game-title">SPACE CAPITAL</div>
+          <div class="game-sub">Fleet Command Dashboard · Live Telemetry</div>
+          <div class="game-desc">
+            A trading cockpit dressed as a retro space sim. Real market data drives ship personality. Your fleet remembers everything.
           </div>
-          <div class="cabinetBody">
-            <div class="mini">
-              You're entering a trading cockpit dressed as a retro space sim.
-              Telemetry drives ship personality. The universe remembers your fleet.
-            </div>
-            <div class="btnRow">
-              <a class="btn warp-trigger" href="./space-capital/">Launch</a>
-              <a class="btn alt warp-trigger" href="./space-capital/#hangar">Hangar</a>
-            </div>
+          <div class="btn-row">
+            <a class="btn btn-primary warp-trigger" href="./space-capital/">▶ LAUNCH</a>
+            <a class="btn btn-secondary warp-trigger" href="./space-capital/#hangar">◇ HANGAR</a>
+          </div>
+
+          <div class="kill-marks">
+            <div class="kill-mark"></div>
+            <div class="kill-mark"></div>
+            <div class="kill-mark"></div>
+            <div class="kill-mark"></div>
+            <div class="kill-mark"></div>
+            <div class="kill-mark"></div>
+            <div class="kill-mark"></div>
           </div>
         </div>
 
-        <aside class="side">
-          <div class="list">
-            <h2>Upcoming Cabinets</h2>
-            <a class="item warp-trigger" href="./space-capital/#battle">
+        <div class="side">
+          <div class="section">
+            <div class="section-title">× UPCOMING</div>
+            <a class="list-item wip warp-trigger" href="./space-capital/#battle">
               <span>Battle Arena</span>
               <small>WIP</small>
             </a>
-            <a class="item warp-trigger" href="./space-capital/#garage">
+            <a class="list-item wip warp-trigger" href="./space-capital/#garage">
               <span>Telemetry Lab</span>
               <small>WIP</small>
             </a>
-            <a class="item warp-trigger" href="./space-capital/#garage">
+            <a class="list-item wip warp-trigger" href="./space-capital/#garage">
               <span>Paint Bay</span>
               <small>WIP</small>
             </a>
           </div>
 
-          <div class="list">
-            <h2>Back to hubs</h2>
-            <a class="item" href="https://haslun.me"><span>Haslun.me</span><small>hub</small></a>
-            <a class="item" href="https://haslun.studio"><span>Haslun.studio</span><small>watercolors</small></a>
+          <div class="section">
+            <div class="section-title">◁ EXIT TO</div>
+            <a class="list-item" href="https://haslun.me">
+              <span>Haslun.me</span>
+              <small>HUB</small>
+            </a>
+            <a class="list-item" href="https://haslun.studio">
+              <span>Haslun.studio</span>
+              <small>ART</small>
+            </a>
           </div>
-        </aside>
+        </div>
       </div>
 
       <div class="footer">
-        <span>STATUS: greenline stable</span>
-        <span>v0.1 — arcade shell</span>
+        <span>SYS: GREENLINE</span>
+        <span>v0.1 — ARCADE SHELL</span>
       </div>
     </section>
   </div>
 
-  <!-- Warp Transition Overlay -->
-  <div id="warp" aria-hidden="true">
-    <div class="warp-stars"></div>
-    <div class="warp-stars fast"></div>
+  <!-- Warp overlay -->
+  <div id="warp">
     <div class="warp-lines"></div>
-    <div class="warp-ui">
-      <div class="warp-content">
-        <!-- Ship silhouette -->
-        <svg class="warp-ship" viewBox="0 0 64 64" fill="none">
-          <path d="M32 4L44 28L56 52H8L20 28L32 4Z" fill="rgba(90,255,200,.15)" stroke="rgba(90,255,200,.6)" stroke-width="1.5"/>
-          <path d="M32 12L40 28L46 44H18L24 28L32 12Z" fill="rgba(90,255,200,.1)" stroke="rgba(90,255,200,.4)" stroke-width="1"/>
-          <circle cx="32" cy="28" r="4" fill="rgba(90,255,200,.8)"/>
-          <path d="M26 44L32 60L38 44" stroke="rgba(255,200,100,.6)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <div class="warp-title">SPACE CAPITAL</div>
-        <div class="warp-sub">ENGAGING WARP DRIVE</div>
-      </div>
-    </div>
+    <div class="warp-text">WARPING</div>
     <div class="warp-flash"></div>
   </div>
 
   <script>
-    // Warp launcher - triggers on any link with warp-trigger class
     document.querySelectorAll('.warp-trigger').forEach(link => {
       link.addEventListener('click', e => {
         e.preventDefault();
-        const targetHref = link.href;
-        
-        const warp = document.getElementById('warp');
-        warp.classList.add('active');
-        
-        // Coin indicator changes
-        const dot = document.querySelector('.dot');
-        const coinText = document.querySelector('.coin span:last-child');
-        if (dot) {
-          dot.style.background = 'var(--accent)';
-          dot.style.boxShadow = '0 0 18px rgba(90,255,200,.5)';
-        }
-        if (coinText) {
-          coinText.textContent = 'WARPING...';
-        }
-
-        // Redirect after animation completes
-        setTimeout(() => {
-          window.location.href = targetHref;
-        }, 950);
+        const target = link.href;
+        document.getElementById('warp').classList.add('active');
+        setTimeout(() => window.location.href = target, 800);
       });
     });
   </script>

@@ -188,9 +188,118 @@
 .bey-readout {
   font-family: 'VT323', 'IBM Plex Mono', monospace;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.4;
   color: rgba(255, 255, 255, 0.85);
-  white-space: pre-line;
+}
+
+/* Pilot Header */
+.pilot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 0, 102, 0.3);
+}
+
+.pilot-ticker {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.bey-panel.left .pilot-ticker {
+  color: var(--arena-hot-magenta);
+}
+
+.bey-panel.right .pilot-ticker {
+  color: var(--arena-toxic-cyan);
+}
+
+.pilot-status {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.pilot-status.ok {
+  background: rgba(170, 255, 0, 0.2);
+  color: var(--arena-acid-lime);
+  border: 1px solid var(--arena-acid-lime);
+}
+
+.pilot-status.warning {
+  background: rgba(255, 200, 0, 0.2);
+  color: #ffcc00;
+  border: 1px solid #ffcc00;
+}
+
+.pilot-status.critical {
+  background: rgba(255, 0, 102, 0.3);
+  color: var(--arena-hot-magenta);
+  border: 1px solid var(--arena-hot-magenta);
+  animation: criticalPulse 0.5s ease-in-out infinite;
+}
+
+.pilot-status.dead {
+  background: rgba(100, 0, 50, 0.5);
+  color: #666;
+  border: 1px solid #444;
+}
+
+@keyframes criticalPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pilot-regime {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+/* Stat Rows */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+}
+
+/* Stat Bars */
+.stat-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  height: 100%;
+  transition: width 0.15s ease-out;
+  box-shadow: 0 0 8px currentColor;
 }
 
 /* Stat emphasis */

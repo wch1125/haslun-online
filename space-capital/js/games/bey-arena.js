@@ -1,8 +1,11 @@
 // =========================================================================
-// BEY ARENA — Illegal Spin Pit in a Backwoods Space Bar
+// BEY ARENA v2 — MACD Chart Arena
 // 
-// Hotline Miami aesthetic: aggressive, unstable, dangerous, gritty
-// Containment field combat, not bouncy physics demo
+// The arena boundaries ARE the price data:
+// - Top boundary = Player A's MACD curve
+// - Bottom boundary = Player B's MACD curve  
+// - Signal crossovers create emanation zones (boost/hazard)
+// - Ships battle between the two charts
 // =========================================================================
 
 (function() {
@@ -11,10 +14,6 @@
   // --- Utilities ---
   const clamp01 = (x) => Math.max(0, Math.min(1, x));
   const clamp = (x, min, max) => Math.max(min, Math.min(max, x));
-  const len = (v) => Math.hypot(v.x, v.y);
-  const norm = (v) => { const l = len(v) || 1; return { x: v.x / l, y: v.y / l }; };
-  const dot = (a, b) => a.x * b.x + a.y * b.y;
-  const perp = (v) => ({ x: -v.y, y: v.x });
   const lerp = (a, b, t) => a + (b - a) * t;
   const rand = (min, max) => min + Math.random() * (max - min);
   const randInt = (min, max) => Math.floor(rand(min, max + 1));
@@ -29,403 +28,257 @@
     toxicCyan: '#00ffcc',
     warnYellow: '#fff04a',
     deepBlack: '#0a0008',
-    rust: '#8b4513',
-    neonBlue: '#4488ff'
+    bullGreen: '#00ff88',
+    bearOrange: '#ff6633'
   };
   
   // =========================================================================
-  // FX SYSTEM — More aggressive, Hotline Miami style
+  // MACD CURVE GENERATOR
+  // Generate smooth MACD-like curves from telemetry stats
+  // =========================================================================
+  function generateMACDCurve(telemetry, numPoints = 60) {
+    const points = [];
+    const volatility = telemetry.chopSensitivity || 0.5;
+    const persistence = telemetry.macdPersistence || 0.5;
+    const trendStrength = telemetry.trendAdherence || 0.5;
+    
+    // Generate base wave with multiple frequencies
+    let value = 0;
+    let velocity = rand(-0.02, 0.02);
+    const noise = [];
+    
+    // Pre-generate noise for smoothness
+    for (let i = 0; i < numPoints; i++) {
+      noise.push(rand(-1, 1));
+    }
+    
+    // Smooth the noise
+    for (let pass = 0; pass < 3; pass++) {
+      for (let i = 1; i < numPoints - 1; i++) {
+        noise[i] = noise[i] * 0.5 + (noise[i-1] + noise[i+1]) * 0.25;
+      }
+    }
+    
+    for (let i = 0; i < numPoints; i++) {
+      // Trend component
+      const trendWave = Math.sin(i * 0.1 * (1 + persistence)) * trendStrength * 0.3;
+      
+      // Oscillation component  
+      const oscWave = Math.sin(i * 0.3 * (1 + volatility * 2)) * volatility * 0.2;
+      
+      // Noise component
+      const noiseComponent = noise[i] * volatility * 0.15;
+      
+      // Random walk component
+      velocity += rand(-0.01, 0.01) * volatility;
+      velocity *= 0.95; // damping
+      value += velocity;
+      value *= 0.98; // mean reversion
+      
+      const finalValue = clamp(
+        trendWave + oscWave + noiseComponent + value,
+        -0.8, 0.8
+      );
+      
+      points.push(finalValue);
+    }
+    
+    return points;
+  }
+  
+  // Detect crossover points (where curve crosses zero)
+  function detectCrossovers(curve) {
+    const crossovers = [];
+    for (let i = 1; i < curve.length; i++) {
+      if ((curve[i-1] < 0 && curve[i] >= 0) || (curve[i-1] >= 0 && curve[i] < 0)) {
+        crossovers.push({
+          index: i,
+          x: i / curve.length,
+          bullish: curve[i] > curve[i-1], // crossing up = bullish
+          strength: Math.abs(curve[i] - curve[i-1]) * 5
+        });
+      }
+    }
+    return crossovers;
+  }
+  
+  // =========================================================================
+  // FX SYSTEM
   // =========================================================================
   function FXSystem() {
     this.particles = [];
     this.sparks = [];
-    this.rings = [];
     this.pops = [];
-    this.shake = { amp: 0, time: 0, trauma: 0 };
+    this.shake = { amp: 0, time: 0 };
     this.trails = new Map();
     this.screenFlash = { color: null, alpha: 0 };
-    this.chromatic = 0;
-    this.slowmo = 1.0;
-    this.burnMarks = [];
   }
   
-  FXSystem.prototype.addShake = function(amp, trauma = 0) {
-    this.shake.amp = Math.min(32, this.shake.amp + amp);
-    this.shake.trauma = Math.min(1, this.shake.trauma + trauma);
-    this.shake.time = 0.2;
+  FXSystem.prototype.addShake = function(amp) {
+    this.shake.amp = Math.min(20, this.shake.amp + amp);
+    this.shake.time = 0.15;
   };
   
-  FXSystem.prototype.flash = function(color, intensity = 0.6) {
+  FXSystem.prototype.flash = function(color, intensity = 0.4) {
     this.screenFlash.color = color;
     this.screenFlash.alpha = intensity;
-  };
-  
-  FXSystem.prototype.addChromatic = function(intensity = 0.3) {
-    this.chromatic = Math.min(1, this.chromatic + intensity);
-  };
-  
-  FXSystem.prototype.hitPause = function(duration = 0.05) {
-    this.slowmo = 0.1;
-    setTimeout(() => { this.slowmo = 1.0; }, duration * 1000);
   };
   
   FXSystem.prototype.pushTrail = function(id, x, y, color) {
     let arr = this.trails.get(id);
     if (!arr) { arr = []; this.trails.set(id, arr); }
-    arr.push({ x, y, life: 0.35, color });
-    if (arr.length > 28) arr.shift();
+    arr.push({ x, y, life: 0.3, color });
+    if (arr.length > 20) arr.shift();
   };
   
-  FXSystem.prototype.edgeScrape = function(x, y, normal, intensity) {
-    const count = Math.floor(5 + intensity * 20);
-    const tangent = perp(normal);
-    
-    for (let i = 0; i < count; i++) {
-      const spread = rand(-0.6, 0.6);
-      const dir = { 
-        x: tangent.x * spread + normal.x * rand(-0.3, 0.1),
-        y: tangent.y * spread + normal.y * rand(-0.3, 0.1)
-      };
-      const spd = rand(200, 600) * (0.5 + intensity);
-      
-      this.sparks.push({
-        x, y,
-        vx: dir.x * spd,
-        vy: dir.y * spd,
-        life: rand(0.15, 0.4),
-        drag: rand(3, 8),
-        size: rand(1.5, 4),
-        color: Math.random() < 0.7 ? COLORS.burntOrange : COLORS.acidLime
-      });
-    }
-    
-    if (Math.random() < 0.3) {
-      this.burnMarks.push({ x, y, alpha: 0.8, size: rand(8, 20) });
-      if (this.burnMarks.length > 30) this.burnMarks.shift();
-    }
-    
-    this.addShake(3 + intensity * 6, intensity * 0.15);
-  };
-  
-  FXSystem.prototype.impact = function(x, y, impact01) {
-    const s = clamp01(impact01);
-    const count = Math.floor(12 + s * 40);
-    
-    this.rings.push({ 
-      x, y, r: 8, grow: 600 + 800 * s, life: 0.15 + 0.12 * s, 
-      color: s > 0.6 ? COLORS.violentPink : COLORS.burntOrange,
-      alpha: 0.9
-    });
-    
-    this.rings.push({
-      x, y, r: 4, grow: 400, life: 0.08,
-      color: '#ffffff',
-      alpha: 1
-    });
-    
+  FXSystem.prototype.impact = function(x, y, intensity) {
+    const count = Math.floor(8 + intensity * 20);
     for (let i = 0; i < count; i++) {
       const ang = rand(0, Math.PI * 2);
-      const spd = rand(180, 800) * (0.5 + s);
+      const spd = rand(100, 400) * intensity;
       this.sparks.push({
         x, y,
         vx: Math.cos(ang) * spd,
         vy: Math.sin(ang) * spd,
-        life: rand(0.12, 0.35),
-        drag: rand(5, 12),
-        size: rand(1.5, 4),
-        color: Math.random() < 0.5 ? COLORS.violentPink : 
-               Math.random() < 0.5 ? COLORS.burntOrange : '#ffffff'
+        life: rand(0.1, 0.3),
+        size: rand(1, 3),
+        color: Math.random() < 0.5 ? COLORS.violentPink : COLORS.burntOrange
       });
     }
-    
-    if (Math.random() < (0.35 + 0.4 * s)) {
-      const words = s > 0.6 
-        ? ["CRUNCH!!", "DESTROY!!", "WRECK!!", "BRUTAL!!", "SAVAGE!!"]
-        : ["CLANG!", "KRAK!", "BAM!", "HIT!", "SMASH!"];
-      this.popText(x + rand(-20, 20), y - 30, 
-        words[randInt(0, words.length - 1)], 
-        1.2 + 0.6 * s, true);
-    }
-    
-    this.addShake(5 + 14 * s, s * 0.2);
-    this.flash(COLORS.violentPink, 0.15 + s * 0.25);
-    this.addChromatic(s * 0.4);
-    
-    if (s > 0.5) this.hitPause(0.03 + s * 0.04);
+    this.addShake(3 + intensity * 8);
   };
   
-  FXSystem.prototype.burst = function(x, y, ticker) {
-    this.flash('#ffffff', 0.7);
-    this.addChromatic(0.8);
-    this.hitPause(0.12);
-    
-    for (let i = 0; i < 3; i++) {
-      setTimeout(() => {
-        this.rings.push({ 
-          x, y, r: 15 + i * 20, grow: 1400 - i * 200, life: 0.25, 
-          color: i === 0 ? '#ffffff' : COLORS.hotMagenta,
-          alpha: 1 - i * 0.2
-        });
-      }, i * 30);
-    }
-    
-    for (let i = 0; i < 150; i++) {
+  FXSystem.prototype.emanationHit = function(x, y, bullish) {
+    const color = bullish ? COLORS.bullGreen : COLORS.bearOrange;
+    for (let i = 0; i < 12; i++) {
       const ang = rand(0, Math.PI * 2);
-      const spd = rand(300, 1200);
+      const spd = rand(50, 150);
       this.sparks.push({
         x, y,
         vx: Math.cos(ang) * spd,
         vy: Math.sin(ang) * spd,
-        life: rand(0.2, 0.6),
-        drag: rand(4, 10),
-        size: rand(2, 6),
-        color: Math.random() < 0.4 ? '#ffffff' :
-               Math.random() < 0.5 ? COLORS.hotMagenta : COLORS.burntOrange
+        life: rand(0.2, 0.4),
+        size: rand(2, 4),
+        color
       });
     }
-    
-    this.addShake(24, 0.8);
-    this.banner("BURST FINISH!!", COLORS.warnYellow);
-    this.popText(x, y - 60, ticker, 2.5, false);
-    
-    if (window.MechSFX) {
-      window.MechSFX.alert(900, 220, 0.32);
-      window.MechSFX.bassHit(54, 0.18);
-    }
+    this.flash(color, 0.2);
   };
   
-  FXSystem.prototype.ringOut = function(x, y, ticker) {
-    this.flash(COLORS.hotMagenta, 0.5);
-    this.addChromatic(0.6);
-    
-    this.rings.push({ 
-      x, y, r: 20, grow: 1600, life: 0.22,
-      color: COLORS.hotMagenta,
-      alpha: 0.9
-    });
-    
-    this.addShake(18, 0.5);
-    this.banner("RING OUT!!", COLORS.hotMagenta);
-    this.popText(x, y + 20, "EJECT!!", 1.8, true);
-    
-    if (window.MechSFX) window.MechSFX.alert(760, 240, 0.28);
-  };
-  
-  FXSystem.prototype.spinOut = function(x, y, ticker) {
-    this.flash(COLORS.burntOrange, 0.3);
-    this.addShake(12, 0.3);
-    this.banner("OUT OF SPIN!!", COLORS.burntOrange);
-    this.popText(x, y - 40, "DEAD", 2.0, false);
-    
-    if (window.MechSFX) window.MechSFX.synthStab(220, 0.12);
-  };
-  
-  FXSystem.prototype.popText = function(x, y, text, scale, jitter) {
+  FXSystem.prototype.popText = function(x, y, text, scale, color) {
     this.pops.push({ 
-      x, y, text, life: 0.7, float: 80, scale: scale || 1.2, 
-      banner: false, jitter: !!jitter,
-      color: '#ffffff'
-    });
-  };
-  
-  FXSystem.prototype.banner = function(text, color = COLORS.warnYellow) {
-    this.pops.push({ 
-      x: 0, y: 0, text, life: 1.2, float: 0, scale: 2.2, 
-      banner: true, jitter: false, color
+      x, y, text, life: 0.8, scale: scale || 1, 
+      color: color || '#ffffff'
     });
   };
   
   FXSystem.prototype.update = function(dt) {
-    const adt = dt * this.slowmo;
+    this.shake.time -= dt;
+    if (this.shake.time < 0) this.shake.amp *= 0.85;
     
-    for (const p of this.sparks) {
-      p.vx *= Math.exp(-p.drag * adt);
-      p.vy *= Math.exp(-p.drag * adt);
-      p.x += p.vx * adt;
-      p.y += p.vy * adt;
-      p.life -= adt;
+    this.screenFlash.alpha *= 0.9;
+    
+    for (const spark of this.sparks) {
+      spark.x += spark.vx * dt;
+      spark.y += spark.vy * dt;
+      spark.vx *= 0.95;
+      spark.vy *= 0.95;
+      spark.life -= dt;
     }
-    this.sparks = this.sparks.filter(p => p.life > 0);
+    this.sparks = this.sparks.filter(s => s.life > 0);
     
-    for (const r of this.rings) {
-      r.r += r.grow * adt;
-      r.life -= adt;
+    for (const p of this.pops) {
+      p.life -= dt;
+      p.y -= 40 * dt;
     }
-    this.rings = this.rings.filter(r => r.life > 0);
+    this.pops = this.pops.filter(p => p.life > 0);
     
-    for (const t of this.pops) {
-      t.y -= t.float * adt;
-      t.life -= adt;
+    for (const [id, arr] of this.trails) {
+      for (const t of arr) t.life -= dt;
+      this.trails.set(id, arr.filter(t => t.life > 0));
     }
-    this.pops = this.pops.filter(t => t.life > 0);
-    
-    if (this.shake.time > 0) {
-      this.shake.time -= dt;
-      this.shake.amp *= Math.exp(-20 * dt);
-      this.shake.trauma *= Math.exp(-3 * dt);
-    } else {
-      this.shake.amp = 0;
-      this.shake.trauma *= Math.exp(-5 * dt);
-    }
-    
-    this.screenFlash.alpha *= Math.exp(-12 * dt);
-    if (this.screenFlash.alpha < 0.01) this.screenFlash.alpha = 0;
-    
-    this.chromatic *= Math.exp(-6 * dt);
-    
-    for (const [id, arr] of this.trails.entries()) {
-      for (const pt of arr) pt.life -= adt;
-      const kept = arr.filter(pt => pt.life > 0);
-      if (kept.length) this.trails.set(id, kept);
-      else this.trails.delete(id);
-    }
-    
-    for (const b of this.burnMarks) {
-      b.alpha *= 0.998;
-    }
-    this.burnMarks = this.burnMarks.filter(b => b.alpha > 0.05);
   };
   
   FXSystem.prototype.getShakeOffset = function() {
-    if (this.shake.amp <= 0.5) return { x: 0, y: 0, rot: 0 };
-    const trauma = this.shake.trauma;
-    const amp = this.shake.amp * (1 + trauma * 2);
+    if (this.shake.amp < 0.5) return { x: 0, y: 0 };
     return {
-      x: (Math.random() - 0.5) * amp * 2,
-      y: (Math.random() - 0.5) * amp * 2,
-      rot: (Math.random() - 0.5) * trauma * 0.05
+      x: (Math.random() - 0.5) * this.shake.amp,
+      y: (Math.random() - 0.5) * this.shake.amp
     };
   };
   
-  FXSystem.prototype.drawTrails = function(ctx) {
-    for (const arr of this.trails.values()) {
-      ctx.save();
-      for (let i = 0; i < arr.length; i++) {
-        const pt = arr[i];
-        const a = clamp01(pt.life / 0.35) * (i / arr.length);
-        ctx.globalAlpha = a * 0.5;
-        ctx.fillStyle = pt.color || COLORS.violentPink;
+  FXSystem.prototype.draw = function(ctx) {
+    // Draw trails
+    for (const [id, arr] of this.trails) {
+      for (const t of arr) {
+        ctx.globalAlpha = t.life * 0.6;
+        ctx.fillStyle = t.color;
         ctx.beginPath();
-        ctx.arc(pt.x, pt.y, 6 * a + 2, 0, Math.PI * 2);
+        ctx.arc(t.x, t.y, 4, 0, Math.PI * 2);
         ctx.fill();
       }
-      ctx.restore();
-    }
-  };
-  
-  FXSystem.prototype.drawBurnMarks = function(ctx) {
-    for (const b of this.burnMarks) {
-      ctx.save();
-      ctx.globalAlpha = b.alpha * 0.6;
-      ctx.fillStyle = COLORS.bloodShadow;
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-  
-  FXSystem.prototype.draw = function(ctx, center) {
-    for (const r of this.rings) {
-      const a = clamp01(r.life * 8) * r.alpha;
-      ctx.save();
-      ctx.globalAlpha = a;
-      ctx.strokeStyle = r.color;
-      ctx.lineWidth = 4 * a;
-      ctx.shadowColor = r.color;
-      ctx.shadowBlur = 20;
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
     }
     
-    for (const p of this.sparks) {
-      const a = clamp01(p.life * 4);
-      ctx.save();
-      ctx.globalAlpha = a;
+    // Draw sparks
+    for (const s of this.sparks) {
+      ctx.globalAlpha = s.life * 2;
+      ctx.fillStyle = s.color;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    // Draw pop text
+    for (const p of this.pops) {
+      ctx.globalAlpha = p.life;
+      ctx.font = `bold ${Math.floor(16 * p.scale)}px "VT323", monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#000';
+      ctx.fillText(p.text, p.x + 2, p.y + 2);
       ctx.fillStyle = p.color;
       ctx.shadowColor = p.color;
-      ctx.shadowBlur = 8;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * a, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+      ctx.shadowBlur = 10;
+      ctx.fillText(p.text, p.x, p.y);
+      ctx.shadowBlur = 0;
     }
     
-    for (const t of this.pops) {
-      const a = clamp01(t.life * 2);
-      ctx.save();
-      ctx.globalAlpha = a;
-      
-      const s = Math.floor(20 * t.scale);
-      ctx.font = `bold ${s}px "VT323", Orbitron, monospace`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      
-      let tx = t.banner ? center.x : t.x;
-      let ty = t.banner ? center.y - 80 : t.y;
-      
-      if (t.jitter) {
-        tx += (Math.random() - 0.5) * 6;
-        ty += (Math.random() - 0.5) * 6;
-      }
-      
-      ctx.fillStyle = COLORS.deepBlack;
-      ctx.fillText(t.text, tx + 3, ty + 3);
-      ctx.fillText(t.text, tx + 2, ty + 2);
-      
-      ctx.shadowColor = t.color;
-      ctx.shadowBlur = t.banner ? 20 : 12;
-      ctx.fillStyle = t.color;
-      ctx.fillText(t.text, tx, ty);
-      
-      ctx.restore();
-    }
+    ctx.globalAlpha = 1;
     
+    // Screen flash
     if (this.screenFlash.alpha > 0.01) {
-      ctx.save();
       ctx.globalAlpha = this.screenFlash.alpha;
-      ctx.fillStyle = this.screenFlash.color || '#ffffff';
+      ctx.fillStyle = this.screenFlash.color || '#fff';
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.restore();
+      ctx.globalAlpha = 1;
     }
   };
   
   // =========================================================================
-  // SPINNER CREATION
+  // SHIP CREATION
   // =========================================================================
-  function spinnerFromTicker(ticker, idx) {
-    const t = (window.ShipTelemetry && window.ShipTelemetry.getTelemetry)
+  function createShip(ticker, isTop) {
+    const tele = (window.ShipTelemetry && window.ShipTelemetry.getTelemetry)
       ? window.ShipTelemetry.getTelemetry(ticker)
-      : (window.ShipTelemetry && window.ShipTelemetry._TELEMETRY && window.ShipTelemetry._TELEMETRY[ticker])
-        ? window.ShipTelemetry._TELEMETRY[ticker]
-        : null;
+      : { thrustPotential: 0.5, maneuverStability: 0.5, hullResilience: 0.5, 
+          chopSensitivity: 0.5, signalClarity: 0.5, macdPersistence: 0.5,
+          trendAdherence: 0.5, regimeBias: 'range' };
     
-    const tele = Object.assign({
+    const telemetry = Object.assign({
       thrustPotential: 0.5,
       maneuverStability: 0.5,
       hullResilience: 0.5,
       chopSensitivity: 0.5,
       signalClarity: 0.5,
-      volumeReliability: 0.6,
+      macdPersistence: 0.5,
+      trendAdherence: 0.5,
       regimeBias: 'range'
-    }, t || {});
+    }, tele || {});
     
-    const vr = tele.volumeReliability ?? 0.6;
-    const mass = 0.8 + 1.4 * (0.75 * tele.hullResilience + 0.25 * vr);
-    const radius = 20 + 10 * (0.6 * tele.hullResilience + 0.4 * (1 - tele.maneuverStability));
-    const omega0 = 12 + 40 * tele.thrustPotential;
-    const vmax = 140 + 280 * (0.55 * tele.thrustPotential + 0.45 * (1 - tele.chopSensitivity));
+    // Generate MACD curve for this ship
+    const macdCurve = generateMACDCurve(telemetry, 60);
+    const crossovers = detectCrossovers(macdCurve);
     
-    const stability = clamp01(
-      0.55 * tele.maneuverStability +
-      0.25 * tele.signalClarity +
-      0.20 * vr -
-      0.35 * tele.chopSensitivity
-    );
-    
-    let shipColor = COLORS.violentPink;
+    let shipColor = isTop ? COLORS.hotMagenta : COLORS.toxicCyan;
     if (window.ShipRegistry && window.ShipRegistry.isReady()) {
       const ship = window.ShipRegistry.get(ticker);
       if (ship) shipColor = ship.color;
@@ -434,91 +287,33 @@
     const spritePath = (window.SHIP_SPRITES && window.SHIP_SPRITES[ticker]) || null;
     
     return {
-      id: `${ticker}_${idx}`,
       ticker,
-      telemetry: tele,
-      mass,
-      radius,
-      vmax,
-      omega0,
-      stability,
-      position: { x: 0, y: 0 },
-      velocity: { x: 0, y: 0 },
-      omega: omega0,
-      integrity: 1.0,
-      coherence: 1.0,
-      angle: Math.random() * Math.PI * 2,
-      alive: true,
-      edgeTime: 0,
+      telemetry,
+      isTop,
+      macdCurve,
+      crossovers,
+      color: shipColor,
       spritePath,
       spriteImg: null,
-      color: shipColor
-    };
-  }
-  
-  // =========================================================================
-  // COLLISION RESOLUTION
-  // =========================================================================
-  function resolveCollision(a, b) {
-    if (!a.alive || !b.alive) return null;
-    
-    const dx = a.position.x - b.position.x;
-    const dy = a.position.y - b.position.y;
-    const dist = Math.hypot(dx, dy);
-    const minDist = a.radius + b.radius;
-    if (dist >= minDist || dist === 0) return null;
-    
-    const n = { x: dx / dist, y: dy / dist };
-    const rv = { x: a.velocity.x - b.velocity.x, y: a.velocity.y - b.velocity.y };
-    const vn = dot(rv, n);
-    
-    const penetration = minDist - dist;
-    const totalInvMass = 1 / a.mass + 1 / b.mass;
-    a.position.x += n.x * penetration * (1 / a.mass) / totalInvMass;
-    a.position.y += n.y * penetration * (1 / a.mass) / totalInvMass;
-    b.position.x -= n.x * penetration * (1 / b.mass) / totalInvMass;
-    b.position.y -= n.y * penetration * (1 / b.mass) / totalInvMass;
-    
-    if (vn > 0) return null;
-    
-    const Sa = a.stability, Sb = b.stability;
-    const e = 0.2 + 0.5 * clamp01((Sa + Sb) * 0.5);
-    
-    const j = -(1 + e) * vn / totalInvMass;
-    
-    a.velocity.x += (j * n.x) / a.mass;
-    a.velocity.y += (j * n.y) / a.mass;
-    b.velocity.x -= (j * n.x) / b.mass;
-    b.velocity.y -= (j * n.y) / b.mass;
-    
-    const t = perp(n);
-    const vt = dot(rv, t);
-    const mu = 0.03 + 0.15 * (0.5 * (1 - Sa) + 0.5 * (1 - Sb));
-    const jt = clamp(-vt / totalInvMass, -mu * Math.abs(j), mu * Math.abs(j));
-    
-    a.velocity.x += (jt * t.x) / a.mass;
-    a.velocity.y += (jt * t.y) / a.mass;
-    b.velocity.x -= (jt * t.x) / b.mass;
-    b.velocity.y -= (jt * t.y) / b.mass;
-    
-    const impact01 = clamp01(Math.abs(j) / 2.5);
-    
-    const damageA = impact01 * (0.08 + 0.12 * (1 - a.telemetry.hullResilience));
-    const damageB = impact01 * (0.08 + 0.12 * (1 - b.telemetry.hullResilience));
-    
-    a.integrity = Math.max(0, a.integrity - damageA);
-    b.integrity = Math.max(0, b.integrity - damageB);
-    
-    const spinLoss = (s) => impact01 * (1 + 2 * (1 - s.telemetry.hullResilience));
-    a.omega = Math.max(0, a.omega - spinLoss(a));
-    b.omega = Math.max(0, b.omega - spinLoss(b));
-    
-    return {
-      x: (a.position.x + b.position.x) * 0.5,
-      y: (a.position.y + b.position.y) * 0.5,
-      impact01,
-      burstA: a.integrity <= 0,
-      burstB: b.integrity <= 0
+      
+      // Physics
+      x: 0, y: 0,
+      vx: rand(-50, 50),
+      vy: rand(-30, 30),
+      radius: 22 + 8 * telemetry.hullResilience,
+      mass: 1 + telemetry.hullResilience,
+      
+      // State
+      integrity: 1.0,
+      spin: 1.0,
+      energy: 1.0,
+      alive: true,
+      angle: 0,
+      
+      // Derived stats
+      maxSpeed: 150 + 200 * telemetry.thrustPotential,
+      stability: 0.3 + 0.7 * telemetry.maneuverStability,
+      volatility: telemetry.chopSensitivity
     };
   }
   
@@ -533,18 +328,19 @@
     raf: null,
     lastTime: 0,
     
-    center: { x: 0, y: 0 },
-    arenaRadius: 220,
+    // Arena bounds
+    arenaLeft: 0,
+    arenaRight: 0,
+    arenaTop: 100,
+    arenaBottom: 420,
+    chartHeight: 80,
+    bufferZone: 60,
     
+    ships: [],
     fx: new FXSystem(),
-    spinners: [],
-    
-    ringInstability: 0,
     fightTime: 0,
-    ringSegments: [],
-    crowd: [],
-    envFlicker: 0,
-    neonPhase: 0,
+    phase: 'countdown', // 'countdown', 'fighting', 'ended'
+    countdown: 3,
     
     init() {
       this.overlay = document.getElementById('bey-arena-overlay');
@@ -560,10 +356,8 @@
       
       const swapBtn = document.getElementById('bey-arena-swap');
       if (swapBtn) swapBtn.onclick = () => {
-        if (this.spinners.length >= 2) {
-          const a = this.spinners[0].ticker;
-          const b = this.spinners[1].ticker;
-          this.start(b, a);
+        if (this.ships.length >= 2) {
+          this.start(this.ships[1].ticker, this.ships[0].ticker);
         }
       };
       
@@ -575,71 +369,18 @@
       
       this.resizeCanvas();
       window.addEventListener('resize', () => this.resizeCanvas());
-      
-      this.generateRingSegments();
-      this.generateCrowd();
     },
     
     resizeCanvas() {
-      const cssW = this.canvas.clientWidth || 520;
-      const cssH = this.canvas.clientHeight || 520;
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      this.canvas.width = Math.floor(cssW * dpr);
-      this.canvas.height = Math.floor(cssH * dpr);
-      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (!this.canvas) return;
+      const rect = this.canvas.getBoundingClientRect();
+      this.canvas.width = rect.width || 520;
+      this.canvas.height = rect.height || 520;
       
-      this.center = { x: cssW / 2, y: cssH / 2 };
-      this.arenaRadius = Math.min(cssW, cssH) * 0.40;
-    },
-    
-    generateRingSegments() {
-      this.ringSegments = [];
-      const numSegments = randInt(8, 14);
-      let angle = rand(0, 0.5);
-      
-      for (let i = 0; i < numSegments; i++) {
-        const arcLen = rand(0.3, 0.8);
-        const gap = rand(0.05, 0.2);
-        const broken = Math.random() < 0.2;
-        const flickerRate = rand(2, 8);
-        
-        this.ringSegments.push({
-          startAngle: angle,
-          arcLength: arcLen,
-          broken,
-          flickerRate,
-          flickerPhase: rand(0, Math.PI * 2),
-          drift: rand(-0.02, 0.02),
-          radiusOffset: rand(-5, 5)
-        });
-        
-        angle += arcLen + gap;
-      }
-    },
-    
-    generateCrowd() {
-      this.crowd = [];
-      const positions = [
-        { x: 0.08, y: 0.3, scale: 0.8 },
-        { x: 0.12, y: 0.5, scale: 1.0 },
-        { x: 0.05, y: 0.7, scale: 0.7 },
-        { x: 0.92, y: 0.35, scale: 0.9 },
-        { x: 0.88, y: 0.55, scale: 1.1 },
-        { x: 0.95, y: 0.75, scale: 0.75 },
-        { x: 0.3, y: 0.92, scale: 0.6 },
-        { x: 0.7, y: 0.95, scale: 0.65 },
-      ];
-      
-      for (const p of positions) {
-        this.crowd.push({
-          x: p.x,
-          y: p.y,
-          scale: p.scale,
-          bobPhase: rand(0, Math.PI * 2),
-          bobSpeed: rand(1.5, 3),
-          type: randInt(0, 2)
-        });
-      }
+      this.arenaLeft = 40;
+      this.arenaRight = this.canvas.width - 40;
+      this.arenaTop = this.chartHeight + this.bufferZone;
+      this.arenaBottom = this.canvas.height - this.chartHeight - this.bufferZone;
     },
     
     open(tickerA, tickerB) {
@@ -655,69 +396,135 @@
       if (this.raf) cancelAnimationFrame(this.raf);
     },
     
-    rematch() {
-      if (this.spinners.length >= 2) {
-        this.start(this.spinners[0].ticker, this.spinners[1].ticker);
-      }
-    },
-    
     start(tickerA, tickerB) {
-      this.fx = new FXSystem();
-      this.ringInstability = 0;
-      this.fightTime = 0;
-      this.generateRingSegments();
+      this.resizeCanvas();
       
-      const sA = spinnerFromTicker(tickerA, 0);
-      const sB = spinnerFromTicker(tickerB, 1);
+      // Create ships
+      const shipA = createShip(tickerA, true);
+      const shipB = createShip(tickerB, false);
       
-      const offset = this.arenaRadius * 0.55;
-      sA.position = { x: this.center.x - offset, y: this.center.y };
-      sB.position = { x: this.center.x + offset, y: this.center.y };
+      // Starting positions
+      const centerX = (this.arenaLeft + this.arenaRight) / 2;
+      const centerY = (this.arenaTop + this.arenaBottom) / 2;
       
-      sA.velocity = { x: rand(60, 120), y: rand(-40, 40) };
-      sB.velocity = { x: rand(-120, -60), y: rand(-40, 40) };
+      shipA.x = centerX - 80;
+      shipA.y = centerY - 40;
+      shipB.x = centerX + 80;
+      shipB.y = centerY + 40;
       
-      this.spinners = [sA, sB];
+      this.ships = [shipA, shipB];
       
-      for (const s of this.spinners) {
-        if (s.spritePath) {
+      // Load sprites
+      for (const ship of this.ships) {
+        if (ship.spritePath) {
           const img = new Image();
-          img.src = s.spritePath;
-          img.onload = () => { s.spriteImg = img; };
+          img.onload = () => { ship.spriteImg = img; };
+          img.src = ship.spritePath;
         }
       }
       
-      this.setBanner(`${tickerA} vs ${tickerB}`);
+      this.fx = new FXSystem();
+      this.fightTime = 0;
+      this.phase = 'countdown';
+      this.countdown = 3;
+      
+      this.setBanner(`${tickerA} VS ${tickerB}`);
+      this.updateSidePanels();
+      
       this.active = true;
       this.lastTime = performance.now();
-      this.raf = requestAnimationFrame((t) => this.loop(t));
-      
-      this.updateSidePanels();
+      this.loop(this.lastTime);
+    },
+    
+    rematch() {
+      if (this.ships.length >= 2) {
+        this.start(this.ships[0].ticker, this.ships[1].ticker);
+      }
     },
     
     setBanner(text) {
-      const el = document.getElementById('bey-arena-banner');
-      if (el) el.textContent = text;
+      const banner = document.getElementById('bey-arena-banner');
+      if (banner) banner.textContent = text;
     },
     
     updateSidePanels() {
-      const left = document.getElementById('bey-pilot-left');
-      const right = document.getElementById('bey-pilot-right');
-      if (!left || !right || this.spinners.length < 2) return;
+      const left = document.getElementById('bey-left-readout');
+      const right = document.getElementById('bey-right-readout');
+      if (!left || !right || this.ships.length < 2) return;
       
-      const fmt = (s) => {
-        const regime = s.telemetry.regimeBias?.toUpperCase() || 'RANGE';
-        const thrust = Math.round(s.telemetry.thrustPotential * 100);
-        const chop = Math.round(s.telemetry.chopSensitivity * 100);
-        const hull = Math.round(s.integrity * 100);
-        const stab = Math.round(s.stability * 100);
-        const signal = Math.round(s.telemetry.signalClarity * 100);
+      const renderStats = (ship) => {
+        const hull = Math.round(ship.integrity * 100);
+        const spin = Math.round(ship.spin * 100);
+        const energy = Math.round(ship.energy * 100);
+        const regime = ship.telemetry.regimeBias?.toUpperCase() || 'RANGE';
         
-        return `${s.ticker}\nREGIME: ${regime}\nTHRUST: ${thrust}  |  CHOP: ${chop}\nHULL: ${hull}     |  STAB: ${stab}\nSIGNAL: ${signal}`;
+        const hullColor = hull > 60 ? COLORS.acidLime : hull > 30 ? COLORS.warnYellow : COLORS.hotMagenta;
+        const spinColor = spin > 50 ? COLORS.acidLime : spin > 25 ? COLORS.warnYellow : COLORS.hotMagenta;
+        
+        const statusClass = ship.alive ? (hull < 30 ? 'critical' : hull < 60 ? 'warning' : 'ok') : 'dead';
+        const statusText = ship.alive ? (hull < 30 ? 'CRITICAL' : hull < 60 ? 'DAMAGED' : 'NOMINAL') : 'DESTROYED';
+        
+        const bar = (val, color) => `<div class="stat-bar"><div class="stat-fill" style="width:${val}%;background:${color}"></div></div>`;
+        
+        return `
+<div class="pilot-header">
+  <span class="pilot-ticker">${ship.ticker}</span>
+  <span class="pilot-status ${statusClass}">${statusText}</span>
+</div>
+<div class="pilot-regime">${regime}</div>
+
+<div class="stat-row"><span class="stat-label">HULL</span><span class="stat-value" style="color:${hullColor}">${hull}%</span></div>
+${bar(hull, hullColor)}
+
+<div class="stat-row"><span class="stat-label">SPIN</span><span class="stat-value" style="color:${spinColor}">${spin}%</span></div>
+${bar(spin, spinColor)}
+
+<div class="stat-row"><span class="stat-label">ENERGY</span><span class="stat-value">${energy}%</span></div>
+${bar(energy, COLORS.toxicCyan)}
+
+<div class="stat-row"><span class="stat-label">CROSSOVERS</span><span class="stat-value">${ship.crossovers.length}</span></div>
+`;
       };
       
-      left.textContent = fmt(this.spinners[0]);
-      right.textContent = fmt(this.spinners[1]);
+      left.innerHTML = renderStats(this.ships[0]);
+      right.innerHTML = renderStats(this.ships[1]);
+    },
+    
+    // Get Y position of chart boundary at given X
+    getChartY(ship, xNorm, isInner) {
+      const curveIndex = Math.floor(xNorm * (ship.macdCurve.length - 1));
+      const curveValue = ship.macdCurve[Math.min(curveIndex, ship.macdCurve.length - 1)];
+      
+      if (ship.isTop) {
+        // Top chart: higher curveValue = wall extends DOWN into arena
+        const baseY = this.chartHeight;
+        const extension = curveValue * 40; // How far wall extends
+        return isInner ? baseY + 20 + Math.max(0, extension) : baseY;
+      } else {
+        // Bottom chart: lower curveValue = wall extends UP into arena
+        const baseY = this.canvas.height - this.chartHeight;
+        const extension = -curveValue * 40;
+        return isInner ? baseY - 20 - Math.max(0, extension) : baseY;
+      }
+    },
+    
+    // Check if ship is in an emanation zone
+    checkEmanations(ship, otherShip) {
+      const xNorm = (ship.x - this.arenaLeft) / (this.arenaRight - this.arenaLeft);
+      
+      // Check other ship's crossovers (you're affected by opponent's chart)
+      for (const cross of otherShip.crossovers) {
+        const dist = Math.abs(xNorm - cross.x);
+        if (dist < 0.08) { // Within emanation zone
+          return {
+            active: true,
+            bullish: cross.bullish,
+            strength: (1 - dist / 0.08) * cross.strength,
+            x: this.arenaLeft + cross.x * (this.arenaRight - this.arenaLeft)
+          };
+        }
+      }
+      return { active: false };
     },
     
     loop(now) {
@@ -732,395 +539,508 @@
     },
     
     update(dt) {
-      const adt = dt * this.fx.slowmo;
-      
-      this.fightTime += adt;
-      this.neonPhase += dt * 3;
-      
-      this.ringInstability = Math.min(1, this.fightTime / 30);
-      
-      this.envFlicker = Math.random() < 0.02 ? rand(0.3, 0.8) : this.envFlicker * 0.95;
-      
-      for (const seg of this.ringSegments) {
-        seg.startAngle += seg.drift * adt * (1 + this.ringInstability * 2);
-        seg.flickerPhase += seg.flickerRate * adt;
-      }
-      
-      for (const s of this.spinners) {
-        if (!s.alive) continue;
-        
-        this.fx.pushTrail(s.id, s.position.x, s.position.y, s.color);
-        
-        const toCenter = norm({ 
-          x: this.center.x - s.position.x, 
-          y: this.center.y - s.position.y 
-        });
-        const tangent = { x: -toCenter.y, y: toCenter.x };
-        
-        let driveDir = tangent;
-        if (s.telemetry.regimeBias === 'range') {
-          driveDir = norm({ 
-            x: tangent.x + toCenter.x * 0.2, 
-            y: tangent.y + toCenter.y * 0.2 
-          });
-        } else if (s.telemetry.regimeBias === 'chaotic') {
-          driveDir = norm({
-            x: tangent.x * 0.6 + toCenter.x * -0.3 + (Math.random() - 0.5) * 1.2,
-            y: tangent.y * 0.6 + toCenter.y * -0.3 + (Math.random() - 0.5) * 1.2
-          });
-        }
-        
-        const accel = 160 + 400 * s.telemetry.thrustPotential;
-        s.velocity.x += driveDir.x * accel * adt;
-        s.velocity.y += driveDir.y * accel * adt;
-        
-        const kv = 0.4 + 0.9 * (s.telemetry.chopSensitivity ** 2);
-        s.velocity.x *= Math.exp(-kv * adt);
-        s.velocity.y *= Math.exp(-kv * adt);
-        
-        const spd = len(s.velocity);
-        if (spd > s.vmax) {
-          const f = s.vmax / spd;
-          s.velocity.x *= f;
-          s.velocity.y *= f;
-        }
-        
-        const kw = 0.08 + 0.4 * (0.6 * s.telemetry.chopSensitivity + 0.4 * (1 - s.telemetry.maneuverStability));
-        s.omega *= Math.exp(-kw * adt);
-        
-        s.position.x += s.velocity.x * adt;
-        s.position.y += s.velocity.y * adt;
-        
-        // === CONTAINMENT FIELD ===
-        const dx = s.position.x - this.center.x;
-        const dy = s.position.y - this.center.y;
-        const dist = Math.hypot(dx, dy);
-        const edgeThreshold = this.arenaRadius * 0.82;
-        const hardEdge = this.arenaRadius - s.radius;
-        
-        if (dist > edgeThreshold) {
-          const n = norm({ x: dx, y: dy });
-          const edgeDepth = (dist - edgeThreshold) / (hardEdge - edgeThreshold);
-          
-          const pushForce = 800 * edgeDepth * (1 + this.ringInstability * 0.5);
-          s.velocity.x -= n.x * pushForce * adt;
-          s.velocity.y -= n.y * pushForce * adt;
-          
-          s.omega += rand(-3, 3) * edgeDepth;
-          
-          s.edgeTime += adt;
-          const scrapeDamage = 0.04 * edgeDepth * adt * (1 + this.ringInstability);
-          s.integrity = Math.max(0, s.integrity - scrapeDamage);
-          
-          if (Math.random() < 0.3 * edgeDepth) {
-            this.fx.edgeScrape(s.position.x, s.position.y, n, edgeDepth);
-          }
+      // Countdown phase
+      if (this.phase === 'countdown') {
+        this.countdown -= dt;
+        if (this.countdown <= 0) {
+          this.phase = 'fighting';
+          this.setBanner('FIGHT!');
+          setTimeout(() => this.setBanner(''), 500);
         } else {
-          s.edgeTime = 0;
+          this.setBanner(Math.ceil(this.countdown).toString());
+        }
+        this.fx.update(dt);
+        return;
+      }
+      
+      if (this.phase === 'ended') {
+        this.fx.update(dt);
+        return;
+      }
+      
+      this.fightTime += dt;
+      
+      // Update ships
+      for (let i = 0; i < this.ships.length; i++) {
+        const ship = this.ships[i];
+        const other = this.ships[1 - i];
+        if (!ship.alive) continue;
+        
+        // Apply movement based on regime
+        const regime = ship.telemetry.regimeBias;
+        let ax = 0, ay = 0;
+        
+        if (regime === 'trend') {
+          // Trend-followers move toward center and accelerate
+          const centerX = (this.arenaLeft + this.arenaRight) / 2;
+          const centerY = (this.arenaTop + this.arenaBottom) / 2;
+          ax = (centerX - ship.x) * 0.3;
+          ay = (centerY - ship.y) * 0.3;
+        } else if (regime === 'chaotic') {
+          // Chaotic movement
+          ax = rand(-200, 200) * ship.volatility;
+          ay = rand(-200, 200) * ship.volatility;
+        } else {
+          // Range-bound: orbit around center
+          const centerX = (this.arenaLeft + this.arenaRight) / 2;
+          const centerY = (this.arenaTop + this.arenaBottom) / 2;
+          const dx = ship.x - centerX;
+          const dy = ship.y - centerY;
+          ax = -dy * 0.8 + rand(-50, 50);
+          ay = dx * 0.8 + rand(-50, 50);
         }
         
-        if (dist > this.arenaRadius + s.radius * 0.5) {
-          s.alive = false;
-          this.fx.ringOut(s.position.x, s.position.y, s.ticker);
-          this.setBanner(`${s.ticker} RING OUT!!`);
+        // Apply thrust
+        const thrust = 80 + 120 * ship.telemetry.thrustPotential;
+        ship.vx += ax * dt;
+        ship.vy += ay * dt;
+        
+        // Clamp speed
+        const speed = Math.hypot(ship.vx, ship.vy);
+        if (speed > ship.maxSpeed) {
+          ship.vx = (ship.vx / speed) * ship.maxSpeed;
+          ship.vy = (ship.vy / speed) * ship.maxSpeed;
         }
         
-        if (s.integrity <= 0 && s.alive) {
-          s.alive = false;
-          this.fx.burst(s.position.x, s.position.y, s.ticker);
-          this.setBanner(`${s.ticker} DESTROYED!!`);
+        // Apply velocity
+        ship.x += ship.vx * dt;
+        ship.y += ship.vy * dt;
+        
+        // Trail
+        this.fx.pushTrail(ship.ticker, ship.x, ship.y, ship.color);
+        
+        // Left/right bounds
+        if (ship.x < this.arenaLeft + ship.radius) {
+          ship.x = this.arenaLeft + ship.radius;
+          ship.vx = Math.abs(ship.vx) * 0.7;
+          ship.integrity -= 0.02;
+        }
+        if (ship.x > this.arenaRight - ship.radius) {
+          ship.x = this.arenaRight - ship.radius;
+          ship.vx = -Math.abs(ship.vx) * 0.7;
+          ship.integrity -= 0.02;
         }
         
-        if (s.omega < 1.5 && s.alive) {
-          s.alive = false;
-          this.fx.spinOut(s.position.x, s.position.y, s.ticker);
-          this.setBanner(`${s.ticker} OUT OF SPIN!!`);
+        // Chart boundary collision (top chart = ships[0], bottom = ships[1])
+        const xNorm = (ship.x - this.arenaLeft) / (this.arenaRight - this.arenaLeft);
+        
+        // Top boundary (opponent A's chart if this is ship B, or own chart)
+        const topChart = this.ships[0];
+        const topY = this.getChartY(topChart, xNorm, true);
+        if (ship.y < topY + ship.radius) {
+          ship.y = topY + ship.radius;
+          ship.vy = Math.abs(ship.vy) * 0.6;
+          ship.integrity -= 0.03;
+          this.fx.impact(ship.x, topY, 0.3);
+        }
+        
+        // Bottom boundary
+        const bottomChart = this.ships[1];
+        const bottomY = this.getChartY(bottomChart, xNorm, true);
+        if (ship.y > bottomY - ship.radius) {
+          ship.y = bottomY - ship.radius;
+          ship.vy = -Math.abs(ship.vy) * 0.6;
+          ship.integrity -= 0.03;
+          this.fx.impact(ship.x, bottomY, 0.3);
+        }
+        
+        // Check emanation zones
+        const emanation = this.checkEmanations(ship, other);
+        if (emanation.active) {
+          if (emanation.bullish) {
+            // Boost!
+            ship.spin = Math.min(1, ship.spin + 0.02 * emanation.strength);
+            ship.energy = Math.min(1, ship.energy + 0.01 * emanation.strength);
+            if (Math.random() < 0.05) {
+              this.fx.emanationHit(ship.x, ship.y, true);
+              this.fx.popText(ship.x, ship.y - 30, 'BOOST!', 0.8, COLORS.bullGreen);
+            }
+          } else {
+            // Hazard!
+            ship.spin = Math.max(0, ship.spin - 0.015 * emanation.strength);
+            ship.integrity -= 0.01 * emanation.strength;
+            if (Math.random() < 0.05) {
+              this.fx.emanationHit(ship.x, ship.y, false);
+              this.fx.popText(ship.x, ship.y - 30, 'HAZARD!', 0.8, COLORS.bearOrange);
+            }
+          }
+        }
+        
+        // Natural decay
+        ship.spin -= dt * 0.02 * (1 + ship.volatility);
+        ship.energy -= dt * 0.01;
+        
+        // Spin affects movement
+        if (ship.spin < 0.3) {
+          ship.vx *= 0.98;
+          ship.vy *= 0.98;
+        }
+        
+        // Update angle
+        ship.angle += (5 + 10 * ship.spin) * dt;
+        
+        // Check death conditions
+        if (ship.integrity <= 0) {
+          ship.alive = false;
+          this.fx.impact(ship.x, ship.y, 1);
+          this.fx.popText(ship.x, ship.y, 'DESTROYED!', 1.5, COLORS.hotMagenta);
+        }
+        if (ship.spin <= 0) {
+          ship.alive = false;
+          this.fx.popText(ship.x, ship.y, 'OUT OF SPIN!', 1.2, COLORS.warnYellow);
         }
       }
       
-      // Collisions
-      for (let i = 0; i < this.spinners.length; i++) {
-        for (let j = i + 1; j < this.spinners.length; j++) {
-          const evt = resolveCollision(this.spinners[i], this.spinners[j]);
-          if (!evt) continue;
+      // Ship-to-ship collision
+      if (this.ships[0].alive && this.ships[1].alive) {
+        const a = this.ships[0];
+        const b = this.ships[1];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy);
+        const minDist = a.radius + b.radius;
+        
+        if (dist < minDist && dist > 0) {
+          const nx = dx / dist;
+          const ny = dy / dist;
           
-          this.fx.impact(evt.x, evt.y, evt.impact01);
+          // Separate
+          const overlap = minDist - dist;
+          a.x -= nx * overlap * 0.5;
+          a.y -= ny * overlap * 0.5;
+          b.x += nx * overlap * 0.5;
+          b.y += ny * overlap * 0.5;
           
-          if (evt.burstA && this.spinners[i].alive) {
-            this.spinners[i].alive = false;
-            this.fx.burst(this.spinners[i].position.x, this.spinners[i].position.y, this.spinners[i].ticker);
-            this.setBanner(`${this.spinners[i].ticker} DESTROYED!!`);
-          }
-          if (evt.burstB && this.spinners[j].alive) {
-            this.spinners[j].alive = false;
-            this.fx.burst(this.spinners[j].position.x, this.spinners[j].position.y, this.spinners[j].ticker);
-            this.setBanner(`${this.spinners[j].ticker} DESTROYED!!`);
+          // Bounce
+          const dvx = a.vx - b.vx;
+          const dvy = a.vy - b.vy;
+          const dvn = dvx * nx + dvy * ny;
+          
+          if (dvn > 0) {
+            const restitution = 0.7;
+            const impulse = (1 + restitution) * dvn / (1/a.mass + 1/b.mass);
+            
+            a.vx -= impulse * nx / a.mass;
+            a.vy -= impulse * ny / a.mass;
+            b.vx += impulse * nx / b.mass;
+            b.vy += impulse * ny / b.mass;
+            
+            // Damage based on impact
+            const impactSpeed = Math.abs(dvn);
+            const impact = clamp01(impactSpeed / 300);
+            
+            a.integrity -= impact * 0.1 * (1 - a.stability);
+            b.integrity -= impact * 0.1 * (1 - b.stability);
+            a.spin -= impact * 0.05;
+            b.spin -= impact * 0.05;
+            
+            this.fx.impact((a.x + b.x) / 2, (a.y + b.y) / 2, impact);
+            
+            if (impact > 0.3) {
+              const words = impact > 0.6 
+                ? ['CRUNCH!', 'SMASH!', 'BRUTAL!']
+                : ['HIT!', 'CLASH!', 'BAM!'];
+              this.fx.popText((a.x + b.x) / 2, (a.y + b.y) / 2 - 20, 
+                words[randInt(0, words.length - 1)], 
+                0.8 + impact * 0.5,
+                COLORS.violentPink);
+            }
           }
         }
+      }
+      
+      // Check for winner
+      const alive = this.ships.filter(s => s.alive);
+      if (alive.length <= 1) {
+        this.phase = 'ended';
+        const winner = alive[0] ? alive[0].ticker : 'DRAW';
+        this.setBanner(`WINNER: ${winner}`);
       }
       
       this.fx.update(dt);
-      
-      const alive = this.spinners.filter(s => s.alive);
-      if (alive.length <= 1) {
-        const winner = alive[0] ? alive[0].ticker : 'NO ONE';
-        this.setBanner(`WINNER: ${winner}`);
-        this.active = false;
-      }
-      
       this.updateSidePanels();
     },
     
     render() {
       const ctx = this.ctx;
-      const w = this.canvas.clientWidth || 520;
-      const h = this.canvas.clientHeight || 520;
+      const w = this.canvas.width;
+      const h = this.canvas.height;
       
       ctx.clearRect(0, 0, w, h);
       
+      // Apply shake
       ctx.save();
       const shake = this.fx.getShakeOffset();
       ctx.translate(shake.x, shake.y);
-      if (shake.rot) ctx.rotate(shake.rot);
       
-      this.drawEnvironment(ctx, w, h);
-      this.drawCrowd(ctx, w, h);
+      // Background
+      this.drawBackground(ctx, w, h);
       
-      this.fx.drawBurnMarks(ctx);
+      // Draw MACD charts as boundaries
+      this.drawChartBoundary(ctx, this.ships[0], true);
+      this.drawChartBoundary(ctx, this.ships[1], false);
       
-      this.drawArenaRing(ctx);
+      // Draw emanation zones
+      this.drawEmanations(ctx);
       
-      this.fx.drawTrails(ctx);
+      // Draw arena ring (simplified center ring)
+      this.drawCenterRing(ctx, w, h);
       
-      for (const s of this.spinners) {
-        if (!s.alive) continue;
-        this.drawSpinner(ctx, s);
+      // Draw ships
+      for (const ship of this.ships) {
+        if (ship.alive) {
+          this.drawShip(ctx, ship);
+        }
       }
       
-      this.fx.draw(ctx, this.center);
+      // FX
+      this.fx.draw(ctx);
       
-      this.drawVignette(ctx, w, h);
+      // Scanlines
       this.drawScanlines(ctx, w, h);
       
       ctx.restore();
     },
     
-    drawEnvironment(ctx, w, h) {
-      const grad = ctx.createRadialGradient(
-        w * 0.5, h * 0.4, 0,
-        w * 0.5, h * 0.5, w * 0.7
-      );
+    drawBackground(ctx, w, h) {
+      // Dark gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
       grad.addColorStop(0, '#1a0a1a');
-      grad.addColorStop(0.5, '#0f0812');
-      grad.addColorStop(1, COLORS.deepBlack);
+      grad.addColorStop(0.5, '#0a0008');
+      grad.addColorStop(1, '#0f0812');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
       
+      // Grid
       ctx.save();
-      ctx.globalAlpha = 0.15 + 0.1 * Math.sin(this.neonPhase);
-      const neonGrad = ctx.createRadialGradient(w * 0.1, h * 0.3, 0, w * 0.1, h * 0.3, w * 0.4);
-      neonGrad.addColorStop(0, COLORS.violentPink);
-      neonGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = neonGrad;
-      ctx.fillRect(0, 0, w, h);
-      
-      const neonGrad2 = ctx.createRadialGradient(w * 0.9, h * 0.6, 0, w * 0.9, h * 0.6, w * 0.35);
-      neonGrad2.addColorStop(0, COLORS.toxicCyan);
-      neonGrad2.addColorStop(1, 'transparent');
-      ctx.fillStyle = neonGrad2;
-      ctx.fillRect(0, 0, w, h);
-      ctx.restore();
-      
-      ctx.save();
-      ctx.globalAlpha = 0.08;
-      ctx.strokeStyle = COLORS.violentPink;
+      ctx.globalAlpha = 0.1;
+      ctx.strokeStyle = COLORS.hotMagenta;
       ctx.lineWidth = 1;
-      const gridSize = 40;
-      for (let x = 0; x < w; x += gridSize) {
+      
+      for (let x = this.arenaLeft; x <= this.arenaRight; x += 40) {
         ctx.beginPath();
-        ctx.moveTo(x, h * 0.5);
-        ctx.lineTo(x + (x - w/2) * 0.3, h);
+        ctx.moveTo(x, this.arenaTop);
+        ctx.lineTo(x, this.arenaBottom);
         ctx.stroke();
       }
-      for (let y = h * 0.5; y < h; y += gridSize * 0.8) {
+      for (let y = this.arenaTop; y <= this.arenaBottom; y += 40) {
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
+        ctx.moveTo(this.arenaLeft, y);
+        ctx.lineTo(this.arenaRight, y);
         ctx.stroke();
       }
       ctx.restore();
     },
     
-    drawCrowd(ctx, w, h) {
-      ctx.save();
-      const time = performance.now() * 0.001;
+    drawChartBoundary(ctx, ship, isTop) {
+      const curve = ship.macdCurve;
+      const arenaWidth = this.arenaRight - this.arenaLeft;
       
-      for (const c of this.crowd) {
-        const bob = Math.sin(time * c.bobSpeed + c.bobPhase) * 3;
-        const x = c.x * w;
-        const y = c.y * h + bob;
-        const scale = c.scale * 25;
-        
-        ctx.globalAlpha = 0.3 + this.envFlicker * 0.2;
-        ctx.fillStyle = '#0a0008';
-        
-        ctx.beginPath();
-        ctx.ellipse(x, y - scale * 0.8, scale * 0.35, scale * 0.4, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(x, y, scale * 0.6, scale * 0.35, 0, 0, Math.PI);
-        ctx.fill();
+      ctx.save();
+      
+      // Draw chart background panel
+      if (isTop) {
+        ctx.fillStyle = 'rgba(30, 10, 30, 0.8)';
+        ctx.fillRect(this.arenaLeft - 10, 0, arenaWidth + 20, this.chartHeight + 10);
+      } else {
+        ctx.fillStyle = 'rgba(10, 30, 30, 0.8)';
+        ctx.fillRect(this.arenaLeft - 10, this.canvas.height - this.chartHeight - 10, arenaWidth + 20, this.chartHeight + 10);
       }
+      
+      // Draw MACD line
+      ctx.beginPath();
+      ctx.strokeStyle = ship.color;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = ship.color;
+      ctx.shadowBlur = 8;
+      
+      const baseY = isTop ? this.chartHeight / 2 : this.canvas.height - this.chartHeight / 2;
+      
+      for (let i = 0; i < curve.length; i++) {
+        const x = this.arenaLeft + (i / (curve.length - 1)) * arenaWidth;
+        const y = baseY - curve[i] * (this.chartHeight * 0.4);
+        
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      
+      // Draw signal line (slightly smoothed version)
+      ctx.beginPath();
+      ctx.strokeStyle = isTop ? COLORS.burntOrange : COLORS.acidLime;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.6;
+      
+      let smoothed = 0;
+      for (let i = 0; i < curve.length; i++) {
+        smoothed = smoothed * 0.8 + curve[i] * 0.2;
+        const x = this.arenaLeft + (i / (curve.length - 1)) * arenaWidth;
+        const y = baseY - smoothed * (this.chartHeight * 0.4);
+        
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      
+      // Draw histogram bars
+      ctx.globalAlpha = 0.4;
+      for (let i = 0; i < curve.length; i++) {
+        const x = this.arenaLeft + (i / (curve.length - 1)) * arenaWidth;
+        const barHeight = curve[i] * (this.chartHeight * 0.3);
+        
+        ctx.fillStyle = curve[i] > 0 ? COLORS.bullGreen : COLORS.bearOrange;
+        ctx.fillRect(x - 2, baseY, 4, -barHeight);
+      }
+      
       ctx.restore();
     },
     
-    drawArenaRing(ctx) {
-      ctx.save();
-      
-      const instab = this.ringInstability;
+    drawEmanations(ctx) {
+      const arenaWidth = this.arenaRight - this.arenaLeft;
       const time = performance.now() * 0.001;
       
-      for (const seg of this.ringSegments) {
-        if (seg.broken && Math.random() < 0.3 * instab) continue;
-        
-        const flicker = seg.broken 
-          ? 0.3 + 0.7 * Math.abs(Math.sin(seg.flickerPhase))
-          : 0.7 + 0.3 * Math.sin(seg.flickerPhase * 0.5);
-        
-        const r = this.arenaRadius + seg.radiusOffset + Math.sin(time * 2 + seg.startAngle) * 3 * instab;
-        
-        ctx.globalAlpha = flicker * (0.5 + 0.5 * (1 - instab));
-        
-        ctx.strokeStyle = seg.broken ? COLORS.burntOrange : COLORS.hotMagenta;
-        ctx.lineWidth = seg.broken ? 2 : 4;
-        ctx.shadowColor = ctx.strokeStyle;
-        ctx.shadowBlur = 15 + 10 * instab;
-        
-        ctx.beginPath();
-        ctx.arc(
-          this.center.x, this.center.y, r,
-          seg.startAngle, seg.startAngle + seg.arcLength
-        );
-        ctx.stroke();
-        
-        if (!seg.broken) {
-          ctx.globalAlpha = flicker * 0.4;
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1;
+      for (const ship of this.ships) {
+        for (const cross of ship.crossovers) {
+          const x = this.arenaLeft + cross.x * arenaWidth;
+          const baseY = ship.isTop ? this.chartHeight : this.canvas.height - this.chartHeight;
+          
+          // Direction into arena
+          const dir = ship.isTop ? 1 : -1;
+          const emanationLength = 60 + 40 * cross.strength;
+          
+          // Pulsing glow
+          const pulse = 0.5 + 0.5 * Math.sin(time * 4 + cross.x * 10);
+          
+          ctx.save();
+          ctx.globalAlpha = 0.3 + 0.2 * pulse;
+          
+          // Gradient emanation
+          const grad = ctx.createLinearGradient(x, baseY, x, baseY + dir * emanationLength);
+          const color = cross.bullish ? COLORS.bullGreen : COLORS.bearOrange;
+          grad.addColorStop(0, color);
+          grad.addColorStop(1, 'transparent');
+          
+          ctx.fillStyle = grad;
+          
+          // Draw spike shape
           ctx.beginPath();
-          ctx.arc(
-            this.center.x, this.center.y, r - 3,
-            seg.startAngle + 0.1, seg.startAngle + seg.arcLength - 0.1
-          );
-          ctx.stroke();
+          ctx.moveTo(x - 15, baseY);
+          ctx.lineTo(x, baseY + dir * emanationLength);
+          ctx.lineTo(x + 15, baseY);
+          ctx.closePath();
+          ctx.fill();
+          
+          // Bright tip
+          ctx.globalAlpha = 0.6 + 0.3 * pulse;
+          ctx.fillStyle = color;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 15;
+          ctx.beginPath();
+          ctx.arc(x, baseY + dir * emanationLength * 0.7, 4, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.restore();
         }
       }
+    },
+    
+    drawCenterRing(ctx, w, h) {
+      const centerX = (this.arenaLeft + this.arenaRight) / 2;
+      const centerY = (this.arenaTop + this.arenaBottom) / 2;
+      const radius = Math.min(this.arenaRight - this.arenaLeft, this.arenaBottom - this.arenaTop) * 0.35;
       
-      if (Math.random() < 0.02 * (1 + instab * 3)) {
-        const ang = rand(0, Math.PI * 2);
-        const sparkLen = rand(0.1, 0.3);
-        ctx.globalAlpha = 0.8;
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.shadowBlur = 25;
-        ctx.shadowColor = COLORS.acidLime;
-        ctx.beginPath();
-        ctx.arc(this.center.x, this.center.y, this.arenaRadius, ang, ang + sparkLen);
-        ctx.stroke();
-      }
+      const time = performance.now() * 0.001;
       
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.strokeStyle = COLORS.hotMagenta;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([10, 10]);
+      ctx.lineDashOffset = time * 20;
+      
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      ctx.setLineDash([]);
       ctx.restore();
     },
     
-    drawSpinner(ctx, s) {
+    drawShip(ctx, ship) {
       const time = performance.now() * 0.001;
-      const wobble = (1 - s.stability) * (1 - Math.min(1, s.omega / s.omega0));
-      const wob = wobble * Math.sin(time * (8 + 15 * (1 - s.stability))) * 0.15;
-      
-      s.angle += s.omega * 0.016;
       
       ctx.save();
-      ctx.translate(s.position.x, s.position.y);
-      ctx.rotate(s.angle + wob);
+      ctx.translate(ship.x, ship.y);
       
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = 'rgba(10,0,15,0.8)';
+      // Outer glow ring
+      ctx.globalAlpha = 0.3 + 0.1 * Math.sin(time * 3);
+      ctx.strokeStyle = ship.color;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = ship.color;
+      ctx.shadowBlur = 15;
       ctx.beginPath();
-      ctx.arc(0, 0, s.radius, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.arc(0, 0, ship.radius * 1.3, 0, Math.PI * 2);
+      ctx.stroke();
       
-      ctx.strokeStyle = s.color;
-      ctx.shadowColor = s.color;
-      ctx.shadowBlur = 12;
+      // Hull integrity ring
+      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = ship.integrity > 0.5 ? COLORS.acidLime : ship.integrity > 0.25 ? COLORS.warnYellow : COLORS.hotMagenta;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(0, 0, ship.radius * 1.1, -Math.PI/2, -Math.PI/2 + Math.PI * 2 * ship.integrity);
+      ctx.stroke();
+      
+      // Spin ring
+      ctx.save();
+      ctx.rotate(ship.angle);
+      ctx.globalAlpha = 0.6;
+      ctx.strokeStyle = ship.color;
       ctx.lineWidth = 3;
-      
-      for (let k = 0; k < 3; k++) {
-        const a0 = time * (3 + k) + k * 2.1;
-        ctx.globalAlpha = 0.8 - k * 0.15;
+      for (let i = 0; i < 3; i++) {
         ctx.beginPath();
-        ctx.arc(0, 0, s.radius * (0.72 + 0.1 * k), a0, a0 + 1.4);
+        ctx.arc(0, 0, ship.radius * (0.6 + i * 0.1), i * 0.5, i * 0.5 + 1.2);
         ctx.stroke();
       }
+      ctx.restore();
       
-      const coreR = s.radius * 0.45;
-      ctx.globalAlpha = 0.95;
-      ctx.fillStyle = s.color;
+      // Core
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = ship.color;
       ctx.shadowBlur = 20;
       ctx.beginPath();
-      ctx.arc(0, 0, coreR, 0, Math.PI * 2);
+      ctx.arc(0, 0, ship.radius * 0.4, 0, Math.PI * 2);
       ctx.fill();
       
-      if (s.spriteImg) {
+      // Sprite
+      if (ship.spriteImg) {
         ctx.globalAlpha = 0.85;
         ctx.shadowBlur = 0;
-        const img = s.spriteImg;
-        const scale = (coreR * 1.5) / Math.max(img.width, img.height);
+        const scale = (ship.radius * 1.2) / Math.max(ship.spriteImg.width, ship.spriteImg.height);
         ctx.save();
-        ctx.rotate(-s.angle * 0.8);
+        ctx.rotate(-ship.angle * 0.3);
         ctx.scale(scale, scale);
-        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        ctx.drawImage(ship.spriteImg, -ship.spriteImg.width/2, -ship.spriteImg.height/2);
         ctx.restore();
       }
       
-      ctx.rotate(-s.angle);
-      ctx.globalAlpha = 0.9;
-      ctx.strokeStyle = s.integrity > 0.3 ? COLORS.acidLime : COLORS.hotMagenta;
-      ctx.shadowColor = ctx.strokeStyle;
-      ctx.shadowBlur = 8;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(0, 0, s.radius * 1.05, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * s.integrity);
-      ctx.stroke();
-      
-      if (s.integrity < 0.3) {
-        ctx.globalAlpha = 0.4 * Math.abs(Math.sin(time * 8));
-        ctx.fillStyle = COLORS.hotMagenta;
-        ctx.beginPath();
-        ctx.arc(0, 0, s.radius * 1.1, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      
       ctx.restore();
-    },
-    
-    drawVignette(ctx, w, h) {
+      
+      // Ticker label
       ctx.save();
-      const g = ctx.createRadialGradient(
-        w / 2, h / 2, Math.min(w, h) * 0.2,
-        w / 2, h / 2, Math.min(w, h) * 0.65
-      );
-      g.addColorStop(0, 'rgba(0,0,0,0)');
-      g.addColorStop(0.7, 'rgba(0,0,0,0.3)');
-      g.addColorStop(1, 'rgba(0,0,0,0.7)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, w, h);
+      ctx.globalAlpha = 0.9;
+      ctx.font = 'bold 12px "VT323", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = ship.color;
+      ctx.shadowColor = ship.color;
+      ctx.shadowBlur = 6;
+      ctx.fillText(ship.ticker, ship.x, ship.y - ship.radius - 10);
       ctx.restore();
     },
     
     drawScanlines(ctx, w, h) {
       ctx.save();
-      ctx.globalAlpha = 0.12 + this.envFlicker * 0.1;
-      ctx.fillStyle = '#000000';
+      ctx.globalAlpha = 0.1;
+      ctx.fillStyle = '#000';
       for (let y = 0; y < h; y += 3) {
         ctx.fillRect(0, y, w, 1);
       }
@@ -1148,7 +1068,7 @@
     const tele = window.ShipTelemetry?._TELEMETRY;
     const keys = tele ? Object.keys(tele) : ['ACHR', 'RKLB', 'GME', 'GE', 'LUNR', 'JOBY', 'ASTS', 'BKSY'];
     const pool = keys.filter(k => k && k !== exclude);
-    return pool[randInt(0, pool.length - 1)] || 'ACHR';
+    return pool[randInt(0, pool.length - 1)] || 'ASTS';
   }
   
   function bindLaunchers() {
