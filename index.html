@@ -293,6 +293,171 @@
       color: rgba(223,247,255,.55);
       font-size: 11px;
     }
+
+    /* ===============================
+       WARP TRANSITION
+    ================================ */
+
+    #warp{
+      position:fixed;
+      inset:0;
+      background: radial-gradient(circle at center, #0b1624, #03070c 70%);
+      z-index:9999;
+      opacity:0;
+      pointer-events:none;
+      overflow:hidden;
+      transition: opacity .2s ease;
+    }
+
+    #warp.active{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    /* Star streak layers */
+    .warp-stars{
+      position:absolute;
+      inset:-100%;
+      background:
+        repeating-radial-gradient(circle,
+          rgba(180,255,255,.15) 0 1px,
+          transparent 2px 6px);
+      animation: warp-drift 1.2s linear infinite paused;
+      opacity:.35;
+    }
+
+    .warp-stars.fast{
+      animation-duration:.35s;
+      opacity:.55;
+    }
+
+    #warp.active .warp-stars{
+      animation-play-state: running;
+    }
+
+    @keyframes warp-drift{
+      from{ transform: scale(1) rotate(0deg); }
+      to{ transform: scale(2.8) rotate(0.001deg); }
+    }
+
+    /* Radial speed lines */
+    .warp-lines{
+      position:absolute;
+      inset:0;
+      background: 
+        repeating-conic-gradient(
+          from 0deg at 50% 50%,
+          transparent 0deg 8deg,
+          rgba(90,255,200,.08) 8deg 9deg
+        );
+      opacity:0;
+      animation: lines-in .6s ease-out forwards;
+      animation-play-state: paused;
+    }
+
+    #warp.active .warp-lines{
+      animation-play-state: running;
+    }
+
+    @keyframes lines-in{
+      from{ opacity:0; transform: scale(.8) rotate(0deg); }
+      to{ opacity:1; transform: scale(1.5) rotate(15deg); }
+    }
+
+    .warp-ui{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      color:#dff7ff;
+      font-family: ui-sans-serif, system-ui;
+    }
+
+    .warp-content{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+    }
+
+    .warp-title{
+      font-size: clamp(28px, 6vw, 56px);
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      text-shadow:
+        0 0 24px rgba(90,255,200,.55),
+        0 0 60px rgba(90,255,200,.25);
+      animation: flicker .8s steps(2,end) infinite;
+      opacity:0;
+      transform: scale(.9);
+    }
+
+    #warp.active .warp-title{
+      animation: title-in .3s ease-out forwards, flicker .8s steps(2,end) infinite .3s;
+    }
+
+    @keyframes title-in{
+      from{ opacity:0; transform: scale(.9); }
+      to{ opacity:1; transform: scale(1); }
+    }
+
+    .warp-sub{
+      font-size:12px;
+      letter-spacing:.28em;
+      opacity:0;
+      text-transform:uppercase;
+    }
+
+    #warp.active .warp-sub{
+      animation: sub-in .3s ease-out .15s forwards;
+    }
+
+    @keyframes sub-in{
+      from{ opacity:0; }
+      to{ opacity:.75; }
+    }
+
+    /* Ship silhouette */
+    .warp-ship{
+      width:80px;
+      height:80px;
+      margin-bottom:20px;
+      opacity:0;
+      filter: drop-shadow(0 0 20px rgba(90,255,200,.6));
+    }
+
+    #warp.active .warp-ship{
+      animation: ship-in .4s ease-out forwards;
+    }
+
+    @keyframes ship-in{
+      from{ opacity:0; transform: scale(.5) translateY(20px); }
+      to{ opacity:1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes flicker{
+      50%{ opacity:.55 }
+    }
+
+    /* Flash overlay */
+    .warp-flash{
+      position:absolute;
+      inset:0;
+      background:#fff;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    #warp.active .warp-flash{
+      animation: flash .3s ease-out .7s;
+    }
+
+    @keyframes flash{
+      0%{ opacity:0; }
+      30%{ opacity:.7; }
+      100%{ opacity:0; }
+    }
   </style>
 </head>
 <body class="crt">
@@ -324,12 +489,12 @@
           </div>
           <div class="cabinetBody">
             <div class="mini">
-              You’re entering a trading cockpit dressed as a retro space sim.
+              You're entering a trading cockpit dressed as a retro space sim.
               Telemetry drives ship personality. The universe remembers your fleet.
             </div>
             <div class="btnRow">
-              <a class="btn" href="./space-capital/">Launch</a>
-              <a class="btn alt" href="./space-capital/#hangar">Hangar</a>
+              <a class="btn warp-trigger" href="./space-capital/">Launch</a>
+              <a class="btn alt warp-trigger" href="./space-capital/#hangar">Hangar</a>
             </div>
           </div>
         </div>
@@ -337,15 +502,15 @@
         <aside class="side">
           <div class="list">
             <h2>Upcoming Cabinets</h2>
-            <a class="item" href="./space-capital/">
+            <a class="item warp-trigger" href="./space-capital/#battle">
               <span>Battle Arena</span>
               <small>WIP</small>
             </a>
-            <a class="item" href="./space-capital/">
+            <a class="item warp-trigger" href="./space-capital/#garage">
               <span>Telemetry Lab</span>
               <small>WIP</small>
             </a>
-            <a class="item" href="./space-capital/">
+            <a class="item warp-trigger" href="./space-capital/#garage">
               <span>Paint Bay</span>
               <small>WIP</small>
             </a>
@@ -365,5 +530,55 @@
       </div>
     </section>
   </div>
+
+  <!-- Warp Transition Overlay -->
+  <div id="warp" aria-hidden="true">
+    <div class="warp-stars"></div>
+    <div class="warp-stars fast"></div>
+    <div class="warp-lines"></div>
+    <div class="warp-ui">
+      <div class="warp-content">
+        <!-- Ship silhouette -->
+        <svg class="warp-ship" viewBox="0 0 64 64" fill="none">
+          <path d="M32 4L44 28L56 52H8L20 28L32 4Z" fill="rgba(90,255,200,.15)" stroke="rgba(90,255,200,.6)" stroke-width="1.5"/>
+          <path d="M32 12L40 28L46 44H18L24 28L32 12Z" fill="rgba(90,255,200,.1)" stroke="rgba(90,255,200,.4)" stroke-width="1"/>
+          <circle cx="32" cy="28" r="4" fill="rgba(90,255,200,.8)"/>
+          <path d="M26 44L32 60L38 44" stroke="rgba(255,200,100,.6)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="warp-title">SPACE CAPITAL</div>
+        <div class="warp-sub">ENGAGING WARP DRIVE</div>
+      </div>
+    </div>
+    <div class="warp-flash"></div>
+  </div>
+
+  <script>
+    // Warp launcher - triggers on any link with warp-trigger class
+    document.querySelectorAll('.warp-trigger').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const targetHref = link.href;
+        
+        const warp = document.getElementById('warp');
+        warp.classList.add('active');
+        
+        // Coin indicator changes
+        const dot = document.querySelector('.dot');
+        const coinText = document.querySelector('.coin span:last-child');
+        if (dot) {
+          dot.style.background = 'var(--accent)';
+          dot.style.boxShadow = '0 0 18px rgba(90,255,200,.5)';
+        }
+        if (coinText) {
+          coinText.textContent = 'WARPING...';
+        }
+
+        // Redirect after animation completes
+        setTimeout(() => {
+          window.location.href = targetHref;
+        }, 950);
+      });
+    });
+  </script>
 </body>
 </html>
