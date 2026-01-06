@@ -3,6 +3,28 @@
    Three pillars: HANGAR | BATTLE ARENA | NEWS
    ========================================================================= */
 
+/* =========================================================================
+   ICON CLASSES (replacing emojis)
+   ========================================================================= */
+.icon-telemetry::before { content: '◈'; }
+.icon-regime::before { content: '◉'; }
+.icon-equipment::before { content: '⬡'; }
+.icon-hull::before { content: '◆'; }
+.icon-accent::before { content: '✦'; }
+.icon-arena::before { content: '✕'; }
+.icon-actions::before { content: '⚡'; }
+.icon-shield::before { content: '◇'; }
+.icon-engine::before { content: '▲'; }
+.icon-scanner::before { content: '◎'; }
+.icon-livery::before { content: '◆'; }
+
+.stat-block-icon[class*="icon-"]::before,
+.equipment-slot-icon[class*="icon-"]::before {
+  font-family: inherit;
+  font-size: 1em;
+  line-height: 1;
+}
+
 /* Hide the old tab navigation */
 .nav-tabs,
 .nav-subtabs,

@@ -478,7 +478,7 @@
           </div>
         </div>
         <nav class="nav-tabs" role="tablist" aria-label="Main navigation">
-          <button class="nav-tab active" data-group="hangar" data-tab="hangar" onclick="switchTab('hangar')" role="tab" aria-selected="true" aria-controls="hangar-panel">🚀 HANGAR</button>
+          <button class="nav-tab active" data-group="hangar" data-tab="hangar" onclick="switchTab('hangar')" role="tab" aria-selected="true" aria-controls="hangar-panel">▣ HANGAR</button>
           <button class="nav-tab" data-group="command" data-tab="positions" onclick="switchTab('positions')" role="tab" aria-selected="false" aria-controls="positions-panel">COMMAND</button>
           <button class="nav-tab" data-group="garage" data-tab="garage" onclick="switchTab('garage')" role="tab" aria-selected="false" aria-controls="garage-panel">GARAGE</button>
           <button class="nav-tab" data-group="arcade" data-tab="arcade" onclick="switchTab('arcade')" role="tab" aria-selected="false" aria-controls="arcade-panel">ARCADE</button>
@@ -1740,7 +1740,7 @@
     <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
       <div class="mobile-nav-items">
         <button class="mobile-nav-item active" data-tab="hangar" data-group="hangar" onclick="switchTabMobile('hangar')">
-          <span class="nav-icon">🚀</span>
+          <span class="nav-icon">▣</span>
           <span>Hangar</span>
         </button>
         <button class="mobile-nav-item" data-tab="positions" data-group="command" onclick="switchTabMobile('positions')">
@@ -2282,15 +2282,15 @@
   
   <div class="cockpit-hud">
     <button class="hud-btn active" data-panel="hangar">
-      <span class="hud-btn-icon">🔧</span>
+      <span class="hud-btn-icon">▣</span>
       <span class="hud-btn-label">HANGAR</span>
     </button>
     <button class="hud-btn battle-btn" data-panel="battle">
-      <span class="hud-btn-icon">⚔️</span>
+      <span class="hud-btn-icon">✕</span>
       <span class="hud-btn-label">BATTLE ARENA</span>
     </button>
     <button class="hud-btn" data-panel="news">
-      <span class="hud-btn-icon">📡</span>
+      <span class="hud-btn-icon">◎</span>
       <span class="hud-btn-label">NEWS</span>
     </button>
   </div>
@@ -2309,7 +2309,7 @@
         <!-- Core Stats -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon">📊</span>
+            <span class="stat-block-icon icon-telemetry"></span>
             <span class="stat-block-title">TELEMETRY STATS</span>
           </div>
           
@@ -2347,7 +2347,7 @@
         <!-- Regime Badge -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon">🎯</span>
+            <span class="stat-block-icon icon-regime"></span>
             <span class="stat-block-title">REGIME BIAS</span>
           </div>
           <div style="text-align: center; padding: 8px 0;">
@@ -2368,24 +2368,24 @@
         <!-- Equipment Slots (Future) -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon">⚙️</span>
+            <span class="stat-block-icon icon-equipment"></span>
             <span class="stat-block-title">EQUIPMENT</span>
           </div>
           <div class="equipment-grid">
             <div class="equipment-slot">
-              <span class="equipment-slot-icon">🛡️</span>
+              <span class="equipment-slot-icon icon-shield"></span>
               <span>SHIELD</span>
             </div>
             <div class="equipment-slot">
-              <span class="equipment-slot-icon">🔋</span>
+              <span class="equipment-slot-icon icon-engine"></span>
               <span>ENGINE</span>
             </div>
             <div class="equipment-slot">
-              <span class="equipment-slot-icon">📡</span>
+              <span class="equipment-slot-icon icon-scanner"></span>
               <span>SCANNER</span>
             </div>
             <div class="equipment-slot">
-              <span class="equipment-slot-icon">🎨</span>
+              <span class="equipment-slot-icon icon-livery"></span>
               <span>LIVERY</span>
             </div>
           </div>
@@ -2419,7 +2419,7 @@
         <!-- Color Customization -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon">🎨</span>
+            <span class="stat-block-icon icon-hull"></span>
             <span class="stat-block-title">HULL COLORS</span>
           </div>
           <div class="color-picker-row">
@@ -2437,7 +2437,7 @@
         <!-- Accent Color -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon">✨</span>
+            <span class="stat-block-icon icon-accent"></span>
             <span class="stat-block-title">ACCENT COLOR</span>
           </div>
           <div class="color-picker-row">
@@ -2452,7 +2452,7 @@
         <!-- Battle Stats Preview -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon">⚔️</span>
+            <span class="stat-block-icon icon-arena"></span>
             <span class="stat-block-title">ARENA RECORD</span>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center;">
@@ -2470,7 +2470,7 @@
         <!-- Quick Actions -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon">⚡</span>
+            <span class="stat-block-icon icon-actions"></span>
             <span class="stat-block-title">QUICK ACTIONS</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -2484,7 +2484,7 @@
               letter-spacing: 0.1em;
               color: white;
               cursor: pointer;
-            ">⚔️ ENTER ARENA</button>
+            ">✕ ENTER ARENA</button>
             <button onclick="switchTab('garage')" style="
               padding: 12px;
               background: rgba(51, 255, 153, 0.15);
@@ -2495,7 +2495,7 @@
               letter-spacing: 0.1em;
               color: #33ff99;
               cursor: pointer;
-            ">🎨 PAINT BAY</button>
+            ">◈ PAINT BAY</button>
           </div>
         </div>
         
@@ -2536,7 +2536,7 @@
             font-size: 12px;
             color: rgba(255,255,255,0.8);
             cursor: pointer;
-          ">🎲 RANDOMIZE</button>
+          ">◈ RANDOMIZE</button>
         </div>
         
         <button id="battle-start-btn" class="battle-start-btn">
@@ -2554,7 +2554,7 @@
   <div class="cockpit-panel" id="news-panel">
     <div class="news-panel">
       <div class="news-header">
-        <h2 class="news-title">📡 FLEET TRANSMISSIONS</h2>
+        <h2 class="news-title">◎ FLEET TRANSMISSIONS</h2>
         <span style="font-size: 11px; color: rgba(255,255,255,0.4);">Live market events & fleet lore</span>
       </div>
       
@@ -2640,5 +2640,134 @@
   
   <!-- Main application -->
   <script src="js/app.js"></script>
+  
+  <!-- Hull Color & Theme Functionality -->
+  <script>
+  (function() {
+    'use strict';
+    
+    // Color to hue mapping for CSS hue-rotate filter
+    const COLOR_HUE_MAP = {
+      '#33ff99': 0,      // Green (default) - no rotation needed
+      '#00d4ff': 180,    // Cyan
+      '#ff6b35': 330,    // Orange
+      '#8a2be2': 270,    // Purple
+      '#ffd700': 45,     // Gold
+      '#ff1493': 300,    // Hot Pink
+      '#ffffff': 0,      // White (special case)
+      '#1a1a2e': 0       // Dark (special case)
+    };
+    
+    function rgbToHex(rgb) {
+      if (rgb.startsWith('#')) return rgb.toLowerCase();
+      const match = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!match) return rgb;
+      const r = parseInt(match[1]).toString(16).padStart(2, '0');
+      const g = parseInt(match[2]).toString(16).padStart(2, '0');
+      const b = parseInt(match[3]).toString(16).padStart(2, '0');
+      return `#${r}${g}${b}`;
+    }
+    
+    function initHullColors() {
+      const statBlocks = document.querySelectorAll('.hangar-sidebar .stat-block');
+      let hullBlock = null;
+      let accentBlock = null;
+      
+      statBlocks.forEach(block => {
+        const title = block.querySelector('.stat-block-title');
+        if (title) {
+          if (title.textContent.includes('HULL')) hullBlock = block;
+          if (title.textContent.includes('ACCENT')) accentBlock = block;
+        }
+      });
+      
+      if (hullBlock) {
+        hullBlock.querySelectorAll('.color-swatch').forEach(swatch => {
+          swatch.addEventListener('click', function() {
+            const color = this.style.backgroundColor || window.getComputedStyle(this).backgroundColor;
+            const hexColor = rgbToHex(color);
+            
+            // Update ship showcase ring glow
+            const showcase = document.querySelector('.ship-showcase');
+            if (showcase) {
+              showcase.style.setProperty('--ship-glow-color', hexColor);
+            }
+            
+            // Apply hue-rotate to ship sprite for actual color change
+            const sprite = document.querySelector('.ship-showcase-sprite');
+            if (sprite) {
+              const hueRotate = COLOR_HUE_MAP[hexColor] || 0;
+              
+              // Special handling for white/dark
+              if (hexColor === '#ffffff') {
+                sprite.style.filter = `brightness(1.5) saturate(0.3) drop-shadow(0 0 30px ${hexColor})`;
+              } else if (hexColor === '#1a1a2e') {
+                sprite.style.filter = `brightness(0.6) saturate(0.5) drop-shadow(0 0 20px rgba(100,100,120,0.5))`;
+              } else {
+                sprite.style.filter = `hue-rotate(${hueRotate}deg) drop-shadow(0 0 30px ${hexColor})`;
+              }
+            }
+            
+            // Update ring colors
+            const ring = document.querySelector('.ship-showcase-ring');
+            if (ring) {
+              ring.style.borderColor = hexColor.replace(')', ', 0.3)').replace('rgb', 'rgba').replace('#', '');
+              ring.style.borderColor = `${hexColor}33`;
+              ring.style.boxShadow = `0 0 30px ${hexColor}22, inset 0 0 30px ${hexColor}11`;
+            }
+            
+            // Update active state
+            hullBlock.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+      }
+      
+      if (accentBlock) {
+        accentBlock.querySelectorAll('.color-swatch').forEach(swatch => {
+          swatch.addEventListener('click', function() {
+            accentBlock.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+      }
+    }
+    
+    // Theme toggle - Press 'T' to toggle Hotline Miami theme
+    function initThemeToggle() {
+      // Check localStorage for saved preference
+      const savedTheme = localStorage.getItem('space-capital-theme');
+      if (savedTheme === 'hotline') {
+        document.body.classList.add('theme-hotline');
+      }
+      
+      document.addEventListener('keydown', function(e) {
+        // Press 'T' (not in input) to toggle theme
+        if (e.key === 't' || e.key === 'T') {
+          if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+          
+          document.body.classList.toggle('theme-hotline');
+          const isHotline = document.body.classList.contains('theme-hotline');
+          localStorage.setItem('space-capital-theme', isHotline ? 'hotline' : 'default');
+          
+          // Visual feedback
+          console.log(`Theme: ${isHotline ? 'HOTLINE MIAMI' : 'SPACE CAPITAL'}`);
+        }
+      });
+    }
+    
+    // Initialize
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initHullColors();
+        initThemeToggle();
+      });
+    } else {
+      initHullColors();
+      initThemeToggle();
+    }
+    setTimeout(initHullColors, 500);
+  })();
+  </script>
 </body>
 </html>

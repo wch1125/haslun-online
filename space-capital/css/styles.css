@@ -1055,6 +1055,68 @@ body.no-scanlines::before {
       --font-mono: 'IBM Plex Mono', monospace;
     }
     
+    /* =========================================================================
+       HOTLINE MIAMI THEME - Aggressive, dangerous, illegal spin pit aesthetic
+       Toggle with: document.body.classList.add('theme-hotline')
+       ========================================================================= */
+    body.theme-hotline {
+      --accent-hue: 330;  /* Hot magenta instead of green */
+      --bg-void: #0a0008;
+      --bg-deep: #120010;
+      --bg-panel: #1a0018;
+      --bg-card: #220020;
+      --border: #3a0030;
+      --border-glow: #550045;
+      --grid-line: rgba(255, 0, 102, 0.12);
+      --phosphor: #ff0066;
+      --phosphor-dim: rgba(255, 0, 102, 0.6);
+      --phosphor-glow: rgba(255, 0, 102, 0.2);
+      --phosphor-ghost: rgba(255, 0, 102, 0.1);
+      --accent-glow: rgba(255, 47, 210, 0.7);
+      --amber: #ff7a00;
+      --amber-dim: rgba(255, 122, 0, 0.6);
+      --amber-glow: rgba(255, 122, 0, 0.2);
+      --signal-up: #aaff00;
+      --signal-down: #ff0066;
+      --signal-warn: #ff7a00;
+      --text-bright: #fff0f8;
+      --text: #d8b0c8;
+      --text-muted: #8a6078;
+    }
+    
+    /* Hotline theme - more aggressive button styling */
+    body.theme-hotline .hud-btn {
+      border-color: var(--phosphor);
+      text-shadow: 0 0 10px var(--phosphor);
+    }
+    
+    body.theme-hotline .hud-btn.active {
+      background: linear-gradient(180deg, rgba(255, 0, 102, 0.3), rgba(255, 0, 102, 0.1));
+      box-shadow: 0 0 30px rgba(255, 0, 102, 0.3), inset 0 0 20px rgba(255, 0, 102, 0.1);
+    }
+    
+    body.theme-hotline .stat-block {
+      border-color: rgba(255, 0, 102, 0.2);
+      background: linear-gradient(135deg, rgba(42, 0, 31, 0.4), rgba(10, 0, 8, 0.8));
+    }
+    
+    body.theme-hotline .ship-showcase-ring {
+      border-color: rgba(255, 0, 102, 0.2);
+      box-shadow: 0 0 30px rgba(255, 0, 102, 0.15), inset 0 0 30px rgba(255, 0, 102, 0.08);
+    }
+    
+    body.theme-hotline .header {
+      background: 
+        radial-gradient(ellipse at 0% 0%, rgba(255, 0, 102, 0.2), transparent 50%),
+        linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-deep) 100%);
+      border-bottom-color: rgba(255, 0, 102, 0.3);
+    }
+    
+    body.theme-hotline .logo-text {
+      color: #ff0066;
+      text-shadow: 0 0 20px rgba(255, 0, 102, 0.6);
+    }
+    
     @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
     @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(51, 255, 153, 0.1); } 50% { box-shadow: 0 0 30px rgba(51, 255, 153, 0.2); } }
     @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
@@ -3753,11 +3815,18 @@ body.no-scanlines::before {
         radial-gradient(ellipse at 0% 0%, rgba(51, 255, 153, 0.15), transparent 50%),
         linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-deep) 100%);
       border-bottom: 1px solid var(--border);
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
       z-index: 100;
       box-shadow: 0 0 30px rgba(51, 255, 153, 0.05);
       flex-shrink: 0;
+    }
+    
+    /* Account for fixed header */
+    body {
+      padding-top: 56px;
     }
 
     /* iOS safe-area support (notches / dynamic islands) */

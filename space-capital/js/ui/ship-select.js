@@ -13,7 +13,7 @@
   const STAT_CONFIG = {
     POWER: {
       label: 'POWER',
-      icon: '⚡',
+      icon: '◈',
       description: 'Long-term momentum (1Y return)',
       source: 'return_1y',
       // Expected range for normalization
@@ -23,7 +23,7 @@
     },
     SPEED: {
       label: 'SPEED',
-      icon: '🚀',
+      icon: '▲',
       description: 'Immediate velocity (1D return)',
       source: 'return_1d',
       min: -10,
@@ -32,7 +32,7 @@
     },
     ARMOR: {
       label: 'ARMOR',
-      icon: '🛡️',
+      icon: '◇',
       description: 'Stability (proximity to 52W high)',
       source: 'armor_calc', // Special calculation
       min: 0,
@@ -41,7 +41,7 @@
     },
     RANGE: {
       label: 'RANGE',
-      icon: '📡',
+      icon: '◎',
       description: 'Operational reach (6M return)',
       source: 'return_6m',
       min: -50,
@@ -50,7 +50,7 @@
     },
     TECH: {
       label: 'TECH',
-      icon: '⚙️',
+      icon: '⬡',
       description: 'Recent capability (3M return)',
       source: 'return_3m',
       min: -30,
@@ -59,7 +59,7 @@
     },
     LUCK: {
       label: 'LUCK',
-      icon: '🎲',
+      icon: '✦',
       description: 'Volatility factor (1W swing)',
       source: 'luck_calc', // Special calculation
       min: 0,
