@@ -1,0 +1,14 @@
+{
+  "ticker": "EVEX",
+  "dataPoints": 2368,
+  "lastUpdated": "2026-01-06T17:39:08.713230",
+  "kernelRespectPct": 0.5485641891891891,
+  "bandCompression": 0.776,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.596,
+  "trendAdherence": 0.669,
+  "chopSensitivity": 0.186
+}

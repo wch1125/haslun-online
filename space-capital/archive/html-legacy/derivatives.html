@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARALLAX // Mission Command</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Ship Brief dialog styles (isolated for modularity) -->
+  <link rel="stylesheet" href="css/ship-brief.css">
+  <style>
+    :root {
+      --bg-dark: #0a0e14;
+      --bg-card: #0d1218;
+      --bg-card-hover: #111820;
+      --phosphor: #33ff99;
+      --phosphor-dim: rgba(51, 255, 153, 0.3);
+      --amber: #ffaa33;
+      --amber-dim: rgba(255, 170, 51, 0.3);
+      --red: #ff4444;
+      --red-dim: rgba(255, 68, 68, 0.3);
+      --cyan: #00d4ff;
+      --text: #c8d4e0;
+      --text-dim: #6a7a8a;
+      --border: rgba(51, 255, 153, 0.15);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: 
+        radial-gradient(ellipse at center, transparent 0%, transparent 60%, rgba(0,0,0,0.35) 100%),
+        var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    
+    /* CRT Scanlines Overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg, 
+        transparent, 
+        transparent 3px, 
+        rgba(0,0,0,0.06) 3px, 
+        rgba(0,0,0,0.06) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
+    /* CRT Ambient Glow */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(
+        ellipse 100% 60% at 50% 30%,
+        rgba(51, 255, 153, 0.03) 0%,
+        transparent 70%
+      );
+      animation: crt-breathe 5s ease-in-out infinite;
+    }
+    
+    @keyframes crt-breathe {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════
+       SCROLLING TICKER BANNER — News broadcast style
+       ═══════════════════════════════════════════════════════════════════ */
+    .ticker-banner {
+      position: relative;
+      background: linear-gradient(to bottom, #080c10, #0d1218);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      height: 32px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .ticker-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(10, 14, 20, 1) 0%,
+        transparent 5%,
+        transparent 95%,
+        rgba(10, 14, 20, 1) 100%
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+    
+    .ticker-label {
+      flex-shrink: 0;
+      background: var(--phosphor);
+      color: var(--bg-dark);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.35rem 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      z-index: 3;
+      box-shadow: 2px 0 10px rgba(51, 255, 153, 0.4);
+    }
+    
+    .ticker-track {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .ticker-content {
+      display: flex;
+      gap: 3rem;
+      animation: ticker-scroll 45s linear infinite;
+      white-space: nowrap;
+      padding-left: 100%;
+    }
+    
+    .ticker-content:hover {
+      animation-play-state: paused;
+    }
+    
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    .ticker-item .symbol {
+      color: var(--phosphor);
+      font-weight: 600;
+    }
+    
+    .ticker-item .price {
+      color: var(--text);
+    }
+    
+    .ticker-item .change {
+      font-weight: 600;
+    }
+    
+    .ticker-item .change.up { color: var(--phosphor); }
+    .ticker-item .change.down { color: var(--red); }
+    
+    .ticker-item .separator {
+      color: var(--border);
+      margin: 0 0.5rem;
+    }
+    
+    /* Mission badge in ticker */
+    .ticker-item .mission-badge {
+      color: var(--amber);
+      font-size: 0.6rem;
+      margin-left: 0.25rem;
+      animation: pulse-badge 1s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-badge {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.2); }
+    }
+    
+    /* Mission status flash in ticker */
+    .ticker-item.mission-alert {
+      color: var(--amber);
+      animation: ticker-flash 2s ease-in-out infinite;
+    }
+    
+    @keyframes ticker-flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════
+       ENHANCED PANEL STYLING — Pip-Boy aesthetic
+       ═══════════════════════════════════════════════════════════════════ */
+    .panel {
+      background: linear-gradient(180deg, rgba(13, 18, 24, 0.95) 0%, rgba(8, 12, 16, 0.98) 100%);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Glass reflection on panels */
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(
+        180deg,
+        rgba(51, 255, 153, 0.03) 0%,
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+    
+    /* Panel header glow */
+    .panel-header {
+      position: relative;
+      background: linear-gradient(
+        90deg,
+        rgba(51, 255, 153, 0.08) 0%,
+        transparent 50%
+      );
+    }
+    
+    .panel-title {
+      text-shadow: 0 0 10px var(--phosphor-dim);
+    }
+    
+    /* Phosphor glow on important values */
+    .stat-value {
+      text-shadow: 
+        0 0 5px currentColor,
+        0 0 15px currentColor;
+    }
+    
+    /* Mission card enhancements */
+    .mission-card {
+      transition: all 0.3s ease;
+      border: 1px solid var(--border);
+    }
+    
+    .mission-card:hover {
+      border-color: var(--phosphor-dim);
+      box-shadow: 
+        0 0 20px rgba(51, 255, 153, 0.1),
+        inset 0 0 30px rgba(51, 255, 153, 0.03);
+    }
+    
+    .mission-card.recommended {
+      border-color: var(--phosphor-dim);
+      box-shadow: 0 0 15px rgba(51, 255, 153, 0.15);
+    }
+    
+    /* Active mission highlight */
+    .ami-card {
+      background: linear-gradient(
+        135deg,
+        rgba(51, 255, 153, 0.08) 0%,
+        rgba(13, 18, 24, 0.95) 50%
+      );
+      border: 1px solid var(--phosphor-dim);
+      animation: active-pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes active-pulse {
+      0%, 100% { 
+        box-shadow: 0 0 10px rgba(51, 255, 153, 0.2);
+      }
+      50% { 
+        box-shadow: 0 0 25px rgba(51, 255, 153, 0.35);
+      }
+    }
+    
+    /* Fleet bay styling */
+    .fleet-bay {
+      background: linear-gradient(180deg, #0d1218 0%, #080c10 100%);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-top: 1.5rem;
+    }
+    
+    .fleet-bay-header {
+      background: linear-gradient(
+        90deg,
+        rgba(51, 255, 153, 0.06) 0%,
+        transparent 100%
+      );
+    }
+    
+    /* Ship cards in fleet */
+    .fleet-ship {
+      transition: all 0.2s ease;
+    }
+    
+    .fleet-ship:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(51, 255, 153, 0.2);
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(
+        to bottom,
+        var(--phosphor-dim),
+        rgba(51, 255, 153, 0.3)
+      );
+      border-radius: 3px;
+    }
+    
+    /* Page Navigation (matches index.html grouped nav) */
+    .page-nav {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .page-nav .nav-link {
+      padding: 0.6rem 1.1rem;
+      background: linear-gradient(to bottom, rgba(51, 255, 153, 0.06), transparent);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      color: var(--text-dim);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    .page-nav .nav-link:hover {
+      color: var(--text);
+      background: linear-gradient(to bottom, rgba(51, 255, 153, 0.1), transparent);
+    }
+    
+    .page-nav .nav-link.active {
+      color: var(--phosphor);
+      background: linear-gradient(to bottom, rgba(51, 255, 153, 0.15), rgba(51, 255, 153, 0.05));
+      border-color: var(--phosphor-dim);
+      text-shadow: 0 0 10px var(--phosphor-dim);
+      box-shadow: inset 0 2px 0 var(--phosphor);
+    }
+    
+    /* Breadcrumb */
+    .page-path {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.25);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    
+    .page-path .path-group { color: var(--phosphor); opacity: 0.85; }
+    .page-path .path-sep { opacity: 0.5; }
+    .page-path .path-leaf { opacity: 0.85; }
+    
+    .container { max-width: 1600px; margin: 0 auto; padding: 1.5rem; }
+    
+    /* ═══════════════════════════════════════════════════════════════════
+       CRT SCREEN FRAME — Pip-Boy Command Terminal
+       ═══════════════════════════════════════════════════════════════════ */
+    .crt-frame {
+      position: relative;
+      background: linear-gradient(145deg, #080a0d 0%, #0d1218 50%, #080a0d 100%);
+      border: 2px solid rgba(51, 255, 153, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 
+        0 0 30px rgba(51, 255, 153, 0.1),
+        inset 0 0 60px rgba(0, 0, 0, 0.5),
+        inset 0 2px 0 rgba(51, 255, 153, 0.1);
+    }
+    
+    /* CRT screen curvature effect */
+    .crt-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: radial-gradient(
+        ellipse 120% 80% at 50% 0%,
+        rgba(51, 255, 153, 0.04) 0%,
+        transparent 50%
+      );
+      pointer-events: none;
+    }
+    
+    /* Screen edge highlight */
+    .crt-frame::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 10px;
+      border: 1px solid rgba(51, 255, 153, 0.08);
+      pointer-events: none;
+      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Corner brackets on frame */
+    .crt-corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--phosphor);
+      border-style: solid;
+      opacity: 0.5;
+    }
+    .crt-corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+    .crt-corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+    .crt-corner.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+    .crt-corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+    
+    /* Static noise background */
+    .crt-static {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      opacity: 0.015;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: static-flicker 0.15s steps(5) infinite;
+    }
+    
+    @keyframes static-flicker {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(-0.5%, 0.5%); }
+      50% { transform: translate(0.5%, -0.5%); }
+      75% { transform: translate(-0.5%, -0.5%); }
+      100% { transform: translate(0, 0); }
+    }
+    
+    /* Horizontal scan line */
+    .crt-scanline {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(51, 255, 153, 0.08),
+        transparent
+      );
+      pointer-events: none;
+      animation: scanline-move 4s linear infinite;
+      z-index: 10;
+    }
+    
+    @keyframes scanline-move {
+      0% { top: -3px; }
+      100% { top: 100%; }
+    }
+    
+    /* Header */
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 5;
+    }
+    .header-title h1 { 
+      font-size: 1.5rem; 
+      color: var(--phosphor); 
+      text-shadow: 
+        0 0 10px var(--phosphor-dim),
+        0 0 30px var(--phosphor-dim),
+        0 0 50px rgba(51, 255, 153, 0.2);
+      letter-spacing: 3px;
+    }
+    .header-title .subtitle { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+    .back-btn { 
+      font-family: inherit; font-size: 0.85rem; background: transparent;
+      color: var(--phosphor); border: 1px solid var(--border); padding: 0.5rem 1rem;
+      cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .back-btn:hover { 
+      background: var(--bg-card-hover); 
+      border-color: var(--phosphor);
+      box-shadow: 0 0 15px var(--phosphor-dim);
+    }
+    
+    /* Controls */
+    .controls { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .control-group { display: flex; align-items: center; gap: 0.5rem; }
+    .control-group label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+    
+    select, button {
+      font-family: inherit; font-size: 0.85rem; background: var(--bg-card);
+      color: var(--phosphor); border: 1px solid var(--border); padding: 0.5rem 1rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    select:hover, button:hover { background: var(--bg-card-hover); border-color: var(--phosphor); }
+    button { text-transform: uppercase; letter-spacing: 1px; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.danger { color: var(--red); border-color: var(--red-dim); }
+    button.danger:hover { background: var(--red-dim); }
+    button.small { padding: 0.3rem 0.6rem; font-size: 0.7rem; }
+    
+    /* Status bar */
+    .status-bar {
+      background: var(--bg-card); border: 1px solid var(--border);
+      padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 0.8rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .status-bar .status { color: var(--text-dim); }
+    .status-bar .status.ready { color: var(--phosphor); }
+    .status-bar .status.loading { color: var(--amber); }
+    .status-bar .status.error { color: var(--red); }
+    .status-bar .meta { color: var(--text-dim); font-size: 0.7rem; }
+    
+    /* Main layout */
+    .main-layout { display: grid; grid-template-columns: 320px 1fr 380px; gap: 1.5rem; }
+    @media (max-width: 1200px) { .main-layout { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+    
+    /* Mobile container padding */
+    @media (max-width: 768px) {
+      .container { padding: 1rem 0.75rem; }
+      .header { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+      .header-title h1 { font-size: 1.1rem; }
+      .back-btn { align-self: flex-end; margin-top: -2rem; }
+      .controls { flex-wrap: wrap; gap: 0.75rem; }
+      .control-group { flex: 1 1 45%; min-width: 140px; }
+      .control-group select { width: 100%; }
+      #compute-btn { flex: 1 1 100%; }
+    }
+    
+    @media (max-width: 480px) {
+      .container { padding: 0.75rem 0.5rem; }
+      .page-nav { padding: 0.5rem; gap: 0.25rem; }
+      .page-nav .nav-link { padding: 0.5rem 0.75rem; font-size: 0.6rem; }
+      .header-title h1 { font-size: 1rem; }
+      .header-title .subtitle { font-size: 0.65rem; }
+      .panel-title { font-size: 0.9rem; }
+      .stat-name { font-size: 0.75rem; }
+      .stat-value { font-size: 1.1rem; }
+      .mission-name { font-size: 0.8rem; }
+      .mission-btn { padding: 0.6rem 1rem; font-size: 0.7rem; min-height: 44px; }
+      .fleet-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    }
+    
+    /* Panels */
+    .panel { background: var(--bg-card); border: 1px solid var(--border); }
+    .panel-header { padding: 1rem; border-bottom: 1px solid var(--border); }
+    .panel-label { color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem; }
+    .panel-title { color: var(--phosphor); font-size: 1rem; font-weight: 600; }
+    .panel-body { padding: 1rem; }
+    
+    /* Stats */
+    .stat-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .stat-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .stat-name { font-size: 0.85rem; color: var(--text); text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .stat-value.high { color: var(--phosphor); }
+    .stat-value.medium { color: var(--amber); }
+    .stat-value.low { color: var(--red); }
+    .stat-bar { height: 4px; background: rgba(255,255,255,0.1); margin-bottom: 0.5rem; overflow: hidden; }
+    .stat-bar-fill { height: 100%; transition: width 0.5s ease; }
+    .stat-bar-fill.high { background: var(--phosphor); box-shadow: 0 0 10px var(--phosphor); }
+    .stat-bar-fill.medium { background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+    .stat-bar-fill.low { background: var(--red); box-shadow: 0 0 10px var(--red); }
+    .stat-why { font-size: 0.7rem; color: var(--text-dim); line-height: 1.4; }
+    
+    /* Polish: Extreme stat narrative microcopy */
+    .stat-extreme {
+      font-size: 0.65rem;
+      color: var(--amber);
+      font-style: italic;
+      margin-top: 0.35rem;
+      padding: 0.3rem 0.5rem;
+      background: rgba(255,170,51,0.08);
+      border-left: 2px solid var(--amber);
+    }
+    .latest-bar { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); }
+    .latest-bar strong { color: var(--text); }
+    
+    /* Mission cards */
+    .missions-grid { display: grid; gap: 1rem; }
+    .mission-card {
+      background: var(--bg-dark); border: 1px solid var(--border);
+      padding: 1rem; transition: all 0.2s;
+    }
+    .mission-card:hover { border-color: var(--phosphor); box-shadow: 0 0 20px var(--phosphor-dim); }
+    .mission-card.recommended { border-color: var(--phosphor); }
+    .mission-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .mission-card-title { display: flex; align-items: center; gap: 0.5rem; }
+    .mission-icon { font-size: 1.5rem; }
+    .mission-name { font-size: 0.9rem; color: var(--phosphor); font-weight: 600; }
+    .mission-meta { text-align: right; }
+    .difficulty-stars { color: var(--amber); font-size: 0.9rem; letter-spacing: 2px; }
+    
+    /* Polish: Fit bar visual affordance */
+    .suitability-container {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: help;
+      margin-top: 0.25rem;
+    }
+    .fit-bar {
+      width: 40px;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .fit-fill {
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .fit-bar.fit-high .fit-fill { background: var(--phosphor); }
+    .fit-bar.fit-medium .fit-fill { background: var(--amber); }
+    .fit-bar.fit-low .fit-fill { background: var(--red); }
+    .suitability-text {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+    .fit-high + .suitability-text { color: var(--phosphor); }
+    .suitability-container:hover .suitability-text { color: var(--text); }
+    
+    .mission-concept { font-size: 0.75rem; color: var(--amber); margin-bottom: 0.5rem; font-style: italic; }
+    .mission-betting { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+    .mission-betting strong { color: var(--cyan); }
+    .mission-why-now { font-size: 0.75rem; color: var(--phosphor); padding: 0.5rem; background: rgba(51,255,153,0.05); border-left: 2px solid var(--phosphor); margin-bottom: 0.75rem; }
+    .mission-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .launch-btn { background: var(--phosphor); color: var(--bg-dark); font-weight: 600; }
+    .launch-btn:hover { background: #2de088; }
+    .launch-btn:disabled { background: var(--text-dim); }
+    
+    /* Active missions panel */
+    .active-missions-list { max-height: 400px; overflow-y: auto; }
+    .active-mission-item {
+      background: var(--bg-dark); border: 1px solid var(--border);
+      padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s;
+    }
+    .active-mission-item:hover { border-color: var(--amber); }
+    .active-mission-item.selected { border-color: var(--phosphor); background: rgba(51,255,153,0.05); }
+    .active-mission-item.complete { border-color: var(--cyan); }
+    .active-mission-item.damaged { border-color: var(--red); }
+    .ami-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .ami-ticker { font-weight: 600; color: var(--phosphor); }
+    .ami-type { font-size: 0.7rem; color: var(--text-dim); }
+    .ami-progress { height: 4px; background: rgba(255,255,255,0.1); margin-bottom: 0.5rem; }
+    .ami-progress-fill { height: 100%; background: var(--amber); transition: width 0.3s; }
+    .ami-progress-fill.complete { background: var(--phosphor); }
+    .ami-time { font-size: 0.7rem; color: var(--text-dim); }
+    .ami-grade { font-size: 1.2rem; font-weight: 700; }
+    .ami-grade.S { color: #ffd700; }
+    .ami-grade.A { color: var(--phosphor); }
+    .ami-grade.B { color: var(--cyan); }
+    .ami-grade.C { color: var(--amber); }
+    .ami-grade.D { color: var(--red); }
+    
+    /* Mission detail panel */
+    .mission-detail { display: none; }
+    .mission-detail.visible { display: block; }
+    .detail-section { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .detail-section:last-child { border-bottom: none; }
+    .detail-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; }
+    .detail-value { font-size: 0.9rem; color: var(--text); }
+    .detail-value.big { font-size: 1.5rem; font-weight: 700; }
+    
+    /* Progress display */
+    .progress-container { margin: 1rem 0; }
+    .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--phosphor)); transition: width 0.3s; }
+    .progress-text { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-dim); }
+    
+    /* Log feed */
+    .log-feed { max-height: 200px; overflow-y: auto; font-size: 0.75rem; }
+    .log-entry { padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 0.5rem; }
+    .log-entry:last-child { border-bottom: none; }
+    .log-kind { font-weight: 600; min-width: 50px; }
+    .log-kind.INFO { color: var(--cyan); }
+    .log-kind.WARN { color: var(--amber); }
+    .log-kind.EVENT { color: var(--phosphor); }
+    .log-msg { color: var(--text); flex: 1; }
+    
+    /* Outcome display */
+    .outcome-box { background: rgba(51,255,153,0.05); border: 1px solid var(--phosphor); padding: 1rem; }
+    .outcome-grade { font-size: 3rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+    .outcome-score { text-align: center; font-size: 1rem; color: var(--text-dim); margin-bottom: 1rem; }
+    .outcome-explanation { font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem; }
+    .outcome-list { font-size: 0.8rem; }
+    .outcome-list h4 { color: var(--phosphor); margin-bottom: 0.5rem; font-size: 0.75rem; text-transform: uppercase; }
+    .outcome-list.hurt h4 { color: var(--red); }
+    .outcome-list ul { list-style: none; padding-left: 0; }
+    .outcome-list li { padding: 0.25rem 0; padding-left: 1rem; position: relative; }
+    .outcome-list li::before { content: '›'; position: absolute; left: 0; color: var(--text-dim); }
+    
+    /* Sim controls */
+    .sim-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+    
+    /* Disclaimer */
+    .disclaimer {
+      background: rgba(255,170,51,0.1); border: 1px solid var(--amber);
+      padding: 0.75rem; margin-top: 1rem; font-size: 0.75rem; color: var(--amber); text-align: center;
+    }
+    
+    /* Empty states */
+    .empty-state { text-align: center; padding: 2rem; color: var(--text-dim); font-size: 0.85rem; }
+    
+    /* Polish: Improved zero state design */
+    .zero-state-missions {
+      padding: 1.5rem;
+      background: rgba(51,255,153,0.02);
+      border: 1px dashed rgba(51,255,153,0.2);
+    }
+    .zero-state-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.6;
+    }
+    .zero-state-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    .zero-state-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+    
+    /* Loading */
+    .loading { text-align: center; padding: 2rem; color: var(--text-dim); }
+    
+    /* Footer */
+    .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-dim); font-size: 0.7rem; }
+    .footer a { color: var(--phosphor); text-decoration: none; }
+    
+    /* Ticker badge */
+    .ticker-badge { display: inline-block; background: var(--amber); color: var(--bg-dark); font-size: 0.6rem; padding: 0.1rem 0.4rem; margin-left: 0.5rem; font-weight: 600; }
+    
+    /* ═══════════════════════════════════════════════════════════════════
+       STEP 3: FLEET BAY & SUPPORT SLOTS
+       ═══════════════════════════════════════════════════════════════════ */
+    
+    /* Fleet Bay Panel */
+    .fleet-bay {
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .fleet-bay-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .fleet-bay-header:hover { background: var(--bg-card-hover); }
+    .fleet-bay-title { color: var(--phosphor); font-size: 0.9rem; font-weight: 600; }
+    .fleet-bay-toggle { color: var(--text-dim); font-size: 0.8rem; }
+    .fleet-bay-content { padding: 1rem; display: none; }
+    .fleet-bay-content.open { display: block; }
+    .fleet-search { width: 100%; padding: 0.5rem; margin-bottom: 1rem; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 0.8rem; }
+    .fleet-search::placeholder { color: var(--text-dim); }
+    
+    /* Fleet Grid */
+    .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; max-height: 300px; overflow-y: auto; }
+    
+    /* Fleet Ship Item */
+    .fleet-ship {
+      background: var(--bg-dark); border: 1px solid var(--border); padding: 0.5rem;
+      cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .fleet-ship:hover { border-color: var(--phosphor); background: var(--bg-card-hover); }
+    .fleet-ship.locked { opacity: 0.5; cursor: not-allowed; }
+    .fleet-ship.locked:hover { border-color: var(--red); }
+    .fleet-ship.assigned { border-color: var(--amber); background: rgba(255,170,51,0.1); }
+    .fleet-ship-ticker { font-weight: 600; font-size: 0.9rem; color: var(--phosphor); }
+    .fleet-ship-name { font-size: 0.65rem; color: var(--text-dim); margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fleet-ship-role { display: inline-block; font-size: 0.6rem; padding: 0.1rem 0.4rem; background: rgba(51,255,153,0.15); color: var(--phosphor); border-radius: 2px; }
+    .fleet-ship-role.SCOUT { background: rgba(0,212,255,0.15); color: var(--cyan); }
+    .fleet-ship-role.ESCORT { background: rgba(255,170,51,0.15); color: var(--amber); }
+    .fleet-ship-role.CARRIER { background: rgba(51,255,153,0.15); color: var(--phosphor); }
+    .fleet-ship-role.UTILITY { background: rgba(200,212,224,0.15); color: var(--text); }
+    .fleet-ship-stats { display: flex; gap: 0.25rem; margin-top: 0.25rem; }
+    .fleet-mini-bar { height: 3px; flex: 1; background: rgba(255,255,255,0.1); overflow: hidden; }
+    .fleet-mini-bar-fill { height: 100%; }
+    .fleet-mini-bar-fill.hull { background: var(--phosphor); }
+    .fleet-mini-bar-fill.sensors { background: var(--cyan); }
+    .fleet-mini-bar-fill.threat { background: var(--red); }
+    .fleet-ship-lock { position: absolute; top: 0.25rem; right: 0.25rem; font-size: 0.6rem; color: var(--red); }
+    
+    /* Locked Ticker (silhouette) */
+    .fleet-ship.silhouette { opacity: 0.3; pointer-events: none; }
+    .fleet-ship.silhouette .fleet-ship-ticker { color: var(--text-dim); letter-spacing: 2px; }
+    .fleet-ship.silhouette .fleet-ship-name { font-style: italic; }
+    .fleet-ship.silhouette .fleet-ship-role { background: rgba(100,100,100,0.2); color: var(--text-dim); }
+    
+    /* Benchmark Ticker (viewable but not assignable) */
+    .fleet-ship.benchmark { opacity: 0.6; cursor: not-allowed; border-color: rgba(255, 200, 100, 0.3); }
+    .fleet-ship.benchmark:hover { border-color: rgba(255, 200, 100, 0.5); background: var(--bg-card); }
+    .fleet-ship.benchmark .fleet-ship-ticker { color: var(--amber); }
+    .fleet-ship.benchmark .fleet-ship-role { background: rgba(255, 170, 51, 0.15); color: var(--amber); }
+    .fleet-ship-role.BENCHMARK { background: rgba(255, 170, 51, 0.15); color: var(--amber); }
+    
+    /* Support Slots */
+    .support-slots { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .support-slots-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .support-slots-container { display: flex; gap: 0.5rem; }
+    .support-slot {
+      flex: 1; padding: 0.5rem; background: var(--bg-dark); border: 2px dashed var(--border);
+      min-height: 60px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .support-slot:hover { border-color: var(--phosphor); background: rgba(51,255,153,0.05); }
+    .support-slot.filled { border-style: solid; border-color: var(--amber); }
+    .support-slot-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; }
+    .support-slot-empty { font-size: 0.7rem; color: var(--text-dim); }
+    .support-slot-ticker { font-weight: 600; color: var(--phosphor); font-size: 0.85rem; }
+    .support-slot-role { font-size: 0.65rem; color: var(--amber); }
+    .support-slot-remove { font-size: 0.7rem; color: var(--red); cursor: pointer; margin-top: 0.25rem; opacity: 0.7; }
+    .support-slot-remove:hover { opacity: 1; }
+    
+    /* Assign Modal */
+    .assign-modal-backdrop {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); z-index: 1000; display: none;
+    }
+    .assign-modal-backdrop.open { display: flex; justify-content: center; align-items: center; }
+    .assign-modal {
+      background: var(--bg-card); border: 1px solid var(--phosphor); padding: 1.5rem;
+      max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto;
+    }
+    .assign-modal h3 { color: var(--phosphor); margin-bottom: 1rem; font-size: 1rem; }
+    .assign-modal-ships { display: flex; flex-direction: column; gap: 0.5rem; max-height: 300px; overflow-y: auto; }
+    .assign-modal-ship {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem; background: var(--bg-dark); border: 1px solid var(--border);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .assign-modal-ship:hover { border-color: var(--phosphor); }
+    .assign-modal-ship.disabled { opacity: 0.4; cursor: not-allowed; }
+    .assign-modal-close { margin-top: 1rem; width: 100%; padding: 0.5rem; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); cursor: pointer; }
+    .assign-modal-close:hover { background: var(--bg-card-hover); border-color: var(--phosphor); }
+  </style>
+</head>
+<body>
+  <!-- Navigation (matches index.html) -->
+  <nav class="page-nav">
+    <a href="index.html#chart" class="nav-link">TELEMETRY</a>
+    <a href="index.html#positions" class="nav-link active">OPERATIONS</a>
+    <a href="index.html#arcade" class="nav-link">TRAINING</a>
+  </nav>
+  
+  <!-- Breadcrumb -->
+  <div class="page-path">
+    <span class="path-group">OPERATIONS</span>
+    <span class="path-sep">›</span>
+    <span class="path-leaf">MISSIONS</span>
+  </div>
+  
+  <!-- Scrolling Ticker Banner -->
+  <div class="ticker-banner">
+    <div class="ticker-label">LIVE</div>
+    <div class="ticker-track">
+      <div class="ticker-content" id="ticker-content">
+        <!-- Populated by JavaScript -->
+        <span class="ticker-item">Loading market data...</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <!-- CRT Screen Frame -->
+    <div class="crt-frame">
+      <div class="crt-static"></div>
+      <div class="crt-scanline"></div>
+      <div class="crt-corner tl"></div>
+      <div class="crt-corner tr"></div>
+      <div class="crt-corner bl"></div>
+      <div class="crt-corner br"></div>
+      
+    <!-- Header -->
+    <header class="header">
+      <div class="header-title">
+        <h1>[MISSION COMMAND]</h1>
+        <div class="subtitle">DERIVATIVES TRAINING SANDBOX</div>
+      </div>
+      <button class="back-btn" onclick="returnToDashboard()">‹ DASHBOARD</button>
+    </header>
+    
+    <!-- Controls -->
+    <div class="controls">
+      <div class="control-group">
+        <label>Sector:</label>
+        <select id="ticker-select"><option value="">Loading...</option></select>
+      </div>
+      <button id="compute-btn" disabled>Analyze Sector</button>
+      <div class="control-group">
+        <label>Sim Speed:</label>
+        <select id="speed-select">
+          <option value="1x">1x (1 bar / 4s)</option>
+          <option value="5x">5x (1 bar / 0.8s)</option>
+          <option value="20x">20x (5 bars / s)</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status" id="status-text">Initializing...</span>
+      <span class="meta" id="status-meta"></span>
+    </div>
+    
+    <!-- Main layout -->
+    <div class="main-layout">
+      <!-- Left: Environment Stats -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-label">// Sector Analysis</div>
+          <div class="panel-title">Environment Stats</div>
+        </div>
+        <div class="panel-body" id="env-stats">
+          <div class="empty-state">Select a sector to begin</div>
+        </div>
+      </div>
+      
+      <!-- Center: Mission Cards -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-label">// Available Operations</div>
+          <div class="panel-title">Mission Recommendations</div>
+        </div>
+        <div class="panel-body">
+          <div class="missions-grid" id="missions-grid">
+            <div class="empty-state">Awaiting sector analysis</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right: Active Missions + Detail -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-label">// Fleet Operations</div>
+          <div class="panel-title">Active Missions</div>
+        </div>
+        <div class="panel-body">
+          <div class="active-missions-list" id="active-missions-list">
+            <div class="empty-state zero-state-missions">
+              <div class="zero-state-icon">[MIS]</div>
+              <div class="zero-state-title">No active missions</div>
+              <div class="zero-state-copy">Launch operations to observe how market conditions evolve over time.</div>
+            </div>
+          </div>
+          
+          <!-- Mission Detail (hidden by default) -->
+          <div class="mission-detail" id="mission-detail">
+            <div class="detail-section">
+              <div class="detail-label">Mission</div>
+              <div class="detail-value" id="detail-name"></div>
+              <div class="detail-value" style="font-size:0.8rem;color:var(--text-dim)" id="detail-ticker"></div>
+            </div>
+            
+            <div class="detail-section">
+              <div class="detail-label">Progress</div>
+              <div class="progress-container">
+                <div class="progress-bar"><div class="progress-fill" id="detail-progress-fill"></div></div>
+                <div class="progress-text">
+                  <span id="detail-bars-elapsed">0 bars</span>
+                  <span id="detail-time-remaining">--</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Step 3: Support Slots -->
+            <div class="support-slots" id="support-slots">
+              <div class="support-slots-label">Support Assets</div>
+              <div class="support-slots-container">
+                <div class="support-slot" id="support-slot-0" onclick="UI.openAssignModal(0)">
+                  <div class="support-slot-label">Slot A</div>
+                  <div class="support-slot-empty">+ Assign</div>
+                </div>
+                <div class="support-slot" id="support-slot-1" onclick="UI.openAssignModal(1)">
+                  <div class="support-slot-label">Slot B</div>
+                  <div class="support-slot-empty">+ Assign</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <div class="detail-label">Mission Log</div>
+              <div class="log-feed" id="detail-logs"></div>
+            </div>
+            
+            <!-- Outcome (shown when complete) -->
+            <div class="outcome-box" id="detail-outcome" style="display:none;">
+              <div class="outcome-grade" id="outcome-grade"></div>
+              <div class="outcome-score" id="outcome-score"></div>
+              <div class="outcome-explanation" id="outcome-explanation"></div>
+              <div class="outcome-list" id="outcome-helped"></div>
+              <div class="outcome-list hurt" id="outcome-hurt"></div>
+            </div>
+            
+            <div class="sim-controls" id="detail-controls">
+              <button class="small" onclick="UI.fastForward(10)">+10 Bars</button>
+              <button class="small" onclick="UI.completeNow()">Complete Now</button>
+              <button class="small danger" onclick="UI.abortMission()">Abort</button>
+              <button class="small danger" onclick="UI.deleteMission()">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    </div><!-- End CRT Frame -->
+    
+    <!-- Step 3: Fleet Bay Panel -->
+    <div class="fleet-bay">
+      <div class="fleet-bay-header" onclick="UI.toggleFleetBay()">
+        <span class="fleet-bay-title">▲ FLEET BAY</span>
+        <span class="fleet-bay-toggle" id="fleet-bay-toggle">▼ Expand</span>
+      </div>
+      <div class="fleet-bay-content" id="fleet-bay-content">
+        <input type="text" class="fleet-search" id="fleet-search" placeholder="Search ships..." oninput="UI.filterFleet()">
+        <div class="fleet-grid" id="fleet-grid">
+          <div class="loading">Loading fleet...</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 3: Assign Modal -->
+    <div class="assign-modal-backdrop" id="assign-modal-backdrop" onclick="UI.closeAssignModal()">
+      <div class="assign-modal" onclick="event.stopPropagation()">
+        <h3>Assign Support to Slot <span id="assign-slot-label">A</span></h3>
+        <div class="assign-modal-ships" id="assign-modal-ships"></div>
+        <button class="assign-modal-close" onclick="UI.closeAssignModal()">Cancel</button>
+      </div>
+    </div>
+    
+    <!-- Disclaimer -->
+    <div class="disclaimer" id="disclaimer-text">
+      <span class="px-warning-icon"></span> TRAINING SIMULATION — Not investment advice. No real orders. Educational purposes only.
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      PARALLAX Mission System v2 // Fleet Command<br>
+      <a href="#" onclick="localStorage.removeItem('PARALLAX_MISSIONS_V1');location.reload();">Clear All Missions</a> |
+      <a href="#" onclick="IndicatorLoader.clearCache();location.reload();">Clear Data Cache</a>
+    </div>
+  </div>
+  
+  <!-- Scripts -->
+  <!-- Step 8: Progression Architecture (must load early) -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/bus.js"></script>
+  <script src="js/core/store.js"></script>
+  <script src="js/state/upgrades.js"></script>
+  <script src="js/state/progression.js"></script>
+  
+  <!-- Data modules for Ship Brief dialog -->
+  <script src="js/data/ticker-profiles.js"></script>
+  <script src="js/data/ship-data.js"></script>
+  <script src="js/data/indicator-loader.js"></script>
+  
+  <!-- Unified Ship Brief Dialog -->
+  <script src="js/ui/shipBrief.js"></script>
+  
+  <!-- Context Focus (Page-Behind Awareness) -->
+  <script src="js/ui/contextFocus.js"></script>
+  
+  <!-- Pixel Icons (emoji replacement) -->
+  <script src="js/data/pixel-icons.js"></script>
+  
+  <!-- Mission System -->
+  <script src="js/mission-system.js"></script>
+  <script>
+    // ═══════════════════════════════════════════════════════════════════
+    // MISSION COMMAND UI (Step 2 + Step 3: Fleet Support)
+    // ═══════════════════════════════════════════════════════════════════
+    
+    const UI = {
+      // DOM refs
+      tickerSelect: null,
+      computeBtn: null,
+      speedSelect: null,
+      statusText: null,
+      statusMeta: null,
+      envStats: null,
+      missionsGrid: null,
+      activeMissionsList: null,
+      missionDetail: null,
+      
+      // State
+      currentTicker: null,
+      currentEnv: null,
+      currentTickerData: null,
+      selectedMissionId: null,
+      updateInterval: null,
+      
+      // Step 3: Fleet state
+      fleetBayOpen: false,
+      fleetData: [],        // { ticker, name, status, env, role }
+      assignSlotIndex: null,
+      
+      init() {
+        this.tickerSelect = document.getElementById('ticker-select');
+        this.computeBtn = document.getElementById('compute-btn');
+        this.speedSelect = document.getElementById('speed-select');
+        this.statusText = document.getElementById('status-text');
+        this.statusMeta = document.getElementById('status-meta');
+        this.envStats = document.getElementById('env-stats');
+        this.missionsGrid = document.getElementById('missions-grid');
+        this.activeMissionsList = document.getElementById('active-missions-list');
+        this.missionDetail = document.getElementById('mission-detail');
+        
+        this.tickerSelect.addEventListener('change', () => this.onTickerChange());
+        this.computeBtn.addEventListener('click', () => this.computeEnvironment());
+        
+        // Read ticker from URL params (Step 2.2)
+        const params = new URLSearchParams(window.location.search);
+        this.preselectedTicker = params.get('ticker')?.toUpperCase() || null;
+        
+        this.loadTickers();
+        this.renderActiveMissions();
+        this.loadFleet(); // Step 3
+        
+        // Start update loop
+        this.updateInterval = setInterval(() => this.updateLoop(), 500);
+      },
+      
+      setStatus(text, type = 'ready') {
+        this.statusText.textContent = text;
+        this.statusText.className = 'status ' + type;
+      },
+      
+      setMeta(text) {
+        this.statusMeta.textContent = text;
+      },
+      
+      async loadTickers() {
+        this.setStatus('Loading manifest...', 'loading');
+        try {
+          const tickers = await IndicatorLoader.getAvailableTickers();
+          const meta = await IndicatorLoader.getMetadata();
+          
+          // Store ticker statuses for later use
+          this.tickerStatuses = {};
+          
+          this.tickerSelect.innerHTML = '<option value="">Select sector...</option>';
+          for (const t of tickers) {
+            const opt = document.createElement('option');
+            opt.value = t.ticker;
+            this.tickerStatuses[t.ticker] = t.status;
+            
+            // Check if active mission exists
+            const activeMission = MissionSystem.getActiveMissionForTicker(t.ticker);
+            
+            // Step 3.1: Mark BENCHMARK tickers
+            if (t.status === 'BENCHMARK') {
+              opt.textContent = `${t.ticker} — ${t.name} [BENCHMARK]`;
+            } else if (activeMission) {
+              opt.textContent = `${t.ticker} — ${t.name} [ACTIVE]`;
+            } else {
+              opt.textContent = `${t.ticker} — ${t.name}`;
+            }
+            
+            this.tickerSelect.appendChild(opt);
+          }
+          
+          this.computeBtn.disabled = true;
+          this.setStatus('Ready', 'ready');
+          this.setMeta(`${tickers.length} sectors • Updated: ${meta.lastUpdated}`);
+          
+          // Auto-select ticker from URL params (Step 2.2)
+          if (this.preselectedTicker) {
+            const tickerExists = tickers.some(t => t.ticker === this.preselectedTicker);
+            if (tickerExists) {
+              this.tickerSelect.value = this.preselectedTicker;
+              this.onTickerChange();
+              // Auto-analyze after short delay
+              setTimeout(() => this.computeEnvironment(), 200);
+            }
+            this.preselectedTicker = null; // Clear so it doesn't trigger again
+          }
+        } catch (err) {
+          this.setStatus('Failed: ' + err.message, 'error');
+        }
+      },
+      
+      onTickerChange() {
+        const ticker = this.tickerSelect.value;
+        this.computeBtn.disabled = !ticker;
+        this.currentTicker = ticker;
+        if (ticker) this.setStatus(`Selected: ${ticker}`, 'ready');
+      },
+      
+      async computeEnvironment() {
+        if (!this.currentTicker) return;
+        
+        this.setStatus(`Analyzing ${this.currentTicker}...`, 'loading');
+        this.computeBtn.disabled = true;
+        
+        try {
+          // Load full ticker data (needed for missions)
+          this.currentTickerData = await IndicatorLoader.loadTicker(this.currentTicker);
+          
+          // Compute environment
+          const env = await MissionSystem.computeEnvironment(this.currentTicker);
+          this.currentEnv = env;
+          
+          // Generate recommendations
+          const recommendations = MissionSystem.generateRecommendations(env);
+          
+          this.renderEnvironment(env);
+          this.renderMissionCards(recommendations);
+          
+          this.setStatus(`Analysis complete: ${this.currentTicker}`, 'ready');
+          this.setMeta(`${env.barsUsed} bars • Latest: ${new Date(env.latestBar.time).toLocaleString()}`);
+        } catch (err) {
+          this.setStatus('Error: ' + err.message, 'error');
+          this.envStats.innerHTML = `<div class="empty-state" style="color:var(--red)">${err.message}</div>`;
+        }
+        
+        this.computeBtn.disabled = false;
+      },
+      
+      renderEnvironment(env) {
+        // Use PixelIcons for stat icons
+        const PI = window.PixelIcons || { toSvg: () => '◈' };
+        const stats = [
+          { key: 'hull', name: 'Hull', icon: PI.toSvg('shield', '#47d4ff', 14) },
+          { key: 'firepower', name: 'Firepower', icon: PI.toSvg('lightning', '#ffaa33', 14) },
+          { key: 'sensors', name: 'Sensors', icon: PI.toSvg('satellite', '#47d4ff', 14) },
+          { key: 'fuel', name: 'Fuel', icon: PI.toSvg('fuel', '#ffaa33', 14) },
+          { key: 'threat', name: 'Threat', icon: PI.toSvg('warning', '#ff4444', 14), inverted: true }
+        ];
+        
+        let html = '';
+        for (const stat of stats) {
+          const value = env[stat.key];
+          const why = env.why[stat.key];
+          let colorClass = stat.inverted
+            ? (value >= 60 ? 'low' : value >= 35 ? 'medium' : 'high')
+            : (value >= 60 ? 'high' : value >= 35 ? 'medium' : 'low');
+          
+          // Polish: Narrative microcopy for extreme values
+          let extremeNote = '';
+          if (stat.key === 'threat' && value >= 90) {
+            extremeNote = '<div class="stat-extreme">' + PI.toSvg('warning', '#ffaa33', 12) + ' Extreme boundary proximity. Regime stability may be deceptive.</div>';
+          } else if (stat.key === 'threat' && value >= 75) {
+            extremeNote = '<div class="stat-extreme">Elevated instability. Consider hedged positions.</div>';
+          } else if (stat.key === 'firepower' && value >= 90) {
+            extremeNote = '<div class="stat-extreme">Exceptional volatility. High risk / high opportunity.</div>';
+          } else if (stat.key === 'hull' && value <= 15) {
+            extremeNote = '<div class="stat-extreme">Trend structure severely compromised.</div>';
+          } else if (stat.key === 'sensors' && value >= 90) {
+            extremeNote = '<div class="stat-extreme">Exceptional flow clarity. Signal quality unusually high.</div>';
+          } else if (stat.key === 'fuel' && value <= 15) {
+            extremeNote = '<div class="stat-extreme">Time tolerance exhausted. Patience-based plays at risk.</div>';
+          }
+          
+          html += `
+            <div class="stat-item">
+              <div class="stat-header">
+                <span class="stat-name">${stat.icon} ${stat.name}</span>
+                <span class="stat-value ${colorClass}">${value}</span>
+              </div>
+              <div class="stat-bar"><div class="stat-bar-fill ${colorClass}" style="width:${value}%"></div></div>
+              <div class="stat-why">${why}</div>
+              ${extremeNote}
+            </div>`;
+        }
+        
+        html += `
+          <div class="latest-bar">
+            <strong>${env.ticker}</strong> @ $${env.latestBar.close.toFixed(2)}<br>
+            Volume: ${env.latestBar.volume?.toLocaleString() || 'N/A'}
+          </div>`;
+        
+        this.envStats.innerHTML = html;
+      },
+      
+      renderMissionCards(recommendations) {
+        const activeMission = this.currentTicker 
+          ? MissionSystem.getActiveMissionForTicker(this.currentTicker)
+          : null;
+        
+        // Step 3.1: Check if current ticker is BENCHMARK
+        const isBenchmark = this.tickerStatuses?.[this.currentTicker] === 'BENCHMARK';
+        const PI = window.PixelIcons || { starRating: (n) => '★'.repeat(n) };
+        
+        let html = '';
+        for (const m of recommendations) {
+          const stars = PI.starRating(m.difficulty, 3);
+          const canLaunch = !activeMission && !isBenchmark && this.currentTickerData;
+          
+          // Polish: Fit % visual affordance with color coding
+          let fitClass = 'fit-low';
+          let fitTooltip = 'Speculative — conditions don\'t favor this thesis';
+          if (m.suitability >= 70) {
+            fitClass = 'fit-high';
+            fitTooltip = 'Aligned — current regime supports this thesis';
+          } else if (m.suitability >= 50) {
+            fitClass = 'fit-medium';
+            fitTooltip = 'Conditional — some factors align, proceed with awareness';
+          }
+          
+          const cardClass = m.recommended ? 'recommended' : '';
+          
+          // Determine button text and title
+          let btnText = 'Launch Mission';
+          let btnTitle = '';
+          if (isBenchmark) {
+            btnText = 'Benchmark Only';
+            btnTitle = 'Benchmark asset — missions disabled';
+          } else if (activeMission) {
+            btnText = 'Mission Active';
+          }
+          
+          html += `
+            <div class="mission-card ${cardClass}">
+              <div class="mission-card-header">
+                <div class="mission-card-title">
+                  <span class="mission-icon">${m.icon}</span>
+                  <span class="mission-name">${m.name}</span>
+                </div>
+                <div class="mission-meta">
+                  <div class="difficulty-stars">${stars}</div>
+                  <div class="suitability-container" title="${fitTooltip}">
+                    <div class="fit-bar ${fitClass}"><div class="fit-fill" style="width:${m.suitability}%"></div></div>
+                    <span class="suitability-text">${m.suitability}%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mission-concept">${m.concept}</div>
+              <div class="mission-betting"><strong>Betting on:</strong> ${m.bettingOn}</div>
+              <div class="mission-why-now">${m.whyNow}</div>
+              <div class="mission-actions">
+                <button class="launch-btn" ${canLaunch ? '' : 'disabled'} title="${btnTitle}" onclick="UI.launchMission('${m.type}', ${m.difficulty})">
+                  ${btnText}
+                </button>
+                <select class="duration-select" id="duration-${m.type}" style="font-size:0.75rem;padding:0.3rem;" ${isBenchmark ? 'disabled' : ''}>
+                  ${m.durationBands.map(d => `<option value="${d}" ${d === m.defaultDuration ? 'selected' : ''}>${d}</option>`).join('')}
+                </select>
+              </div>
+            </div>`;
+        }
+        
+        this.missionsGrid.innerHTML = html;
+      },
+      
+      async launchMission(type, difficulty) {
+        if (!this.currentTicker || !this.currentTickerData || !this.currentEnv) {
+          alert('Please analyze a sector first');
+          return;
+        }
+        
+        // Check for existing active mission
+        if (MissionSystem.getActiveMissionForTicker(this.currentTicker)) {
+          alert('This sector already has an active mission');
+          return;
+        }
+        
+        const durationKey = document.getElementById(`duration-${type}`)?.value || '1D';
+        const simSpeed = this.speedSelect.value;
+        
+        // Create mission
+        const mission = MissionSystem.createMission(this.currentTicker, type, {
+          difficulty,
+          durationKey,
+          simSpeed,
+          env: this.currentEnv
+        });
+        
+        // Save to storage
+        const missions = MissionSystem.loadMissions();
+        missions.push(mission);
+        MissionSystem.saveMissions(missions);
+        
+        // Launch it
+        MissionSystem.launchMission(mission.id, this.currentTickerData);
+        
+        this.setStatus(`Mission launched: ${mission.typeName}`, 'ready');
+        this.renderActiveMissions();
+        this.selectMission(mission.id);
+        
+        // Refresh ticker dropdown to show [ACTIVE] badge
+        this.loadTickers();
+        
+        // Re-render mission cards to disable launch buttons
+        const recommendations = MissionSystem.generateRecommendations(this.currentEnv);
+        this.renderMissionCards(recommendations);
+      },
+      
+      renderActiveMissions() {
+        const missions = MissionSystem.loadMissions();
+        
+        if (missions.length === 0) {
+          this.activeMissionsList.innerHTML = `
+            <div class="empty-state zero-state-missions">
+              <div class="zero-state-icon">[MIS]</div>
+              <div class="zero-state-title">No missions yet</div>
+              <div class="zero-state-copy">Select a sector above and launch a mission to observe how market conditions evolve over time.</div>
+            </div>`;
+          return;
+        }
+        
+        // Sort: active first, then by creation time
+        missions.sort((a, b) => {
+          if (a.status === 'ACTIVE' && b.status !== 'ACTIVE') return -1;
+          if (b.status === 'ACTIVE' && a.status !== 'ACTIVE') return 1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        
+        let html = '';
+        const PI = window.PixelIcons || { replaceEmojis: (s) => s, starRating: (n) => '★'.repeat(n) };
+        for (const m of missions) {
+          const progress = MissionSystem.getMissionProgress(m);
+          const isSelected = m.id === this.selectedMissionId;
+          const statusClass = m.status === 'COMPLETE' ? 'complete' : m.status === 'DAMAGED' ? 'damaged' : '';
+          const missionIcon = PI.replaceEmojis(m.icon || '');
+          const difficultyStars = PI.starRating(m.difficulty, 3);
+          
+          html += `
+            <div class="active-mission-item ${statusClass} ${isSelected ? 'selected' : ''}" onclick="UI.selectMission('${m.id}')">
+              <div class="ami-header">
+                <span class="ami-ticker">${missionIcon} ${m.ticker}</span>
+                ${m.outcome ? `<span class="ami-grade ${m.outcome.grade}">${m.outcome.grade}</span>` : ''}
+              </div>
+              <div class="ami-type">${m.typeName} • ${difficultyStars}</div>
+              <div class="ami-progress">
+                <div class="ami-progress-fill ${progress.progress >= 1 ? 'complete' : ''}" style="width:${progress.progress * 100}%"></div>
+              </div>
+              <div class="ami-time">${m.status === 'ACTIVE' ? progress.timeRemaining : m.status}</div>
+            </div>`;
+        }
+        
+        this.activeMissionsList.innerHTML = html;
+      },
+      
+      async selectMission(missionId) {
+        this.selectedMissionId = missionId;
+        const mission = MissionSystem.getMission(missionId);
+        
+        if (!mission) {
+          this.missionDetail.classList.remove('visible');
+          return;
+        }
+        
+        // Load ticker data if needed for log generation
+        if (!this.currentTickerData || this.currentTickerData.ticker !== mission.ticker) {
+          try {
+            this.currentTickerData = await IndicatorLoader.loadTicker(mission.ticker);
+          } catch (e) {
+            console.error('Failed to load ticker data:', e);
+          }
+        }
+        
+        this.missionDetail.classList.add('visible');
+        this.renderMissionDetail(mission);
+        this.renderActiveMissions(); // Update selection highlight
+      },
+      
+      renderMissionDetail(mission) {
+        const PI = window.PixelIcons || { replaceEmojis: (s) => s, starRating: (n) => '★'.repeat(n) };
+        const missionIcon = PI.replaceEmojis(mission.icon || '');
+        const difficultyStars = PI.starRating(mission.difficulty, 3);
+        
+        document.getElementById('detail-name').innerHTML = `${missionIcon} ${mission.typeName}`;
+        document.getElementById('detail-ticker').innerHTML = `${mission.ticker} • ${difficultyStars} • ${mission.duration.label}`;
+        
+        const progress = MissionSystem.getMissionProgress(mission);
+        document.getElementById('detail-progress-fill').style.width = `${progress.progress * 100}%`;
+        document.getElementById('detail-bars-elapsed').textContent = `${progress.barsElapsed} / ${mission.duration.targetBars} bars`;
+        document.getElementById('detail-time-remaining').textContent = progress.timeRemaining;
+        
+        // Step 3: Render support slots
+        this.renderSupportSlots(mission);
+        
+        // Render logs
+        const logsHtml = mission.logs.map(log => `
+          <div class="log-entry">
+            <span class="log-kind ${log.kind}">${log.kind}</span>
+            <span class="log-msg">${log.msg}</span>
+          </div>
+        `).join('');
+        document.getElementById('detail-logs').innerHTML = logsHtml || '<div style="color:var(--text-dim)">No events yet</div>';
+        
+        // Show/hide outcome
+        const outcomeBox = document.getElementById('detail-outcome');
+        const controlsBox = document.getElementById('detail-controls');
+        
+        if (mission.outcome) {
+          outcomeBox.style.display = 'block';
+          document.getElementById('outcome-grade').textContent = mission.outcome.grade;
+          document.getElementById('outcome-grade').className = `outcome-grade ${mission.outcome.grade}`;
+          document.getElementById('outcome-score').textContent = `Score: ${mission.outcome.score}/100`;
+          document.getElementById('outcome-explanation').textContent = mission.outcome.explanation;
+          
+          document.getElementById('outcome-helped').innerHTML = mission.outcome.whatHelped.length
+            ? `<h4>What Helped</h4><ul>${mission.outcome.whatHelped.map(w => `<li>${w}</li>`).join('')}</ul>`
+            : '';
+          document.getElementById('outcome-hurt').innerHTML = mission.outcome.whatHurt.length
+            ? `<h4>What Hurt</h4><ul>${mission.outcome.whatHurt.map(w => `<li>${w}</li>`).join('')}</ul>`
+            : '';
+          
+          // Hide active controls for completed missions
+          controlsBox.innerHTML = `<button class="small danger" onclick="UI.deleteMission()">Delete Mission</button>`;
+        } else {
+          outcomeBox.style.display = 'none';
+          controlsBox.innerHTML = `
+            <button class="small" onclick="UI.fastForward(10)">+10 Bars</button>
+            <button class="small" onclick="UI.completeNow()">Complete Now</button>
+            <button class="small danger" onclick="UI.abortMission()">Abort</button>
+          `;
+        }
+      },
+      
+      async updateLoop() {
+        const activeMissions = MissionSystem.getActiveMissions();
+        
+        for (const mission of activeMissions) {
+          // Load ticker data if needed
+          let tickerData = this.currentTickerData;
+          if (!tickerData || tickerData.ticker !== mission.ticker) {
+            try {
+              tickerData = await IndicatorLoader.loadTicker(mission.ticker);
+            } catch (e) {
+              continue;
+            }
+          }
+          
+          // Generate logs for elapsed bars
+          const newLogs = MissionSystem.generateLogsForMission(mission, tickerData);
+          
+          // Check if mission should complete
+          const progress = MissionSystem.getMissionProgress(mission);
+          if (progress.progress >= 1 && mission.status === 'ACTIVE') {
+            MissionSystem.resolveMission(mission.id, tickerData);
+            this.loadTickers(); // Refresh dropdown
+          }
+          
+          // Save if logs were added
+          if (newLogs.length > 0) {
+            const missions = MissionSystem.loadMissions();
+            const idx = missions.findIndex(m => m.id === mission.id);
+            if (idx >= 0) {
+              missions[idx] = mission;
+              MissionSystem.saveMissions(missions);
+            }
+          }
+        }
+        
+        // Re-render
+        this.renderActiveMissions();
+        if (this.selectedMissionId) {
+          const m = MissionSystem.getMission(this.selectedMissionId);
+          if (m) this.renderMissionDetail(m);
+        }
+      },
+      
+      async fastForward(bars) {
+        if (!this.selectedMissionId) return;
+        MissionSystem.fastForwardMission(this.selectedMissionId, bars);
+        await this.updateLoop();
+      },
+      
+      async completeNow() {
+        if (!this.selectedMissionId) return;
+        MissionSystem.completeMissionNow(this.selectedMissionId);
+        await this.updateLoop();
+      },
+      
+      abortMission() {
+        if (!this.selectedMissionId) return;
+        if (!confirm('Abort this mission? It will be marked as DAMAGED.')) return;
+        MissionSystem.abortMission(this.selectedMissionId);
+        this.renderActiveMissions();
+        this.loadTickers();
+        
+        const m = MissionSystem.getMission(this.selectedMissionId);
+        if (m) this.renderMissionDetail(m);
+        
+        // Refresh mission cards
+        if (this.currentEnv) {
+          const recommendations = MissionSystem.generateRecommendations(this.currentEnv);
+          this.renderMissionCards(recommendations);
+        }
+      },
+      
+      deleteMission() {
+        if (!this.selectedMissionId) return;
+        if (!confirm('Delete this mission permanently?')) return;
+        MissionSystem.deleteMission(this.selectedMissionId);
+        this.selectedMissionId = null;
+        this.missionDetail.classList.remove('visible');
+        this.renderActiveMissions();
+        this.loadTickers();
+        
+        // Refresh mission cards
+        if (this.currentEnv) {
+          const recommendations = MissionSystem.generateRecommendations(this.currentEnv);
+          this.renderMissionCards(recommendations);
+        }
+      },
+      
+      // ═══════════════════════════════════════════════════════════════════
+      // STEP 3: FLEET BAY & SUPPORT METHODS
+      // ═══════════════════════════════════════════════════════════════════
+      
+      async loadFleet() {
+        const grid = document.getElementById('fleet-grid');
+        grid.innerHTML = '<div class="loading">Loading fleet...</div>';
+        
+        try {
+          const manifest = await IndicatorLoader.getMetadata();
+          const allTickers = manifest.tickers || [];
+          
+          // Step 3.1: Separate active, benchmark, and locked
+          // BENCHMARK tickers can't be assigned as support
+          const active = allTickers.filter(t => t.status === 'ACTIVE');
+          const locked = allTickers.filter(t => t.status === 'LOCKED');
+          const benchmark = allTickers.filter(t => t.status === 'BENCHMARK');
+          
+          // Compute environments for active tickers (cached)
+          for (const t of active) {
+            try {
+              const env = await MissionSystem.computeEnvironment(t.ticker);
+              const role = MissionSystem.classifyRole(env);
+              
+              // Cache in FleetCache
+              MissionSystem.FleetCache.envs[t.ticker] = env;
+              MissionSystem.FleetCache.roles[t.ticker] = role;
+              
+              this.fleetData.push({
+                ticker: t.ticker,
+                name: t.name,
+                status: 'ACTIVE',
+                env: env,
+                role: role
+              });
+            } catch (e) {
+              console.warn(`Failed to compute env for ${t.ticker}:`, e);
+            }
+          }
+          
+          // Add locked tickers (silhouettes)
+          for (const t of locked) {
+            this.fleetData.push({
+              ticker: t.ticker,
+              name: t.name,
+              status: 'LOCKED',
+              hint: t.hint,
+              env: null,
+              role: null
+            });
+          }
+          
+          // Step 3.1: Add benchmark tickers as special category (viewable but not assignable)
+          for (const t of benchmark) {
+            this.fleetData.push({
+              ticker: t.ticker,
+              name: t.name,
+              status: 'BENCHMARK',
+              hint: 'Benchmark asset — not assignable as support',
+              env: null,
+              role: null
+            });
+          }
+          
+          MissionSystem.FleetCache.loaded = true;
+          this.renderFleet();
+        } catch (e) {
+          grid.innerHTML = `<div class="empty-state" style="color:var(--red)">Failed to load fleet: ${e.message}</div>`;
+        }
+      },
+      
+      renderFleet() {
+        const grid = document.getElementById('fleet-grid');
+        const search = document.getElementById('fleet-search').value.toLowerCase();
+        const locked = MissionSystem.getLockedTickers();
+        
+        let html = '';
+        for (const ship of this.fleetData) {
+          // Filter by search
+          if (search && !ship.ticker.toLowerCase().includes(search) && !ship.name.toLowerCase().includes(search)) {
+            continue;
+          }
+          
+          if (ship.status === 'LOCKED') {
+            // Render silhouette
+            html += `
+              <div class="fleet-ship silhouette">
+                <div class="fleet-ship-ticker">${ship.ticker}</div>
+                <div class="fleet-ship-name">${ship.name}</div>
+                <div class="fleet-ship-role">${ship.hint || 'CLASSIFIED'}</div>
+              </div>`;
+          } else if (ship.status === 'BENCHMARK') {
+            // Step 3.1: Render benchmark (distinct but not assignable)
+            html += `
+              <div class="fleet-ship benchmark" title="Benchmark asset — not assignable as support">
+                <div class="fleet-ship-ticker">${ship.ticker}</div>
+                <div class="fleet-ship-name">${ship.name}</div>
+                <div class="fleet-ship-role BENCHMARK">≡ BENCHMARK</div>
+              </div>`;
+          } else {
+            const isLocked = locked[ship.ticker];
+            const roleInfo = MissionSystem.SUPPORT_ROLES[ship.role] || MissionSystem.SUPPORT_ROLES.UTILITY;
+            
+            html += `
+              <div class="fleet-ship ${isLocked ? 'locked' : ''}" data-ticker="${ship.ticker}" onclick="UI.handleShipClick('${ship.ticker}')">
+                ${isLocked ? `<div class="fleet-ship-lock">🔒</div>` : ''}
+                <div class="fleet-ship-ticker">${ship.ticker}</div>
+                <div class="fleet-ship-name">${ship.name}</div>
+                <div class="fleet-ship-role ${ship.role}">${roleInfo.icon} ${ship.role}</div>
+                <div class="fleet-ship-stats">
+                  <div class="fleet-mini-bar" title="Hull"><div class="fleet-mini-bar-fill hull" style="width:${ship.env?.hull || 0}%"></div></div>
+                  <div class="fleet-mini-bar" title="Sensors"><div class="fleet-mini-bar-fill sensors" style="width:${ship.env?.sensors || 0}%"></div></div>
+                  <div class="fleet-mini-bar" title="Threat"><div class="fleet-mini-bar-fill threat" style="width:${ship.env?.threat || 0}%"></div></div>
+                </div>
+              </div>`;
+          }
+        }
+        
+        grid.innerHTML = html || '<div class="empty-state">No ships found</div>';
+      },
+      
+      filterFleet() {
+        this.renderFleet();
+      },
+      
+      toggleFleetBay() {
+        this.fleetBayOpen = !this.fleetBayOpen;
+        const content = document.getElementById('fleet-bay-content');
+        const toggle = document.getElementById('fleet-bay-toggle');
+        content.classList.toggle('open', this.fleetBayOpen);
+        toggle.textContent = this.fleetBayOpen ? '▲ Collapse' : '▼ Expand';
+      },
+      
+      handleShipClick(ticker) {
+        // If no mission selected, just show info
+        if (!this.selectedMissionId) {
+          alert(`Select an active mission first, then click a ship to assign it as support.`);
+          return;
+        }
+        
+        const mission = MissionSystem.getMission(this.selectedMissionId);
+        if (!mission || mission.status !== 'ACTIVE') {
+          alert('Can only assign supports to active missions.');
+          return;
+        }
+        
+        // Check if ship is locked
+        const lockStatus = MissionSystem.isTickerLocked(ticker);
+        if (lockStatus.locked && lockStatus.missionId !== mission.id) {
+          alert(`${ticker} is already assigned to another mission.`);
+          return;
+        }
+        
+        // Check if ticker is already assigned to this mission
+        const alreadyAssigned = mission.support?.slots?.some(s => s.ticker === ticker);
+        if (alreadyAssigned) {
+          alert(`${ticker} is already assigned to this mission.`);
+          return;
+        }
+        
+        // Find first empty slot
+        const emptySlot = mission.support?.slots?.findIndex(s => !s.ticker);
+        if (emptySlot === -1 || emptySlot === undefined) {
+          alert('Both support slots are full. Remove one first.');
+          return;
+        }
+        
+        this.assignShipToSlot(ticker, emptySlot);
+      },
+      
+      openAssignModal(slotIndex) {
+        if (!this.selectedMissionId) return;
+        
+        const mission = MissionSystem.getMission(this.selectedMissionId);
+        if (!mission || mission.status !== 'ACTIVE') return;
+        
+        this.assignSlotIndex = slotIndex;
+        document.getElementById('assign-slot-label').textContent = slotIndex === 0 ? 'A' : 'B';
+        
+        const locked = MissionSystem.getLockedTickers();
+        const modal = document.getElementById('assign-modal-ships');
+        let html = '';
+        
+        for (const ship of this.fleetData) {
+          if (ship.status === 'LOCKED') continue;
+          
+          const isLocked = locked[ship.ticker] && locked[ship.ticker].missionId !== mission.id;
+          const isSelf = ship.ticker === mission.ticker;
+          const alreadyAssigned = mission.support?.slots?.some(s => s.ticker === ship.ticker);
+          const disabled = isLocked || isSelf || alreadyAssigned;
+          
+          const roleInfo = MissionSystem.SUPPORT_ROLES[ship.role] || MissionSystem.SUPPORT_ROLES.UTILITY;
+          
+          html += `
+            <div class="assign-modal-ship ${disabled ? 'disabled' : ''}" onclick="${disabled ? '' : `UI.assignShipToSlot('${ship.ticker}', ${slotIndex})`}">
+              <div>
+                <strong>${ship.ticker}</strong>
+                <span style="color:var(--text-dim);font-size:0.75rem;margin-left:0.5rem">${ship.name}</span>
+              </div>
+              <span class="fleet-ship-role ${ship.role}">${roleInfo.icon} ${ship.role}</span>
+            </div>`;
+        }
+        
+        modal.innerHTML = html || '<div class="empty-state">No ships available</div>';
+        document.getElementById('assign-modal-backdrop').classList.add('open');
+      },
+      
+      closeAssignModal() {
+        document.getElementById('assign-modal-backdrop').classList.remove('open');
+        this.assignSlotIndex = null;
+      },
+      
+      assignShipToSlot(ticker, slotIndex) {
+        try {
+          MissionSystem.assignSupport(this.selectedMissionId, slotIndex, ticker);
+          this.closeAssignModal();
+          this.renderFleet();
+          
+          const mission = MissionSystem.getMission(this.selectedMissionId);
+          if (mission) this.renderMissionDetail(mission);
+        } catch (e) {
+          alert(e.message);
+        }
+      },
+      
+      removeSupport(slotIndex) {
+        try {
+          MissionSystem.removeSupport(this.selectedMissionId, slotIndex);
+          this.renderFleet();
+          
+          const mission = MissionSystem.getMission(this.selectedMissionId);
+          if (mission) this.renderMissionDetail(mission);
+        } catch (e) {
+          alert(e.message);
+        }
+      },
+      
+      renderSupportSlots(mission) {
+        const slot0 = document.getElementById('support-slot-0');
+        const slot1 = document.getElementById('support-slot-1');
+        
+        const slotsContainer = document.getElementById('support-slots');
+        
+        // Hide support slots for completed/damaged missions
+        if (mission.status !== 'ACTIVE') {
+          slotsContainer.style.display = 'none';
+          return;
+        }
+        slotsContainer.style.display = 'block';
+        
+        for (let i = 0; i < 2; i++) {
+          const slot = i === 0 ? slot0 : slot1;
+          const data = mission.support?.slots?.[i];
+          
+          if (data?.ticker) {
+            const roleInfo = MissionSystem.SUPPORT_ROLES[data.role] || MissionSystem.SUPPORT_ROLES.UTILITY;
+            slot.classList.add('filled');
+            slot.innerHTML = `
+              <div class="support-slot-label">Slot ${i === 0 ? 'A' : 'B'}</div>
+              <div class="support-slot-ticker">${data.ticker}</div>
+              <div class="support-slot-role">${roleInfo.icon} ${data.role}</div>
+              <div class="support-slot-remove" onclick="event.stopPropagation(); UI.removeSupport(${i})">✕ Remove</div>
+            `;
+            slot.onclick = null;
+          } else {
+            slot.classList.remove('filled');
+            slot.innerHTML = `
+              <div class="support-slot-label">Slot ${i === 0 ? 'A' : 'B'}</div>
+              <div class="support-slot-empty">+ Assign</div>
+            `;
+            slot.onclick = () => this.openAssignModal(i);
+          }
+        }
+      }
+    };
+    
+    /**
+     * Return to main dashboard, optionally preserving ticker context (Step 2.2)
+     */
+    function returnToDashboard() {
+      let url = 'index.html#positions';
+      window.location.href = url;
+    }
+    
+    /**
+     * ═══════════════════════════════════════════════════════════════════
+     * LIVE TICKER BANNER — News broadcast style scrolling prices
+     * ═══════════════════════════════════════════════════════════════════
+     */
+    const TickerBanner = {
+      container: null,
+      data: null,
+      
+      async init() {
+        this.container = document.getElementById('ticker-content');
+        if (!this.container) return;
+        
+        try {
+          // Load stats data
+          const response = await fetch('data/stats.json');
+          this.data = await response.json();
+          this.render();
+          
+          // Refresh every 60 seconds
+          setInterval(() => this.render(), 60000);
+        } catch (e) {
+          console.warn('Ticker banner failed to load:', e);
+          this.container.innerHTML = '<span class="ticker-item">Market data unavailable</span>';
+        }
+      },
+      
+      render() {
+        if (!this.data?.stats) return;
+        
+        const stats = this.data.stats;
+        const tickers = this.data.tickers || Object.keys(stats);
+        
+        // Build ticker items
+        let items = [];
+        
+        // Get active missions for alerts
+        const activeMissions = typeof MissionSystem !== 'undefined' 
+          ? MissionSystem.getActiveMissions() 
+          : [];
+        const missionTickers = new Set(activeMissions.map(m => m.ticker));
+        
+        for (const ticker of tickers) {
+          const s = stats[ticker];
+          if (!s) continue;
+          
+          const price = s.current?.toFixed(2) || '--';
+          const change = s.return_1d;
+          const changeStr = change >= 0 ? `+${change.toFixed(2)}%` : `${change.toFixed(2)}%`;
+          const changeClass = change >= 0 ? 'up' : 'down';
+          
+          // Check if has active mission
+          const hasMission = missionTickers.has(ticker);
+          const missionClass = hasMission ? ' mission-alert' : '';
+          
+          items.push(`
+            <span class="ticker-item${missionClass}">
+              <span class="symbol">${ticker}</span>
+              <span class="price">$${price}</span>
+              <span class="change ${changeClass}">${changeStr}</span>
+              ${hasMission ? '<span class="mission-badge">◉</span>' : ''}
+            </span>
+          `);
+        }
+        
+        // Add mission status alerts
+        for (const m of activeMissions) {
+          const progress = Math.round((m.barsElapsed / m.barsTotal) * 100);
+          items.push(`
+            <span class="ticker-item mission-alert">
+              MISSION: ${m.ticker} ${m.missionType.replace('_', ' ')} — ${progress}% COMPLETE
+            </span>
+          `);
+        }
+        
+        // Duplicate for seamless scroll
+        const content = items.join('<span class="separator">•</span>');
+        this.container.innerHTML = content + '<span class="separator">•</span>' + content;
+        
+        // Adjust animation duration based on content length
+        const itemCount = items.length * 2;
+        const duration = Math.max(30, itemCount * 3);
+        this.container.style.animationDuration = `${duration}s`;
+      }
+    };
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      UI.init();
+      TickerBanner.init();
+      
+      // Replace warning icon in disclaimer with pixel icon
+      const warningSpan = document.querySelector('.px-warning-icon');
+      if (warningSpan && window.PixelIcons) {
+        warningSpan.innerHTML = PixelIcons.toSvg('warning', '#ffaa33', 14);
+      }
+    });
+  </script>
+</body>
+</html>

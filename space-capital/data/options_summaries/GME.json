@@ -1,0 +1,10 @@
+{
+  "ticker": "GME",
+  "structure": "Bull Spread",
+  "deltaExposure": 0.6,
+  "timeHorizonDays": 373,
+  "leverageFactor": 1.2,
+  "upcomingCatalysts": 1,
+  "riskPosture": "moderate",
+  "catalystPressure": "low"
+}

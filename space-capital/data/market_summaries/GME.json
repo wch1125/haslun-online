@@ -1,0 +1,14 @@
+{
+  "ticker": "GME",
+  "dataPoints": 2368,
+  "lastUpdated": "2026-01-06T17:39:08.209667",
+  "kernelRespectPct": 0.7964527027027027,
+  "bandCompression": 0.856,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.345,
+  "trendAdherence": 0.769,
+  "chopSensitivity": 0.112
+}

@@ -1,0 +1,14 @@
+{
+  "ticker": "ASTS",
+  "dataPoints": 2380,
+  "lastUpdated": "2026-01-06T17:39:08.783606",
+  "kernelRespectPct": 0.45168067226890757,
+  "bandCompression": 0.703,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.308,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.692,
+  "trendAdherence": 0.631,
+  "chopSensitivity": 0.228
+}

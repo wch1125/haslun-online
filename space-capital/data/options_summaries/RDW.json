@@ -1,0 +1,10 @@
+{
+  "ticker": "RDW",
+  "structure": "Bull Spread",
+  "deltaExposure": 0.55,
+  "timeHorizonDays": 373,
+  "leverageFactor": 1.2,
+  "upcomingCatalysts": 0,
+  "riskPosture": "moderate",
+  "catalystPressure": "low"
+}

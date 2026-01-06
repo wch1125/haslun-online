@@ -1,0 +1,1997 @@
+{
+  "version": "1.0",
+  "standard_size": [
+    256,
+    256
+  ],
+  "animation_types": [
+    "idle",
+    "thrust",
+    "pulse",
+    "shield",
+    "charge",
+    "drone",
+    "refuel",
+    "special"
+  ],
+  "frame_counts": {
+    "idle": 8,
+    "thrust": 6,
+    "pulse": 12,
+    "shield": 8,
+    "charge": 10,
+    "drone": 16,
+    "refuel": 12,
+    "special": 8
+  },
+  "ships": {
+    "ACHR": {
+      "name": "ACHR",
+      "class": "eVTOL",
+      "colors": {
+        "primary": [
+          255,
+          165,
+          0
+        ],
+        "secondary": [
+          76,
+          175,
+          80
+        ],
+        "accent": [
+          255,
+          255,
+          255
+        ]
+      },
+      "special_effect": "vtol_hover",
+      "animations": {
+        "base": [
+          "ACHR_base.png"
+        ],
+        "idle": [
+          "ACHR_idle_00.png",
+          "ACHR_idle_01.png",
+          "ACHR_idle_02.png",
+          "ACHR_idle_03.png",
+          "ACHR_idle_04.png",
+          "ACHR_idle_05.png",
+          "ACHR_idle_06.png",
+          "ACHR_idle_07.png"
+        ],
+        "thrust": [
+          "ACHR_thrust_00.png",
+          "ACHR_thrust_01.png",
+          "ACHR_thrust_02.png",
+          "ACHR_thrust_03.png",
+          "ACHR_thrust_04.png",
+          "ACHR_thrust_05.png"
+        ],
+        "pulse": [
+          "ACHR_pulse_00.png",
+          "ACHR_pulse_01.png",
+          "ACHR_pulse_02.png",
+          "ACHR_pulse_03.png",
+          "ACHR_pulse_04.png",
+          "ACHR_pulse_05.png",
+          "ACHR_pulse_06.png",
+          "ACHR_pulse_07.png",
+          "ACHR_pulse_08.png",
+          "ACHR_pulse_09.png",
+          "ACHR_pulse_10.png",
+          "ACHR_pulse_11.png"
+        ],
+        "shield": [
+          "ACHR_shield_00.png",
+          "ACHR_shield_01.png",
+          "ACHR_shield_02.png",
+          "ACHR_shield_03.png",
+          "ACHR_shield_04.png",
+          "ACHR_shield_05.png",
+          "ACHR_shield_06.png",
+          "ACHR_shield_07.png"
+        ],
+        "charge": [
+          "ACHR_charge_00.png",
+          "ACHR_charge_01.png",
+          "ACHR_charge_02.png",
+          "ACHR_charge_03.png",
+          "ACHR_charge_04.png",
+          "ACHR_charge_05.png",
+          "ACHR_charge_06.png",
+          "ACHR_charge_07.png",
+          "ACHR_charge_08.png",
+          "ACHR_charge_09.png"
+        ],
+        "drone": [
+          "ACHR_drone_00.png",
+          "ACHR_drone_01.png",
+          "ACHR_drone_02.png",
+          "ACHR_drone_03.png",
+          "ACHR_drone_04.png",
+          "ACHR_drone_05.png",
+          "ACHR_drone_06.png",
+          "ACHR_drone_07.png",
+          "ACHR_drone_08.png",
+          "ACHR_drone_09.png",
+          "ACHR_drone_10.png",
+          "ACHR_drone_11.png",
+          "ACHR_drone_12.png",
+          "ACHR_drone_13.png",
+          "ACHR_drone_14.png",
+          "ACHR_drone_15.png"
+        ],
+        "refuel": [
+          "ACHR_refuel_00.png",
+          "ACHR_refuel_01.png",
+          "ACHR_refuel_02.png",
+          "ACHR_refuel_03.png",
+          "ACHR_refuel_04.png",
+          "ACHR_refuel_05.png",
+          "ACHR_refuel_06.png",
+          "ACHR_refuel_07.png",
+          "ACHR_refuel_08.png",
+          "ACHR_refuel_09.png",
+          "ACHR_refuel_10.png",
+          "ACHR_refuel_11.png"
+        ],
+        "special": [
+          "ACHR_special_00.png",
+          "ACHR_special_01.png",
+          "ACHR_special_02.png",
+          "ACHR_special_03.png",
+          "ACHR_special_04.png",
+          "ACHR_special_05.png",
+          "ACHR_special_06.png",
+          "ACHR_special_07.png"
+        ]
+      }
+    },
+    "ASTS": {
+      "name": "ASTS",
+      "class": "Communications",
+      "colors": {
+        "primary": [
+          30,
+          100,
+          200
+        ],
+        "secondary": [
+          255,
+          165,
+          0
+        ],
+        "accent": [
+          255,
+          255,
+          255
+        ]
+      },
+      "special_effect": "signal_pulse",
+      "animations": {
+        "base": [
+          "ASTS_base.png"
+        ],
+        "idle": [
+          "ASTS_idle_00.png",
+          "ASTS_idle_01.png",
+          "ASTS_idle_02.png",
+          "ASTS_idle_03.png",
+          "ASTS_idle_04.png",
+          "ASTS_idle_05.png",
+          "ASTS_idle_06.png",
+          "ASTS_idle_07.png"
+        ],
+        "thrust": [
+          "ASTS_thrust_00.png",
+          "ASTS_thrust_01.png",
+          "ASTS_thrust_02.png",
+          "ASTS_thrust_03.png",
+          "ASTS_thrust_04.png",
+          "ASTS_thrust_05.png"
+        ],
+        "pulse": [
+          "ASTS_pulse_00.png",
+          "ASTS_pulse_01.png",
+          "ASTS_pulse_02.png",
+          "ASTS_pulse_03.png",
+          "ASTS_pulse_04.png",
+          "ASTS_pulse_05.png",
+          "ASTS_pulse_06.png",
+          "ASTS_pulse_07.png",
+          "ASTS_pulse_08.png",
+          "ASTS_pulse_09.png",
+          "ASTS_pulse_10.png",
+          "ASTS_pulse_11.png"
+        ],
+        "shield": [
+          "ASTS_shield_00.png",
+          "ASTS_shield_01.png",
+          "ASTS_shield_02.png",
+          "ASTS_shield_03.png",
+          "ASTS_shield_04.png",
+          "ASTS_shield_05.png",
+          "ASTS_shield_06.png",
+          "ASTS_shield_07.png"
+        ],
+        "charge": [
+          "ASTS_charge_00.png",
+          "ASTS_charge_01.png",
+          "ASTS_charge_02.png",
+          "ASTS_charge_03.png",
+          "ASTS_charge_04.png",
+          "ASTS_charge_05.png",
+          "ASTS_charge_06.png",
+          "ASTS_charge_07.png",
+          "ASTS_charge_08.png",
+          "ASTS_charge_09.png"
+        ],
+        "drone": [
+          "ASTS_drone_00.png",
+          "ASTS_drone_01.png",
+          "ASTS_drone_02.png",
+          "ASTS_drone_03.png",
+          "ASTS_drone_04.png",
+          "ASTS_drone_05.png",
+          "ASTS_drone_06.png",
+          "ASTS_drone_07.png",
+          "ASTS_drone_08.png",
+          "ASTS_drone_09.png",
+          "ASTS_drone_10.png",
+          "ASTS_drone_11.png",
+          "ASTS_drone_12.png",
+          "ASTS_drone_13.png",
+          "ASTS_drone_14.png",
+          "ASTS_drone_15.png"
+        ],
+        "refuel": [
+          "ASTS_refuel_00.png",
+          "ASTS_refuel_01.png",
+          "ASTS_refuel_02.png",
+          "ASTS_refuel_03.png",
+          "ASTS_refuel_04.png",
+          "ASTS_refuel_05.png",
+          "ASTS_refuel_06.png",
+          "ASTS_refuel_07.png",
+          "ASTS_refuel_08.png",
+          "ASTS_refuel_09.png",
+          "ASTS_refuel_10.png",
+          "ASTS_refuel_11.png"
+        ],
+        "special": [
+          "ASTS_special_00.png",
+          "ASTS_special_01.png",
+          "ASTS_special_02.png",
+          "ASTS_special_03.png",
+          "ASTS_special_04.png",
+          "ASTS_special_05.png",
+          "ASTS_special_06.png",
+          "ASTS_special_07.png"
+        ]
+      }
+    },
+    "BKSY": {
+      "name": "BKSY",
+      "class": "Recon",
+      "colors": {
+        "primary": [
+          128,
+          0,
+          128
+        ],
+        "secondary": [
+          0,
+          255,
+          255
+        ],
+        "accent": [
+          255,
+          150,
+          200
+        ]
+      },
+      "special_effect": "stealth_shimmer",
+      "animations": {
+        "base": [
+          "BKSY_base.png"
+        ],
+        "idle": [
+          "BKSY_idle_00.png",
+          "BKSY_idle_01.png",
+          "BKSY_idle_02.png",
+          "BKSY_idle_03.png",
+          "BKSY_idle_04.png",
+          "BKSY_idle_05.png",
+          "BKSY_idle_06.png",
+          "BKSY_idle_07.png"
+        ],
+        "thrust": [
+          "BKSY_thrust_00.png",
+          "BKSY_thrust_01.png",
+          "BKSY_thrust_02.png",
+          "BKSY_thrust_03.png",
+          "BKSY_thrust_04.png",
+          "BKSY_thrust_05.png"
+        ],
+        "pulse": [
+          "BKSY_pulse_00.png",
+          "BKSY_pulse_01.png",
+          "BKSY_pulse_02.png",
+          "BKSY_pulse_03.png",
+          "BKSY_pulse_04.png",
+          "BKSY_pulse_05.png",
+          "BKSY_pulse_06.png",
+          "BKSY_pulse_07.png",
+          "BKSY_pulse_08.png",
+          "BKSY_pulse_09.png",
+          "BKSY_pulse_10.png",
+          "BKSY_pulse_11.png"
+        ],
+        "shield": [
+          "BKSY_shield_00.png",
+          "BKSY_shield_01.png",
+          "BKSY_shield_02.png",
+          "BKSY_shield_03.png",
+          "BKSY_shield_04.png",
+          "BKSY_shield_05.png",
+          "BKSY_shield_06.png",
+          "BKSY_shield_07.png"
+        ],
+        "charge": [
+          "BKSY_charge_00.png",
+          "BKSY_charge_01.png",
+          "BKSY_charge_02.png",
+          "BKSY_charge_03.png",
+          "BKSY_charge_04.png",
+          "BKSY_charge_05.png",
+          "BKSY_charge_06.png",
+          "BKSY_charge_07.png",
+          "BKSY_charge_08.png",
+          "BKSY_charge_09.png"
+        ],
+        "drone": [
+          "BKSY_drone_00.png",
+          "BKSY_drone_01.png",
+          "BKSY_drone_02.png",
+          "BKSY_drone_03.png",
+          "BKSY_drone_04.png",
+          "BKSY_drone_05.png",
+          "BKSY_drone_06.png",
+          "BKSY_drone_07.png",
+          "BKSY_drone_08.png",
+          "BKSY_drone_09.png",
+          "BKSY_drone_10.png",
+          "BKSY_drone_11.png",
+          "BKSY_drone_12.png",
+          "BKSY_drone_13.png",
+          "BKSY_drone_14.png",
+          "BKSY_drone_15.png"
+        ],
+        "refuel": [
+          "BKSY_refuel_00.png",
+          "BKSY_refuel_01.png",
+          "BKSY_refuel_02.png",
+          "BKSY_refuel_03.png",
+          "BKSY_refuel_04.png",
+          "BKSY_refuel_05.png",
+          "BKSY_refuel_06.png",
+          "BKSY_refuel_07.png",
+          "BKSY_refuel_08.png",
+          "BKSY_refuel_09.png",
+          "BKSY_refuel_10.png",
+          "BKSY_refuel_11.png"
+        ],
+        "special": [
+          "BKSY_special_00.png",
+          "BKSY_special_01.png",
+          "BKSY_special_02.png",
+          "BKSY_special_03.png",
+          "BKSY_special_04.png",
+          "BKSY_special_05.png",
+          "BKSY_special_06.png",
+          "BKSY_special_07.png"
+        ]
+      }
+    },
+    "COHR": {
+      "name": "COHR",
+      "class": "Reflector",
+      "colors": {
+        "primary": [
+          0,
+          255,
+          255
+        ],
+        "secondary": [
+          255,
+          200,
+          0
+        ],
+        "accent": [
+          255,
+          255,
+          255
+        ]
+      },
+      "special_effect": "crystal_refract",
+      "animations": {
+        "base": [
+          "COHR_base.png"
+        ],
+        "idle": [
+          "COHR_idle_00.png",
+          "COHR_idle_01.png",
+          "COHR_idle_02.png",
+          "COHR_idle_03.png",
+          "COHR_idle_04.png",
+          "COHR_idle_05.png",
+          "COHR_idle_06.png",
+          "COHR_idle_07.png"
+        ],
+        "thrust": [
+          "COHR_thrust_00.png",
+          "COHR_thrust_01.png",
+          "COHR_thrust_02.png",
+          "COHR_thrust_03.png",
+          "COHR_thrust_04.png",
+          "COHR_thrust_05.png"
+        ],
+        "pulse": [
+          "COHR_pulse_00.png",
+          "COHR_pulse_01.png",
+          "COHR_pulse_02.png",
+          "COHR_pulse_03.png",
+          "COHR_pulse_04.png",
+          "COHR_pulse_05.png",
+          "COHR_pulse_06.png",
+          "COHR_pulse_07.png",
+          "COHR_pulse_08.png",
+          "COHR_pulse_09.png",
+          "COHR_pulse_10.png",
+          "COHR_pulse_11.png"
+        ],
+        "shield": [
+          "COHR_shield_00.png",
+          "COHR_shield_01.png",
+          "COHR_shield_02.png",
+          "COHR_shield_03.png",
+          "COHR_shield_04.png",
+          "COHR_shield_05.png",
+          "COHR_shield_06.png",
+          "COHR_shield_07.png"
+        ],
+        "charge": [
+          "COHR_charge_00.png",
+          "COHR_charge_01.png",
+          "COHR_charge_02.png",
+          "COHR_charge_03.png",
+          "COHR_charge_04.png",
+          "COHR_charge_05.png",
+          "COHR_charge_06.png",
+          "COHR_charge_07.png",
+          "COHR_charge_08.png",
+          "COHR_charge_09.png"
+        ],
+        "drone": [
+          "COHR_drone_00.png",
+          "COHR_drone_01.png",
+          "COHR_drone_02.png",
+          "COHR_drone_03.png",
+          "COHR_drone_04.png",
+          "COHR_drone_05.png",
+          "COHR_drone_06.png",
+          "COHR_drone_07.png",
+          "COHR_drone_08.png",
+          "COHR_drone_09.png",
+          "COHR_drone_10.png",
+          "COHR_drone_11.png",
+          "COHR_drone_12.png",
+          "COHR_drone_13.png",
+          "COHR_drone_14.png",
+          "COHR_drone_15.png"
+        ],
+        "refuel": [
+          "COHR_refuel_00.png",
+          "COHR_refuel_01.png",
+          "COHR_refuel_02.png",
+          "COHR_refuel_03.png",
+          "COHR_refuel_04.png",
+          "COHR_refuel_05.png",
+          "COHR_refuel_06.png",
+          "COHR_refuel_07.png",
+          "COHR_refuel_08.png",
+          "COHR_refuel_09.png",
+          "COHR_refuel_10.png",
+          "COHR_refuel_11.png"
+        ],
+        "special": [
+          "COHR_special_00.png",
+          "COHR_special_01.png",
+          "COHR_special_02.png",
+          "COHR_special_03.png",
+          "COHR_special_04.png",
+          "COHR_special_05.png",
+          "COHR_special_06.png",
+          "COHR_special_07.png"
+        ]
+      }
+    },
+    "EVEX": {
+      "name": "EVEX",
+      "class": "Transport",
+      "colors": {
+        "primary": [
+          100,
+          180,
+          100
+        ],
+        "secondary": [
+          255,
+          120,
+          50
+        ],
+        "accent": [
+          0,
+          200,
+          255
+        ]
+      },
+      "special_effect": "cargo_pulse",
+      "animations": {
+        "base": [
+          "EVEX_base.png"
+        ],
+        "idle": [
+          "EVEX_idle_00.png",
+          "EVEX_idle_01.png",
+          "EVEX_idle_02.png",
+          "EVEX_idle_03.png",
+          "EVEX_idle_04.png",
+          "EVEX_idle_05.png",
+          "EVEX_idle_06.png",
+          "EVEX_idle_07.png"
+        ],
+        "thrust": [
+          "EVEX_thrust_00.png",
+          "EVEX_thrust_01.png",
+          "EVEX_thrust_02.png",
+          "EVEX_thrust_03.png",
+          "EVEX_thrust_04.png",
+          "EVEX_thrust_05.png"
+        ],
+        "pulse": [
+          "EVEX_pulse_00.png",
+          "EVEX_pulse_01.png",
+          "EVEX_pulse_02.png",
+          "EVEX_pulse_03.png",
+          "EVEX_pulse_04.png",
+          "EVEX_pulse_05.png",
+          "EVEX_pulse_06.png",
+          "EVEX_pulse_07.png",
+          "EVEX_pulse_08.png",
+          "EVEX_pulse_09.png",
+          "EVEX_pulse_10.png",
+          "EVEX_pulse_11.png"
+        ],
+        "shield": [
+          "EVEX_shield_00.png",
+          "EVEX_shield_01.png",
+          "EVEX_shield_02.png",
+          "EVEX_shield_03.png",
+          "EVEX_shield_04.png",
+          "EVEX_shield_05.png",
+          "EVEX_shield_06.png",
+          "EVEX_shield_07.png"
+        ],
+        "charge": [
+          "EVEX_charge_00.png",
+          "EVEX_charge_01.png",
+          "EVEX_charge_02.png",
+          "EVEX_charge_03.png",
+          "EVEX_charge_04.png",
+          "EVEX_charge_05.png",
+          "EVEX_charge_06.png",
+          "EVEX_charge_07.png",
+          "EVEX_charge_08.png",
+          "EVEX_charge_09.png"
+        ],
+        "drone": [
+          "EVEX_drone_00.png",
+          "EVEX_drone_01.png",
+          "EVEX_drone_02.png",
+          "EVEX_drone_03.png",
+          "EVEX_drone_04.png",
+          "EVEX_drone_05.png",
+          "EVEX_drone_06.png",
+          "EVEX_drone_07.png",
+          "EVEX_drone_08.png",
+          "EVEX_drone_09.png",
+          "EVEX_drone_10.png",
+          "EVEX_drone_11.png",
+          "EVEX_drone_12.png",
+          "EVEX_drone_13.png",
+          "EVEX_drone_14.png",
+          "EVEX_drone_15.png"
+        ],
+        "refuel": [
+          "EVEX_refuel_00.png",
+          "EVEX_refuel_01.png",
+          "EVEX_refuel_02.png",
+          "EVEX_refuel_03.png",
+          "EVEX_refuel_04.png",
+          "EVEX_refuel_05.png",
+          "EVEX_refuel_06.png",
+          "EVEX_refuel_07.png",
+          "EVEX_refuel_08.png",
+          "EVEX_refuel_09.png",
+          "EVEX_refuel_10.png",
+          "EVEX_refuel_11.png"
+        ],
+        "special": [
+          "EVEX_special_00.png",
+          "EVEX_special_01.png",
+          "EVEX_special_02.png",
+          "EVEX_special_03.png",
+          "EVEX_special_04.png",
+          "EVEX_special_05.png",
+          "EVEX_special_06.png",
+          "EVEX_special_07.png"
+        ]
+      }
+    },
+    "GE": {
+      "name": "GE",
+      "class": "Stealth",
+      "colors": {
+        "primary": [
+          40,
+          40,
+          40
+        ],
+        "secondary": [
+          255,
+          100,
+          0
+        ],
+        "accent": [
+          255,
+          50,
+          50
+        ]
+      },
+      "special_effect": "afterburner",
+      "animations": {
+        "base": [
+          "GE_base.png"
+        ],
+        "idle": [
+          "GE_idle_00.png",
+          "GE_idle_01.png",
+          "GE_idle_02.png",
+          "GE_idle_03.png",
+          "GE_idle_04.png",
+          "GE_idle_05.png",
+          "GE_idle_06.png",
+          "GE_idle_07.png"
+        ],
+        "thrust": [
+          "GE_thrust_00.png",
+          "GE_thrust_01.png",
+          "GE_thrust_02.png",
+          "GE_thrust_03.png",
+          "GE_thrust_04.png",
+          "GE_thrust_05.png"
+        ],
+        "pulse": [
+          "GE_pulse_00.png",
+          "GE_pulse_01.png",
+          "GE_pulse_02.png",
+          "GE_pulse_03.png",
+          "GE_pulse_04.png",
+          "GE_pulse_05.png",
+          "GE_pulse_06.png",
+          "GE_pulse_07.png",
+          "GE_pulse_08.png",
+          "GE_pulse_09.png",
+          "GE_pulse_10.png",
+          "GE_pulse_11.png"
+        ],
+        "shield": [
+          "GE_shield_00.png",
+          "GE_shield_01.png",
+          "GE_shield_02.png",
+          "GE_shield_03.png",
+          "GE_shield_04.png",
+          "GE_shield_05.png",
+          "GE_shield_06.png",
+          "GE_shield_07.png"
+        ],
+        "charge": [
+          "GE_charge_00.png",
+          "GE_charge_01.png",
+          "GE_charge_02.png",
+          "GE_charge_03.png",
+          "GE_charge_04.png",
+          "GE_charge_05.png",
+          "GE_charge_06.png",
+          "GE_charge_07.png",
+          "GE_charge_08.png",
+          "GE_charge_09.png"
+        ],
+        "drone": [
+          "GE_drone_00.png",
+          "GE_drone_01.png",
+          "GE_drone_02.png",
+          "GE_drone_03.png",
+          "GE_drone_04.png",
+          "GE_drone_05.png",
+          "GE_drone_06.png",
+          "GE_drone_07.png",
+          "GE_drone_08.png",
+          "GE_drone_09.png",
+          "GE_drone_10.png",
+          "GE_drone_11.png",
+          "GE_drone_12.png",
+          "GE_drone_13.png",
+          "GE_drone_14.png",
+          "GE_drone_15.png"
+        ],
+        "refuel": [
+          "GE_refuel_00.png",
+          "GE_refuel_01.png",
+          "GE_refuel_02.png",
+          "GE_refuel_03.png",
+          "GE_refuel_04.png",
+          "GE_refuel_05.png",
+          "GE_refuel_06.png",
+          "GE_refuel_07.png",
+          "GE_refuel_08.png",
+          "GE_refuel_09.png",
+          "GE_refuel_10.png",
+          "GE_refuel_11.png"
+        ],
+        "special": [
+          "GE_special_00.png",
+          "GE_special_01.png",
+          "GE_special_02.png",
+          "GE_special_03.png",
+          "GE_special_04.png",
+          "GE_special_05.png",
+          "GE_special_06.png",
+          "GE_special_07.png"
+        ]
+      }
+    },
+    "GME": {
+      "name": "GME",
+      "class": "Moonshot",
+      "colors": {
+        "primary": [
+          220,
+          50,
+          50
+        ],
+        "secondary": [
+          100,
+          255,
+          100
+        ],
+        "accent": [
+          0,
+          200,
+          255
+        ]
+      },
+      "special_effect": "rocket_boost",
+      "animations": {
+        "base": [
+          "GME_base.png"
+        ],
+        "idle": [
+          "GME_idle_00.png",
+          "GME_idle_01.png",
+          "GME_idle_02.png",
+          "GME_idle_03.png",
+          "GME_idle_04.png",
+          "GME_idle_05.png",
+          "GME_idle_06.png",
+          "GME_idle_07.png"
+        ],
+        "thrust": [
+          "GME_thrust_00.png",
+          "GME_thrust_01.png",
+          "GME_thrust_02.png",
+          "GME_thrust_03.png",
+          "GME_thrust_04.png",
+          "GME_thrust_05.png"
+        ],
+        "pulse": [
+          "GME_pulse_00.png",
+          "GME_pulse_01.png",
+          "GME_pulse_02.png",
+          "GME_pulse_03.png",
+          "GME_pulse_04.png",
+          "GME_pulse_05.png",
+          "GME_pulse_06.png",
+          "GME_pulse_07.png",
+          "GME_pulse_08.png",
+          "GME_pulse_09.png",
+          "GME_pulse_10.png",
+          "GME_pulse_11.png"
+        ],
+        "shield": [
+          "GME_shield_00.png",
+          "GME_shield_01.png",
+          "GME_shield_02.png",
+          "GME_shield_03.png",
+          "GME_shield_04.png",
+          "GME_shield_05.png",
+          "GME_shield_06.png",
+          "GME_shield_07.png"
+        ],
+        "charge": [
+          "GME_charge_00.png",
+          "GME_charge_01.png",
+          "GME_charge_02.png",
+          "GME_charge_03.png",
+          "GME_charge_04.png",
+          "GME_charge_05.png",
+          "GME_charge_06.png",
+          "GME_charge_07.png",
+          "GME_charge_08.png",
+          "GME_charge_09.png"
+        ],
+        "drone": [
+          "GME_drone_00.png",
+          "GME_drone_01.png",
+          "GME_drone_02.png",
+          "GME_drone_03.png",
+          "GME_drone_04.png",
+          "GME_drone_05.png",
+          "GME_drone_06.png",
+          "GME_drone_07.png",
+          "GME_drone_08.png",
+          "GME_drone_09.png",
+          "GME_drone_10.png",
+          "GME_drone_11.png",
+          "GME_drone_12.png",
+          "GME_drone_13.png",
+          "GME_drone_14.png",
+          "GME_drone_15.png"
+        ],
+        "refuel": [
+          "GME_refuel_00.png",
+          "GME_refuel_01.png",
+          "GME_refuel_02.png",
+          "GME_refuel_03.png",
+          "GME_refuel_04.png",
+          "GME_refuel_05.png",
+          "GME_refuel_06.png",
+          "GME_refuel_07.png",
+          "GME_refuel_08.png",
+          "GME_refuel_09.png",
+          "GME_refuel_10.png",
+          "GME_refuel_11.png"
+        ],
+        "special": [
+          "GME_special_00.png",
+          "GME_special_01.png",
+          "GME_special_02.png",
+          "GME_special_03.png",
+          "GME_special_04.png",
+          "GME_special_05.png",
+          "GME_special_06.png",
+          "GME_special_07.png"
+        ]
+      }
+    },
+    "JOBY": {
+      "name": "JOBY",
+      "class": "Light-eVTOL",
+      "colors": {
+        "primary": [
+          0,
+          200,
+          200
+        ],
+        "secondary": [
+          255,
+          100,
+          150
+        ],
+        "accent": [
+          255,
+          200,
+          0
+        ]
+      },
+      "special_effect": "rotor_spin",
+      "animations": {
+        "base": [
+          "JOBY_base.png"
+        ],
+        "idle": [
+          "JOBY_idle_00.png",
+          "JOBY_idle_01.png",
+          "JOBY_idle_02.png",
+          "JOBY_idle_03.png",
+          "JOBY_idle_04.png",
+          "JOBY_idle_05.png",
+          "JOBY_idle_06.png",
+          "JOBY_idle_07.png"
+        ],
+        "thrust": [
+          "JOBY_thrust_00.png",
+          "JOBY_thrust_01.png",
+          "JOBY_thrust_02.png",
+          "JOBY_thrust_03.png",
+          "JOBY_thrust_04.png",
+          "JOBY_thrust_05.png"
+        ],
+        "pulse": [
+          "JOBY_pulse_00.png",
+          "JOBY_pulse_01.png",
+          "JOBY_pulse_02.png",
+          "JOBY_pulse_03.png",
+          "JOBY_pulse_04.png",
+          "JOBY_pulse_05.png",
+          "JOBY_pulse_06.png",
+          "JOBY_pulse_07.png",
+          "JOBY_pulse_08.png",
+          "JOBY_pulse_09.png",
+          "JOBY_pulse_10.png",
+          "JOBY_pulse_11.png"
+        ],
+        "shield": [
+          "JOBY_shield_00.png",
+          "JOBY_shield_01.png",
+          "JOBY_shield_02.png",
+          "JOBY_shield_03.png",
+          "JOBY_shield_04.png",
+          "JOBY_shield_05.png",
+          "JOBY_shield_06.png",
+          "JOBY_shield_07.png"
+        ],
+        "charge": [
+          "JOBY_charge_00.png",
+          "JOBY_charge_01.png",
+          "JOBY_charge_02.png",
+          "JOBY_charge_03.png",
+          "JOBY_charge_04.png",
+          "JOBY_charge_05.png",
+          "JOBY_charge_06.png",
+          "JOBY_charge_07.png",
+          "JOBY_charge_08.png",
+          "JOBY_charge_09.png"
+        ],
+        "drone": [
+          "JOBY_drone_00.png",
+          "JOBY_drone_01.png",
+          "JOBY_drone_02.png",
+          "JOBY_drone_03.png",
+          "JOBY_drone_04.png",
+          "JOBY_drone_05.png",
+          "JOBY_drone_06.png",
+          "JOBY_drone_07.png",
+          "JOBY_drone_08.png",
+          "JOBY_drone_09.png",
+          "JOBY_drone_10.png",
+          "JOBY_drone_11.png",
+          "JOBY_drone_12.png",
+          "JOBY_drone_13.png",
+          "JOBY_drone_14.png",
+          "JOBY_drone_15.png"
+        ],
+        "refuel": [
+          "JOBY_refuel_00.png",
+          "JOBY_refuel_01.png",
+          "JOBY_refuel_02.png",
+          "JOBY_refuel_03.png",
+          "JOBY_refuel_04.png",
+          "JOBY_refuel_05.png",
+          "JOBY_refuel_06.png",
+          "JOBY_refuel_07.png",
+          "JOBY_refuel_08.png",
+          "JOBY_refuel_09.png",
+          "JOBY_refuel_10.png",
+          "JOBY_refuel_11.png"
+        ],
+        "special": [
+          "JOBY_special_00.png",
+          "JOBY_special_01.png",
+          "JOBY_special_02.png",
+          "JOBY_special_03.png",
+          "JOBY_special_04.png",
+          "JOBY_special_05.png",
+          "JOBY_special_06.png",
+          "JOBY_special_07.png"
+        ]
+      }
+    },
+    "KTOS": {
+      "name": "KTOS",
+      "class": "Fighter",
+      "colors": {
+        "primary": [
+          80,
+          50,
+          150
+        ],
+        "secondary": [
+          150,
+          100,
+          255
+        ],
+        "accent": [
+          0,
+          255,
+          255
+        ]
+      },
+      "special_effect": "weapon_glow",
+      "animations": {
+        "base": [
+          "KTOS_base.png"
+        ],
+        "idle": [
+          "KTOS_idle_00.png",
+          "KTOS_idle_01.png",
+          "KTOS_idle_02.png",
+          "KTOS_idle_03.png",
+          "KTOS_idle_04.png",
+          "KTOS_idle_05.png",
+          "KTOS_idle_06.png",
+          "KTOS_idle_07.png"
+        ],
+        "thrust": [
+          "KTOS_thrust_00.png",
+          "KTOS_thrust_01.png",
+          "KTOS_thrust_02.png",
+          "KTOS_thrust_03.png",
+          "KTOS_thrust_04.png",
+          "KTOS_thrust_05.png"
+        ],
+        "pulse": [
+          "KTOS_pulse_00.png",
+          "KTOS_pulse_01.png",
+          "KTOS_pulse_02.png",
+          "KTOS_pulse_03.png",
+          "KTOS_pulse_04.png",
+          "KTOS_pulse_05.png",
+          "KTOS_pulse_06.png",
+          "KTOS_pulse_07.png",
+          "KTOS_pulse_08.png",
+          "KTOS_pulse_09.png",
+          "KTOS_pulse_10.png",
+          "KTOS_pulse_11.png"
+        ],
+        "shield": [
+          "KTOS_shield_00.png",
+          "KTOS_shield_01.png",
+          "KTOS_shield_02.png",
+          "KTOS_shield_03.png",
+          "KTOS_shield_04.png",
+          "KTOS_shield_05.png",
+          "KTOS_shield_06.png",
+          "KTOS_shield_07.png"
+        ],
+        "charge": [
+          "KTOS_charge_00.png",
+          "KTOS_charge_01.png",
+          "KTOS_charge_02.png",
+          "KTOS_charge_03.png",
+          "KTOS_charge_04.png",
+          "KTOS_charge_05.png",
+          "KTOS_charge_06.png",
+          "KTOS_charge_07.png",
+          "KTOS_charge_08.png",
+          "KTOS_charge_09.png"
+        ],
+        "drone": [
+          "KTOS_drone_00.png",
+          "KTOS_drone_01.png",
+          "KTOS_drone_02.png",
+          "KTOS_drone_03.png",
+          "KTOS_drone_04.png",
+          "KTOS_drone_05.png",
+          "KTOS_drone_06.png",
+          "KTOS_drone_07.png",
+          "KTOS_drone_08.png",
+          "KTOS_drone_09.png",
+          "KTOS_drone_10.png",
+          "KTOS_drone_11.png",
+          "KTOS_drone_12.png",
+          "KTOS_drone_13.png",
+          "KTOS_drone_14.png",
+          "KTOS_drone_15.png"
+        ],
+        "refuel": [
+          "KTOS_refuel_00.png",
+          "KTOS_refuel_01.png",
+          "KTOS_refuel_02.png",
+          "KTOS_refuel_03.png",
+          "KTOS_refuel_04.png",
+          "KTOS_refuel_05.png",
+          "KTOS_refuel_06.png",
+          "KTOS_refuel_07.png",
+          "KTOS_refuel_08.png",
+          "KTOS_refuel_09.png",
+          "KTOS_refuel_10.png",
+          "KTOS_refuel_11.png"
+        ],
+        "special": [
+          "KTOS_special_00.png",
+          "KTOS_special_01.png",
+          "KTOS_special_02.png",
+          "KTOS_special_03.png",
+          "KTOS_special_04.png",
+          "KTOS_special_05.png",
+          "KTOS_special_06.png",
+          "KTOS_special_07.png"
+        ]
+      }
+    },
+    "LHX": {
+      "name": "LHX",
+      "class": "Drone",
+      "colors": {
+        "primary": [
+          200,
+          200,
+          200
+        ],
+        "secondary": [
+          255,
+          200,
+          50
+        ],
+        "accent": [
+          0,
+          200,
+          255
+        ]
+      },
+      "special_effect": "swarm_pulse",
+      "animations": {
+        "base": [
+          "LHX_base.png"
+        ],
+        "idle": [
+          "LHX_idle_00.png",
+          "LHX_idle_01.png",
+          "LHX_idle_02.png",
+          "LHX_idle_03.png",
+          "LHX_idle_04.png",
+          "LHX_idle_05.png",
+          "LHX_idle_06.png",
+          "LHX_idle_07.png"
+        ],
+        "thrust": [
+          "LHX_thrust_00.png",
+          "LHX_thrust_01.png",
+          "LHX_thrust_02.png",
+          "LHX_thrust_03.png",
+          "LHX_thrust_04.png",
+          "LHX_thrust_05.png"
+        ],
+        "pulse": [
+          "LHX_pulse_00.png",
+          "LHX_pulse_01.png",
+          "LHX_pulse_02.png",
+          "LHX_pulse_03.png",
+          "LHX_pulse_04.png",
+          "LHX_pulse_05.png",
+          "LHX_pulse_06.png",
+          "LHX_pulse_07.png",
+          "LHX_pulse_08.png",
+          "LHX_pulse_09.png",
+          "LHX_pulse_10.png",
+          "LHX_pulse_11.png"
+        ],
+        "shield": [
+          "LHX_shield_00.png",
+          "LHX_shield_01.png",
+          "LHX_shield_02.png",
+          "LHX_shield_03.png",
+          "LHX_shield_04.png",
+          "LHX_shield_05.png",
+          "LHX_shield_06.png",
+          "LHX_shield_07.png"
+        ],
+        "charge": [
+          "LHX_charge_00.png",
+          "LHX_charge_01.png",
+          "LHX_charge_02.png",
+          "LHX_charge_03.png",
+          "LHX_charge_04.png",
+          "LHX_charge_05.png",
+          "LHX_charge_06.png",
+          "LHX_charge_07.png",
+          "LHX_charge_08.png",
+          "LHX_charge_09.png"
+        ],
+        "drone": [
+          "LHX_drone_00.png",
+          "LHX_drone_01.png",
+          "LHX_drone_02.png",
+          "LHX_drone_03.png",
+          "LHX_drone_04.png",
+          "LHX_drone_05.png",
+          "LHX_drone_06.png",
+          "LHX_drone_07.png",
+          "LHX_drone_08.png",
+          "LHX_drone_09.png",
+          "LHX_drone_10.png",
+          "LHX_drone_11.png",
+          "LHX_drone_12.png",
+          "LHX_drone_13.png",
+          "LHX_drone_14.png",
+          "LHX_drone_15.png"
+        ],
+        "refuel": [
+          "LHX_refuel_00.png",
+          "LHX_refuel_01.png",
+          "LHX_refuel_02.png",
+          "LHX_refuel_03.png",
+          "LHX_refuel_04.png",
+          "LHX_refuel_05.png",
+          "LHX_refuel_06.png",
+          "LHX_refuel_07.png",
+          "LHX_refuel_08.png",
+          "LHX_refuel_09.png",
+          "LHX_refuel_10.png",
+          "LHX_refuel_11.png"
+        ],
+        "special": [
+          "LHX_special_00.png",
+          "LHX_special_01.png",
+          "LHX_special_02.png",
+          "LHX_special_03.png",
+          "LHX_special_04.png",
+          "LHX_special_05.png",
+          "LHX_special_06.png",
+          "LHX_special_07.png"
+        ]
+      }
+    },
+    "LUNR": {
+      "name": "LUNR",
+      "class": "Lander",
+      "colors": {
+        "primary": [
+          200,
+          170,
+          100
+        ],
+        "secondary": [
+          0,
+          150,
+          255
+        ],
+        "accent": [
+          255,
+          255,
+          255
+        ]
+      },
+      "special_effect": "landing_jets",
+      "animations": {
+        "base": [
+          "LUNR_base.png"
+        ],
+        "idle": [
+          "LUNR_idle_00.png",
+          "LUNR_idle_01.png",
+          "LUNR_idle_02.png",
+          "LUNR_idle_03.png",
+          "LUNR_idle_04.png",
+          "LUNR_idle_05.png",
+          "LUNR_idle_06.png",
+          "LUNR_idle_07.png"
+        ],
+        "thrust": [
+          "LUNR_thrust_00.png",
+          "LUNR_thrust_01.png",
+          "LUNR_thrust_02.png",
+          "LUNR_thrust_03.png",
+          "LUNR_thrust_04.png",
+          "LUNR_thrust_05.png"
+        ],
+        "pulse": [
+          "LUNR_pulse_00.png",
+          "LUNR_pulse_01.png",
+          "LUNR_pulse_02.png",
+          "LUNR_pulse_03.png",
+          "LUNR_pulse_04.png",
+          "LUNR_pulse_05.png",
+          "LUNR_pulse_06.png",
+          "LUNR_pulse_07.png",
+          "LUNR_pulse_08.png",
+          "LUNR_pulse_09.png",
+          "LUNR_pulse_10.png",
+          "LUNR_pulse_11.png"
+        ],
+        "shield": [
+          "LUNR_shield_00.png",
+          "LUNR_shield_01.png",
+          "LUNR_shield_02.png",
+          "LUNR_shield_03.png",
+          "LUNR_shield_04.png",
+          "LUNR_shield_05.png",
+          "LUNR_shield_06.png",
+          "LUNR_shield_07.png"
+        ],
+        "charge": [
+          "LUNR_charge_00.png",
+          "LUNR_charge_01.png",
+          "LUNR_charge_02.png",
+          "LUNR_charge_03.png",
+          "LUNR_charge_04.png",
+          "LUNR_charge_05.png",
+          "LUNR_charge_06.png",
+          "LUNR_charge_07.png",
+          "LUNR_charge_08.png",
+          "LUNR_charge_09.png"
+        ],
+        "drone": [
+          "LUNR_drone_00.png",
+          "LUNR_drone_01.png",
+          "LUNR_drone_02.png",
+          "LUNR_drone_03.png",
+          "LUNR_drone_04.png",
+          "LUNR_drone_05.png",
+          "LUNR_drone_06.png",
+          "LUNR_drone_07.png",
+          "LUNR_drone_08.png",
+          "LUNR_drone_09.png",
+          "LUNR_drone_10.png",
+          "LUNR_drone_11.png",
+          "LUNR_drone_12.png",
+          "LUNR_drone_13.png",
+          "LUNR_drone_14.png",
+          "LUNR_drone_15.png"
+        ],
+        "refuel": [
+          "LUNR_refuel_00.png",
+          "LUNR_refuel_01.png",
+          "LUNR_refuel_02.png",
+          "LUNR_refuel_03.png",
+          "LUNR_refuel_04.png",
+          "LUNR_refuel_05.png",
+          "LUNR_refuel_06.png",
+          "LUNR_refuel_07.png",
+          "LUNR_refuel_08.png",
+          "LUNR_refuel_09.png",
+          "LUNR_refuel_10.png",
+          "LUNR_refuel_11.png"
+        ],
+        "special": [
+          "LUNR_special_00.png",
+          "LUNR_special_01.png",
+          "LUNR_special_02.png",
+          "LUNR_special_03.png",
+          "LUNR_special_04.png",
+          "LUNR_special_05.png",
+          "LUNR_special_06.png",
+          "LUNR_special_07.png"
+        ]
+      }
+    },
+    "PL": {
+      "name": "PL",
+      "class": "Scout",
+      "colors": {
+        "primary": [
+          100,
+          130,
+          80
+        ],
+        "secondary": [
+          255,
+          150,
+          80
+        ],
+        "accent": [
+          255,
+          255,
+          255
+        ]
+      },
+      "special_effect": "sensor_sweep",
+      "animations": {
+        "base": [
+          "PL_base.png"
+        ],
+        "idle": [
+          "PL_idle_00.png",
+          "PL_idle_01.png",
+          "PL_idle_02.png",
+          "PL_idle_03.png",
+          "PL_idle_04.png",
+          "PL_idle_05.png",
+          "PL_idle_06.png",
+          "PL_idle_07.png"
+        ],
+        "thrust": [
+          "PL_thrust_00.png",
+          "PL_thrust_01.png",
+          "PL_thrust_02.png",
+          "PL_thrust_03.png",
+          "PL_thrust_04.png",
+          "PL_thrust_05.png"
+        ],
+        "pulse": [
+          "PL_pulse_00.png",
+          "PL_pulse_01.png",
+          "PL_pulse_02.png",
+          "PL_pulse_03.png",
+          "PL_pulse_04.png",
+          "PL_pulse_05.png",
+          "PL_pulse_06.png",
+          "PL_pulse_07.png",
+          "PL_pulse_08.png",
+          "PL_pulse_09.png",
+          "PL_pulse_10.png",
+          "PL_pulse_11.png"
+        ],
+        "shield": [
+          "PL_shield_00.png",
+          "PL_shield_01.png",
+          "PL_shield_02.png",
+          "PL_shield_03.png",
+          "PL_shield_04.png",
+          "PL_shield_05.png",
+          "PL_shield_06.png",
+          "PL_shield_07.png"
+        ],
+        "charge": [
+          "PL_charge_00.png",
+          "PL_charge_01.png",
+          "PL_charge_02.png",
+          "PL_charge_03.png",
+          "PL_charge_04.png",
+          "PL_charge_05.png",
+          "PL_charge_06.png",
+          "PL_charge_07.png",
+          "PL_charge_08.png",
+          "PL_charge_09.png"
+        ],
+        "drone": [
+          "PL_drone_00.png",
+          "PL_drone_01.png",
+          "PL_drone_02.png",
+          "PL_drone_03.png",
+          "PL_drone_04.png",
+          "PL_drone_05.png",
+          "PL_drone_06.png",
+          "PL_drone_07.png",
+          "PL_drone_08.png",
+          "PL_drone_09.png",
+          "PL_drone_10.png",
+          "PL_drone_11.png",
+          "PL_drone_12.png",
+          "PL_drone_13.png",
+          "PL_drone_14.png",
+          "PL_drone_15.png"
+        ],
+        "refuel": [
+          "PL_refuel_00.png",
+          "PL_refuel_01.png",
+          "PL_refuel_02.png",
+          "PL_refuel_03.png",
+          "PL_refuel_04.png",
+          "PL_refuel_05.png",
+          "PL_refuel_06.png",
+          "PL_refuel_07.png",
+          "PL_refuel_08.png",
+          "PL_refuel_09.png",
+          "PL_refuel_10.png",
+          "PL_refuel_11.png"
+        ],
+        "special": [
+          "PL_special_00.png",
+          "PL_special_01.png",
+          "PL_special_02.png",
+          "PL_special_03.png",
+          "PL_special_04.png",
+          "PL_special_05.png",
+          "PL_special_06.png",
+          "PL_special_07.png"
+        ]
+      }
+    },
+    "RDW": {
+      "name": "RDW",
+      "class": "Hauler",
+      "colors": {
+        "primary": [
+          200,
+          50,
+          150
+        ],
+        "secondary": [
+          150,
+          255,
+          100
+        ],
+        "accent": [
+          255,
+          255,
+          255
+        ]
+      },
+      "special_effect": "tractor_beam",
+      "animations": {
+        "base": [
+          "RDW_base.png"
+        ],
+        "idle": [
+          "RDW_idle_00.png",
+          "RDW_idle_01.png",
+          "RDW_idle_02.png",
+          "RDW_idle_03.png",
+          "RDW_idle_04.png",
+          "RDW_idle_05.png",
+          "RDW_idle_06.png",
+          "RDW_idle_07.png"
+        ],
+        "thrust": [
+          "RDW_thrust_00.png",
+          "RDW_thrust_01.png",
+          "RDW_thrust_02.png",
+          "RDW_thrust_03.png",
+          "RDW_thrust_04.png",
+          "RDW_thrust_05.png"
+        ],
+        "pulse": [
+          "RDW_pulse_00.png",
+          "RDW_pulse_01.png",
+          "RDW_pulse_02.png",
+          "RDW_pulse_03.png",
+          "RDW_pulse_04.png",
+          "RDW_pulse_05.png",
+          "RDW_pulse_06.png",
+          "RDW_pulse_07.png",
+          "RDW_pulse_08.png",
+          "RDW_pulse_09.png",
+          "RDW_pulse_10.png",
+          "RDW_pulse_11.png"
+        ],
+        "shield": [
+          "RDW_shield_00.png",
+          "RDW_shield_01.png",
+          "RDW_shield_02.png",
+          "RDW_shield_03.png",
+          "RDW_shield_04.png",
+          "RDW_shield_05.png",
+          "RDW_shield_06.png",
+          "RDW_shield_07.png"
+        ],
+        "charge": [
+          "RDW_charge_00.png",
+          "RDW_charge_01.png",
+          "RDW_charge_02.png",
+          "RDW_charge_03.png",
+          "RDW_charge_04.png",
+          "RDW_charge_05.png",
+          "RDW_charge_06.png",
+          "RDW_charge_07.png",
+          "RDW_charge_08.png",
+          "RDW_charge_09.png"
+        ],
+        "drone": [
+          "RDW_drone_00.png",
+          "RDW_drone_01.png",
+          "RDW_drone_02.png",
+          "RDW_drone_03.png",
+          "RDW_drone_04.png",
+          "RDW_drone_05.png",
+          "RDW_drone_06.png",
+          "RDW_drone_07.png",
+          "RDW_drone_08.png",
+          "RDW_drone_09.png",
+          "RDW_drone_10.png",
+          "RDW_drone_11.png",
+          "RDW_drone_12.png",
+          "RDW_drone_13.png",
+          "RDW_drone_14.png",
+          "RDW_drone_15.png"
+        ],
+        "refuel": [
+          "RDW_refuel_00.png",
+          "RDW_refuel_01.png",
+          "RDW_refuel_02.png",
+          "RDW_refuel_03.png",
+          "RDW_refuel_04.png",
+          "RDW_refuel_05.png",
+          "RDW_refuel_06.png",
+          "RDW_refuel_07.png",
+          "RDW_refuel_08.png",
+          "RDW_refuel_09.png",
+          "RDW_refuel_10.png",
+          "RDW_refuel_11.png"
+        ],
+        "special": [
+          "RDW_special_00.png",
+          "RDW_special_01.png",
+          "RDW_special_02.png",
+          "RDW_special_03.png",
+          "RDW_special_04.png",
+          "RDW_special_05.png",
+          "RDW_special_06.png",
+          "RDW_special_07.png"
+        ]
+      }
+    },
+    "RKLB": {
+      "name": "RKLB",
+      "class": "Flagship",
+      "colors": {
+        "primary": [
+          50,
+          100,
+          200
+        ],
+        "secondary": [
+          220,
+          50,
+          50
+        ],
+        "accent": [
+          200,
+          200,
+          200
+        ]
+      },
+      "special_effect": "command_aura",
+      "animations": {
+        "base": [
+          "RKLB_base.png"
+        ],
+        "idle": [
+          "RKLB_idle_00.png",
+          "RKLB_idle_01.png",
+          "RKLB_idle_02.png",
+          "RKLB_idle_03.png",
+          "RKLB_idle_04.png",
+          "RKLB_idle_05.png",
+          "RKLB_idle_06.png",
+          "RKLB_idle_07.png"
+        ],
+        "thrust": [
+          "RKLB_thrust_00.png",
+          "RKLB_thrust_01.png",
+          "RKLB_thrust_02.png",
+          "RKLB_thrust_03.png",
+          "RKLB_thrust_04.png",
+          "RKLB_thrust_05.png"
+        ],
+        "pulse": [
+          "RKLB_pulse_00.png",
+          "RKLB_pulse_01.png",
+          "RKLB_pulse_02.png",
+          "RKLB_pulse_03.png",
+          "RKLB_pulse_04.png",
+          "RKLB_pulse_05.png",
+          "RKLB_pulse_06.png",
+          "RKLB_pulse_07.png",
+          "RKLB_pulse_08.png",
+          "RKLB_pulse_09.png",
+          "RKLB_pulse_10.png",
+          "RKLB_pulse_11.png"
+        ],
+        "shield": [
+          "RKLB_shield_00.png",
+          "RKLB_shield_01.png",
+          "RKLB_shield_02.png",
+          "RKLB_shield_03.png",
+          "RKLB_shield_04.png",
+          "RKLB_shield_05.png",
+          "RKLB_shield_06.png",
+          "RKLB_shield_07.png"
+        ],
+        "charge": [
+          "RKLB_charge_00.png",
+          "RKLB_charge_01.png",
+          "RKLB_charge_02.png",
+          "RKLB_charge_03.png",
+          "RKLB_charge_04.png",
+          "RKLB_charge_05.png",
+          "RKLB_charge_06.png",
+          "RKLB_charge_07.png",
+          "RKLB_charge_08.png",
+          "RKLB_charge_09.png"
+        ],
+        "drone": [
+          "RKLB_drone_00.png",
+          "RKLB_drone_01.png",
+          "RKLB_drone_02.png",
+          "RKLB_drone_03.png",
+          "RKLB_drone_04.png",
+          "RKLB_drone_05.png",
+          "RKLB_drone_06.png",
+          "RKLB_drone_07.png",
+          "RKLB_drone_08.png",
+          "RKLB_drone_09.png",
+          "RKLB_drone_10.png",
+          "RKLB_drone_11.png",
+          "RKLB_drone_12.png",
+          "RKLB_drone_13.png",
+          "RKLB_drone_14.png",
+          "RKLB_drone_15.png"
+        ],
+        "refuel": [
+          "RKLB_refuel_00.png",
+          "RKLB_refuel_01.png",
+          "RKLB_refuel_02.png",
+          "RKLB_refuel_03.png",
+          "RKLB_refuel_04.png",
+          "RKLB_refuel_05.png",
+          "RKLB_refuel_06.png",
+          "RKLB_refuel_07.png",
+          "RKLB_refuel_08.png",
+          "RKLB_refuel_09.png",
+          "RKLB_refuel_10.png",
+          "RKLB_refuel_11.png"
+        ],
+        "special": [
+          "RKLB_special_00.png",
+          "RKLB_special_01.png",
+          "RKLB_special_02.png",
+          "RKLB_special_03.png",
+          "RKLB_special_04.png",
+          "RKLB_special_05.png",
+          "RKLB_special_06.png",
+          "RKLB_special_07.png"
+        ]
+      }
+    },
+    "RTX": {
+      "name": "RTX",
+      "class": "Officer",
+      "colors": {
+        "primary": [
+          255,
+          150,
+          50
+        ],
+        "secondary": [
+          255,
+          50,
+          50
+        ],
+        "accent": [
+          255,
+          255,
+          255
+        ]
+      },
+      "special_effect": "rank_insignia",
+      "animations": {
+        "base": [
+          "RTX_base.png"
+        ],
+        "idle": [
+          "RTX_idle_00.png",
+          "RTX_idle_01.png",
+          "RTX_idle_02.png",
+          "RTX_idle_03.png",
+          "RTX_idle_04.png",
+          "RTX_idle_05.png",
+          "RTX_idle_06.png",
+          "RTX_idle_07.png"
+        ],
+        "thrust": [
+          "RTX_thrust_00.png",
+          "RTX_thrust_01.png",
+          "RTX_thrust_02.png",
+          "RTX_thrust_03.png",
+          "RTX_thrust_04.png",
+          "RTX_thrust_05.png"
+        ],
+        "pulse": [
+          "RTX_pulse_00.png",
+          "RTX_pulse_01.png",
+          "RTX_pulse_02.png",
+          "RTX_pulse_03.png",
+          "RTX_pulse_04.png",
+          "RTX_pulse_05.png",
+          "RTX_pulse_06.png",
+          "RTX_pulse_07.png",
+          "RTX_pulse_08.png",
+          "RTX_pulse_09.png",
+          "RTX_pulse_10.png",
+          "RTX_pulse_11.png"
+        ],
+        "shield": [
+          "RTX_shield_00.png",
+          "RTX_shield_01.png",
+          "RTX_shield_02.png",
+          "RTX_shield_03.png",
+          "RTX_shield_04.png",
+          "RTX_shield_05.png",
+          "RTX_shield_06.png",
+          "RTX_shield_07.png"
+        ],
+        "charge": [
+          "RTX_charge_00.png",
+          "RTX_charge_01.png",
+          "RTX_charge_02.png",
+          "RTX_charge_03.png",
+          "RTX_charge_04.png",
+          "RTX_charge_05.png",
+          "RTX_charge_06.png",
+          "RTX_charge_07.png",
+          "RTX_charge_08.png",
+          "RTX_charge_09.png"
+        ],
+        "drone": [
+          "RTX_drone_00.png",
+          "RTX_drone_01.png",
+          "RTX_drone_02.png",
+          "RTX_drone_03.png",
+          "RTX_drone_04.png",
+          "RTX_drone_05.png",
+          "RTX_drone_06.png",
+          "RTX_drone_07.png",
+          "RTX_drone_08.png",
+          "RTX_drone_09.png",
+          "RTX_drone_10.png",
+          "RTX_drone_11.png",
+          "RTX_drone_12.png",
+          "RTX_drone_13.png",
+          "RTX_drone_14.png",
+          "RTX_drone_15.png"
+        ],
+        "refuel": [
+          "RTX_refuel_00.png",
+          "RTX_refuel_01.png",
+          "RTX_refuel_02.png",
+          "RTX_refuel_03.png",
+          "RTX_refuel_04.png",
+          "RTX_refuel_05.png",
+          "RTX_refuel_06.png",
+          "RTX_refuel_07.png",
+          "RTX_refuel_08.png",
+          "RTX_refuel_09.png",
+          "RTX_refuel_10.png",
+          "RTX_refuel_11.png"
+        ],
+        "special": [
+          "RTX_special_00.png",
+          "RTX_special_01.png",
+          "RTX_special_02.png",
+          "RTX_special_03.png",
+          "RTX_special_04.png",
+          "RTX_special_05.png",
+          "RTX_special_06.png",
+          "RTX_special_07.png"
+        ]
+      }
+    },
+    "Unclaimed": {
+      "name": "Unclaimed",
+      "class": "Drone",
+      "colors": {
+        "primary": [
+          255,
+          255,
+          255
+        ],
+        "secondary": [
+          255,
+          200,
+          50
+        ],
+        "accent": [
+          0,
+          200,
+          255
+        ]
+      },
+      "special_effect": "idle_drift",
+      "animations": {
+        "base": [
+          "Unclaimed_base.png"
+        ],
+        "idle": [
+          "Unclaimed_idle_00.png",
+          "Unclaimed_idle_01.png",
+          "Unclaimed_idle_02.png",
+          "Unclaimed_idle_03.png",
+          "Unclaimed_idle_04.png",
+          "Unclaimed_idle_05.png",
+          "Unclaimed_idle_06.png",
+          "Unclaimed_idle_07.png"
+        ],
+        "thrust": [
+          "Unclaimed_thrust_00.png",
+          "Unclaimed_thrust_01.png",
+          "Unclaimed_thrust_02.png",
+          "Unclaimed_thrust_03.png",
+          "Unclaimed_thrust_04.png",
+          "Unclaimed_thrust_05.png"
+        ],
+        "pulse": [
+          "Unclaimed_pulse_00.png",
+          "Unclaimed_pulse_01.png",
+          "Unclaimed_pulse_02.png",
+          "Unclaimed_pulse_03.png",
+          "Unclaimed_pulse_04.png",
+          "Unclaimed_pulse_05.png",
+          "Unclaimed_pulse_06.png",
+          "Unclaimed_pulse_07.png",
+          "Unclaimed_pulse_08.png",
+          "Unclaimed_pulse_09.png",
+          "Unclaimed_pulse_10.png",
+          "Unclaimed_pulse_11.png"
+        ],
+        "shield": [
+          "Unclaimed_shield_00.png",
+          "Unclaimed_shield_01.png",
+          "Unclaimed_shield_02.png",
+          "Unclaimed_shield_03.png",
+          "Unclaimed_shield_04.png",
+          "Unclaimed_shield_05.png",
+          "Unclaimed_shield_06.png",
+          "Unclaimed_shield_07.png"
+        ],
+        "charge": [
+          "Unclaimed_charge_00.png",
+          "Unclaimed_charge_01.png",
+          "Unclaimed_charge_02.png",
+          "Unclaimed_charge_03.png",
+          "Unclaimed_charge_04.png",
+          "Unclaimed_charge_05.png",
+          "Unclaimed_charge_06.png",
+          "Unclaimed_charge_07.png",
+          "Unclaimed_charge_08.png",
+          "Unclaimed_charge_09.png"
+        ],
+        "drone": [
+          "Unclaimed_drone_00.png",
+          "Unclaimed_drone_01.png",
+          "Unclaimed_drone_02.png",
+          "Unclaimed_drone_03.png",
+          "Unclaimed_drone_04.png",
+          "Unclaimed_drone_05.png",
+          "Unclaimed_drone_06.png",
+          "Unclaimed_drone_07.png",
+          "Unclaimed_drone_08.png",
+          "Unclaimed_drone_09.png",
+          "Unclaimed_drone_10.png",
+          "Unclaimed_drone_11.png",
+          "Unclaimed_drone_12.png",
+          "Unclaimed_drone_13.png",
+          "Unclaimed_drone_14.png",
+          "Unclaimed_drone_15.png"
+        ],
+        "refuel": [
+          "Unclaimed_refuel_00.png",
+          "Unclaimed_refuel_01.png",
+          "Unclaimed_refuel_02.png",
+          "Unclaimed_refuel_03.png",
+          "Unclaimed_refuel_04.png",
+          "Unclaimed_refuel_05.png",
+          "Unclaimed_refuel_06.png",
+          "Unclaimed_refuel_07.png",
+          "Unclaimed_refuel_08.png",
+          "Unclaimed_refuel_09.png",
+          "Unclaimed_refuel_10.png",
+          "Unclaimed_refuel_11.png"
+        ],
+        "special": [
+          "Unclaimed_special_00.png",
+          "Unclaimed_special_01.png",
+          "Unclaimed_special_02.png",
+          "Unclaimed_special_03.png",
+          "Unclaimed_special_04.png",
+          "Unclaimed_special_05.png",
+          "Unclaimed_special_06.png",
+          "Unclaimed_special_07.png"
+        ]
+      }
+    }
+  }
+}

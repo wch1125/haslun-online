@@ -1,0 +1,14 @@
+{
+  "ticker": "PL",
+  "dataPoints": 2380,
+  "lastUpdated": "2026-01-06T17:39:08.130915",
+  "kernelRespectPct": 0.5852941176470589,
+  "bandCompression": 0.754,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.627,
+  "trendAdherence": 0.684,
+  "chopSensitivity": 0.199
+}

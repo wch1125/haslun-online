@@ -1,0 +1,10 @@
+{
+  "ticker": "RKLB",
+  "structure": "Naked LEAP",
+  "deltaExposure": 0.68,
+  "timeHorizonDays": 373,
+  "leverageFactor": 2.86,
+  "upcomingCatalysts": 1,
+  "riskPosture": "leveraged",
+  "catalystPressure": "low"
+}

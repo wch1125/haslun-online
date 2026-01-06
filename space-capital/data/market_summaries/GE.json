@@ -1,0 +1,14 @@
+{
+  "ticker": "GE",
+  "dataPoints": 2356,
+  "lastUpdated": "2026-01-06T17:39:08.642624",
+  "kernelRespectPct": 0.9380305602716469,
+  "bandCompression": 0.913,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.366,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.208,
+  "trendAdherence": 0.825,
+  "chopSensitivity": 0.068
+}

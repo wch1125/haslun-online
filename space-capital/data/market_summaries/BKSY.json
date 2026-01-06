@@ -1,0 +1,14 @@
+{
+  "ticker": "BKSY",
+  "dataPoints": 2384,
+  "lastUpdated": "2026-01-06T17:39:09.138520",
+  "kernelRespectPct": 0.4433724832214765,
+  "bandCompression": 0.674,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.123,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.757,
+  "trendAdherence": 0.627,
+  "chopSensitivity": 0.249
+}

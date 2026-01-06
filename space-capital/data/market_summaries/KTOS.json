@@ -1,0 +1,14 @@
+{
+  "ticker": "KTOS",
+  "dataPoints": 2360,
+  "lastUpdated": "2026-01-06T17:39:08.566693",
+  "kernelRespectPct": 0.6860169491525424,
+  "bandCompression": 0.824,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.308,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.423,
+  "trendAdherence": 0.724,
+  "chopSensitivity": 0.137
+}

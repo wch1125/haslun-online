@@ -1,0 +1,14 @@
+{
+  "ticker": "COHR",
+  "dataPoints": 2380,
+  "lastUpdated": "2026-01-06T17:39:08.498049",
+  "kernelRespectPct": 0.6247899159663866,
+  "bandCompression": 0.801,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.247,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.504,
+  "trendAdherence": 0.7,
+  "chopSensitivity": 0.16
+}

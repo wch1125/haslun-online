@@ -1,0 +1,14 @@
+{
+  "ticker": "LUNR",
+  "dataPoints": 2384,
+  "lastUpdated": "2026-01-06T17:39:08.854090",
+  "kernelRespectPct": 0.49328859060402686,
+  "bandCompression": 0.688,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.117,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.723,
+  "trendAdherence": 0.647,
+  "chopSensitivity": 0.238
+}

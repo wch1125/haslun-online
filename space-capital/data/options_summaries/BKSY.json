@@ -1,0 +1,10 @@
+{
+  "ticker": "BKSY",
+  "structure": "Naked LEAP",
+  "deltaExposure": 0.7,
+  "timeHorizonDays": 373,
+  "leverageFactor": 2.9,
+  "upcomingCatalysts": 0,
+  "riskPosture": "leveraged",
+  "catalystPressure": "low"
+}

@@ -1,0 +1,14 @@
+{
+  "ticker": "RTX",
+  "dataPoints": 2368,
+  "lastUpdated": "2026-01-06T17:39:09.068849",
+  "kernelRespectPct": 0.9598817567567568,
+  "bandCompression": 0.931,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.402,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.164,
+  "trendAdherence": 0.834,
+  "chopSensitivity": 0.053
+}

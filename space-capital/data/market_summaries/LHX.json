@@ -1,0 +1,14 @@
+{
+  "ticker": "LHX",
+  "dataPoints": 2368,
+  "lastUpdated": "2026-01-06T17:39:08.283705",
+  "kernelRespectPct": 0.9611486486486487,
+  "bandCompression": 0.935,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.382,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.163,
+  "trendAdherence": 0.834,
+  "chopSensitivity": 0.052
+}

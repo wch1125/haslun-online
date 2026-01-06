@@ -1,0 +1,14 @@
+{
+  "ticker": "XAR",
+  "dataPoints": 2380,
+  "lastUpdated": "2026-01-06T17:39:08.927766",
+  "kernelRespectPct": 0.9584033613445379,
+  "bandCompression": 0.931,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.263,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.192,
+  "trendAdherence": 0.833,
+  "chopSensitivity": 0.059
+}

@@ -1,0 +1,14 @@
+{
+  "ticker": "JOBY",
+  "dataPoints": 2380,
+  "lastUpdated": "2026-01-06T17:39:08.428285",
+  "kernelRespectPct": 0.5504201680672269,
+  "bandCompression": 0.788,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.247,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.586,
+  "trendAdherence": 0.67,
+  "chopSensitivity": 0.181
+}

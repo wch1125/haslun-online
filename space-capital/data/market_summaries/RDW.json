@@ -1,0 +1,14 @@
+{
+  "ticker": "RDW",
+  "dataPoints": 2372,
+  "lastUpdated": "2026-01-06T17:39:08.357167",
+  "kernelRespectPct": 0.45446880269814505,
+  "bandCompression": 0.658,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.067,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.773,
+  "trendAdherence": 0.632,
+  "chopSensitivity": 0.257
+}

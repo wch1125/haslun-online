@@ -1,0 +1,10 @@
+{
+  "ticker": "ACHR",
+  "structure": "Naked LEAP",
+  "deltaExposure": 0.72,
+  "timeHorizonDays": 373,
+  "leverageFactor": 2.94,
+  "upcomingCatalysts": 1,
+  "riskPosture": "leveraged",
+  "catalystPressure": "low"
+}

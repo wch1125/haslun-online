@@ -1,0 +1,10 @@
+{
+  "ticker": "PL",
+  "structure": "Bull Spread",
+  "deltaExposure": 0.43,
+  "timeHorizonDays": 373,
+  "leverageFactor": 1.2,
+  "upcomingCatalysts": 0,
+  "riskPosture": "moderate",
+  "catalystPressure": "low"
+}

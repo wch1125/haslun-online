@@ -1,0 +1,14 @@
+{
+  "ticker": "RKLB",
+  "dataPoints": 2384,
+  "lastUpdated": "2026-01-06T17:39:09.208930",
+  "kernelRespectPct": 0.5016778523489933,
+  "bandCompression": 0.763,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.37,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.646,
+  "trendAdherence": 0.651,
+  "chopSensitivity": 0.2
+}

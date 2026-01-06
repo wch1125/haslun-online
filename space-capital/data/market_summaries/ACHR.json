@@ -1,0 +1,14 @@
+{
+  "ticker": "ACHR",
+  "dataPoints": 2380,
+  "lastUpdated": "2026-01-06T17:39:08.995979",
+  "kernelRespectPct": 0.5369747899159664,
+  "bandCompression": 0.75,
+  "signalFollowThrough": 0.5,
+  "stopHuntFrequency": 0.0,
+  "volumeReliability": 0.294,
+  "macdPersistence": 1,
+  "volatilityFactor": 0.639,
+  "trendAdherence": 0.665,
+  "chopSensitivity": 0.203
+}
