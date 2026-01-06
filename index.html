@@ -1,14 +1,369 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Redirecting…</title>
-  <meta http-equiv="refresh" content="0; url=./space-capital/" />
-  <link rel="canonical" href="./space-capital/" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Haslun.online — Arcade</title>
+  <meta name="description" content="Haslun.online — a small arcade of weird, beautiful web toys.">
+  <style>
+    :root{
+      --bg:#060a10;
+      --panel:rgba(10,18,28,.72);
+      --line:rgba(90,255,200,.22);
+      --glow:rgba(90,255,200,.35);
+      --text:#dff7ff;
+      --muted:rgba(223,247,255,.72);
+      --accent:#5affc8;
+      --accent2:#ff6bd6;
+      --accent3:#ffd86b;
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 800px at 50% 30%, #0c1a2a 0%, var(--bg) 65%);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow:hidden;
+    }
+
+    /* starfield layers */
+    .stars, .stars2, .stars3{
+      position:fixed; inset:-50%;
+      background-repeat:repeat;
+      pointer-events:none;
+      filter: drop-shadow(0 0 8px rgba(90,255,200,.08));
+      opacity:.55;
+      transform:translateZ(0);
+      animation: drift 28s linear infinite;
+    }
+    .stars{ background-image: radial-gradient(#cfffff 1px, transparent 1px); background-size: 120px 120px; opacity:.25; }
+    .stars2{ background-image: radial-gradient(#9fffe6 1px, transparent 1px); background-size: 180px 180px; opacity:.18; animation-duration: 44s; }
+    .stars3{ background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 260px 260px; opacity:.12; animation-duration: 70s; }
+
+    @keyframes drift{
+      from{ transform: translate3d(0,0,0) }
+      to{ transform: translate3d(6%, 10%, 0) }
+    }
+
+    /* CRT scanlines + vignette */
+    .crt::before{
+      content:"";
+      position:fixed; inset:0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.03),
+        rgba(255,255,255,.03) 1px,
+        rgba(0,0,0,0) 3px,
+        rgba(0,0,0,0) 6px
+      );
+      mix-blend-mode: overlay;
+      opacity:.35;
+      pointer-events:none;
+    }
+    .crt::after{
+      content:"";
+      position:fixed; inset:0;
+      background: radial-gradient(1200px 800px at 50% 40%, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 100%);
+      pointer-events:none;
+    }
+
+    .wrap{
+      position:relative;
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+
+    .panel{
+      width:min(980px, 96vw);
+      background: linear-gradient(180deg, rgba(10,18,28,.76), rgba(10,18,28,.62));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.05) inset,
+        0 18px 60px rgba(0,0,0,.55),
+        0 0 60px rgba(90,255,200,.10);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .panelTop{
+      padding:22px 22px 16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      border-bottom:1px solid rgba(90,255,200,.12);
+      background:
+        radial-gradient(900px 300px at 10% 0%, rgba(90,255,200,.10), transparent 65%),
+        radial-gradient(900px 300px at 90% 0%, rgba(255,107,214,.10), transparent 65%);
+    }
+
+    .brand{
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .brand h1{
+      margin:0;
+      font-size: clamp(22px, 3vw, 30px);
+      letter-spacing:.06em;
+      text-transform: uppercase;
+    }
+    .brand p{
+      margin:0;
+      color:var(--muted);
+      font-size: 13px;
+      line-height:1.5;
+      max-width: 60ch;
+    }
+
+    .coin{
+      display:flex; align-items:center; gap:10px;
+      color:rgba(223,247,255,.86);
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      user-select:none;
+    }
+    .dot{
+      width:9px; height:9px;
+      border-radius:50%;
+      background: var(--accent3);
+      box-shadow: 0 0 18px rgba(255,216,107,.35);
+      animation: blink 1.2s steps(2,end) infinite;
+    }
+    @keyframes blink{ 50%{ opacity:.25 } }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:18px;
+      padding:18px 22px 22px;
+    }
+
+    @media (max-width: 880px){
+      body{ overflow:auto; }
+      .wrap{ height:auto; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .cabinet{
+      border:1px solid rgba(90,255,200,.16);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(6,10,16,.5), rgba(12,26,42,.45));
+      box-shadow: 0 0 0 1px rgba(255,255,255,.04) inset;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .cabinetHeader{
+      padding:16px 16px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid rgba(90,255,200,.10);
+    }
+    .cabinetTitle{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .cabinetTitle strong{
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-size: 13px;
+    }
+    .cabinetTitle span{
+      color:var(--muted);
+      font-size: 12px;
+    }
+
+    .pill{
+      border:1px solid rgba(90,255,200,.22);
+      color: rgba(223,247,255,.88);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:11px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      background: rgba(0,0,0,.12);
+      box-shadow: 0 0 18px rgba(90,255,200,.10);
+    }
+
+    .cabinetBody{
+      padding:16px;
+      display:grid;
+      gap:12px;
+    }
+
+    .btnRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    a.btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:11px 14px;
+      border-radius: 12px;
+      border:1px solid rgba(90,255,200,.22);
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(90,255,200,.14), rgba(90,255,200,.06));
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      transition: transform .14s ease, border-color .14s ease, filter .14s ease;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      font-size:12px;
+    }
+    a.btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(90,255,200,.38);
+      filter: drop-shadow(0 0 18px rgba(90,255,200,.18));
+    }
+
+    a.btn.alt{
+      border-color: rgba(255,107,214,.22);
+      background: linear-gradient(180deg, rgba(255,107,214,.14), rgba(255,107,214,.06));
+    }
+    a.btn.alt:hover{
+      border-color: rgba(255,107,214,.38);
+      filter: drop-shadow(0 0 18px rgba(255,107,214,.18));
+    }
+
+    .mini{
+      padding:14px 16px;
+      border:1px dashed rgba(223,247,255,.18);
+      border-radius: 12px;
+      color: rgba(223,247,255,.78);
+      font-size: 12px;
+      line-height:1.6;
+    }
+
+    .side{
+      display:grid;
+      gap:18px;
+    }
+
+    .list{
+      padding:16px;
+      border:1px solid rgba(90,255,200,.12);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.12);
+    }
+    .list h2{
+      margin:0 0 10px 0;
+      font-size:12px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color: rgba(223,247,255,.82);
+    }
+    .item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 10px;
+      border-radius: 12px;
+      border:1px solid transparent;
+      color: rgba(223,247,255,.86);
+      text-decoration:none;
+      transition: border-color .14s ease, transform .14s ease;
+    }
+    .item:hover{
+      border-color: rgba(90,255,200,.18);
+      transform: translateX(2px);
+    }
+    .item small{
+      color: rgba(223,247,255,.55);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-size:10px;
+    }
+
+    .footer{
+      padding:12px 18px 16px;
+      border-top:1px solid rgba(90,255,200,.10);
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      color: rgba(223,247,255,.55);
+      font-size: 11px;
+    }
+  </style>
 </head>
-<body>
-  <p>
-    Redirecting to <a href="./space-capital/">Space Capital</a>…
-  </p>
+<body class="crt">
+  <div class="stars"></div>
+  <div class="stars2"></div>
+  <div class="stars3"></div>
+
+  <div class="wrap">
+    <section class="panel" role="application" aria-label="Haslun Online Arcade">
+      <div class="panelTop">
+        <div class="brand">
+          <h1>Haslun.online</h1>
+          <p>An arcade hub for interactive projects. One cabinet live. More incoming.</p>
+        </div>
+        <div class="coin">
+          <span class="dot"></span>
+          <span>INSERT COIN</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="cabinet">
+          <div class="cabinetHeader">
+            <div class="cabinetTitle">
+              <strong>Space Capital</strong>
+              <span>Fleet command dashboard · web game</span>
+            </div>
+            <div class="pill">LIVE</div>
+          </div>
+          <div class="cabinetBody">
+            <div class="mini">
+              You’re entering a trading cockpit dressed as a retro space sim.
+              Telemetry drives ship personality. The universe remembers your fleet.
+            </div>
+            <div class="btnRow">
+              <a class="btn" href="./space-capital/">Launch</a>
+              <a class="btn alt" href="./space-capital/#hangar">Hangar</a>
+            </div>
+          </div>
+        </div>
+
+        <aside class="side">
+          <div class="list">
+            <h2>Upcoming Cabinets</h2>
+            <a class="item" href="./space-capital/">
+              <span>Battle Arena</span>
+              <small>WIP</small>
+            </a>
+            <a class="item" href="./space-capital/">
+              <span>Telemetry Lab</span>
+              <small>WIP</small>
+            </a>
+            <a class="item" href="./space-capital/">
+              <span>Paint Bay</span>
+              <small>WIP</small>
+            </a>
+          </div>
+
+          <div class="list">
+            <h2>Back to hubs</h2>
+            <a class="item" href="https://haslun.me"><span>Haslun.me</span><small>hub</small></a>
+            <a class="item" href="https://haslun.studio"><span>Haslun.studio</span><small>watercolors</small></a>
+          </div>
+        </aside>
+      </div>
+
+      <div class="footer">
+        <span>STATUS: greenline stable</span>
+        <span>v0.1 — arcade shell</span>
+      </div>
+    </section>
+  </div>
 </body>
 </html>
