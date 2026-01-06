@@ -654,8 +654,10 @@
     ships: [],
     fx: new FXSystem(),
     fightTime: 0,
-    phase: 'countdown', // 'countdown', 'fighting', 'ended'
+    phase: 'telemetry', // 'telemetry', 'countdown', 'fighting', 'ended'
     countdown: 3,
+    telemetryScanTime: 0,
+    telemetryScanDuration: 3.5, // seconds for scan phase
     
     // Configuration
     config: {
@@ -752,10 +754,11 @@
       
       this.fx = new FXSystem();
       this.fightTime = 0;
-      this.phase = 'countdown';
+      this.phase = 'telemetry';
+      this.telemetryScanTime = 0;
       this.countdown = 3;
       
-      this.setBanner(`${tickerA} VS ${tickerB}`);
+      this.setBanner('ANALYZING...');
       this.updateSidePanels();
       
       this.active = true;
@@ -1080,6 +1083,31 @@ ${bar(energy, COLORS.toxicCyan)}
     },
     
     update(dt) {
+      // === TELEMETRY SCAN PHASE ===
+      if (this.phase === 'telemetry') {
+        this.telemetryScanTime += dt;
+        
+        // Update banner text based on scan progress
+        const progress = this.telemetryScanTime / this.telemetryScanDuration;
+        if (progress < 0.3) {
+          this.setBanner('SCANNING TELEMETRY...');
+        } else if (progress < 0.6) {
+          this.setBanner('ANALYZING SIGNATURES...');
+        } else if (progress < 0.9) {
+          this.setBanner('MATCH READY');
+        }
+        
+        // Transition to countdown
+        if (this.telemetryScanTime >= this.telemetryScanDuration) {
+          this.phase = 'countdown';
+          this.countdown = 3;
+          this.fx.flash(COLORS.toxicCyan, 0.3);
+        }
+        
+        this.fx.update(dt);
+        return;
+      }
+      
       // Countdown phase
       if (this.phase === 'countdown') {
         this.countdown -= dt;
@@ -1444,6 +1472,14 @@ ${bar(energy, COLORS.toxicCyan)}
       const shake = this.fx.getShakeOffset();
       ctx.translate(shake.x, shake.y);
       
+      // === TELEMETRY SCAN PHASE RENDERING ===
+      if (this.phase === 'telemetry') {
+        this.drawTelemetryScan(ctx, w, h);
+        this.drawScanlines(ctx, w, h);
+        ctx.restore();
+        return;
+      }
+      
       // Background
       this.drawBackground(ctx, w, h);
       
@@ -1506,6 +1542,236 @@ ${bar(energy, COLORS.toxicCyan)}
         ctx.lineTo(this.arenaRight, y);
         ctx.stroke();
       }
+      ctx.restore();
+    },
+    
+    // === PRE-FIGHT TELEMETRY SCAN SCREEN ===
+    drawTelemetryScan(ctx, w, h) {
+      const progress = this.telemetryScanTime / this.telemetryScanDuration;
+      const time = performance.now() * 0.001;
+      
+      // Dark background with scan sweep
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#0a0515');
+      grad.addColorStop(0.5, '#050208');
+      grad.addColorStop(1, '#0a0812');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      
+      // Animated scan line sweep
+      const scanY = (time * 0.3 % 1) * h;
+      ctx.save();
+      const scanGrad = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
+      scanGrad.addColorStop(0, 'transparent');
+      scanGrad.addColorStop(0.5, 'rgba(0, 255, 200, 0.15)');
+      scanGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanY - 30, w, 60);
+      ctx.restore();
+      
+      // Central divider line
+      ctx.save();
+      ctx.strokeStyle = COLORS.toxicCyan;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.4 + 0.2 * Math.sin(time * 3);
+      ctx.setLineDash([8, 8]);
+      ctx.beginPath();
+      ctx.moveTo(w / 2, 60);
+      ctx.lineTo(w / 2, h - 60);
+      ctx.stroke();
+      ctx.restore();
+      
+      // "VS" text in center
+      ctx.save();
+      ctx.fillStyle = COLORS.hotMagenta;
+      ctx.font = 'bold 28px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = COLORS.hotMagenta;
+      ctx.shadowBlur = 15;
+      ctx.globalAlpha = 0.6 + 0.3 * Math.sin(time * 4);
+      ctx.fillText('VS', w / 2, h / 2);
+      ctx.restore();
+      
+      // Draw both ships' telemetry panels
+      if (this.ships.length >= 2) {
+        this.drawTelemetryPanel(ctx, this.ships[0], w * 0.25, h / 2, progress, true);
+        this.drawTelemetryPanel(ctx, this.ships[1], w * 0.75, h / 2, progress, false);
+      }
+      
+      // Progress bar at bottom
+      ctx.save();
+      const barWidth = w * 0.6;
+      const barX = (w - barWidth) / 2;
+      const barY = h - 40;
+      const barHeight = 6;
+      
+      // Background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.fillRect(barX, barY, barWidth, barHeight);
+      
+      // Progress fill
+      const fillGrad = ctx.createLinearGradient(barX, 0, barX + barWidth * progress, 0);
+      fillGrad.addColorStop(0, COLORS.toxicCyan);
+      fillGrad.addColorStop(1, COLORS.acidLime);
+      ctx.fillStyle = fillGrad;
+      ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+      
+      // Glow on leading edge
+      if (progress < 1) {
+        ctx.shadowColor = COLORS.toxicCyan;
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = COLORS.toxicCyan;
+        ctx.fillRect(barX + barWidth * progress - 2, barY - 2, 4, barHeight + 4);
+      }
+      ctx.restore();
+    },
+    
+    // Draw individual ship telemetry panel
+    drawTelemetryPanel(ctx, ship, centerX, centerY, scanProgress, isLeft) {
+      const time = performance.now() * 0.001;
+      const panelWidth = 180;
+      const panelHeight = 280;
+      const x = centerX - panelWidth / 2;
+      const y = centerY - panelHeight / 2;
+      
+      ctx.save();
+      
+      // Panel background
+      ctx.fillStyle = 'rgba(10, 5, 20, 0.8)';
+      ctx.strokeStyle = ship.color;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.9;
+      
+      // Rounded rectangle
+      const r = 8;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + panelWidth - r, y);
+      ctx.quadraticCurveTo(x + panelWidth, y, x + panelWidth, y + r);
+      ctx.lineTo(x + panelWidth, y + panelHeight - r);
+      ctx.quadraticCurveTo(x + panelWidth, y + panelHeight, x + panelWidth - r, y + panelHeight);
+      ctx.lineTo(x + r, y + panelHeight);
+      ctx.quadraticCurveTo(x, y + panelHeight, x, y + panelHeight - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      
+      // Ticker name header
+      ctx.fillStyle = ship.color;
+      ctx.font = 'bold 20px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = ship.color;
+      ctx.shadowBlur = 10;
+      ctx.fillText(ship.ticker, centerX, y + 25);
+      ctx.shadowBlur = 0;
+      
+      // Ship sprite or circle
+      const spriteY = y + 70;
+      const spriteSize = 50;
+      
+      if (ship.spriteImg) {
+        // Rotate to face opponent
+        ctx.save();
+        ctx.translate(centerX, spriteY);
+        ctx.rotate(isLeft ? 0 : Math.PI);
+        ctx.drawImage(ship.spriteImg, -spriteSize/2, -spriteSize/2, spriteSize, spriteSize);
+        ctx.restore();
+      } else {
+        // Fallback circle
+        ctx.beginPath();
+        ctx.arc(centerX, spriteY, spriteSize / 2, 0, Math.PI * 2);
+        ctx.fillStyle = ship.color;
+        ctx.globalAlpha = 0.6;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      
+      // Spinning ring around ship
+      ctx.save();
+      ctx.strokeStyle = ship.color;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.5 + 0.3 * Math.sin(time * 5);
+      ctx.beginPath();
+      ctx.arc(centerX, spriteY, spriteSize / 2 + 8, time * 2, time * 2 + Math.PI * 1.5);
+      ctx.stroke();
+      ctx.restore();
+      
+      // Telemetry stats with animated reveal
+      const stats = [
+        { label: 'HULL', value: ship.telemetry.hullResilience, color: COLORS.acidLime },
+        { label: 'THRUST', value: ship.telemetry.thrustPotential, color: COLORS.toxicCyan },
+        { label: 'STABILITY', value: ship.telemetry.maneuverStability, color: COLORS.bullGreen },
+        { label: 'VOLATILITY', value: ship.telemetry.chopSensitivity, color: COLORS.bearOrange },
+        { label: 'SIGNAL', value: ship.telemetry.macdPersistence, color: COLORS.hotMagenta }
+      ];
+      
+      const statStartY = y + 115;
+      const statHeight = 28;
+      const barMaxWidth = panelWidth - 30;
+      
+      stats.forEach((stat, i) => {
+        const statY = statStartY + i * statHeight;
+        
+        // Reveal animation based on scan progress
+        const revealDelay = i * 0.12;
+        const statProgress = clamp01((scanProgress - revealDelay) / 0.3);
+        
+        if (statProgress <= 0) return;
+        
+        ctx.globalAlpha = statProgress;
+        
+        // Label
+        ctx.fillStyle = '#888';
+        ctx.font = '10px "Courier New", monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(stat.label, x + 10, statY);
+        
+        // Value bar background
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(x + 10, statY + 4, barMaxWidth, 8);
+        
+        // Value bar fill (animated)
+        const fillWidth = barMaxWidth * stat.value * statProgress;
+        const barGrad = ctx.createLinearGradient(x + 10, 0, x + 10 + fillWidth, 0);
+        barGrad.addColorStop(0, stat.color);
+        barGrad.addColorStop(1, stat.color + '88');
+        ctx.fillStyle = barGrad;
+        ctx.fillRect(x + 10, statY + 4, fillWidth, 8);
+        
+        // Percentage text
+        ctx.fillStyle = stat.color;
+        ctx.font = 'bold 10px "Courier New", monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(Math.round(stat.value * 100 * statProgress) + '%', x + panelWidth - 10, statY + 12);
+      });
+      
+      // Regime badge at bottom
+      const regime = ship.telemetry.regimeBias?.toUpperCase() || 'RANGE';
+      const regimeY = y + panelHeight - 25;
+      
+      ctx.globalAlpha = clamp01((scanProgress - 0.6) / 0.2);
+      ctx.fillStyle = regime === 'TREND' ? COLORS.bullGreen : 
+                      regime === 'CHAOTIC' ? COLORS.bearOrange : COLORS.toxicCyan;
+      ctx.font = 'bold 12px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      
+      // Badge background
+      const badgeWidth = ctx.measureText(regime).width + 16;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(centerX - badgeWidth / 2, regimeY - 10, badgeWidth, 18);
+      ctx.strokeStyle = regime === 'TREND' ? COLORS.bullGreen : 
+                        regime === 'CHAOTIC' ? COLORS.bearOrange : COLORS.toxicCyan;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(centerX - badgeWidth / 2, regimeY - 10, badgeWidth, 18);
+      
+      // Badge text
+      ctx.fillStyle = regime === 'TREND' ? COLORS.bullGreen : 
+                      regime === 'CHAOTIC' ? COLORS.bearOrange : COLORS.toxicCyan;
+      ctx.fillText(regime, centerX, regimeY + 2);
+      
       ctx.restore();
     },
     
