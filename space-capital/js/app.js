@@ -7345,6 +7345,11 @@
             class: ship.class
           });
         }
+        
+        // Update Hangar Atmosphere with ship telemetry
+        if (window.HangarAtmosphere) {
+          HangarAtmosphere.setShipData({ ticker: ship.ticker });
+        }
       } else if (animContainer) {
         // Fallback: use static image if ShipAnimator not available
         const staticPath = ship.sprite;
@@ -7359,6 +7364,11 @@
             });
           }, 50);
         }
+      }
+      
+      // Update Hangar Atmosphere with ship telemetry
+      if (window.HangarAtmosphere) {
+        HangarAtmosphere.setShipData({ ticker: ship.ticker });
       }
       
       // Update viewport labels

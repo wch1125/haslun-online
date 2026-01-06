@@ -273,6 +273,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
+    }
+    
+    /* Hangar atmosphere canvas (animated background) */
+    .hangar-ship-viewport .atmosphere-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 8px;
     }
     
     .viewport-frame {
@@ -1429,6 +1442,34 @@ body.no-scanlines::before {
       border-radius: 3px;
       transition: width 0.3s ease;
       position: relative;
+      animation: stat-fill-pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes stat-fill-pulse {
+      0%, 100% { opacity: 1; filter: brightness(1); }
+      50% { opacity: 0.85; filter: brightness(1.1); }
+    }
+    
+    /* Shimmer overlay on stat bars */
+    .ship-stat-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent
+      );
+      animation: stat-shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes stat-shimmer {
+      0% { left: -100%; }
+      50%, 100% { left: 200%; }
     }
     
     .ship-stat-fill.hull {
