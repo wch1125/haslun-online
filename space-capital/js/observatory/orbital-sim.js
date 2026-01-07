@@ -1059,6 +1059,16 @@
       if (this.running) return;
       this.running = true;
       this.lastTime = performance.now();
+      
+      // One-time debug log
+      console.log('[OrbitalObservatory] Starting simulation:', {
+        canvasSize: `${this.canvas.width}x${this.canvas.height}`,
+        cameraCenter: `${this.camera.centerX}, ${this.camera.centerY}`,
+        sunPos: `${this.sun.x}, ${this.sun.y}`,
+        benchmarks: this.benchmarks.length,
+        fleets: this.fleets.length
+      });
+      
       this.tick();
     }
     
@@ -1083,6 +1093,13 @@
     
     render() {
       const ctx = this.ctx;
+      
+      // Validate canvas dimensions
+      if (this.canvas.width < 10 || this.canvas.height < 10) {
+        console.warn('[OrbitalObservatory] Canvas too small:', this.canvas.width, 'x', this.canvas.height);
+        this.resize();
+        return;
+      }
       
       ctx.fillStyle = '#050608';
       ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -1126,7 +1143,10 @@
     
     resize() {
       const parent = this.canvas.parentElement;
-      if (!parent) return;
+      if (!parent) {
+        console.warn('[OrbitalObservatory] No parent element for resize');
+        return;
+      }
       
       const rect = parent.getBoundingClientRect();
       
@@ -1135,11 +1155,23 @@
       let height = rect.height;
       
       // If dimensions are too small, use fallback sizes
-      if (width < 100) width = Math.min(window.innerWidth, 1200);
-      if (height < 100) height = Math.min(window.innerHeight - 140, 600);
+      if (width < 100) {
+        width = Math.min(window.innerWidth - 40, 1200);
+        console.log('[OrbitalObservatory] Width fallback:', width);
+      }
+      if (height < 100) {
+        height = Math.min(window.innerHeight - 200, 600);
+        console.log('[OrbitalObservatory] Height fallback:', height);
+      }
+      
+      // Ensure minimum dimensions
+      width = Math.max(width, 400);
+      height = Math.max(height, 300);
       
       this.canvas.width = width;
       this.canvas.height = height;
+      
+      console.log(`[OrbitalObservatory] Resized to ${width}x${height}`);
     }
   }
   

@@ -291,6 +291,38 @@
       
       // Also handle old loading-screen if still in DOM
       const oldLoadingScreen = document.getElementById('loading-screen');
+      
+      // Track if we've completed to prevent double-init
+      let hasCompleted = false;
+      
+      function completeLoading() {
+        if (hasCompleted) return;
+        hasCompleted = true;
+        console.log('[Loading] Completing...');
+        
+        if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        if (oldLoadingScreen) oldLoadingScreen.classList.add('hidden');
+        app.classList.add('visible');
+        
+        // Stop flight scene after fade
+        setTimeout(() => {
+          if (flightController) {
+            try { flightController.stop(); } catch(e) {}
+          }
+          if (loadingOverlay) loadingOverlay.remove();
+        }, 600);
+        
+        // Initialize app
+        init();
+      }
+      
+      // Safety timeout: ALWAYS complete loading after 5 seconds max
+      setTimeout(() => {
+        if (!hasCompleted) {
+          console.warn('[Loading] Safety timeout triggered');
+          completeLoading();
+        }
+      }, 5000);
 
       // Step 5: Start canvas flight scene
       let flightController = null;
@@ -306,22 +338,7 @@
             mode: 'loading',
             intensity: 1.0,
             minDisplayTime: 2000, // 2 second minimum display
-            onReady: () => {
-              // Fade out loading overlay
-              if (loadingOverlay) loadingOverlay.classList.add('hidden');
-              if (oldLoadingScreen) oldLoadingScreen.classList.add('hidden');
-              app.classList.add('visible');
-              
-              // Stop flight scene after fade
-              setTimeout(() => {
-                if (flightController) flightController.stop();
-                // Remove overlay from DOM after animation
-                if (loadingOverlay) loadingOverlay.remove();
-              }, 600);
-              
-              // Initialize app
-              init();
-            }
+            onReady: completeLoading
           });
           
           // Signal ready after init tasks complete (data loads, etc.)
@@ -333,21 +350,11 @@
         } catch (e) {
           console.warn('[Loading] Flight scene failed, falling back:', e);
           // Fallback: just show app after delay
-          setTimeout(() => {
-            if (loadingOverlay) loadingOverlay.classList.add('hidden');
-            if (oldLoadingScreen) oldLoadingScreen.classList.add('hidden');
-            app.classList.add('visible');
-            init();
-          }, 1500);
+          setTimeout(completeLoading, 1500);
         }
       } else {
         // No FlightScene available, fallback to simple timer
-        setTimeout(() => {
-          if (loadingOverlay) loadingOverlay.classList.add('hidden');
-          if (oldLoadingScreen) oldLoadingScreen.classList.add('hidden');
-          app.classList.add('visible');
-          init();
-        }, 1500);
+        setTimeout(completeLoading, 1500);
       }
     }
 

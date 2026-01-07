@@ -37,6 +37,10 @@
         return;
       }
       
+      // Ensure container has dimensions before proceeding
+      const containerRect = this.container.getBoundingClientRect();
+      console.log('[ObservatoryController] Container dimensions:', containerRect.width, 'x', containerRect.height);
+      
       // Create canvas
       const canvas = document.createElement('canvas');
       canvas.className = 'observatory-canvas';
@@ -49,8 +53,14 @@
       // Initialize observatory
       this.observatory = new window.OrbitalObservatory(canvas);
       
-      // Size canvas
+      // Size canvas with retries to handle layout timing
       this.resize();
+      
+      // Schedule additional resize calls to handle late layout
+      requestAnimationFrame(() => this.resize());
+      setTimeout(() => this.resize(), 100);
+      setTimeout(() => this.resize(), 300);
+      
       window.addEventListener('resize', () => this.resize());
       
       // Wait for telemetry data to load, then add fleets
@@ -76,7 +86,7 @@
       this.observatory.start();
       
       this.isInitialized = true;
-      console.log('[ObservatoryController] Initialized');
+      console.log('[ObservatoryController] Initialized - canvas:', canvas.width, 'x', canvas.height);
     },
     
     destroy() {
