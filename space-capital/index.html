@@ -1,30 +1,351 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Space Capital</title>
-  <meta http-equiv="refresh" content="0; url=html/space-capital.html" />
-  <script>
-    (function () {
-      var target = 'html/space-capital.html' + window.location.search + window.location.hash;
-      window.location.replace(target);
-    })();
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPACE CAPITAL</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SPACE CAPITAL — LANDING / ENTRY SCREEN
+       ═══════════════════════════════════════════════════════════════════════════
+       A deliberate entry state, not a redirect.
+       This creates the feeling of "entering" the command interface.
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      --magenta: #FF2975;
+      --magenta-dim: #CC1F5C;
+      --cyan: #00FFFF;
+      --bg-void: #0A0A0F;
+      --bg-panel: #12121A;
+      --text-primary: #F0F0F0;
+      --text-dim: #888899;
+      --font-main: 'VT323', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
     body {
-      background: #0A0A0F;
-      color: #FF2975;
-      font-family: 'Courier New', monospace;
+      background: var(--bg-void);
+      color: var(--text-primary);
+      font-family: var(--font-main);
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      margin: 0;
+      position: relative;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       CRT EFFECTS — Consistent with main app
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    /* Scanlines */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.03) 2px,
+        rgba(0, 0, 0, 0.03) 4px
+      );
+    }
+
+    /* Vignette */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        transparent 50%,
+        rgba(0, 0, 0, 0.5) 100%
+      );
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       ENTRY CONTAINER
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .entry-container {
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      padding: 2rem;
+    }
+
+    /* Logo / Title */
+    .entry-logo {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      color: var(--magenta);
+      margin: 0 0 0.5rem 0;
+      letter-spacing: 0.15em;
+      text-shadow: 
+        0 0 10px var(--magenta),
+        0 0 30px rgba(255, 41, 117, 0.5);
+      animation: logo-pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes logo-pulse {
+      0%, 100% { 
+        text-shadow: 
+          0 0 10px var(--magenta),
+          0 0 30px rgba(255, 41, 117, 0.5);
+      }
+      50% { 
+        text-shadow: 
+          0 0 15px var(--magenta),
+          0 0 40px rgba(255, 41, 117, 0.7),
+          0 0 60px rgba(255, 41, 117, 0.3);
+      }
+    }
+
+    .entry-subtitle {
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      color: var(--text-dim);
+      margin: 0 0 3rem 0;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    /* Status Line */
+    .entry-status {
+      font-size: 1rem;
+      color: var(--cyan);
+      margin-bottom: 2rem;
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+    }
+
+    .entry-status::before {
+      content: "▸ ";
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       ENTER BUTTON — Primary CTA
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .enter-btn {
+      font-family: var(--font-main);
+      font-size: 1.5rem;
+      color: var(--magenta);
+      background: transparent;
+      border: 2px solid var(--magenta);
+      padding: 1rem 3rem;
+      cursor: pointer;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.15s steps(4);
+    }
+
+    .enter-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--magenta);
+      transform: translateX(-101%);
+      transition: transform 0.15s steps(4);
+      z-index: -1;
+    }
+
+    .enter-btn:hover {
+      color: var(--bg-void);
+      text-shadow: none;
+      box-shadow: 
+        0 0 20px var(--magenta),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    .enter-btn:hover::before {
+      transform: translateX(0);
+    }
+
+    .enter-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       TRANSITION STATE
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .entry-container.transitioning .enter-btn {
+      pointer-events: none;
+      color: var(--bg-void);
+    }
+
+    .entry-container.transitioning .enter-btn::before {
+      transform: translateX(0);
+    }
+
+    .entry-container.transitioning .entry-status {
+      color: var(--magenta);
+      animation: status-blink 0.2s steps(2) infinite;
+    }
+
+    @keyframes status-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Exit animation */
+    body.exiting {
+      animation: exit-fade 0.4s steps(8) forwards;
+    }
+
+    @keyframes exit-fade {
+      0% { opacity: 1; }
+      100% { 
+        opacity: 0;
+        filter: brightness(2);
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       DECORATIVE ELEMENTS
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    /* Corner brackets */
+    .corner {
+      position: fixed;
+      width: 40px;
+      height: 40px;
+      border-color: var(--magenta);
+      border-style: solid;
+      border-width: 0;
+      opacity: 0.4;
+    }
+
+    .corner-tl { top: 20px; left: 20px; border-top-width: 2px; border-left-width: 2px; }
+    .corner-tr { top: 20px; right: 20px; border-top-width: 2px; border-right-width: 2px; }
+    .corner-bl { bottom: 20px; left: 20px; border-bottom-width: 2px; border-left-width: 2px; }
+    .corner-br { bottom: 20px; right: 20px; border-bottom-width: 2px; border-right-width: 2px; }
+
+    /* Version / Build info */
+    .build-info {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      opacity: 0.5;
+      letter-spacing: 0.1em;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       MOBILE ADJUSTMENTS
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    @media (max-width: 480px) {
+      .entry-container {
+        padding: 1rem;
+      }
+
+      .enter-btn {
+        padding: 0.8rem 2rem;
+        font-size: 1.25rem;
+      }
+
+      .corner {
+        width: 25px;
+        height: 25px;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div>Redirecting to Fleet Command...</div>
+  <!-- Corner brackets -->
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <!-- Main entry content -->
+  <div class="entry-container" id="entryContainer">
+    <h1 class="entry-logo">SPACE CAPITAL</h1>
+    <p class="entry-subtitle">Fleet Command Interface</p>
+    <p class="entry-status" id="entryStatus">SYSTEMS ONLINE</p>
+    <button class="enter-btn" id="enterBtn">ENTER FLEET</button>
+  </div>
+
+  <!-- Build info -->
+  <div class="build-info">BUILD 2026.01 // PARALLAX</div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      const enterBtn = document.getElementById('enterBtn');
+      const entryContainer = document.getElementById('entryContainer');
+      const entryStatus = document.getElementById('entryStatus');
+
+      // Preserve any query params/hash for the target
+      const params = window.location.search + window.location.hash;
+      const target = 'html/space-capital.html' + params;
+
+      let isTransitioning = false;
+
+      function enterFleet() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        // Visual feedback
+        entryContainer.classList.add('transitioning');
+        entryStatus.textContent = 'INITIALIZING COMMAND LINK';
+
+        // Short delay for the transition feel
+        setTimeout(() => {
+          entryStatus.textContent = 'ENTERING FLEET';
+          document.body.classList.add('exiting');
+
+          // Navigate after exit animation
+          setTimeout(() => {
+            window.location.href = target;
+          }, 400);
+        }, 300);
+      }
+
+      // Button click
+      enterBtn.addEventListener('click', enterFleet);
+
+      // Keyboard support
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          enterFleet();
+        }
+      });
+
+      // Focus the button for keyboard users
+      enterBtn.focus();
+    })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,237 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SPACE CAPITAL — CRT APP SHELL
+   ═══════════════════════════════════════════════════════════════════════════
+   
+   CANONICAL CRT OVERLAY SYSTEM
+   
+   This file provides ONE consistent CRT effect layer for all pages.
+   Import this file INSTEAD of page-level CRT pseudo-elements.
+   
+   USAGE:
+   1. Add <link rel="stylesheet" href="../css/crt-shell.css"> to your page
+   2. Wrap your content in <div class="app-shell">...</div>
+   3. Do NOT add additional scanline/noise pseudo-elements
+   
+   The app-shell provides:
+   - Consistent scanlines (subtle, readable)
+   - Consistent vignette
+   - Optional noise overlay (add .with-noise class)
+   - Semantic state responses (bullish/bearish/volatile)
+   
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CRT VARIABLES — Tune these for global effect intensity
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Base CRT settings */
+  --crt-scanline-opacity: 0.03;
+  --crt-scanline-gap: 3px;
+  --crt-vignette-intensity: 0.4;
+  --crt-noise-opacity: 0.015;
+  
+  /* Semantic state overrides (applied via body classes) */
+  --crt-state-scanline: var(--crt-scanline-opacity);
+  --crt-state-noise: var(--crt-noise-opacity);
+  --crt-state-vignette: var(--crt-vignette-intensity);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   APP SHELL — The single container for CRT effects
+   ───────────────────────────────────────────────────────────────────────── */
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate; /* Create stacking context */
+}
+
+/* Scanlines — Applied once at shell level */
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent var(--crt-scanline-gap),
+    rgba(0, 0, 0, var(--crt-state-scanline)) var(--crt-scanline-gap),
+    rgba(0, 0, 0, var(--crt-state-scanline)) calc(var(--crt-scanline-gap) + 1px)
+  );
+  /* Slight animation for "live" feel */
+  animation: scanline-drift 8s linear infinite;
+}
+
+@keyframes scanline-drift {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* Vignette — Subtle screen edge darkening */
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, var(--crt-state-vignette)) 100%
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   NOISE OVERLAY — Optional, add .with-noise to app-shell
+   ───────────────────────────────────────────────────────────────────────── */
+
+.app-shell.with-noise .crt-noise,
+.crt-noise {
+  position: fixed;
+  inset: -5%;
+  pointer-events: none;
+  z-index: 9997;
+  opacity: var(--crt-state-noise);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: noise-drift 0.3s steps(4) infinite;
+}
+
+@keyframes noise-drift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-0.5%, 0.5%); }
+  50% { transform: translate(0.5%, -0.5%); }
+  75% { transform: translate(-0.5%, -0.5%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SEMANTIC STATES — CRT responds to market/system state
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* BULLISH — Clean, no distortion */
+body.regime-bullish {
+  --crt-state-scanline: 0.02;
+  --crt-state-noise: 0;
+  --crt-state-vignette: 0.3;
+}
+
+body.regime-bullish .crt-noise {
+  display: none;
+}
+
+/* BEARISH — Subtle interference */
+body.regime-bearish {
+  --crt-state-scanline: 0.05;
+  --crt-state-noise: 0.03;
+  --crt-state-vignette: 0.5;
+}
+
+/* VOLATILE — Jittery, unstable */
+body.regime-volatile {
+  --crt-state-scanline: 0.06;
+  --crt-state-noise: 0.04;
+  --crt-state-vignette: 0.5;
+}
+
+body.regime-volatile .app-shell::before {
+  animation: scanline-jitter 0.2s steps(3) infinite;
+}
+
+@keyframes scanline-jitter {
+  0%, 100% { transform: translateY(0); }
+  33% { transform: translateY(1px); }
+  66% { transform: translateY(-1px); }
+}
+
+/* CRITICAL — Heavy interference */
+body.state-critical {
+  --crt-state-scanline: 0.08;
+  --crt-state-noise: 0.06;
+  --crt-state-vignette: 0.6;
+}
+
+body.state-critical .app-shell::after {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 0, 64, 0.15) 70%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+}
+
+/* ERROR — Red alert vignette */
+body.state-error {
+  --crt-state-noise: 0.08;
+}
+
+body.state-error .app-shell::after {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 30%,
+    rgba(255, 0, 64, 0.2) 60%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  animation: error-pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes error-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DISABLE CRT — For accessibility or performance
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .app-shell::before,
+  .crt-noise {
+    animation: none !important;
+  }
+}
+
+/* Explicit disable class */
+body.crt-disabled .app-shell::before,
+body.crt-disabled .app-shell::after,
+body.crt-disabled .crt-noise {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   MOBILE — Lighter effects for battery and performance
+   ───────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  :root {
+    --crt-scanline-opacity: 0.02;
+    --crt-noise-opacity: 0.01;
+    --crt-vignette-intensity: 0.3;
+  }
+  
+  .app-shell::before {
+    animation: none;
+  }
+  
+  .crt-noise {
+    animation-duration: 0.5s;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   LEGACY OVERRIDE — Suppress old page-level CRT if present
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* If a page accidentally has its own scanlines, hide them */
+.app-shell body::before,
+.app-shell body::after,
+.app-shell .scanlines,
+.app-shell .vhs-noise,
+.app-shell .crt-vignette {
+  display: none !important;
+}

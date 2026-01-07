@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PILOT SELECT | SPACE CAPITAL</title>
   <link rel="stylesheet" href="../css/theme.css">
+  <!-- Canonical CRT App Shell -->
+  <link rel="stylesheet" href="../css/crt-shell.css">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -480,9 +482,9 @@
   </style>
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <div class="vignette"></div>
-  <div class="scanlines"></div>
+  <div class="app-shell">
+    <div class="crt-noise"></div>
+    <div class="bg-grid"></div>
 
   <div class="container">
     <header class="header">
@@ -751,5 +753,6 @@
       init();
     })();
   </script>
+  </div><!-- /.app-shell -->
 </body>
 </html>

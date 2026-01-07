@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Shared theme variables -->
   <link rel="stylesheet" href="../css/theme.css">
+  <!-- Canonical CRT App Shell (ONE consistent overlay for all pages) -->
+  <link rel="stylesheet" href="../css/crt-shell.css">
   <!-- UI Overhaul - Pixel discipline, semantic CRT, visual tiers -->
   <link rel="stylesheet" href="../css/ui-overhaul.css">
   <!-- Ship behavior states (thrust, volatility, hull effects) -->
@@ -1348,10 +1350,9 @@
   </style>
 </head>
 <body>
-  <!-- VHS / CRT Effects -->
-  <div class="scanlines"></div>
-  <div class="vhs-noise"></div>
-  <div class="crt-vignette"></div>
+  <!-- CRT App Shell - Single canonical overlay -->
+  <div class="app-shell">
+    <div class="crt-noise"></div>
 
   <!-- Loading handled by TelemetryLockIn module -->
   <!-- Lock-in screen is created dynamically by js/ui/telemetry-lockin.js -->
@@ -2457,6 +2458,8 @@
     // Start
     init();
   </script>
+  
+  </div><!-- /.app-shell -->
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        MODULE VIEWER OVERLAY

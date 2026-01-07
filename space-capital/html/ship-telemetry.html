@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SHIP TELEMETRY | SPACE CAPITAL</title>
   <link rel="stylesheet" href="../css/theme.css">
+  <!-- Canonical CRT App Shell -->
+  <link rel="stylesheet" href="../css/crt-shell.css">
   <!-- UI Overhaul - Pixel discipline, semantic CRT, visual tiers -->
   <link rel="stylesheet" href="../css/ui-overhaul.css">
   <link rel="stylesheet" href="../css/ship-states.css">
@@ -382,8 +384,9 @@
   </style>
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <div class="scanlines"></div>
+  <div class="app-shell">
+    <div class="crt-noise"></div>
+    <div class="bg-grid"></div>
 
   <div class="container">
     <header class="header">
@@ -1047,5 +1050,6 @@
     // Start
     init();
   </script>
+  </div><!-- /.app-shell -->
 </body>
 </html>

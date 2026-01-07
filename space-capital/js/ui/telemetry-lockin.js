@@ -21,15 +21,23 @@
   'use strict';
 
   const TIMING = {
-    LAYER_DELAY: 100,      // ms between layer activations
-    DATA_DELAY: 50,        // ms between data panel activations
-    HOLD_DURATION: 200,    // ms to hold complete state
-    EXIT_DURATION: 200,    // ms for exit animation
-    TOTAL_MAX: 800         // max total duration
+    LAYER_DELAY: 80,       // ms between layer activations (faster)
+    DATA_DELAY: 40,        // ms between data panel activations
+    HOLD_DURATION: 120,    // ms to hold complete state (shorter)
+    EXIT_DURATION: 150,    // ms for exit animation
+    TOTAL_MAX: 600         // max total duration (tighter)
   };
 
   const LAYERS = ['engine', 'shield', 'targeting'];
   const DATA_PANELS = ['left', 'right'];
+
+  // Purposeful status messages (no warp/hyperspace)
+  const STATUS_MESSAGES = {
+    ACQUIRING: 'SYNCING TELEMETRY',
+    CONFIGURING: 'ARMING FLEET',
+    LOADING: 'LOADING POSITIONS',
+    CONFIRMED: 'COMMAND READY'
+  };
 
   /**
    * Create the Lock-In screen DOM structure
@@ -152,7 +160,7 @@
     let progress = 0;
     
     // Stage 1: Activate layers sequentially
-    updateStatus(screen, 'ACQUIRING TELEMETRY', true);
+    updateStatus(screen, STATUS_MESSAGES.ACQUIRING, true);
     
     for (const layer of LAYERS) {
       await delay(TIMING.LAYER_DELAY);
@@ -162,7 +170,7 @@
     }
     
     // Stage 2: Activate data panels
-    updateStatus(screen, 'CONFIGURING SYSTEMS', true);
+    updateStatus(screen, STATUS_MESSAGES.CONFIGURING, true);
     
     // If we have actual telemetry data, update the panels
     if (telemetryData) {
@@ -186,12 +194,12 @@
     
     // Stage 3: Load actual data if callback provided
     if (typeof onDataReady === 'function') {
-      updateStatus(screen, 'LOADING FLEET DATA', true);
+      updateStatus(screen, STATUS_MESSAGES.LOADING, true);
       await onDataReady();
     }
     
     // Stage 4: Brief hold, then exit
-    updateStatus(screen, 'LOCK CONFIRMED', false);
+    updateStatus(screen, STATUS_MESSAGES.CONFIRMED, false);
     await delay(TIMING.HOLD_DURATION);
     
     // Complete and exit

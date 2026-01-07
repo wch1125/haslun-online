@@ -12,10 +12,11 @@
   
   <!-- Shared theme variables -->
   <link rel="stylesheet" href="../css/theme.css">
+  <!-- Canonical CRT App Shell -->
+  <link rel="stylesheet" href="../css/crt-shell.css">
   <!-- UI Overhaul - Pixel discipline, semantic CRT, visual tiers -->
   <link rel="stylesheet" href="../css/ui-overhaul.css">
   <!-- Core styles -->
-  <link rel="stylesheet" href="../css/crt-effects.css">
   <link rel="stylesheet" href="../css/ship-select.css">
   <!-- Ship behavior states -->
   <link rel="stylesheet" href="../css/ship-states.css">
@@ -181,8 +182,8 @@
   </style>
 </head>
 <body>
-  <!-- CRT Scanlines -->
-  <div class="scanlines" aria-hidden="true"></div>
+  <div class="app-shell">
+    <div class="crt-noise"></div>
   
   <!-- Loading State -->
   <div class="loading-state" id="loading">
@@ -497,5 +498,6 @@
       100% { width: 100%; }
     }
   </style>
+  </div><!-- /.app-shell -->
 </body>
 </html>

@@ -7,6 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
   <!-- Shared theme variables -->
   <link rel="stylesheet" href="../css/theme.css">
+  <!-- Canonical CRT App Shell -->
+  <link rel="stylesheet" href="../css/crt-shell.css">
   <!-- UI Overhaul - Pixel discipline, semantic CRT, visual tiers -->
   <link rel="stylesheet" href="../css/ui-overhaul.css">
   <!-- Ship Brief dialog styles (isolated for modularity) -->
@@ -865,6 +867,9 @@
   </style>
 </head>
 <body>
+  <div class="app-shell">
+    <div class="crt-noise"></div>
+
   <!-- Navigation -->
   <nav class="page-nav">
     <a href="space-capital.html" class="nav-link">FLEET</a>
@@ -2019,5 +2024,6 @@
       }
     });
   </script>
+  </div><!-- /.app-shell -->
 </body>
 </html>
