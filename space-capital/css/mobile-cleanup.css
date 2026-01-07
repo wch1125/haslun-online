@@ -1,0 +1,319 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE CLEANUP — Remove visual clutter, maximize content space
+   
+   Problems addressed:
+   1. Multiple nested border frames creating visual noise
+   2. Cramped ship selector grid
+   3. Cramped battle arena matchup screen
+   4. Too many pseudo-element decorations on small screens
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     1. REMOVE ALL FRAME DECORATIONS ON MOBILE
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  /* Remove cabinet frame */
+  .hangar-rpg::before {
+    display: none !important;
+  }
+  
+  /* Remove corner bolt */
+  .hangar-rpg::after {
+    display: none !important;
+  }
+  
+  /* Remove targeting corners */
+  .hangar-center::before,
+  .hangar-center::after,
+  .ship-showcase::before {
+    display: none !important;
+  }
+  
+  /* Remove noise overlay */
+  .noise-overlay {
+    display: none !important;
+  }
+  
+  /* Remove stat block LEDs */
+  .stat-block::after {
+    display: none !important;
+  }
+  
+  /* Remove sidebar edge glow lines */
+  .hangar-sidebar.left::before,
+  .hangar-sidebar.right::before,
+  .hangar-sidebar::after {
+    display: none !important;
+  }
+  
+  /* Remove crosshair pulse */
+  .ship-showcase::after {
+    display: none !important;
+  }
+  
+  /* Simplify ship ring - no chromatic aberration */
+  .ship-showcase-ring::before,
+  .ship-showcase-ring::after {
+    display: none !important;
+  }
+  
+  /* Remove traveling scanline */
+  .hangar-rpg > .hangar-center::after {
+    display: none !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     2. CLEAN UP HANGAR LAYOUT
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .hangar-rpg {
+    padding: 8px !important;
+    gap: 8px !important;
+    box-shadow: none !important;
+  }
+  
+  .hangar-center {
+    padding: 0 !important;
+  }
+  
+  /* Ship showcase - more compact */
+  .ship-showcase {
+    max-width: 240px !important;
+    margin: 0 auto !important;
+  }
+  
+  .ship-showcase-ring {
+    inset: 5% !important;
+    border: 1px solid rgba(255, 0, 102, 0.2) !important;
+    box-shadow: 0 0 20px rgba(255, 0, 102, 0.1) !important;
+  }
+  
+  /* Ship nameplate */
+  .ship-nameplate {
+    margin-top: 8px !important;
+  }
+  
+  .ship-nameplate-ticker {
+    font-size: 18px !important;
+  }
+  
+  .ship-nameplate-class {
+    font-size: 10px !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     3. SHIP SELECTOR GRID — Smaller, tighter thumbnails
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .ship-selector {
+    margin-top: 10px !important;
+    gap: 5px !important;
+    max-width: 100% !important;
+    padding: 0 4px !important;
+  }
+  
+  .ship-selector-btn {
+    width: 38px !important;
+    height: 38px !important;
+    padding: 3px !important;
+    border-radius: 4px !important;
+  }
+  
+  .ship-selector-btn::before {
+    display: none !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     4. SIDEBARS — Hidden on mobile, content in center
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .hangar-sidebar {
+    display: none !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     5. BOTTOM NAV — Clean and accessible
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .mobile-bottom-nav {
+    background: rgba(10, 0, 8, 0.98) !important;
+    border-top: 1px solid rgba(255, 0, 102, 0.3) !important;
+    padding: 8px 12px !important;
+  }
+  
+  .mobile-bottom-nav::before {
+    display: none !important;
+  }
+  
+  .mobile-nav-item {
+    padding: 8px 12px !important;
+  }
+  
+  .mobile-nav-item::before,
+  .mobile-nav-item::after {
+    display: none !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     6. BATTLE ARENA MATCHUP SCREEN — Compact and clean
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .battle-arena-panel,
+  .battle-ready-screen {
+    padding: 12px 8px !important;
+  }
+  
+  .battle-title {
+    font-size: 24px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .battle-subtitle {
+    font-size: 9px !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .battle-matchup {
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .battle-ship-card {
+    padding: 12px !important;
+    min-width: 100px !important;
+    border-radius: 8px !important;
+    gap: 6px !important;
+  }
+  
+  .battle-ship-card img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .battle-ship-card .ticker {
+    font-size: 14px !important;
+  }
+  
+  .battle-vs {
+    font-size: 18px !important;
+    transform: none !important;
+    margin: 4px 0 !important;
+  }
+  
+  .battle-start-btn {
+    padding: 14px 40px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     7. COCKPIT PANELS — Clean backgrounds, no heavy decorations
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .cockpit-panel {
+    padding: 8px !important;
+  }
+  
+  .cockpit-panel::before,
+  .cockpit-panel::after {
+    display: none !important;
+  }
+  
+  .cockpit-hud::before,
+  .cockpit-hud::after {
+    display: none !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     8. BUTTON STYLING — Cleaner on mobile
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .hangar-action-btn,
+  .quick-action-btn,
+  .hud-btn {
+    border-radius: 4px !important;
+  }
+  
+  .hangar-action-btn::before,
+  .hangar-action-btn::after,
+  .hud-btn::before,
+  .hud-btn::after {
+    display: none !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     9. TYPOGRAPHY ADJUSTMENTS
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .section-title,
+  .arena-title {
+    font-size: 22px !important;
+  }
+  
+  .section-subtitle,
+  .arena-subtitle {
+    font-size: 9px !important;
+    letter-spacing: 0.08em !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EXTRA SMALL PHONES — Even more compact
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 400px) {
+  .ship-showcase {
+    max-width: 200px !important;
+  }
+  
+  .ship-selector-btn {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 2px !important;
+  }
+  
+  .ship-nameplate-ticker {
+    font-size: 16px !important;
+  }
+  
+  .battle-title {
+    font-size: 20px !important;
+  }
+  
+  .battle-ship-card img {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .battle-ship-card .ticker {
+    font-size: 12px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TABLET — Show sidebars but remove some decorations
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Remove cabinet frame on tablet too */
+  .hangar-rpg::before {
+    border-width: 1px !important;
+    opacity: 0.3 !important;
+  }
+  
+  .hangar-rpg::after {
+    display: none !important;
+  }
+  
+  /* Simpler targeting corners */
+  .hangar-center::before,
+  .hangar-center::after,
+  .ship-showcase::before {
+    width: 25px !important;
+    height: 25px !important;
+    opacity: 0.2 !important;
+  }
+}

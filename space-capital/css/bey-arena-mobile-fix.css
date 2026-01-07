@@ -1,0 +1,303 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   BEY ARENA MOBILE FIX
+   
+   Problem: Stat panels expand to fill all available space, hiding the canvas
+   Solution: Restructure mobile layout with fixed panel heights and prominent canvas
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENSURE ARENA-SPECIFIC STATS DON'T GET OVERRIDDEN BY GLOBAL STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Scope bey-arena stat bars specifically */
+.bey-arena-shell .stat-bar,
+.bey-panel .stat-bar {
+  height: 6px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1px !important;
+  overflow: hidden !important;
+}
+
+.bey-arena-shell .stat-fill,
+.bey-panel .stat-fill {
+  height: 100% !important;
+}
+
+.bey-arena-shell .stat-row,
+.bey-panel .stat-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-top: 6px !important;
+  margin-bottom: 2px !important;
+}
+
+.bey-arena-shell .stat-label,
+.bey-panel .stat-label {
+  font-size: 10px !important;
+  letter-spacing: 0.1em !important;
+}
+
+.bey-arena-shell .stat-value,
+.bey-panel .stat-value {
+  font-size: 13px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE LAYOUT FIX
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  
+  /* Make the shell full-height and scrollable */
+  .bey-arena-shell {
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important; /* Dynamic viewport height for mobile browsers */
+    max-height: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-top: 2px solid var(--arena-hot-magenta, #ff0066) !important;
+  }
+  
+  /* Remove scanlines on mobile - they're too heavy */
+  .bey-arena-shell .bey-scanlines,
+  .bey-canvas-wrap .bey-scanlines {
+    display: none !important;
+  }
+  
+  /* Make stage a scrollable flex column */
+  .bey-arena-stage {
+    position: absolute !important;
+    inset: 50px 0 0 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 80px !important; /* Space for fixed controls */
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     CANVAS - ALWAYS FIRST AND VISIBLE
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  .bey-canvas-wrap {
+    order: 1 !important;
+    flex-shrink: 0 !important;
+    min-height: 55vw !important; /* Square-ish based on screen width */
+    max-height: 45vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 10px !important;
+    background: radial-gradient(
+      ellipse at 50% 45%,
+      rgba(42, 0, 31, 0.4) 0%,
+      rgba(10, 0, 8, 0.95) 70%
+    ) !important;
+    border-bottom: 1px solid rgba(255, 0, 102, 0.3) !important;
+  }
+  
+  /* Canvas itself - fit nicely in container */
+  #bey-arena-canvas {
+    width: auto !important;
+    height: 100% !important;
+    max-width: 90vw !important;
+    max-height: 100% !important;
+    aspect-ratio: 1 !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     PANELS - COMPACT AND SCROLLABLE
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  /* Left panel */
+  .bey-panel.left {
+    order: 2 !important;
+    padding: 8px 12px !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 0, 102, 0.2) !important;
+  }
+  
+  /* Right panel */
+  .bey-panel.right {
+    order: 3 !important;
+    padding: 8px 12px !important;
+    border: none !important;
+  }
+  
+  /* Panel headers */
+  .bey-panel h3 {
+    margin: 0 0 4px 0 !important;
+    font-size: 11px !important;
+  }
+  
+  /* Pilot header row */
+  .bey-panel .pilot-header {
+    margin-bottom: 4px !important;
+    padding-bottom: 4px !important;
+  }
+  
+  .bey-panel .pilot-ticker {
+    font-size: 14px !important;
+  }
+  
+  .bey-panel .pilot-status {
+    font-size: 9px !important;
+    padding: 2px 4px !important;
+  }
+  
+  .bey-panel .pilot-regime {
+    font-size: 10px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  /* Stat rows - tighter spacing */
+  .bey-panel .stat-row {
+    margin-top: 4px !important;
+    margin-bottom: 1px !important;
+  }
+  
+  .bey-panel .stat-label {
+    font-size: 9px !important;
+  }
+  
+  .bey-panel .stat-value {
+    font-size: 11px !important;
+  }
+  
+  .bey-panel .stat-bar {
+    height: 5px !important;
+  }
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     BANNER AND CONTROLS
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  /* Banner positioning */
+  .bey-banner {
+    top: 6px !important;
+    font-size: 10px !important;
+    padding: 4px 10px !important;
+  }
+  
+  /* Controls at fixed bottom */
+  .bey-controls {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 10px 12px !important;
+    background: rgba(10, 0, 8, 0.98) !important;
+    border-top: 1px solid rgba(255, 0, 102, 0.4) !important;
+    z-index: 100 !important;
+    display: flex !important;
+    gap: 10px !important;
+    justify-content: center !important;
+  }
+  
+  .bey-btn {
+    flex: 1 !important;
+    max-width: 140px !important;
+    padding: 12px 10px !important;
+    font-size: 12px !important;
+  }
+  
+  /* Top bar adjustments */
+  .bey-arena-topbar {
+    padding: 8px 10px !important;
+  }
+  
+  .bey-arena-title {
+    font-size: 14px !important;
+  }
+  
+  .bey-arena-sub {
+    font-size: 9px !important;
+  }
+  
+  .bey-arena-close {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EXTRA SMALL PHONES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 400px) {
+  .bey-canvas-wrap {
+    min-height: 50vw !important;
+    max-height: 40vh !important;
+  }
+  
+  .bey-panel .pilot-ticker {
+    font-size: 12px !important;
+  }
+  
+  .bey-panel .stat-row {
+    margin-top: 3px !important;
+  }
+  
+  .bey-btn {
+    padding: 10px 8px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LANDSCAPE MOBILE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .bey-arena-stage {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
+  }
+  
+  .bey-canvas-wrap {
+    order: 2 !important;
+    flex: 1 1 50% !important;
+    min-height: auto !important;
+    max-height: none !important;
+    height: 100% !important;
+  }
+  
+  #bey-arena-canvas {
+    max-height: calc(100vh - 120px) !important;
+    max-width: 100% !important;
+  }
+  
+  .bey-panel.left {
+    order: 1 !important;
+    flex: 0 0 25% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    border-right: 1px solid rgba(255, 0, 102, 0.2) !important;
+    border-bottom: none !important;
+  }
+  
+  .bey-panel.right {
+    order: 3 !important;
+    flex: 0 0 25% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    border-left: 1px solid rgba(255, 0, 102, 0.2) !important;
+  }
+  
+  .bey-controls {
+    top: auto !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    padding: 8px !important;
+  }
+  
+  .bey-btn {
+    padding: 8px 12px !important;
+  }
+}
+
