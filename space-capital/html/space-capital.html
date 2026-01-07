@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPACE CAPITAL // FLEET COMMAND</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================================================
+       HOTLINE MIAMI AESTHETIC - SPACE CAPITAL
+       ========================================================================= */
+    :root {
+      /* Core Hotline Miami palette */
+      --magenta: #FF2975;
+      --magenta-dark: #CC1F5C;
+      --magenta-glow: #FF69B4;
+      --cyan: #00FFFF;
+      --cyan-dark: #00CCCC;
+      --yellow: #FFE600;
+      --orange: #FF6B35;
+      --purple: #9D4EDD;
+      --green-neon: #39FF14;
+      --red-alert: #FF0040;
+      
+      /* Backgrounds */
+      --bg-void: #0A0A0F;
+      --bg-panel: #12121A;
+      --bg-surface: #1A1A24;
+      --bg-elevated: #22222E;
+      
+      /* Text */
+      --text-primary: #F0F0F0;
+      --text-dim: #888899;
+      --text-muted: #555566;
+      
+      /* Borders */
+      --border-harsh: #FF2975;
+      --border-dim: #333344;
+      --border-panel: #2A2A3A;
+      
+      /* Typography */
+      --font-main: 'VT323', monospace;
+      
+      /* Effects */
+      --scanline-opacity: 0.03;
+      --noise-opacity: 0.02;
+      --glow-spread: 20px;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+    
+    body {
+      background: var(--bg-void);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      font-size: 16px;
+      line-height: 1.4;
+      position: relative;
+    }
+
+    /* =========================================================================
+       VHS / CRT OVERLAY EFFECTS
+       ========================================================================= */
+    
+    /* Scanlines */
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, var(--scanline-opacity)) 2px,
+        rgba(0, 0, 0, var(--scanline-opacity)) 4px
+      );
+    }
+
+    /* VHS Noise */
+    .vhs-noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      opacity: var(--noise-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      animation: noise-shift 0.5s steps(10) infinite;
+    }
+
+    @keyframes noise-shift {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-1%, -1%); }
+      20% { transform: translate(1%, 1%); }
+      30% { transform: translate(-1%, 1%); }
+      40% { transform: translate(1%, -1%); }
+      50% { transform: translate(-1%, 0); }
+      60% { transform: translate(1%, 0); }
+      70% { transform: translate(0, -1%); }
+      80% { transform: translate(0, 1%); }
+      90% { transform: translate(-1%, -1%); }
+    }
+
+    /* Chromatic Aberration on hover */
+    .chromatic-target {
+      position: relative;
+    }
+    .chromatic-target::before,
+    .chromatic-target::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+    .chromatic-target:hover::before {
+      color: var(--cyan);
+      left: -2px;
+      opacity: 0.7;
+      clip-path: inset(0 0 50% 0);
+    }
+    .chromatic-target:hover::after {
+      color: var(--magenta);
+      left: 2px;
+      opacity: 0.7;
+      clip-path: inset(50% 0 0 0);
+    }
+
+    /* CRT Vignette */
+    .crt-vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9997;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        transparent 60%,
+        rgba(0, 0, 0, 0.4) 100%
+      );
+    }
+
+    /* =========================================================================
+       LAYOUT
+       ========================================================================= */
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--bg-panel);
+      border-bottom: 3px solid var(--magenta);
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--magenta);
+      box-shadow: 0 0 20px var(--magenta), 0 0 40px var(--magenta-dark);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-logo {
+      font-size: 2rem;
+      filter: drop-shadow(0 0 10px var(--magenta));
+      animation: logo-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes logo-pulse {
+      0%, 100% { filter: drop-shadow(0 0 10px var(--magenta)); }
+      50% { filter: drop-shadow(0 0 20px var(--magenta)) drop-shadow(0 0 30px var(--cyan)); }
+    }
+
+    .header-title {
+      font-size: 1.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--magenta);
+      text-shadow: 0 0 10px var(--magenta), 0 0 20px var(--magenta-dark);
+      margin: 0;
+    }
+
+    .header-subtitle {
+      font-size: 0.875rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .status-dot.online {
+      background: var(--green-neon);
+      box-shadow: 0 0 10px var(--green-neon), 0 0 20px var(--green-neon);
+      animation: pulse-glow 1s ease-in-out infinite;
+    }
+
+    .status-dot.warning {
+      background: var(--yellow);
+      box-shadow: 0 0 10px var(--yellow);
+    }
+
+    .status-dot.offline {
+      background: var(--red-alert);
+      box-shadow: 0 0 10px var(--red-alert);
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1200px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* =========================================================================
+       PANELS - COCKPIT STYLE
+       ========================================================================= */
+    .panel {
+      background: var(--bg-panel);
+      border: 2px solid var(--border-panel);
+      position: relative;
+    }
+
+    /* Corner brackets */
+    .panel::before,
+    .panel::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--magenta);
+      border-style: solid;
+    }
+
+    .panel::before {
+      top: -2px;
+      left: -2px;
+      border-width: 3px 0 0 3px;
+    }
+
+    .panel::after {
+      top: -2px;
+      right: -2px;
+      border-width: 3px 3px 0 0;
+    }
+
+    .panel-corners::before,
+    .panel-corners::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--magenta);
+      border-style: solid;
+    }
+
+    .panel-corners::before {
+      bottom: -2px;
+      left: -2px;
+      border-width: 0 0 3px 3px;
+    }
+
+    .panel-corners::after {
+      bottom: -2px;
+      right: -2px;
+      border-width: 0 3px 3px 0;
+    }
+
+    .panel-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-label {
+      font-size: 0.625rem;
+      letter-spacing: 0.2em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .panel-title {
+      font-size: 1.125rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin: 0.25rem 0 0;
+    }
+
+    .panel-body {
+      padding: 1rem;
+    }
+
+    /* =========================================================================
+       FLEET HANGAR - SHIP VISUALIZATIONS
+       ========================================================================= */
+    .fleet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .ship-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-dim);
+      padding: 1rem;
+      position: relative;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .ship-card:hover {
+      border-color: var(--magenta);
+      box-shadow: 0 0 20px rgba(255, 41, 117, 0.3), inset 0 0 30px rgba(255, 41, 117, 0.05);
+    }
+
+    .ship-card.positive {
+      border-color: var(--green-neon);
+    }
+
+    .ship-card.positive:hover {
+      box-shadow: 0 0 20px rgba(57, 255, 20, 0.3), inset 0 0 30px rgba(57, 255, 20, 0.05);
+    }
+
+    .ship-card.negative {
+      border-color: var(--red-alert);
+    }
+
+    .ship-card.negative:hover {
+      box-shadow: 0 0 20px rgba(255, 0, 64, 0.3), inset 0 0 30px rgba(255, 0, 64, 0.05);
+    }
+
+    /* Ship Header */
+    .ship-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .ship-callsign {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .ship-ticker {
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      color: var(--magenta);
+      text-shadow: 0 0 10px var(--magenta);
+    }
+
+    .ship-class {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--border-dim);
+      background: var(--bg-panel);
+    }
+
+    .ship-pnl {
+      font-size: 1.125rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+    }
+
+    .ship-pnl.positive {
+      color: var(--green-neon);
+      text-shadow: 0 0 10px var(--green-neon);
+    }
+
+    .ship-pnl.negative {
+      color: var(--red-alert);
+      text-shadow: 0 0 10px var(--red-alert);
+    }
+
+    /* Ship Visualization */
+    .ship-display {
+      height: 100px;
+      margin: 0.75rem 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: 
+        linear-gradient(90deg, transparent 49%, var(--border-dim) 49%, var(--border-dim) 51%, transparent 51%),
+        linear-gradient(0deg, transparent 49%, var(--border-dim) 49%, var(--border-dim) 51%, transparent 51%);
+      background-size: 20px 20px;
+      border: 1px solid var(--border-dim);
+    }
+
+    /* Ship Sprite - Pixel Art Style */
+    .ship-sprite {
+      width: 64px;
+      height: 64px;
+      position: relative;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 0 10px var(--magenta));
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    .ship-card:hover .ship-sprite {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 20px var(--magenta)) drop-shadow(0 0 30px var(--cyan));
+    }
+
+    .ship-sprite svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Engine glow based on delta */
+    .engine-glow {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 30px;
+      background: linear-gradient(to bottom, var(--cyan), transparent);
+      opacity: 0.8;
+      filter: blur(5px);
+      animation: engine-flicker 0.15s ease-in-out infinite alternate;
+    }
+
+    @keyframes engine-flicker {
+      0% { opacity: 0.6; height: 25px; }
+      100% { opacity: 1; height: 35px; }
+    }
+
+    /* Telemetry Display */
+    .ship-telemetry {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .telemetry-item {
+      text-align: center;
+    }
+
+    .telemetry-label {
+      font-size: 0.625rem;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .telemetry-value {
+      font-size: 1rem;
+      color: var(--cyan);
+      text-shadow: 0 0 5px var(--cyan);
+    }
+
+    /* Strike Range Indicator */
+    .strike-range {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dim);
+    }
+
+    .strike-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--bg-void);
+      position: relative;
+      border: 1px solid var(--border-dim);
+    }
+
+    .strike-marker {
+      position: absolute;
+      top: -3px;
+      width: 4px;
+      height: 14px;
+      background: var(--yellow);
+      box-shadow: 0 0 5px var(--yellow);
+    }
+
+    .strike-marker.current {
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    .strike-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* =========================================================================
+       SIDEBAR - MISSION CONTROL
+       ========================================================================= */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-dim);
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--magenta);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value.positive {
+      color: var(--green-neon);
+      text-shadow: 0 0 10px var(--green-neon);
+    }
+
+    .stat-value.negative {
+      color: var(--red-alert);
+      text-shadow: 0 0 10px var(--red-alert);
+    }
+
+    .stat-label {
+      font-size: 0.625rem;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Catalysts Panel */
+    .catalyst-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .catalyst-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dim);
+      border-left: 3px solid var(--magenta);
+      transition: all 0.2s ease;
+    }
+
+    .catalyst-item:hover {
+      border-color: var(--magenta);
+      background: var(--bg-elevated);
+    }
+
+    .catalyst-item.high-impact {
+      border-left-color: var(--red-alert);
+    }
+
+    .catalyst-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      min-width: 70px;
+    }
+
+    .catalyst-info {
+      flex: 1;
+    }
+
+    .catalyst-ticker {
+      font-size: 0.875rem;
+      font-weight: bold;
+      color: var(--magenta);
+    }
+
+    .catalyst-event {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .catalyst-impact {
+      font-size: 0.625rem;
+      letter-spacing: 0.1em;
+      padding: 0.25rem 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .catalyst-impact.high {
+      background: var(--red-alert);
+      color: white;
+    }
+
+    .catalyst-impact.medium {
+      background: var(--yellow);
+      color: var(--bg-void);
+    }
+
+    /* Theme Breakdown */
+    .theme-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .theme-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dim);
+    }
+
+    .theme-icon {
+      font-size: 1.25rem;
+    }
+
+    .theme-name {
+      flex: 1;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    .theme-value {
+      font-size: 0.875rem;
+      color: var(--cyan);
+    }
+
+    .theme-bar {
+      width: 60px;
+      height: 6px;
+      background: var(--bg-void);
+      border: 1px solid var(--border-dim);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: var(--magenta);
+      transition: width 0.3s ease;
+    }
+
+    /* =========================================================================
+       LOADING SCREEN
+       ========================================================================= */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-void);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loading-title {
+      font-size: 3rem;
+      letter-spacing: 0.3em;
+      color: var(--magenta);
+      text-shadow: 0 0 20px var(--magenta), 0 0 40px var(--magenta-dark);
+      margin-bottom: 0.5rem;
+      animation: title-glitch 3s ease-in-out infinite;
+    }
+
+    @keyframes title-glitch {
+      0%, 95%, 100% { text-shadow: 0 0 20px var(--magenta), 0 0 40px var(--magenta-dark); transform: translateX(0); }
+      96% { text-shadow: -3px 0 var(--cyan), 3px 0 var(--magenta); transform: translateX(-2px); }
+      97% { text-shadow: 3px 0 var(--cyan), -3px 0 var(--magenta); transform: translateX(2px); }
+      98% { text-shadow: -3px 0 var(--cyan), 3px 0 var(--magenta); transform: translateX(-1px); }
+    }
+
+    .loading-subtitle {
+      font-size: 0.875rem;
+      letter-spacing: 0.5em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 3rem;
+    }
+
+    .loading-bar-container {
+      width: 300px;
+      height: 4px;
+      background: var(--border-dim);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--magenta);
+      box-shadow: 0 0 10px var(--magenta), 0 0 20px var(--magenta-dark);
+      transition: width 0.3s ease;
+    }
+
+    .loading-status {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* =========================================================================
+       RESPONSIVE
+       ========================================================================= */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+
+      .header-status {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .fleet-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .vhs-noise, .scanlines { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- VHS / CRT Effects -->
+  <div class="scanlines"></div>
+  <div class="vhs-noise"></div>
+  <div class="crt-vignette"></div>
+
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loading-screen">
+    <div class="loading-title">SPACE CAPITAL</div>
+    <div class="loading-subtitle">Fleet Command System</div>
+    <div class="loading-bar-container">
+      <div class="loading-bar" id="loading-bar"></div>
+    </div>
+    <div class="loading-status" id="loading-status">INITIALIZING SYSTEMS...</div>
+  </div>
+
+  <!-- Main App -->
+  <div class="app">
+    <header class="header">
+      <div class="header-brand">
+        <span class="header-logo">🚀</span>
+        <div>
+          <h1 class="header-title">SPACE CAPITAL</h1>
+          <div class="header-subtitle">Fleet Command // Sector Alpha</div>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="status-item">
+          <span class="status-dot online" id="system-status"></span>
+          <span>SYSTEMS ONLINE</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot warning" id="market-status"></span>
+          <span id="market-status-text">MARKET CLOSED</span>
+        </div>
+        <div class="status-item">
+          <span style="color: var(--text-muted);">LAST SYNC:</span>
+          <span id="last-update" style="color: var(--cyan);">--:--:--</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Fleet Hangar -->
+      <div class="panel panel-corners">
+        <div class="panel-header">
+          <div>
+            <div class="panel-label">// HANGAR BAY</div>
+            <h2 class="panel-title">ACTIVE FLEET</h2>
+          </div>
+          <div style="font-size: 0.875rem; color: var(--text-dim);">
+            <span id="ship-count">0</span> VESSELS DEPLOYED
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="fleet-grid" id="fleet-grid">
+            <!-- Ships rendered here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Portfolio Stats -->
+        <div class="panel panel-corners">
+          <div class="panel-header">
+            <div>
+              <div class="panel-label">// TELEMETRY</div>
+              <h2 class="panel-title">FLEET STATUS</h2>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value" id="total-value">$0</div>
+                <div class="stat-label">FLEET VALUE</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="total-pnl">$0</div>
+                <div class="stat-label">TOTAL P&L</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="total-delta">0.00</div>
+                <div class="stat-label">NET DELTA</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="days-to-expiry">0</div>
+                <div class="stat-label">DAYS TO EXP</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Theme Breakdown -->
+        <div class="panel panel-corners">
+          <div class="panel-header">
+            <div>
+              <div class="panel-label">// SECTOR ANALYSIS</div>
+              <h2 class="panel-title">DEPLOYMENT</h2>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="theme-grid" id="theme-grid">
+              <!-- Themes rendered here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Catalysts -->
+        <div class="panel panel-corners">
+          <div class="panel-header">
+            <div>
+              <div class="panel-label">// INTEL FEED</div>
+              <h2 class="panel-title">UPCOMING EVENTS</h2>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="catalyst-list" id="catalyst-list">
+              <!-- Catalysts rendered here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // =========================================================================
+    // DATA & CONFIGURATION
+    // =========================================================================
+    
+    // Ticker metadata - themes, colors, ship classes
+    const TICKER_CONFIG = {
+      'RKLB': { theme: 'Space', icon: '🚀', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
+      'LUNR': { theme: 'Space', icon: '🌙', color: '#9D4EDD', class: 'EXPLORER', sin: 'FAITH' },
+      'ASTS': { theme: 'Space', icon: '📡', color: '#00FFFF', class: 'CRUISER', sin: 'AMBITION' },
+      'ACHR': { theme: 'Air Mobility', icon: '🛸', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
+      'JOBY': { theme: 'Air Mobility', icon: '🚁', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
+      'GME': { theme: 'Meme', icon: '🎮', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
+      'BKSY': { theme: 'Space', icon: '🛰️', color: '#FF69B4', class: 'SCOUT', sin: 'VIGILANCE' },
+      'RDW': { theme: 'Space', icon: '⚙️', color: '#00CCCC', class: 'ENGINEER', sin: 'CRAFT' },
+      'PL': { theme: 'Space', icon: '🌍', color: '#B8986B', class: 'SURVEYOR', sin: 'WISDOM' },
+      'EVEX': { theme: 'Air Mobility', icon: '✈️', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' }
+    };
+
+    const DEFAULT_CONFIG = { theme: 'Other', icon: '📊', color: '#888899', class: 'UNKNOWN', sin: 'MYSTERY' };
+
+    // Ship SVG generator based on class type
+    function generateShipSVG(shipClass, color) {
+      const ships = {
+        'INTERCEPTOR': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 4L40 20L48 28L48 44L40 48L32 60L24 48L16 44L16 28L24 20L32 4Z" fill="${color}" fill-opacity="0.3"/>
+            <path d="M32 4L40 20L48 28L48 44L40 48L32 60L24 48L16 44L16 28L24 20L32 4Z" stroke="${color}" stroke-width="2"/>
+            <path d="M32 16L36 24L40 28V36L36 38L32 44L28 38L24 36V28L28 24L32 16Z" fill="${color}"/>
+            <circle cx="32" cy="28" r="4" fill="#000" stroke="${color}"/>
+          </svg>`,
+        'EXPLORER': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="32" cy="32" rx="24" ry="12" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <ellipse cx="32" cy="32" rx="16" ry="8" fill="${color}"/>
+            <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
+            <path d="M32 8V20M32 44V56" stroke="${color}" stroke-width="2"/>
+          </svg>`,
+        'CRUISER': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="12" width="24" height="40" rx="4" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <rect x="24" y="16" width="16" height="12" fill="${color}"/>
+            <rect x="12" y="24" width="8" height="20" fill="${color}" fill-opacity="0.5" stroke="${color}"/>
+            <rect x="44" y="24" width="8" height="20" fill="${color}" fill-opacity="0.5" stroke="${color}"/>
+            <circle cx="32" cy="40" r="4" fill="#000" stroke="${color}"/>
+          </svg>`,
+        'STRIKER': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 8L44 24L52 32L44 40L32 56L20 40L12 32L20 24L32 8Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <path d="M32 16L40 28L32 40L24 28L32 16Z" fill="${color}"/>
+            <circle cx="32" cy="28" r="4" fill="#000" stroke="${color}"/>
+          </svg>`,
+        'TRANSPORT': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="16" width="32" height="32" rx="2" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <rect x="20" y="20" width="24" height="16" fill="${color}"/>
+            <rect x="24" y="40" width="6" height="8" fill="${color}"/>
+            <rect x="34" y="40" width="6" height="8" fill="${color}"/>
+            <circle cx="32" cy="28" r="4" fill="#000" stroke="${color}"/>
+          </svg>`,
+        'BERSERKER': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 4L48 20V44L32 60L16 44V20L32 4Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <path d="M32 12L44 24V40L32 52L20 40V24L32 12Z" fill="${color}"/>
+            <path d="M24 28L32 20L40 28L32 36L24 28Z" fill="#000" stroke="${color}"/>
+            <path d="M8 32H16M48 32H56" stroke="${color}" stroke-width="3"/>
+          </svg>`,
+        'SCOUT': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="20" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <circle cx="32" cy="32" r="12" fill="${color}"/>
+            <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
+            <path d="M32 8V16M32 48V56M8 32H16M48 32H56" stroke="${color}" stroke-width="2"/>
+          </svg>`,
+        'ENGINEER': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="12" width="32" height="40" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <rect x="20" y="16" width="8" height="8" fill="${color}"/>
+            <rect x="36" y="16" width="8" height="8" fill="${color}"/>
+            <rect x="20" y="28" width="24" height="4" fill="${color}"/>
+            <rect x="20" y="36" width="24" height="4" fill="${color}"/>
+            <rect x="20" y="44" width="24" height="4" fill="${color}"/>
+          </svg>`,
+        'SURVEYOR': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 8L56 32L32 56L8 32L32 8Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <path d="M32 16L48 32L32 48L16 32L32 16Z" fill="${color}"/>
+            <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
+          </svg>`,
+        'PROTOTYPE': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 4L40 16L52 20L56 32L52 44L40 48L32 60L24 48L12 44L8 32L12 20L24 16L32 4Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <circle cx="32" cy="32" r="12" fill="${color}"/>
+            <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
+          </svg>`,
+        'UNKNOWN': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="16" width="32" height="32" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <text x="32" y="38" text-anchor="middle" fill="${color}" font-size="16" font-family="VT323">?</text>
+          </svg>`
+      };
+      return ships[shipClass] || ships['UNKNOWN'];
+    }
+
+    // Calculate strike position as percentage
+    function calculateStrikePosition(current, strike, range = 0.5) {
+      const min = strike * (1 - range);
+      const max = strike * (1 + range);
+      const position = ((current - min) / (max - min)) * 100;
+      return Math.max(0, Math.min(100, position));
+    }
+
+    // Format currency
+    function formatCurrency(amount) {
+      const prefix = amount >= 0 ? '$' : '-$';
+      return prefix + Math.abs(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // =========================================================================
+    // RENDERING
+    // =========================================================================
+
+    function renderShipCard(position) {
+      const config = TICKER_CONFIG[position.ticker] || DEFAULT_CONFIG;
+      
+      // Calculate P&L
+      const cost = position.entry_cost * position.contracts * 100;
+      const value = position.current_price * position.contracts * 100;
+      const pnl = value - cost;
+      const pnlPct = cost > 0 ? (pnl / cost * 100) : 0;
+      const pnlClass = pnl >= 0 ? 'positive' : 'negative';
+
+      // Strike visualization
+      const strikePos = calculateStrikePosition(position.stock_price, position.long_strike);
+      const shortStrikePos = position.short_strike ? calculateStrikePosition(position.stock_price, position.short_strike) : null;
+
+      const card = document.createElement('div');
+      card.className = `ship-card ${pnlClass}`;
+      
+      card.innerHTML = `
+        <div class="ship-header">
+          <div class="ship-callsign">
+            <span class="ship-ticker" style="color: ${config.color}; text-shadow: 0 0 10px ${config.color};">${position.ticker}</span>
+            <span class="ship-class">${config.class}</span>
+          </div>
+          <div class="ship-pnl ${pnlClass}">
+            ${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%
+          </div>
+        </div>
+        
+        <div class="ship-display">
+          <div class="ship-sprite">
+            ${generateShipSVG(config.class, config.color)}
+          </div>
+          <div class="engine-glow" style="background: linear-gradient(to bottom, ${config.color}, transparent); opacity: ${0.5 + position.delta * 0.5};"></div>
+        </div>
+
+        <div class="strike-range">
+          <span style="font-size: 0.625rem; color: var(--text-muted);">$${position.long_strike}</span>
+          <div class="strike-bar">
+            <div class="strike-marker" style="left: ${strikePos}%;"></div>
+            ${shortStrikePos !== null ? `<div class="strike-marker current" style="left: ${shortStrikePos}%;"></div>` : ''}
+          </div>
+          <span style="font-size: 0.625rem; color: var(--text-muted);">${position.short_strike ? '$' + position.short_strike : '--'}</span>
+        </div>
+
+        <div class="ship-telemetry">
+          <div class="telemetry-item">
+            <div class="telemetry-label">PRICE</div>
+            <div class="telemetry-value">$${position.stock_price.toFixed(2)}</div>
+          </div>
+          <div class="telemetry-item">
+            <div class="telemetry-label">DELTA</div>
+            <div class="telemetry-value">${position.delta.toFixed(2)}</div>
+          </div>
+          <div class="telemetry-item">
+            <div class="telemetry-label">VALUE</div>
+            <div class="telemetry-value">${formatCurrency(value)}</div>
+          </div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function renderFleet(positions) {
+      const grid = document.getElementById('fleet-grid');
+      grid.innerHTML = '';
+      
+      positions.forEach(pos => {
+        grid.appendChild(renderShipCard(pos));
+      });
+
+      document.getElementById('ship-count').textContent = positions.length;
+    }
+
+    function renderThemes(positions) {
+      const themes = {};
+      let maxValue = 0;
+
+      positions.forEach(pos => {
+        const config = TICKER_CONFIG[pos.ticker] || DEFAULT_CONFIG;
+        const value = pos.entry_cost * pos.contracts * 100;
+        
+        if (!themes[config.theme]) {
+          themes[config.theme] = { icon: config.icon, value: 0 };
+        }
+        themes[config.theme].value += value;
+        maxValue = Math.max(maxValue, themes[config.theme].value);
+      });
+
+      const grid = document.getElementById('theme-grid');
+      grid.innerHTML = Object.entries(themes)
+        .sort((a, b) => b[1].value - a[1].value)
+        .map(([name, data]) => `
+          <div class="theme-row">
+            <span class="theme-icon">${data.icon}</span>
+            <span class="theme-name">${name}</span>
+            <span class="theme-value">${formatCurrency(data.value)}</span>
+            <div class="theme-bar">
+              <div class="theme-bar-fill" style="width: ${(data.value / maxValue * 100)}%;"></div>
+            </div>
+          </div>
+        `).join('');
+    }
+
+    function renderCatalysts(catalysts) {
+      const list = document.getElementById('catalyst-list');
+      list.innerHTML = catalysts.slice(0, 5).map(cat => {
+        const config = TICKER_CONFIG[cat.ticker] || DEFAULT_CONFIG;
+        return `
+          <div class="catalyst-item ${cat.impact === 'HIGH' ? 'high-impact' : ''}">
+            <div class="catalyst-date">${cat.date}</div>
+            <div class="catalyst-info">
+              <div class="catalyst-ticker" style="color: ${config.color};">${cat.ticker}</div>
+              <div class="catalyst-event">${cat.event}</div>
+            </div>
+            <span class="catalyst-impact ${cat.impact.toLowerCase()}">${cat.impact}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderStats(data) {
+      const positions = data.positions || [];
+      
+      let totalCost = 0;
+      let totalValue = 0;
+      let totalDelta = 0;
+
+      positions.forEach(pos => {
+        const cost = pos.entry_cost * pos.contracts * 100;
+        const value = pos.current_price * pos.contracts * 100;
+        totalCost += cost;
+        totalValue += value;
+        totalDelta += pos.delta * pos.contracts;
+      });
+
+      const totalPnl = totalValue - totalCost;
+      
+      document.getElementById('total-value').textContent = formatCurrency(totalValue);
+      
+      const pnlEl = document.getElementById('total-pnl');
+      pnlEl.textContent = formatCurrency(totalPnl);
+      pnlEl.className = 'stat-value ' + (totalPnl >= 0 ? 'positive' : 'negative');
+      
+      document.getElementById('total-delta').textContent = totalDelta.toFixed(2);
+      document.getElementById('days-to-expiry').textContent = data.summary?.days_to_expiry || calculateDaysToExpiry(positions);
+      document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+    }
+
+    function calculateDaysToExpiry(positions) {
+      if (!positions.length) return 0;
+      const expiry = new Date(positions[0].expiry);
+      const today = new Date();
+      return Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+    }
+
+    // =========================================================================
+    // DATA LOADING
+    // =========================================================================
+
+    async function loadData() {
+      try {
+        // Try to fetch from Flask backend
+        const response = await fetch('/api/options');
+        if (response.ok) {
+          return await response.json();
+        }
+      } catch (e) {
+        console.log('API not available, using embedded data');
+      }
+
+      // Fallback to embedded data
+      return {
+        "positions": [
+          { "ticker": "RKLB", "structure": "Naked LEAP", "long_strike": 75, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 24.14, "current_price": 24.14, "delta": 0.68, "contracts": 1, "stock_price": 75.99, "entry_stock": 75.99 },
+          { "ticker": "LUNR", "structure": "Naked LEAP", "long_strike": 17.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 6.69, "current_price": 6.69, "delta": 0.7, "contracts": 1, "stock_price": 17.88, "entry_stock": 17.88 },
+          { "ticker": "ASTS", "structure": "Bull Spread", "long_strike": 80, "short_strike": 120, "expiry": "2027-01-15", "entry_cost": 20.0, "current_price": 20.0, "delta": 0.42, "contracts": 1, "stock_price": 83.47, "entry_stock": 83.47 },
+          { "ticker": "ACHR", "structure": "Naked LEAP", "long_strike": 7.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 3.0, "current_price": 3.0, "delta": 0.72, "contracts": 1, "stock_price": 8.13, "entry_stock": 8.13 },
+          { "ticker": "JOBY", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.43, "contracts": 1, "stock_price": 14.36, "entry_stock": 14.36 },
+          { "ticker": "GME", "structure": "Bull Spread", "long_strike": 20, "short_strike": 35, "expiry": "2027-01-15", "entry_cost": 4.5, "current_price": 4.5, "delta": 0.6, "contracts": 1, "stock_price": 20.62, "entry_stock": 20.62 },
+          { "ticker": "BKSY", "structure": "Naked LEAP", "long_strike": 20, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 7.56, "current_price": 7.56, "delta": 0.7, "contracts": 1, "stock_price": 20.82, "entry_stock": 20.82 },
+          { "ticker": "RDW", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.55, "contracts": 1, "stock_price": 15.0, "entry_stock": 15.0 },
+          { "ticker": "PL", "structure": "Bull Spread", "long_strike": 4, "short_strike": 6, "expiry": "2027-01-15", "entry_cost": 0.65, "current_price": 0.65, "delta": 0.43, "contracts": 1, "stock_price": 4.0, "entry_stock": 4.0 },
+          { "ticker": "EVEX", "structure": "Bull Spread", "long_strike": 7.5, "short_strike": 12.5, "expiry": "2027-01-15", "entry_cost": 2.0, "current_price": 2.0, "delta": 0.45, "contracts": 1, "stock_price": 8.0, "entry_stock": 8.0 }
+        ],
+        "catalysts": [
+          { "date": "2026-02-15", "ticker": "LUNR", "event": "IM-2 Lunar Mission", "impact": "HIGH", "status": "UPCOMING" },
+          { "date": "2026-Q1", "ticker": "ACHR", "event": "FAA Certification", "impact": "HIGH", "status": "UPCOMING" },
+          { "date": "2026-Q1", "ticker": "JOBY", "event": "FAA Certification", "impact": "HIGH", "status": "UPCOMING" },
+          { "date": "2026-Q2", "ticker": "ASTS", "event": "Commercial Launch", "impact": "HIGH", "status": "UPCOMING" },
+          { "date": "2026-Q2", "ticker": "RKLB", "event": "Neutron Update", "impact": "MEDIUM", "status": "UPCOMING" },
+          { "date": "2026-03-31", "ticker": "GME", "event": "Q4 Earnings", "impact": "MEDIUM", "status": "UPCOMING" }
+        ]
+      };
+    }
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+
+    async function init() {
+      const loadingBar = document.getElementById('loading-bar');
+      const loadingStatus = document.getElementById('loading-status');
+      const loadingScreen = document.getElementById('loading-screen');
+
+      // Simulate boot sequence
+      const stages = [
+        { progress: 20, status: 'LOADING FLEET MANIFEST...' },
+        { progress: 40, status: 'INITIALIZING TELEMETRY...' },
+        { progress: 60, status: 'SYNCING MARKET DATA...' },
+        { progress: 80, status: 'CALIBRATING SENSORS...' },
+        { progress: 100, status: 'SYSTEMS READY' }
+      ];
+
+      for (const stage of stages) {
+        loadingBar.style.width = stage.progress + '%';
+        loadingStatus.textContent = stage.status;
+        await new Promise(r => setTimeout(r, 400));
+      }
+
+      // Load and render data
+      const data = await loadData();
+      renderFleet(data.positions);
+      renderThemes(data.positions);
+      renderCatalysts(data.catalysts);
+      renderStats(data);
+
+      // Hide loading screen
+      await new Promise(r => setTimeout(r, 500));
+      loadingScreen.classList.add('hidden');
+
+      // Set up polling for updates
+      setInterval(async () => {
+        const freshData = await loadData();
+        renderFleet(freshData.positions);
+        renderStats(freshData);
+      }, 30000);
+    }
+
+    // Start
+    init();
+  </script>
+</body>
+</html>
