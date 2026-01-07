@@ -549,6 +549,108 @@
       100% { transform: translate(1px, 1px); }
     }
 
+    /* ═══════════════════════════════════════════════════════════════════════
+       ANIMATED SHIP SPRITES
+       GIF-based animations driven by telemetry data
+       ═══════════════════════════════════════════════════════════════════════ */
+    
+    .ship-sprite-wrap {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Hotline Miami glow */
+      filter: drop-shadow(0 0 8px var(--ship-color, var(--magenta)));
+      transition: filter 0.3s ease, transform 0.2s ease;
+    }
+    
+    .ship-sprite-wrap:hover {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 15px var(--ship-color, var(--magenta))) 
+              drop-shadow(0 0 25px var(--ship-color, var(--magenta)));
+    }
+    
+    .ship-sprite-img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      /* GPU acceleration for smooth GIF playback */
+      transform: translateZ(0);
+      will-change: transform;
+    }
+    
+    /* ───────────────────────────────────────────────────────────────────────
+       TELEMETRY-DRIVEN EFFECTS
+       Classes added by ShipAnimator based on market data
+       ─────────────────────────────────────────────────────────────────────── */
+    
+    /* High Volatility - Jitter/shake effect */
+    .ship-sprite-wrap.ship--volatile {
+      animation: sprite-jitter 0.12s steps(3) infinite;
+    }
+    
+    @keyframes sprite-jitter {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-2px, 1px); }
+      50% { transform: translate(2px, -1px); }
+      75% { transform: translate(-1px, -2px); }
+    }
+    
+    /* Damaged / Bearish - Red damage overlay with scanlines */
+    .ship-sprite-wrap.ship--damaged::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(255, 0, 64, 0.15) 3px,
+          rgba(255, 0, 64, 0.15) 4px
+        );
+      pointer-events: none;
+      animation: damage-pulse 0.4s steps(2) infinite;
+    }
+    
+    @keyframes damage-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* High Thrust/Momentum - Enhanced glow */
+    .ship-sprite-wrap.ship--thrust {
+      filter: drop-shadow(0 0 12px var(--ship-color, var(--cyan))) 
+              drop-shadow(0 0 25px var(--ship-color, var(--cyan)))
+              drop-shadow(0 4px 20px var(--cyan));
+    }
+    
+    /* Bull Signal - Green tint glow */
+    .ship-sprite-wrap.ship--bull {
+      filter: drop-shadow(0 0 10px var(--green-neon)) 
+              drop-shadow(0 0 20px rgba(57, 255, 20, 0.4));
+    }
+    
+    /* Bear Signal - Red tint glow */
+    .ship-sprite-wrap.ship--bear {
+      filter: drop-shadow(0 0 10px var(--red-alert)) 
+              drop-shadow(0 0 20px rgba(255, 0, 64, 0.4));
+    }
+    
+    /* Combined volatile + damaged = critical state */
+    .ship-sprite-wrap.ship--volatile.ship--damaged {
+      animation: sprite-jitter 0.08s steps(4) infinite, critical-flash 0.3s ease-in-out infinite;
+    }
+    
+    @keyframes critical-flash {
+      0%, 100% { filter: drop-shadow(0 0 8px var(--red-alert)); }
+      50% { filter: drop-shadow(0 0 20px var(--red-alert)) brightness(1.2); }
+    }
+
     /* Telemetry bars - mini horizontal indicators */
     .telemetry-bars {
       display: flex;
@@ -1333,9 +1435,18 @@
         
         <div class="ship-display">
           <div class="signal-indicator" style="background: ${signalColor}; box-shadow: 0 0 10px ${signalColor};"></div>
-          <div class="ship-sprite" style="filter: drop-shadow(0 0 ${15 * glowIntensity}px ${config.color});">
-            ${generateShipSVG(config.class, config.color)}
-            ${damageOpacity > 0.1 ? `<div class="damage-overlay" style="opacity: ${damageOpacity};"></div>` : ''}
+          <div class="ship-sprite-wrap" style="--ship-color: ${config.color};">
+            <img class="ship-sprite-img" 
+                 data-ticker="${position.ticker}"
+                 data-pnl-pct="${displayPct}"
+                 data-volatility="${volatility}"
+                 data-trend="${trend}"
+                 data-momentum="${momentum}"
+                 data-activity="${activity}"
+                 data-signal="${signalState}"
+                 alt="${position.ticker} ship"
+                 loading="lazy"
+                 decoding="async" />
           </div>
           <div class="engine-glow" style="
             background: linear-gradient(to bottom, ${config.color}, transparent);
@@ -1401,11 +1512,45 @@
       const grid = document.getElementById('fleet-grid');
       grid.innerHTML = '';
       
+      // Store positions for the animator to access
+      window._fleetPositions = {};
       positions.forEach(pos => {
+        window._fleetPositions[pos.ticker] = pos;
         grid.appendChild(renderShipCard(pos));
       });
 
       document.getElementById('ship-count').textContent = positions.length;
+      
+      // Hydrate animated sprites after DOM update
+      // Use retry in case ShipAnimator hasn't loaded yet
+      function hydrateSprites() {
+        if (window.ShipAnimator) {
+          ShipAnimator.hydrateShipSprites((ticker) => {
+            const pos = window._fleetPositions[ticker];
+            if (!pos) return {};
+            
+            // Calculate P&L percentage for animation state
+            const cost = pos.entry_cost * pos.contracts * 100;
+            const value = pos.current_price * pos.contracts * 100;
+            const pnlPct = cost > 0 ? ((value - cost) / cost * 100) : pos.chgPct;
+            
+            return {
+              pnlPct: pnlPct,
+              volatility: pos.volatility ?? 0.5,
+              trend: pos.trend ?? 0,
+              momentum: pos.momentum ?? 0,
+              activity: pos.activity ?? 0.5,
+              signalState: pos.signalState || 'neutral',
+              damage: pos.visual?.damage ?? 0
+            };
+          });
+        } else {
+          // Retry after script loads
+          setTimeout(hydrateSprites, 100);
+        }
+      }
+      
+      requestAnimationFrame(hydrateSprites);
     }
 
     function renderThemes(positions) {
@@ -1669,6 +1814,9 @@
       <iframe id="moduleViewerFrame" class="moduleViewer__frame" title="Module content"></iframe>
     </div>
   </div>
+
+  <!-- Ship Animator - Telemetry-driven sprite animations -->
+  <script src="../js/ui/ship-animator.js"></script>
 
   <!-- Module Viewer Script -->
   <script src="../js/ui/module-viewer.js"></script>
