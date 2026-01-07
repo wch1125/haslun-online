@@ -1082,16 +1082,32 @@
     
     // Ticker metadata - themes, colors, ship classes
     const TICKER_CONFIG = {
+      // Space & Satellites
       'RKLB': { theme: 'Space', icon: '🚀', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
       'LUNR': { theme: 'Space', icon: '🌙', color: '#9D4EDD', class: 'EXPLORER', sin: 'FAITH' },
       'ASTS': { theme: 'Space', icon: '📡', color: '#00FFFF', class: 'CRUISER', sin: 'AMBITION' },
-      'ACHR': { theme: 'Air Mobility', icon: '🛸', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
-      'JOBY': { theme: 'Air Mobility', icon: '🚁', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
-      'GME': { theme: 'Meme', icon: '🎮', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
       'BKSY': { theme: 'Space', icon: '🛰️', color: '#FF69B4', class: 'SCOUT', sin: 'VIGILANCE' },
       'RDW': { theme: 'Space', icon: '⚙️', color: '#00CCCC', class: 'ENGINEER', sin: 'CRAFT' },
       'PL': { theme: 'Space', icon: '🌍', color: '#B8986B', class: 'SURVEYOR', sin: 'WISDOM' },
-      'EVEX': { theme: 'Air Mobility', icon: '✈️', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' }
+      
+      // Air Mobility / eVTOL
+      'ACHR': { theme: 'Air Mobility', icon: '🛸', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
+      'JOBY': { theme: 'Air Mobility', icon: '🚁', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
+      'EVEX': { theme: 'Air Mobility', icon: '✈️', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' },
+      
+      // Defense & Aerospace
+      'KTOS': { theme: 'Defense', icon: '🎯', color: '#FF4444', class: 'FIGHTER', sin: 'PRECISION' },
+      'LHX': { theme: 'Defense', icon: '🛡️', color: '#4488FF', class: 'SENTINEL', sin: 'DUTY' },
+      'RTX': { theme: 'Defense', icon: '🔧', color: '#888888', class: 'CARRIER', sin: 'POWER' },
+      'GE': { theme: 'Defense', icon: '⚡', color: '#44AAFF', class: 'TITAN', sin: 'LEGACY' },
+      
+      // Tech & Other
+      'COHR': { theme: 'Tech', icon: '💎', color: '#AA44FF', class: 'PHANTOM', sin: 'CLARITY' },
+      'GME': { theme: 'Meme', icon: '🎮', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
+      
+      // Benchmarks
+      'XAR': { theme: 'Benchmark', icon: '📊', color: '#666677', class: 'FLAGSHIP', sin: 'INDEX' },
+      'SPY': { theme: 'Benchmark', icon: '📈', color: '#4466AA', class: 'COMMAND', sin: 'MARKET' }
     };
 
     const DEFAULT_CONFIG = { theme: 'Other', icon: '📊', color: '#888899', class: 'UNKNOWN', sin: 'MYSTERY' };
@@ -1170,10 +1186,64 @@
             <circle cx="32" cy="32" r="12" fill="${color}"/>
             <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
           </svg>`,
+        'FIGHTER': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 4L36 16L48 12L52 24L56 32L52 40L48 52L36 48L32 60L28 48L16 52L12 40L8 32L12 24L16 12L28 16L32 4Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <path d="M32 16L40 24V40L32 48L24 40V24L32 16Z" fill="${color}"/>
+            <circle cx="32" cy="32" r="4" fill="#000" stroke="${color}"/>
+            <path d="M20 20L12 12M44 20L52 12M20 44L12 52M44 44L52 52" stroke="${color}" stroke-width="2"/>
+          </svg>`,
+        'SENTINEL': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 8L52 20V44L32 56L12 44V20L32 8Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <path d="M32 16L44 24V40L32 48L20 40V24L32 16Z" fill="${color}"/>
+            <rect x="28" y="24" width="8" height="16" fill="#000" stroke="${color}"/>
+            <circle cx="32" cy="32" r="3" fill="${color}"/>
+          </svg>`,
+        'CARRIER': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="12" y="20" width="40" height="24" rx="2" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <rect x="16" y="24" width="32" height="16" fill="${color}"/>
+            <rect x="20" y="28" width="6" height="8" fill="#000"/>
+            <rect x="29" y="28" width="6" height="8" fill="#000"/>
+            <rect x="38" y="28" width="6" height="8" fill="#000"/>
+            <path d="M32 12V20M32 44V52" stroke="${color}" stroke-width="2"/>
+          </svg>`,
+        'TITAN': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="8" width="32" height="48" rx="4" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <rect x="20" y="12" width="24" height="20" fill="${color}"/>
+            <circle cx="32" cy="22" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
+            <rect x="8" y="20" width="8" height="24" fill="${color}" fill-opacity="0.5" stroke="${color}"/>
+            <rect x="48" y="20" width="8" height="24" fill="${color}" fill-opacity="0.5" stroke="${color}"/>
+            <rect x="24" y="40" width="16" height="12" fill="${color}"/>
+          </svg>`,
+        'PHANTOM': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 4L44 16L56 28L52 40L44 52L32 60L20 52L12 40L8 28L20 16L32 4Z" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="1" stroke-dasharray="4 2"/>
+            <path d="M32 16L40 24L44 32L40 40L32 48L24 40L20 32L24 24L32 16Z" fill="${color}" fill-opacity="0.5"/>
+            <circle cx="32" cy="32" r="6" fill="${color}"/>
+            <circle cx="32" cy="32" r="3" fill="#000"/>
+          </svg>`,
+        'FLAGSHIP': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 4L48 16L56 32L48 48L32 60L16 48L8 32L16 16L32 4Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <path d="M32 12L44 20L48 32L44 44L32 52L20 44L16 32L20 20L32 12Z" fill="${color}"/>
+            <path d="M32 20L40 28L40 36L32 44L24 36L24 28L32 20Z" fill="#000" stroke="${color}"/>
+            <circle cx="32" cy="32" r="4" fill="${color}"/>
+          </svg>`,
+        'COMMAND': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="24" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>
+            <circle cx="32" cy="32" r="16" fill="${color}" fill-opacity="0.4" stroke="${color}" stroke-width="2"/>
+            <circle cx="32" cy="32" r="8" fill="${color}"/>
+            <circle cx="32" cy="32" r="4" fill="#000" stroke="${color}"/>
+            <path d="M32 4V12M32 52V60M4 32H12M52 32H60" stroke="${color}" stroke-width="2"/>
+          </svg>`,
         'UNKNOWN': `
           <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="16" y="16" width="32" height="32" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <text x="32" y="38" text-anchor="middle" fill="${color}" font-size="16" font-family="VT323">?</text>
+            <text x="32" y="38" text-anchor="middle" fill="${color}" font-size="16" font-family="monospace">?</text>
           </svg>`
       };
       return ships[shipClass] || ships['UNKNOWN'];
@@ -1200,18 +1270,27 @@
     function renderShipCard(position) {
       const config = TICKER_CONFIG[position.ticker] || DEFAULT_CONFIG;
       
-      // Calculate P&L
-      const cost = position.entry_cost * position.contracts * 100;
-      const value = position.current_price * position.contracts * 100;
-      const pnl = value - cost;
-      const pnlPct = cost > 0 ? (pnl / cost * 100) : 0;
-      const pnlClass = pnl >= 0 ? 'positive' : 'negative';
+      // Position-based P&L (only if we have a position)
+      const hasPosition = position.contracts > 0 && position.entry_cost > 0;
+      let pnl = 0, pnlPct = 0, value = 0;
+      
+      if (hasPosition) {
+        const cost = position.entry_cost * position.contracts * 100;
+        value = position.current_price * position.contracts * 100;
+        pnl = value - cost;
+        pnlPct = cost > 0 ? (pnl / cost * 100) : 0;
+      }
+      
+      // Use daily change if no position P&L
+      const displayPct = hasPosition ? pnlPct : position.chgPct;
+      const pnlClass = displayPct >= 0 ? 'positive' : 'negative';
 
-      // Strike visualization
-      const strikePos = calculateStrikePosition(position.stock_price, position.long_strike);
+      // Strike visualization (only for options)
+      const hasStrikes = position.long_strike != null;
+      const strikePos = hasStrikes ? calculateStrikePosition(position.stock_price, position.long_strike) : 50;
       const shortStrikePos = position.short_strike ? calculateStrikePosition(position.stock_price, position.short_strike) : null;
 
-      // Telemetry-driven visuals (with fallbacks)
+      // Telemetry-driven visuals
       const visual = position.visual || { glow: 0.5, jitter: 0.1, thrust: 0.3, damage: 0 };
       const trend = position.trend ?? 0;
       const momentum = position.momentum ?? 0;
@@ -1219,13 +1298,10 @@
       const activity = position.activity ?? 0.5;
       const signalState = position.signalState || 'neutral';
 
-      // Calculate visual modifiers from telemetry
       const glowIntensity = Math.max(0.3, visual.glow);
-      const jitterAmount = visual.jitter * 3; // max 3px jitter
-      const thrustLength = 20 + (visual.thrust * 30); // 20-50px
-      const damageOpacity = visual.damage * 0.5; // corruption overlay
+      const thrustLength = 20 + (visual.thrust * 30);
+      const damageOpacity = visual.damage * 0.5;
 
-      // Signal state colors
       const signalColors = {
         bull: 'var(--green-neon)',
         bear: 'var(--red-alert)',
@@ -1235,17 +1311,9 @@
 
       const card = document.createElement('div');
       card.className = `ship-card ${pnlClass}`;
-      card.style.cssText = `
-        --ship-glow: ${glowIntensity};
-        --ship-jitter: ${jitterAmount}px;
-        --ship-color: ${config.color};
-        --signal-color: ${signalColor};
-      `;
+      card.style.cssText = `--ship-glow: ${glowIntensity}; --ship-color: ${config.color}; --signal-color: ${signalColor};`;
       
-      // Add jitter animation if volatility is high
-      if (volatility > 0.6) {
-        card.classList.add('high-volatility');
-      }
+      if (volatility > 0.6) card.classList.add('high-volatility');
       
       card.innerHTML = `
         <div class="ship-header">
@@ -1254,21 +1322,16 @@
             <span class="ship-class">${config.class}</span>
           </div>
           <div class="ship-pnl ${pnlClass}">
-            ${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%
+            ${displayPct >= 0 ? '+' : ''}${displayPct.toFixed(1)}%
           </div>
         </div>
         
         <div class="ship-display">
-          <!-- Signal state indicator -->
           <div class="signal-indicator" style="background: ${signalColor}; box-shadow: 0 0 10px ${signalColor};"></div>
-          
-          <!-- Ship sprite with telemetry-driven effects -->
           <div class="ship-sprite" style="filter: drop-shadow(0 0 ${15 * glowIntensity}px ${config.color});">
             ${generateShipSVG(config.class, config.color)}
             ${damageOpacity > 0.1 ? `<div class="damage-overlay" style="opacity: ${damageOpacity};"></div>` : ''}
           </div>
-          
-          <!-- Engine thrust based on momentum/activity -->
           <div class="engine-glow" style="
             background: linear-gradient(to bottom, ${config.color}, transparent);
             height: ${thrustLength}px;
@@ -1276,7 +1339,6 @@
           "></div>
         </div>
 
-        <!-- Telemetry bars -->
         <div class="telemetry-bars">
           <div class="telem-bar-row">
             <span class="telem-bar-label">TRD</span>
@@ -1300,6 +1362,7 @@
           </div>
         </div>
 
+        ${hasStrikes ? `
         <div class="strike-range">
           <span style="font-size: 0.625rem; color: var(--text-muted);">$${position.long_strike}</span>
           <div class="strike-bar">
@@ -1308,6 +1371,7 @@
           </div>
           <span style="font-size: 0.625rem; color: var(--text-muted);">${position.short_strike ? '$' + position.short_strike : '--'}</span>
         </div>
+        ` : ''}
 
         <div class="ship-telemetry">
           <div class="telemetry-item">
@@ -1315,12 +1379,12 @@
             <div class="telemetry-value">$${position.stock_price.toFixed(2)}</div>
           </div>
           <div class="telemetry-item">
-            <div class="telemetry-label">DELTA</div>
-            <div class="telemetry-value">${position.delta.toFixed(2)}</div>
+            <div class="telemetry-label">${hasPosition ? 'DELTA' : 'SIGNAL'}</div>
+            <div class="telemetry-value">${hasPosition ? position.delta.toFixed(2) : signalState.toUpperCase()}</div>
           </div>
           <div class="telemetry-item">
-            <div class="telemetry-label">VALUE</div>
-            <div class="telemetry-value">${formatCurrency(value)}</div>
+            <div class="telemetry-label">${hasPosition ? 'VALUE' : 'ACTIVITY'}</div>
+            <div class="telemetry-value">${hasPosition ? formatCurrency(value) : (activity * 100).toFixed(0) + '%'}</div>
           </div>
         </div>
       `;
@@ -1425,12 +1489,12 @@
     // DATA LOADING - Supports multiple sources
     // =========================================================================
     
-    // Data paths (adjust based on your local setup)
+    // Data paths - relative to html/ subfolder
     const DATA_PATHS = {
-      fleet: './data/telemetry/fleet.json',
-      positions: './data/options_summaries/positions.json',
-      catalysts: './data/options_summaries/catalysts.json',
-      manifest: './data/telemetry/manifest.json'
+      fleet: '../data/telemetry/fleet.json',
+      positions: '../data/options_summaries/positions.json',
+      catalysts: '../data/options_summaries/catalysts.json',
+      manifest: '../data/telemetry/manifest.json'
     };
 
     // Load telemetry-enriched fleet data
@@ -1448,7 +1512,7 @@
       return null;
     }
 
-    // Load position data
+    // Load options position data (for P&L calculations)
     async function loadPositions() {
       try {
         const response = await fetch(DATA_PATHS.positions);
@@ -1458,64 +1522,56 @@
           return data;
         }
       } catch (e) {
-        console.log('Positions file not found, using fallback');
+        console.log('Positions file not found');
       }
       return null;
     }
 
-    // Merge telemetry with position data
-    function mergeData(telemetry, positions) {
-      if (!positions?.positions) return null;
-      
-      const telemetryMap = {};
-      if (telemetry?.ships) {
-        telemetry.ships.forEach(ship => {
-          telemetryMap[ship.ticker] = ship;
-        });
-      }
-
-      // Enrich positions with telemetry
-      const enrichedPositions = positions.positions.map(pos => {
-        const telem = telemetryMap[pos.ticker] || {};
-        return {
-          ...pos,
-          // Use telemetry price if available, else position price
-          stock_price: telem.price || pos.stock_price,
-          chgPct: telem.chgPct || 0,
-          // Telemetry-derived visuals
-          trend: telem.trend ?? 0,
-          momentum: telem.momentum ?? 0,
-          volatility: telem.volatility ?? 0.5,
-          activity: telem.activity ?? 0.5,
-          signalState: telem.signalState || 'neutral',
-          visual: telem.visual || {
-            glow: 0.5,
-            jitter: 0.1,
-            thrust: 0.3,
-            damage: 0
-          }
-        };
-      });
-
-      return {
-        positions: enrichedPositions,
-        catalysts: positions.catalysts || FALLBACK_DATA.catalysts,
-        asOf: telemetry?.asOf || positions?.asOf || new Date().toISOString()
-      };
-    }
-
-    // Main data loader
+    // Main data loader - fleet.json is primary, positions optional
     async function loadData() {
-      // Try loading real data files
-      const [telemetry, positions] = await Promise.all([
+      const [fleet, positions] = await Promise.all([
         loadFleetTelemetry(),
         loadPositions()
       ]);
 
-      // Merge if we have position data
-      if (positions) {
-        const merged = mergeData(telemetry, positions);
-        if (merged) return merged;
+      // If we have fleet telemetry, use it as the base
+      if (fleet?.ships) {
+        const positionMap = {};
+        if (positions?.positions) {
+          positions.positions.forEach(p => { positionMap[p.ticker] = p; });
+        }
+
+        // Merge fleet telemetry with any position data
+        const enrichedShips = fleet.ships.map(ship => {
+          const pos = positionMap[ship.ticker] || {};
+          return {
+            ticker: ship.ticker,
+            // Telemetry data
+            stock_price: ship.price,
+            chgPct: ship.chgPct,
+            trend: ship.trend,
+            momentum: ship.momentum,
+            volatility: ship.volatility,
+            activity: ship.activity,
+            signalState: ship.signalState,
+            visual: ship.visual,
+            // Position data (if available)
+            structure: pos.structure || 'Equity',
+            long_strike: pos.long_strike || null,
+            short_strike: pos.short_strike || null,
+            expiry: pos.expiry || null,
+            entry_cost: pos.entry_cost || 0,
+            current_price: pos.current_price || ship.price,
+            delta: pos.delta || ship.trend,
+            contracts: pos.contracts || 0
+          };
+        });
+
+        return {
+          positions: enrichedShips,
+          catalysts: positions?.catalysts || FALLBACK_DATA.catalysts,
+          asOf: fleet.asOf
+        };
       }
 
       // Fallback to embedded data
