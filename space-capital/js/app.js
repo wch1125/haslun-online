@@ -3623,7 +3623,6 @@
     function getPrimaryGroup(tab) {
       if (tab === 'hangar') return 'hangar';
       if (tab === 'chart') return 'data';
-      if (tab === 'arcade') return 'arcade';
       if (tab === 'garage' || tab === 'upgrades') return 'garage';
       if (tab === 'positions' || tab === 'options' || tab === 'catalysts') return 'command';
       return 'hangar'; // Default to hangar
@@ -3705,11 +3704,6 @@
         SpaceScene.setMode(group);
       }
       
-      // Refresh arcade previews when switching to arcade tab
-      if (tabName === 'arcade' && window.SpriteCache && SpriteCache.loaded) {
-        setTimeout(() => SpriteCache.renderGamePreviews(), 100);
-      }
-      
       // Re-initialize trajectory canvas when switching to holdings/options tab
       if (tabName === 'options' && window.initTrajectoryCanvas) {
         setTimeout(() => window.initTrajectoryCanvas(), 100);
@@ -3725,7 +3719,7 @@
     function handleHashNavigation() {
       const hash = window.location.hash.slice(1); // Remove #
       if (hash) {
-        const validTabs = ['hangar', 'positions', 'arcade', 'garage', 'upgrades', 'chart', 'catalysts', 'options'];
+        const validTabs = ['hangar', 'positions', 'garage', 'upgrades', 'chart', 'catalysts', 'options'];
         if (validTabs.includes(hash)) {
           switchTab(hash);
         }
@@ -3741,13 +3735,11 @@
     });
     
     // Step 5.1: Fleet background controller
-    let arcadeFlightController = null;
     let hangarFlightController = null; // Step 5: Fleet Hangar
     
     async function handleFleetBackground(tabName) {
       if (!window.FlightScene) return;
       
-      const arcadeCanvas = document.getElementById('arcade-bg-canvas');
       const hangarCanvas = document.getElementById('fleet-hangar-canvas');
       
       // Step 5: Fleet Hangar background for positions panel
@@ -3771,29 +3763,6 @@
           hangarFlightController.stop();
           hangarFlightController = null;
           FlightScene.clearFocus();
-        }
-      }
-      
-      if (tabName === 'arcade' && arcadeCanvas) {
-        // Start fleet background for arcade
-        if (!arcadeFlightController) {
-          try {
-            const ships = await FlightScene.buildShipRoster();
-            arcadeFlightController = FlightScene.create({
-              canvas: arcadeCanvas,
-              ships: ships,
-              mode: 'fleet', // Reduced intensity
-              intensity: 0.6
-            });
-          } catch (e) {
-            console.warn('[FleetBg] Failed to start arcade background:', e);
-          }
-        }
-      } else {
-        // Stop fleet background when leaving arcade
-        if (arcadeFlightController) {
-          arcadeFlightController.stop();
-          arcadeFlightController = null;
         }
       }
     }
@@ -5032,9 +5001,8 @@
         { id:'tabs',      text:'Explore 3 panels', done:false },
         { id:'analysis',  text:'Run analysis once', done:false },
         { id:'simulation', text:'Run P&L simulation', done:false },
-        { id:'find_invader', text:'Find the hidden invader', done:false },
-        { id:'arcade_score', text:'Score 500+ in Signal Invaders', done:false },
-        { id:'space_run', text:'Complete a Space Run of 5000+ km', done:false },
+        { id:'fleet_status', text:'Check Fleet Status panel', done:false },
+        { id:'ship_inspect', text:'Inspect 3 different ships', done:false },
         { id:'snoop_master', text:'Trigger 5 access denials', done:false }
       ];
       

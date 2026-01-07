@@ -40,10 +40,9 @@ window.ParallaxA11y = (function() {
       { key: '←/→', desc: 'Change time range' },
       { key: 'R', desc: 'Refresh chart' },
     ],
-    arcade: [
-      { key: 'Space', desc: 'Start / Action' },
-      { key: '←/→', desc: 'Move left/right' },
-      { key: '↑/↓', desc: 'Move up/down' },
+    fleetStatus: [
+      { key: '2', desc: 'Open Fleet Status panel' },
+      { key: 'Esc', desc: 'Return to Hangar' },
     ]
   };
   
@@ -245,7 +244,7 @@ window.ParallaxA11y = (function() {
           ${renderShortcutSection('GLOBAL', SHORTCUTS.global)}
           ${renderShortcutSection('HANGAR', SHORTCUTS.hangar)}
           ${renderShortcutSection('DATA VIEW', SHORTCUTS.data)}
-          ${renderShortcutSection('ARCADE', SHORTCUTS.arcade)}
+          ${renderShortcutSection('FLEET STATUS', SHORTCUTS.fleetStatus)}
         </div>
         <div class="shortcuts-footer">
           <span class="shortcuts-hint">Press <kbd>?</kbd> or <kbd>Esc</kbd> to close</span>
@@ -366,7 +365,7 @@ window.ParallaxA11y = (function() {
           if (typeof switchTab === 'function') switchTab('positions');
           break;
         case '3':
-          if (typeof switchTab === 'function') switchTab('arcade');
+          if (typeof switchTab === 'function') switchTab('garage');
           break;
         case '4':
           if (typeof switchTab === 'function') switchTab('chart');

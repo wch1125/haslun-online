@@ -23,15 +23,14 @@
   <link rel="stylesheet" href="css/paint-bay.css">
   <!-- Ship Behavior States (reactive animations) -->
   <link rel="stylesheet" href="css/ship-states.css">
-  <!-- Bey Arena (Beyblade-style ship battles) -->
-  <link rel="stylesheet" href="css/bey-arena.css">
+
   <!-- Cockpit HUD (New 3-panel navigation) -->
   <link rel="stylesheet" href="css/cockpit-hud.css">
   <link rel="stylesheet" href="css/hotline-hud.css">
   <link rel="stylesheet" href="css/hotline-atmosphere.css">
   <link rel="stylesheet" href="css/hotline-hud-clean.css">
   <link rel="stylesheet" href="css/hud-glitch-fix.css">
-  <link rel="stylesheet" href="css/bey-arena-mobile-fix.css">
+
   <link rel="stylesheet" href="css/mobile-cleanup.css">
 <script src="js/space-scene.js"></script>
 </head>
@@ -487,7 +486,6 @@
           <button class="nav-tab active" data-group="hangar" data-tab="hangar" onclick="switchTab('hangar')" role="tab" aria-selected="true" aria-controls="hangar-panel">▣ HANGAR</button>
           <button class="nav-tab" data-group="command" data-tab="positions" onclick="switchTab('positions')" role="tab" aria-selected="false" aria-controls="positions-panel">COMMAND</button>
           <button class="nav-tab" data-group="garage" data-tab="garage" onclick="switchTab('garage')" role="tab" aria-selected="false" aria-controls="garage-panel">GARAGE</button>
-          <button class="nav-tab" data-group="arcade" data-tab="arcade" onclick="switchTab('arcade')" role="tab" aria-selected="false" aria-controls="arcade-panel">ARCADE</button>
           <button class="nav-tab" data-group="data" data-tab="chart" onclick="switchTab('chart')" role="tab" aria-selected="false" aria-controls="chart-panel">DATA</button>
         </nav>
       </div>
@@ -543,12 +541,6 @@
           <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('positions');">› Holdings</button>
           <button class="push-btn primary" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); launchMissionCommand();">› Missions</button>
           <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('catalysts');">› Events</button>
-        </div>
-        <div class="sidebar-section" style="padding-bottom: 0.5rem;">
-          <div class="sidebar-title">◇ Training</div>
-        </div>
-        <div style="padding: 0 0.5rem 0.5rem;">
-          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('arcade');">› Arcade</button>
         </div>
         <div class="sidebar-section" style="padding-bottom: 0.5rem;">
           <div class="sidebar-title">⚙ Garage</div>
@@ -1399,110 +1391,6 @@
           </div>
         </div>
         
-        <!-- ARCADE PANEL -->
-        <div class="tab-panel fleet-scene-container" id="arcade-panel">
-          <!-- Step 5.1: Fleet background canvas -->
-          <canvas class="fleet-bg-canvas" id="arcade-bg-canvas"></canvas>
-          
-          <div class="arcade-lobby fleet-ui-layer">
-            <div class="arcade-lobby-header">
-              <div class="arcade-lobby-title">
-                <span class="arcade-icon">◈</span>
-                <div>
-                  <h2>SPACE CAPITAL ARCADE</h2>
-                  <span class="arcade-subtitle">VECTOR RACING SIMULATION</span>
-                </div>
-              </div>
-              <div class="arcade-stats-bar">
-                <div class="arcade-stat"><span class="label">BEST DISTANCE</span><span class="value" id="arcade-high-score">0 km</span></div>
-                <div class="arcade-stat"><span class="label">RUNS</span><span class="value" id="arcade-games-played">0</span></div>
-              </div>
-            </div>
-            
-            <!-- SPACE RUN - Unified Arcade Experience -->
-            <div class="space-run-launcher">
-              <div class="run-hero-card" onclick="window.SpaceRun && SpaceRun.start()">
-                <div class="run-hero-preview">
-                  <canvas id="run-preview-canvas" width="400" height="200"></canvas>
-                  <div class="run-hero-overlay">
-                    <span class="run-play-icon">▶</span>
-                    <span class="run-play-text">INITIATE RUN</span>
-                  </div>
-                </div>
-                <div class="run-hero-info">
-                  <div class="run-hero-title">SPACE RUN</div>
-                  <div class="run-hero-subtitle">High-Speed Market Corridor</div>
-                  <div class="run-hero-desc">
-                    Thread through the volatility field. Dodge debris, ride momentum streams, 
-                    and push your ship to the limit. The market is the track — speed is survival.
-                  </div>
-                  <div class="run-hero-controls">
-                    <span class="control-hint"><kbd>←</kbd> <kbd>→</kbd> DODGE</span>
-                    <span class="control-hint"><kbd>SPACE</kbd> BOOST</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="run-stats-panel">
-                <div class="run-stat-block">
-                  <span class="run-stat-label">LAST RUN</span>
-                  <span class="run-stat-value" id="run-last-distance">— km</span>
-                </div>
-                <div class="run-stat-block highlight">
-                  <span class="run-stat-label">BEST RUN</span>
-                  <span class="run-stat-value" id="run-best-distance">0 km</span>
-                </div>
-                <div class="run-stat-block">
-                  <span class="run-stat-label">ACTIVE SHIP</span>
-                  <span class="run-stat-value" id="run-active-ship">RKLB</span>
-                </div>
-                <div class="run-stat-block">
-                  <span class="run-stat-label">SQUADRON</span>
-                  <div class="run-squadron-bar" id="run-squadron-strength">
-                    <span class="squadron-fill"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- BEY ARENA - Telemetry Spin Battle -->
-            <div class="bey-arena-launcher" style="margin-top: 24px;">
-              <div class="run-hero-card" id="bey-arena-launch" style="cursor: pointer;">
-                <div class="run-hero-preview" style="background: radial-gradient(circle at 50% 40%, rgba(28,32,44,0.95), rgba(8,10,14,0.98)); display: flex; align-items: center; justify-content: center;">
-                  <div class="run-hero-overlay">
-                    <span class="run-play-icon" style="font-size: 2.2rem;">⟳</span>
-                    <span class="run-play-text">LAUNCH ARENA</span>
-                  </div>
-                </div>
-                <div class="run-hero-info">
-                  <div class="run-hero-title">BEY ARENA</div>
-                  <div class="run-hero-subtitle">Telemetry Spin Battle</div>
-                  <div class="run-hero-desc">
-                    Ships become spinners. Market behavior becomes physics. Watch your fleet collide 
-                    in an anime-style arena where telemetry drives the action. Ring-outs, burst finishes, 
-                    and momentum clashes — all derived from real trading data.
-                  </div>
-                  <div class="run-hero-controls">
-                    <span class="control-hint">TELEMETRY → PHYSICS</span>
-                    <span class="control-hint">CHAOS GUARANTEED</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Ship Selection for Games -->
-            <div class="arcade-ship-select">
-              <div class="ship-select-header">
-                <span class="ship-select-title">▲ SELECT YOUR SHIP</span>
-                <span class="ship-select-hint">Your vessel determines your handling characteristics</span>
-              </div>
-              <div class="ship-select-grid" id="arcade-ship-grid">
-                <!-- Ships will be populated dynamically -->
-              </div>
-            </div>
-          </div>
-        </div>
-        
         <!-- GARAGE PANEL - Refit Bay (Ship Livery Customization) -->
         <div class="tab-panel" id="garage-panel">
           <div id="paint-bay-container"></div>
@@ -1753,10 +1641,6 @@
           <span class="nav-icon">▲</span>
           <span>Command</span>
         </button>
-        <button class="mobile-nav-item" data-tab="arcade" data-group="arcade" onclick="switchTabMobile('arcade')">
-          <span class="nav-icon">◇</span>
-          <span>Arcade</span>
-        </button>
         <button class="mobile-nav-item" data-tab="chart" data-group="data" onclick="switchTabMobile('chart')">
           <span class="nav-icon">◈</span>
           <span>Data</span>
@@ -1821,26 +1705,6 @@
       </div>
     </div>
     
-    <!-- ARCADE HUD – mini mission list -->
-    <div id="arcade-hud" class="arcade-hud hidden">
-      <div class="hud-title">[ARCADE MODE]</div>
-      <ul id="mission-list"></ul>
-      <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem;">
-        <button class="arcade-launch-btn" onclick="window.BeyArena && BeyArena.open('RKLB', 'ACHR')" style="border-color: #ff6b35; color: #ff6b35;">
-          › BEY ARENA
-        </button>
-        <button class="arcade-launch-btn" onclick="window.SignalInvaders && SignalInvaders.start()">
-          › SIGNAL INVADERS
-        </button>
-        <button class="arcade-launch-btn" onclick="window.LandingGame && LandingGame.start()">
-          › TERRAIN LANDER
-        </button>
-        <button class="arcade-launch-btn" onclick="window.AdminConsole && AdminConsole.open()" style="border-color: var(--amber); color: var(--amber);">
-          › ADMIN CONSOLE
-        </button>
-      </div>
-    </div>
-    
     <!-- Tiny uplink terminal -->
     <div id="terminal-log" class="terminal-log"></div>
     
@@ -1885,102 +1749,6 @@
       </div>
     </div>
     
-    <!-- CHART LANDING GAME -->
-    <!-- SPACE RUN GAME OVERLAY -->
-    <div id="space-run-overlay" class="space-run-overlay hidden">
-      <div class="run-game-backdrop"></div>
-      <div class="run-game-container">
-        <button class="run-close-btn" id="space-run-close-btn">✕ ESC</button>
-        
-        <div class="run-game-header">
-          <div class="run-game-title">[SPACE RUN]</div>
-          <div class="run-game-stats">
-            <div class="run-stat">
-              <span class="stat-label">DISTANCE</span>
-              <span class="stat-value" id="run-distance">0</span>
-              <span class="stat-unit">km</span>
-            </div>
-            <div class="run-stat">
-              <span class="stat-label">SPEED</span>
-              <span class="stat-value" id="run-speed">0</span>
-            </div>
-            <div class="run-stat multiplier">
-              <span class="stat-label">MULT</span>
-              <span class="stat-value" id="run-multiplier">×1.0</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="run-hud-bars">
-          <div class="run-bar-container hull-bar">
-            <span class="bar-label">HULL</span>
-            <div class="bar-track">
-              <div class="bar-fill" id="run-hull-bar" style="width: 100%"></div>
-            </div>
-            <span class="bar-value" id="run-hull">100</span>
-          </div>
-          <div class="run-bar-container boost-bar">
-            <span class="bar-label">BOOST</span>
-            <div class="bar-track">
-              <div class="bar-fill" id="run-boost-bar" style="width: 100%"></div>
-            </div>
-            <span class="bar-value" id="run-boost">100</span>
-          </div>
-        </div>
-        
-        <canvas id="space-run-canvas" width="700" height="450"></canvas>
-        
-        <div class="run-controls-hint">
-          <span>← → DODGE</span>
-          <span>SPACE / ↑ BOOST</span>
-          <span>ESC EXIT</span>
-        </div>
-        
-        <div class="run-touch-controls">
-          <button class="run-touch-btn" id="run-touch-left">◀</button>
-          <button class="run-touch-btn boost" id="run-touch-boost">▲ BOOST</button>
-          <button class="run-touch-btn" id="run-touch-right">▶</button>
-        </div>
-        
-        <div class="run-message" id="run-message" style="display: none;"></div>
-      </div>
-    </div>
-    
-    <!-- BEY ARENA OVERLAY -->
-    <div id="bey-arena-overlay" class="bey-arena-overlay">
-      <div class="bey-arena-shell">
-        <div class="bey-arena-topbar">
-          <div>
-            <div class="bey-arena-title">BEY ARENA</div>
-            <div class="bey-arena-sub">TELEMETRY SPIN BATTLE</div>
-          </div>
-          <button class="bey-arena-close" id="bey-arena-close">✕ ESC</button>
-        </div>
-        
-        <div class="bey-arena-stage">
-          <div class="bey-panel left">
-            <h3>PILOT 1</h3>
-            <pre class="bey-readout" id="bey-left-readout">—</pre>
-          </div>
-          
-          <div class="bey-canvas-wrap">
-            <canvas id="bey-arena-canvas" width="520" height="520"></canvas>
-            <div class="bey-banner" id="bey-arena-banner">AWAITING LAUNCH</div>
-            <div class="bey-controls">
-              <button class="bey-btn primary" id="bey-arena-rematch">⟳ REMATCH</button>
-              <button class="bey-btn" id="bey-arena-swap">⇄ SWAP</button>
-            </div>
-            <div class="bey-scanlines"></div>
-          </div>
-          
-          <div class="bey-panel right">
-            <h3>PILOT 2</h3>
-            <pre class="bey-readout" id="bey-right-readout">—</pre>
-          </div>
-        </div>
-      </div>
-    </div>
-    
     <!-- ABOUT / STORY OVERLAY -->
     <div id="about-overlay" class="about-overlay hidden">
       <div class="about-backdrop"></div>
@@ -1995,7 +1763,7 @@
         <div class="about-body">
           <p>
             PARALLAX is a <strong>command and telemetry interface</strong> for a fictional research fund.
-            It's part data room, part arcade cabinet, and part mood board for how we think about risk,
+            It's part data room, part observatory, and part mood board for how we think about risk,
             storytelling, and markets.
           </p>
           <p>
@@ -2283,7 +2051,7 @@
 
   <!-- ═══════════════════════════════════════════════════════════════════════════
        COCKPIT HUD - Persistent Navigation
-       Three pillars: HANGAR | BATTLE ARENA | NEWS
+       Three pillars: HANGAR | FLEET STATUS | NEWS
        ═══════════════════════════════════════════════════════════════════════════ -->
   
   <div class="cockpit-hud">
@@ -2291,9 +2059,9 @@
       <span class="hud-btn-icon">▣</span>
       <span class="hud-btn-label">HANGAR</span>
     </button>
-    <button class="hud-btn battle-btn" data-panel="battle">
-      <span class="hud-btn-icon">✕</span>
-      <span class="hud-btn-label">BATTLE ARENA</span>
+    <button class="hud-btn" data-panel="fleet-status">
+      <span class="hud-btn-icon">◈</span>
+      <span class="hud-btn-label">FLEET STATUS</span>
     </button>
     <button class="hud-btn" data-panel="news">
       <span class="hud-btn-icon">◎</span>
@@ -2480,9 +2248,9 @@
             <span class="stat-block-title">QUICK ACTIONS</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button onclick="CockpitNav.switchPanel('battle')" style="
+            <button onclick="CockpitNav.switchPanel('fleet-status')" style="
               padding: 12px;
-              background: linear-gradient(180deg, #ff6b35 0%, #e55a2b 100%);
+              background: linear-gradient(180deg, #00c8ff 0%, #0099cc 100%);
               border: none;
               border-radius: 8px;
               font-family: 'Orbitron', system-ui;
@@ -2490,7 +2258,7 @@
               letter-spacing: 0.1em;
               color: white;
               cursor: pointer;
-            ">✕ ENTER ARENA</button>
+            ">◈ FLEET STATUS</button>
             <button onclick="switchTab('garage')" style="
               padding: 12px;
               background: rgba(51, 255, 153, 0.15);
@@ -2509,50 +2277,68 @@
     </div>
   </div>
   
-  <!-- BATTLE ARENA PANEL -->
-  <div class="cockpit-panel" id="battle-panel">
-    <div class="battle-arena-panel">
-      <div class="battle-ready-screen">
-        <h1 class="battle-title">BATTLE ARENA</h1>
-        <p class="battle-subtitle">TELEMETRY-DRIVEN SPIN COMBAT</p>
-        
-        <div class="battle-matchup">
-          <div class="battle-ship-card">
-            <img src="assets/ships/static/RKLB-flagship-ship.png" alt="Player Ship" id="battle-player-sprite">
-            <span class="ticker" id="battle-player-ticker">RKLB</span>
-            <span style="font-size: 10px; color: rgba(255,255,255,0.5);">YOUR SHIP</span>
-          </div>
-          
-          <span class="battle-vs">VS</span>
-          
-          <div class="battle-ship-card">
-            <img src="assets/ships/static/ACHR-eVTOL-ship.png" alt="Opponent Ship" id="battle-opponent-sprite">
-            <span class="ticker" id="battle-opponent-ticker">ACHR</span>
-            <span style="font-size: 10px; color: rgba(255,255,255,0.5);">OPPONENT</span>
-          </div>
-        </div>
-        
-        <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 20px;">
-          <button id="battle-random-btn" style="
-            padding: 12px 24px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
-            cursor: pointer;
-          ">◈ RANDOMIZE</button>
-        </div>
-        
-        <button id="battle-start-btn" class="battle-start-btn">
-          ▶ START BATTLE
-        </button>
-        
-        <p style="margin-top: 24px; font-size: 11px; color: rgba(255,255,255,0.4);">
-          Press <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">B</kbd> to quick-launch
-        </p>
+  <!-- FLEET STATUS PANEL - Observatory View -->
+  <div class="cockpit-panel" id="fleet-status-panel">
+    <div class="fleet-status-panel">
+      <div class="fleet-status-header">
+        <h1 class="fleet-status-title">FLEET STATUS</h1>
+        <p class="fleet-status-subtitle">REAL-TIME TELEMETRY OVERVIEW</p>
       </div>
+      
+      <div class="fleet-status-grid">
+        <!-- Fleet Health Summary -->
+        <div class="status-card">
+          <div class="status-card-header">
+            <span class="status-icon">◈</span>
+            <span class="status-card-title">FLEET HEALTH</span>
+          </div>
+          <div class="status-metric-large">
+            <span id="fleet-health-pct">87%</span>
+            <span class="metric-label">OVERALL STABILITY</span>
+          </div>
+          <div class="status-bar-wrap">
+            <div class="status-bar positive" id="fleet-health-bar" style="width: 87%"></div>
+          </div>
+        </div>
+        
+        <!-- Momentum Aggregate -->
+        <div class="status-card">
+          <div class="status-card-header">
+            <span class="status-icon">▲</span>
+            <span class="status-card-title">FLEET MOMENTUM</span>
+          </div>
+          <div class="status-metric-large positive">
+            <span id="fleet-momentum">+2.4%</span>
+            <span class="metric-label">AVG VELOCITY</span>
+          </div>
+        </div>
+        
+        <!-- Risk Exposure -->
+        <div class="status-card">
+          <div class="status-card-header">
+            <span class="status-icon">⚠</span>
+            <span class="status-card-title">RISK EXPOSURE</span>
+          </div>
+          <div class="status-metric-large warning">
+            <span id="fleet-risk">MODERATE</span>
+            <span class="metric-label">VOLATILITY INDEX</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="fleet-positions-summary">
+        <div class="positions-header">
+          <span>ACTIVE POSITIONS</span>
+          <span class="positions-count" id="fleet-position-count">6 ships</span>
+        </div>
+        <div class="positions-list" id="fleet-positions-list">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+      
+      <p style="margin-top: 24px; font-size: 11px; color: rgba(255,255,255,0.4); text-align: center;">
+        Telemetry refreshes every market tick
+      </p>
     </div>
   </div>
   
@@ -2601,9 +2387,6 @@
   <!-- Audio system -->
   <script src="js/audio/audio-system.js"></script>
   
-  <!-- Mini-games -->
-  <script src="js/games/mini-games.js"></script>
-  
   <!-- Step 4: Mission Bridge (read-only adapter for dashboard) -->
   <script src="js/mission-bridge.js"></script>
   
@@ -2633,12 +2416,6 @@
   
   <!-- Hangar Atmosphere (animated background, ring effects) -->
   <script src="js/ui/hangar-atmosphere.js"></script>
-  
-  <!-- SPACE RUN Racing Game -->
-  <script src="js/games/space-run.js"></script>
-  
-  <!-- BEY ARENA Spin Battle Game -->
-  <script src="js/games/bey-arena.js"></script>
   
   <!-- Cockpit Navigation Controller -->
   <script src="js/cockpit-nav.js"></script>

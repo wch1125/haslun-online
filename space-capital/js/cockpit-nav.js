@@ -1,6 +1,6 @@
 // =========================================================================
 // COCKPIT NAVIGATION CONTROLLER
-// Three pillars: HANGAR | BATTLE ARENA | NEWS
+// Three pillars: HANGAR | FLEET STATUS | NEWS
 // =========================================================================
 
 (function() {
@@ -17,7 +17,7 @@
       
       this.bindNavigation();
       this.initHangar();
-      this.initBattleArena();
+      this.initFleetStatus();
       this.initNews();
       this.initHullColorPickers(); // Wire up hull color buttons
       
@@ -29,9 +29,8 @@
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         
         if (e.key === '1') this.switchPanel('hangar');
-        if (e.key === '2') this.switchPanel('battle');
+        if (e.key === '2') this.switchPanel('fleet-status');
         if (e.key === '3') this.switchPanel('news');
-        if (e.key === 'b' || e.key === 'B') this.launchBattle();
       });
       
       console.log('[CockpitNav] Initialized - 3 Panel Architecture Active');
@@ -81,13 +80,13 @@
         if (hangarOld) {
           hangarOld.style.display = 'none'; // Keep old one hidden, we use new layout
         }
-      } else if (panel === 'battle') {
-        const battlePanel = document.getElementById('battle-panel');
-        if (battlePanel) {
-          battlePanel.classList.add('active');
-          battlePanel.style.display = 'block';
+      } else if (panel === 'fleet-status') {
+        const fleetStatusPanel = document.getElementById('fleet-status-panel');
+        if (fleetStatusPanel) {
+          fleetStatusPanel.classList.add('active');
+          fleetStatusPanel.style.display = 'block';
         }
-        this.showBattleReady();
+        this.updateFleetStatus();
       } else if (panel === 'news') {
         const newsPanel = document.getElementById('news-panel');
         if (newsPanel) {
@@ -177,9 +176,6 @@
       
       // Update stats
       this.updateStatBars(tele);
-      
-      // Update battle preview
-      this.updateBattlePreview();
       
       // Start idle animation on the ship showcase
       this.startShipIdleAnimation(ticker, shipClass);
@@ -398,65 +394,63 @@
     },
     
     // -------------------------------------------------------------------------
-    // BATTLE ARENA
+    // FLEET STATUS - Observatory View
     // -------------------------------------------------------------------------
-    initBattleArena() {
-      const startBtn = document.getElementById('battle-start-btn');
-      if (startBtn) {
-        startBtn.addEventListener('click', () => this.launchBattle());
+    initFleetStatus() {
+      // Fleet status will be populated when panel is opened
+      console.log('[CockpitNav] Fleet Status panel initialized');
+    },
+    
+    updateFleetStatus() {
+      // Calculate fleet-wide telemetry metrics
+      const ships = this.ships;
+      let totalHealth = 0;
+      let totalMomentum = 0;
+      let positionsHtml = '';
+      
+      ships.forEach(ticker => {
+        const telem = window.Telemetry?.get(ticker) || {};
+        const rsi = telem.rsi || 50;
+        const momentum = telem.momentum || 0;
+        
+        // Health based on RSI normalization
+        const health = 100 - Math.abs(rsi - 50) * 2;
+        totalHealth += health;
+        totalMomentum += momentum;
+        
+        // Position status
+        const status = momentum > 0 ? 'positive' : momentum < 0 ? 'negative' : 'neutral';
+        positionsHtml += `
+          <div class="position-row ${status}">
+            <span class="position-ticker">${ticker}</span>
+            <span class="position-momentum">${momentum >= 0 ? '+' : ''}${(momentum * 100).toFixed(1)}%</span>
+          </div>
+        `;
+      });
+      
+      const avgHealth = totalHealth / ships.length;
+      const avgMomentum = (totalMomentum / ships.length) * 100;
+      
+      // Update UI
+      const healthEl = document.getElementById('fleet-health-pct');
+      const healthBar = document.getElementById('fleet-health-bar');
+      const momentumEl = document.getElementById('fleet-momentum');
+      const riskEl = document.getElementById('fleet-risk');
+      const positionsEl = document.getElementById('fleet-positions-list');
+      const countEl = document.getElementById('fleet-position-count');
+      
+      if (healthEl) healthEl.textContent = `${avgHealth.toFixed(0)}%`;
+      if (healthBar) healthBar.style.width = `${avgHealth}%`;
+      if (momentumEl) {
+        momentumEl.textContent = `${avgMomentum >= 0 ? '+' : ''}${avgMomentum.toFixed(1)}%`;
+        momentumEl.className = `status-metric-large ${avgMomentum >= 0 ? 'positive' : 'negative'}`;
       }
-      
-      const randomBtn = document.getElementById('battle-random-btn');
-      if (randomBtn) {
-        randomBtn.addEventListener('click', () => this.randomizeOpponent());
+      if (riskEl) {
+        const riskLevel = avgHealth > 70 ? 'LOW' : avgHealth > 40 ? 'MODERATE' : 'HIGH';
+        riskEl.textContent = riskLevel;
       }
-    },
-    
-    showBattleReady() {
-      this.updateBattlePreview();
-    },
-    
-    updateBattlePreview() {
-      const playerSprite = document.getElementById('battle-player-sprite');
-      const playerTicker = document.getElementById('battle-player-ticker');
-      const opponentSprite = document.getElementById('battle-opponent-sprite');
-      const opponentTicker = document.getElementById('battle-opponent-ticker');
-      
-      const playerShip = this.selectedShip;
-      const opponentShip = this.getRandomOpponent(playerShip);
-      
-      if (playerSprite) playerSprite.src = window.SHIP_SPRITES?.[playerShip] || window.DEFAULT_SHIP_SPRITE;
-      if (playerTicker) playerTicker.textContent = playerShip;
-      if (opponentSprite) opponentSprite.src = window.SHIP_SPRITES?.[opponentShip] || window.DEFAULT_SHIP_SPRITE;
-      if (opponentTicker) opponentTicker.textContent = opponentShip;
-      
-      this._currentOpponent = opponentShip;
-    },
-    
-    getRandomOpponent(exclude) {
-      const pool = this.ships.filter(s => s !== exclude);
-      return pool[Math.floor(Math.random() * pool.length)] || 'ACHR';
-    },
-    
-    randomizeOpponent() {
-      this._currentOpponent = this.getRandomOpponent(this.selectedShip);
-      
-      const opponentSprite = document.getElementById('battle-opponent-sprite');
-      const opponentTicker = document.getElementById('battle-opponent-ticker');
-      
-      if (opponentSprite) opponentSprite.src = window.SHIP_SPRITES?.[this._currentOpponent] || window.DEFAULT_SHIP_SPRITE;
-      if (opponentTicker) opponentTicker.textContent = this._currentOpponent;
-    },
-    
-    launchBattle() {
-      const player = this.selectedShip;
-      const opponent = this._currentOpponent || this.getRandomOpponent(player);
-      
-      if (window.BeyArena) {
-        window.BeyArena.open(player, opponent);
-      } else {
-        console.warn('[CockpitNav] BeyArena not loaded');
-      }
+      if (positionsEl) positionsEl.innerHTML = positionsHtml;
+      if (countEl) countEl.textContent = `${ships.length} ships`;
     },
     
     // -------------------------------------------------------------------------
@@ -517,7 +511,7 @@
             typeLabel: 'STABILITY REPORT',
             icon: '⚖️',
             title: `${stableSorted[0][0]} Maintains Steadiest Course`,
-            body: `Maneuver stability at ${Math.round((stableSorted[0][1].maneuverStability || 0) * 100)}%. Recommended for defensive arena strategies.`,
+            body: `Maneuver stability at ${Math.round((stableSorted[0][1].maneuverStability || 0) * 100)}%. Recommended for long-term positions.`,
             time: '3 minutes ago'
           });
         }
@@ -532,7 +526,7 @@
             typeLabel: 'VOLATILITY WARNING',
             icon: '⚡',
             title: `Chaotic Regime Detected: ${chaoticSorted.map(c => c[0]).join(', ')}`,
-            body: 'These vessels are experiencing turbulent market conditions. Expect erratic arena behavior and burst potential.',
+            body: 'These vessels are experiencing turbulent market conditions. Monitor closely for sudden trajectory changes.',
             time: '7 minutes ago'
           });
         }
@@ -552,8 +546,8 @@
         type: '',
         typeLabel: 'SYSTEM',
         icon: '🛠️',
-        title: 'Battle Arena Now Online',
-        body: 'The new telemetry-driven arena system is active. Ship stats directly influence battle physics. May the best telemetry win.',
+        title: 'Fleet Telemetry Online',
+        body: 'Real-time market telemetry is active. Ship stats derived from live market data. All systems nominal.',
         time: '2 hours ago'
       });
       

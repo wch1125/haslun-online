@@ -10,7 +10,7 @@
  *   - activeTicker: string   — Currently selected ticker symbol
  *   - route: string          — Current view route (e.g., '#telemetry')
  *   - opsSub: string         — Operations sub-route ('holdings', etc.)
- *   - trainingSub: string    — Training sub-route ('arcade', etc.)
+ *   - trainingSub: string    — Training sub-route (reserved)
  *   - activeMissionId: string|null — Currently active mission
  * 
  * Usage:
@@ -47,7 +47,7 @@
     activeTicker: 'RKLB',
     route: '#telemetry',
     opsSub: 'holdings',
-    trainingSub: 'arcade',
+    trainingSub: 'fleet-status',
     activeMissionId: null
   };
 

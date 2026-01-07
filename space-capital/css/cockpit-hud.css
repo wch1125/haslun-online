@@ -1,6 +1,6 @@
 /* =========================================================================
    COCKPIT HUD - Persistent Navigation
-   Three pillars: HANGAR | BATTLE ARENA | NEWS
+   Three pillars: HANGAR | FLEET STATUS | NEWS
    ========================================================================= */
 
 /* =========================================================================
@@ -867,16 +867,177 @@ body.cockpit-active .mobile-quick-stats {
     font-size: 9px;
   }
   
-  .battle-title {
-    font-size: 32px;
+  .fleet-status-panel {
+    padding: 40px;
   }
   
-  .battle-matchup {
+  .fleet-status-grid {
     flex-direction: column;
-    gap: 20px;
-  }
-  
-  .battle-vs {
-    transform: rotate(90deg);
+    gap: 16px;
   }
 }
+
+/* =========================================================================
+   FLEET STATUS PANEL - Observatory View
+   ========================================================================= */
+
+.fleet-status-panel {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 40px;
+}
+
+.fleet-status-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.fleet-status-title {
+  font-family: 'VT323', monospace;
+  font-size: 48px;
+  color: var(--hotline-cyan, #00ffff);
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  margin: 0 0 8px 0;
+  letter-spacing: 4px;
+}
+
+.fleet-status-subtitle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 2px;
+}
+
+.fleet-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.status-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  position: relative;
+}
+
+.status-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--hotline-cyan, #00ffff), transparent);
+  opacity: 0.5;
+}
+
+.status-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.status-icon {
+  font-size: 16px;
+  color: var(--hotline-cyan, #00ffff);
+}
+
+.status-card-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.status-metric-large {
+  font-family: 'VT323', monospace;
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.status-metric-large.positive {
+  color: var(--hotline-green, #33ff99);
+}
+
+.status-metric-large.negative {
+  color: var(--hotline-magenta, #ff3366);
+}
+
+.status-metric-large.warning {
+  color: var(--amber, #ffb347);
+}
+
+.status-metric-large .metric-label {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 4px;
+}
+
+.status-bar-wrap {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.status-bar {
+  height: 100%;
+  background: var(--hotline-cyan, #00ffff);
+  transition: width 0.5s ease;
+}
+
+.status-bar.positive {
+  background: var(--hotline-green, #33ff99);
+}
+
+.fleet-positions-summary {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px;
+}
+
+.positions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.positions-count {
+  color: var(--hotline-cyan, #00ffff);
+}
+
+.positions-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.position-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+}
+
+.position-row.positive .position-momentum {
+  color: var(--hotline-green, #33ff99);
+}
+
+.position-row.negative .position-momentum {
+  color: var(--hotline-magenta, #ff3366);
+}
+
+.position-ticker {
+  color: rgba(255, 255, 255, 0.8);
+}
+
