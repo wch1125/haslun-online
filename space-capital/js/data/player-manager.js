@@ -20,16 +20,16 @@ window.PlayerManager = (function() {
   const STORAGE_VERSION = 1;
   const MAX_PROFILES = 8;
 
-  // Halloween pilot avatars
+  // Halloween pilot avatars (PNG format)
   const PILOT_AVATARS = [
-    { id: 'vampire', name: 'Vampire', file: 'pilot-vampire.svg' },
-    { id: 'werewolf', name: 'Werewolf', file: 'pilot-werewolf.svg' },
-    { id: 'witch', name: 'Witch', file: 'pilot-witch.svg' },
-    { id: 'skeleton', name: 'Skeleton', file: 'pilot-skeleton.svg' },
-    { id: 'zombie', name: 'Zombie', file: 'pilot-zombie.svg' },
-    { id: 'ghost', name: 'Ghost', file: 'pilot-ghost.svg' },
-    { id: 'pumpkin', name: 'Pumpkin', file: 'pilot-pumpkin.svg' },
-    { id: 'franken', name: 'Franken', file: 'pilot-franken.svg' }
+    { id: 'vampire', name: 'Vampire', file: 'vampire-pilot.png' },
+    { id: 'werewolf', name: 'Werewolf', file: 'werewolf-pilot.png' },
+    { id: 'witch', name: 'Witch', file: 'witch-pilot.png' },
+    { id: 'skeleton', name: 'Skeleton', file: 'skeleton-pilot.png' },
+    { id: 'zombie', name: 'Zombie', file: 'zombie-pilot.png' },
+    { id: 'ghost', name: 'Ghost', file: 'ghost-pilot.png' },
+    { id: 'pumpkin', name: 'Pumpkin', file: 'pumpkin-pilot.png' },
+    { id: 'franken', name: 'Franken', file: 'frankenstein-pilot.png' }
   ];
 
   // Default demo profile
@@ -266,7 +266,7 @@ window.PlayerManager = (function() {
 
   function getAvatarPath(avatarId) {
     const avatar = PILOT_AVATARS.find(a => a.id === avatarId);
-    return avatar ? `../assets/pilots/${avatar.file}` : '../assets/pilots/pilot-ghost.png';
+    return avatar ? `../assets/pilots/${avatar.file}` : '../assets/pilots/ghost-pilot.png';
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
