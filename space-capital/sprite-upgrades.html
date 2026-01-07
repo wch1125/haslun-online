@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprite Upgrade System - PARALLAX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-void: #050608;
+      --bg-deep: #0a0c0f;
+      --bg-panel: #0d1117;
+      --phosphor: #33ff99;
+      --phosphor-dim: rgba(51, 255, 153, 0.5);
+      --text: #e0e0e0;
+      --muted: #666;
+      --line: #222;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: var(--bg-void);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--phosphor);
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    
+    .back-link {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      color: var(--phosphor-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    
+    .controls {
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1.5rem;
+    }
+    
+    .controls h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--phosphor-dim);
+      margin-bottom: 1rem;
+    }
+    
+    .slider-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .slider-group label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .slider-group label span {
+      color: var(--phosphor);
+    }
+    
+    .slider-group input[type="range"] {
+      width: 100%;
+      height: 4px;
+      -webkit-appearance: none;
+      background: var(--line);
+      border-radius: 2px;
+    }
+    
+    .slider-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--phosphor);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    
+    .ship-display {
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    
+    .ship-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .ship-panel h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--phosphor-dim);
+      margin-bottom: 1rem;
+    }
+    
+    .ship-canvas-container {
+      background: 
+        linear-gradient(45deg, #111 25%, transparent 25%),
+        linear-gradient(-45deg, #111 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #111 75%),
+        linear-gradient(-45deg, transparent 75%, #111 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+      background-color: #0a0a0a;
+      border-radius: 4px;
+      padding: 2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+    }
+    
+    .ship-canvas-container canvas,
+    .ship-canvas-container img {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      max-width: 100%;
+    }
+    
+    .power-level {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      color: var(--phosphor);
+      margin-bottom: 0.5rem;
+    }
+    
+    .power-bar {
+      height: 8px;
+      background: var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    
+    .power-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff4444, #ffaa00, #33ff99);
+      transition: width 0.3s ease;
+    }
+    
+    .upgrade-list {
+      text-align: left;
+      font-size: 0.75rem;
+    }
+    
+    .upgrade-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    
+    .upgrade-item:last-child {
+      border-bottom: none;
+    }
+    
+    .upgrade-slot {
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    
+    .upgrade-value {
+      color: var(--phosphor);
+    }
+    
+    .upgrade-value.none {
+      color: var(--muted);
+      font-style: italic;
+    }
+    
+    .ticker-select {
+      margin-bottom: 1rem;
+    }
+    
+    .ticker-select select {
+      width: 100%;
+      padding: 0.5rem;
+      background: var(--bg-deep);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: inherit;
+    }
+    
+    .info-box {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      background: rgba(51, 255, 153, 0.05);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 4px;
+    }
+    
+    .info-box h3 {
+      color: var(--phosphor);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
+    .info-box p {
+      color: #ccc;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+    }
+    
+    .info-box ul {
+      color: #aaa;
+      font-size: 0.8rem;
+      padding-left: 1.5rem;
+    }
+    
+    .info-box li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .info-box code {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      color: var(--phosphor);
+    }
+    
+    @media (max-width: 640px) {
+      .slider-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .ship-display {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Back to Dashboard</a>
+  
+  <div class="page-header">
+    <h1>▸ SPRITE UPGRADE SYSTEM</h1>
+    <p>Adjust stats to see how ships visually evolve</p>
+  </div>
+  
+  <div class="controls">
+    <h3>Adjust Stats</h3>
+    <div class="slider-grid">
+      <div class="slider-group">
+        <label>Today P&L <span id="pnl-value">0%</span></label>
+        <input type="range" id="pnl" min="-10" max="10" value="0" step="0.5">
+      </div>
+      <div class="slider-group">
+        <label>Win Rate <span id="winrate-value">50%</span></label>
+        <input type="range" id="winrate" min="20" max="90" value="50" step="1">
+      </div>
+      <div class="slider-group">
+        <label>Volatility <span id="volatility-value">3%</span></label>
+        <input type="range" id="volatility" min="0.5" max="10" value="3" step="0.5">
+      </div>
+      <div class="slider-group">
+        <label>Volume (rel) <span id="volume-value">1.0x</span></label>
+        <input type="range" id="volume" min="0.2" max="5" value="1" step="0.1">
+      </div>
+      <div class="slider-group">
+        <label>Total Gain <span id="gain-value">0%</span></label>
+        <input type="range" id="gain" min="-30" max="80" value="0" step="1">
+      </div>
+      <div class="slider-group">
+        <label>Max Drawdown <span id="drawdown-value">10%</span></label>
+        <input type="range" id="drawdown" min="0" max="30" value="10" step="1">
+      </div>
+    </div>
+  </div>
+  
+  <div class="ship-display">
+    <div class="ship-panel">
+      <div class="ticker-select">
+        <select id="ticker-select">
+          <option value="RKLB">RKLB - Flagship</option>
+          <option value="LUNR">LUNR - Lander</option>
+          <option value="JOBY">JOBY - eVTOL</option>
+          <option value="ACHR">ACHR - eVTOL</option>
+          <option value="GME">GME - Moonshot</option>
+          <option value="BKSY">BKSY - Recon</option>
+          <option value="ASTS">ASTS - Comm Relay</option>
+          <option value="GE">GE - Stealth Bomber</option>
+          <option value="RTX">RTX - Officer Class</option>
+          <option value="KTOS">KTOS - Fighter</option>
+        </select>
+      </div>
+      <h3>Composed Sprite</h3>
+      <div class="ship-canvas-container">
+        <canvas id="composed-ship" width="128" height="128"></canvas>
+      </div>
+      <div class="power-level">
+        <span id="power-value">50</span>
+        <span style="font-size: 0.5em; color: var(--muted);">POWER</span>
+      </div>
+      <div class="power-bar">
+        <div class="power-bar-fill" id="power-bar" style="width: 50%"></div>
+      </div>
+    </div>
+    
+    <div class="ship-panel">
+      <h3>Upgrade Breakdown</h3>
+      <div class="upgrade-list" id="upgrade-list">
+        <!-- Populated by JS -->
+      </div>
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--line);">
+        <div style="font-size: 0.7rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem;">Summary</div>
+        <div id="upgrade-summary" style="font-size: 0.8rem; color: var(--phosphor);">
+          Stock Configuration
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="info-box">
+    <h3>How It Works</h3>
+    <p>
+      Ships visually evolve based on their trading performance. Each stat maps to a specific upgrade slot:
+    </p>
+    <ul>
+      <li><code>Momentum (P&L)</code> → Wings size and style</li>
+      <li><code>Strength (Win Rate)</code> → Engine power and glow</li>
+      <li><code>Risk (Volatility)</code> → Armor plating</li>
+      <li><code>Activity (Volume)</code> → Communication antenna</li>
+      <li><code>Magnitude (Total Gain)</code> → Weapon systems</li>
+      <li><code>Consistency (Low Drawdown)</code> → Shield effects</li>
+    </ul>
+    <p>
+      The system uses a <strong>table-driven approach</strong>: you can add new parts or adjust thresholds 
+      in <code>data/sprite-upgrades.js</code> without changing any rendering code. Parts are layered 
+      using z-index ordering, with engines behind the hull and armor/weapons on top.
+    </p>
+  </div>
+  
+  <script type="module">
+    // Import the sprite system
+    import { mapStatsToUpgrades, calculatePowerLevel, getUpgradeSummary } from './js/sprites/upgrade-mapper.js';
+    import { composeSprite, getDataUrl } from './js/sprites/sprite-composer.js';
+    
+    // DOM elements
+    const canvas = document.getElementById('composed-ship');
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    
+    const powerValue = document.getElementById('power-value');
+    const powerBar = document.getElementById('power-bar');
+    const upgradeList = document.getElementById('upgrade-list');
+    const upgradeSummary = document.getElementById('upgrade-summary');
+    const tickerSelect = document.getElementById('ticker-select');
+    
+    // Sliders
+    const sliders = {
+      pnl: document.getElementById('pnl'),
+      winrate: document.getElementById('winrate'),
+      volatility: document.getElementById('volatility'),
+      volume: document.getElementById('volume'),
+      gain: document.getElementById('gain'),
+      drawdown: document.getElementById('drawdown')
+    };
+    
+    // Value displays
+    const values = {
+      pnl: document.getElementById('pnl-value'),
+      winrate: document.getElementById('winrate-value'),
+      volatility: document.getElementById('volatility-value'),
+      volume: document.getElementById('volume-value'),
+      gain: document.getElementById('gain-value'),
+      drawdown: document.getElementById('drawdown-value')
+    };
+    
+    // Get current stats from sliders
+    function getCurrentStats() {
+      return {
+        todayPnlPct: parseFloat(sliders.pnl.value),
+        winRate: parseFloat(sliders.winrate.value) / 100,
+        volatility: parseFloat(sliders.volatility.value) / 100,
+        relativeVolume: parseFloat(sliders.volume.value),
+        totalGainPct: parseFloat(sliders.gain.value),
+        maxDrawdownPct: parseFloat(sliders.drawdown.value)
+      };
+    }
+    
+    // Update value displays
+    function updateValueDisplays() {
+      values.pnl.textContent = sliders.pnl.value + '%';
+      values.winrate.textContent = sliders.winrate.value + '%';
+      values.volatility.textContent = sliders.volatility.value + '%';
+      values.volume.textContent = parseFloat(sliders.volume.value).toFixed(1) + 'x';
+      values.gain.textContent = sliders.gain.value + '%';
+      values.drawdown.textContent = sliders.drawdown.value + '%';
+    }
+    
+    // Render the upgrade breakdown
+    function renderUpgradeList(upgrades) {
+      const slots = ['wings', 'engines', 'armor', 'antenna', 'weapons', 'shield'];
+      
+      upgradeList.innerHTML = slots.map(slot => {
+        const tier = upgrades[slot];
+        const label = tier?.label || 'None';
+        const hasUpgrade = tier?.id != null;
+        
+        return `
+          <div class="upgrade-item">
+            <span class="upgrade-slot">${slot}</span>
+            <span class="upgrade-value ${hasUpgrade ? '' : 'none'}">${label}</span>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Main update function
+    async function update() {
+      const ticker = tickerSelect.value;
+      const stats = getCurrentStats();
+      const upgrades = mapStatsToUpgrades(stats);
+      const powerLevel = calculatePowerLevel(upgrades);
+      const summary = getUpgradeSummary(upgrades);
+      
+      // Update UI
+      powerValue.textContent = powerLevel;
+      powerBar.style.width = powerLevel + '%';
+      upgradeSummary.textContent = summary;
+      renderUpgradeList(upgrades);
+      
+      // Compose sprite
+      const baseSrc = `assets/ships/animated/${ticker}/${ticker}_base.png`;
+      
+      try {
+        const result = await composeSprite({
+          baseSrc,
+          upgrades,
+          stats,
+          options: { includeStatus: true }
+        });
+        
+        // Draw to display canvas (scaled up 2x)
+        canvas.width = result.width * 2;
+        canvas.height = result.height * 2;
+        ctx.imageSmoothingEnabled = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(result.canvas, 0, 0, canvas.width, canvas.height);
+      } catch (err) {
+        console.error('Composition error:', err);
+      }
+    }
+    
+    // Event listeners
+    Object.values(sliders).forEach(slider => {
+      slider.addEventListener('input', () => {
+        updateValueDisplays();
+        update();
+      });
+    });
+    
+    tickerSelect.addEventListener('change', update);
+    
+    // Initial render
+    updateValueDisplays();
+    update();
+  </script>
+</body>
+</html>

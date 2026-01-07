@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARALLAX RUN - F-Zero 99 Style Racing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-void: #050608;
+      --bg-deep: #0a0c0f;
+      --phosphor: #33ff99;
+      --phosphor-dim: rgba(51, 255, 153, 0.6);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: var(--bg-void);
+      color: #ffffff;
+      font-family: 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--phosphor);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      letter-spacing: 0.1em;
+    }
+    
+    .game-container {
+      position: relative;
+      border: 3px solid var(--phosphor);
+      box-shadow: 
+        0 0 30px rgba(51, 255, 153, 0.3),
+        inset 0 0 30px rgba(51, 255, 153, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    
+    .controls-hint {
+      margin-top: 1.5rem;
+      color: #888;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    
+    .controls-hint kbd {
+      background: #222;
+      border: 1px solid #444;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #fff;
+    }
+    
+    .theme-select {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    .theme-select label {
+      color: #888;
+      font-size: 0.8rem;
+    }
+    
+    .theme-select select {
+      background: #1a1a2e;
+      border: 1px solid var(--phosphor-dim);
+      color: var(--phosphor);
+      padding: 0.3rem 0.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: pointer;
+    }
+    
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: var(--phosphor-dim);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    
+    .back-link:hover {
+      color: var(--phosphor);
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Back to Dashboard</a>
+  
+  <h1>▸ PARALLAX RUN</h1>
+  
+  <div class="game-container">
+    <canvas id="game-canvas"></canvas>
+  </div>
+  
+  <div class="theme-select">
+    <label>TRACK:</label>
+    <select id="track-theme" onchange="changeTheme(this.value)">
+      <option value="sand_ocean">Sand Ocean (Sunset)</option>
+      <option value="mute_city">Mute City (Night)</option>
+      <option value="big_blue">Big Blue (Ocean)</option>
+      <option value="death_wind">Death Wind (Storm)</option>
+    </select>
+  </div>
+  
+  <div class="controls-hint">
+    <p>
+      <kbd>↑</kbd>/<kbd>↓</kbd> or <kbd>W</kbd>/<kbd>S</kbd> — Accelerate / Brake
+    </p>
+    <p style="margin-top: 0.5rem;">
+      <kbd>←</kbd>/<kbd>→</kbd> or <kbd>A</kbd>/<kbd>D</kbd> — Steer
+    </p>
+    <p style="margin-top: 0.5rem;">
+      <kbd>SHIFT</kbd> — Boost &nbsp;&nbsp; <kbd>SPACE</kbd> — Start Race
+    </p>
+  </div>
+  
+  <script src="js/games/parallax-run.js"></script>
+  <script>
+    // Initialize game
+    const canvas = document.getElementById('game-canvas');
+    ParallaxRun.init(canvas);
+    ParallaxRun.start();
+    
+    function changeTheme(theme) {
+      ParallaxRun.setTheme(theme);
+    }
+    
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      ParallaxRun.destroy();
+    });
+  </script>
+</body>
+</html>

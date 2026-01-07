@@ -1,0 +1,1 @@
+This directory will contain a folder "45m" with the individual csv files for the 45 min candle charts. During development this file will be removed due to size limitations (it is about 29mb). 

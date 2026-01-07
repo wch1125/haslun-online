@@ -1,0 +1,363 @@
+/* =========================================================================
+   PARALLAX CRT EFFECTS — Web Art Installation Layer
+   =========================================================================
+   Transforms the dashboard into an immersive retro-futuristic experience.
+   Focused on atmosphere, not obstruction.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   CSS CUSTOM PROPERTIES
+   ------------------------------------------------------------------------- */
+:root {
+  /* Phosphor colors */
+  --phosphor-green: #33ff99;
+  --phosphor-amber: #ffb347;
+  --phosphor-cyan: #47d4ff;
+  --phosphor-magenta: #ff4fd8;
+  --phosphor-violet: #b388ff;
+  
+  /* CRT characteristics — tuned for readability */
+  --scanline-opacity: 0.06;
+  --bloom-intensity: 1.15;
+  --noise-opacity: 0.015;
+}
+
+/* -------------------------------------------------------------------------
+   GLOBAL ATMOSPHERE — Subtle vignette
+   ------------------------------------------------------------------------- */
+body {
+  background: 
+    radial-gradient(ellipse at center, transparent 0%, transparent 60%, rgba(0,0,0,0.35) 100%),
+    #0a0f14;
+}
+
+/* Scanlines — very light, won't obstruct text */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10000;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 3px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 4px
+  );
+  /* Screen edge darkening */
+  box-shadow: inset 0 0 120px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Ambient phosphor glow */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10001;
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 40%,
+    rgba(51, 255, 153, 0.025) 0%,
+    transparent 60%
+  );
+  animation: ambient-pulse 6s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes ambient-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* -------------------------------------------------------------------------
+   PHOSPHOR TEXT GLOW — Subtle, not overwhelming
+   ------------------------------------------------------------------------- */
+.ticker-symbol,
+.stat-value,
+h1, h2, h3,
+.section-title {
+  text-shadow: 
+    0 0 2px currentColor,
+    0 0 8px rgba(51, 255, 153, 0.3);
+}
+
+/* Price values get stronger glow */
+[class*="price"],
+[class*="value"] {
+  text-shadow: 
+    0 0 3px currentColor,
+    0 0 12px currentColor;
+}
+
+/* Positive = green glow */
+.positive, .gain, [class*="up"] {
+  color: var(--phosphor-green) !important;
+  text-shadow: 
+    0 0 4px var(--phosphor-green),
+    0 0 12px rgba(51, 255, 153, 0.4);
+}
+
+/* Negative = red glow */
+.negative, .loss, [class*="down"] {
+  color: #ff6b6b !important;
+  text-shadow: 
+    0 0 4px #ff6b6b,
+    0 0 12px rgba(255, 107, 107, 0.4);
+}
+
+/* -------------------------------------------------------------------------
+   CHART CANVAS — Topographic terrain aesthetic
+   ------------------------------------------------------------------------- */
+.price-chart-wrapper canvas,
+.macd-chart-wrapper canvas {
+  filter: 
+    drop-shadow(0 0 3px var(--phosphor-green))
+    drop-shadow(0 0 8px rgba(51, 255, 153, 0.3))
+    brightness(var(--bloom-intensity));
+}
+
+/* Terrain grid overlay */
+.price-chart-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: 
+    /* Subtle contour lines */
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 39px,
+      rgba(51, 255, 153, 0.04) 40px
+    ),
+    /* Vertical grid */
+    repeating-linear-gradient(
+      to right,
+      transparent 0px,
+      transparent 79px,
+      rgba(51, 255, 153, 0.025) 80px
+    );
+  animation: terrain-shift 20s linear infinite;
+}
+
+@keyframes terrain-shift {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 0 40px, 80px 0; }
+}
+
+/* Altitude gradient beneath chart area */
+.price-chart-wrapper::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60%;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(51, 255, 153, 0.06) 0%,
+    rgba(71, 212, 255, 0.03) 30%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+}
+
+/* -------------------------------------------------------------------------
+   ORBITAL DISPLAY — Enhanced atmosphere
+   ------------------------------------------------------------------------- */
+.macd-chart-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Deep space gradient */
+.macd-chart-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: 
+    radial-gradient(
+      ellipse 100% 120% at 50% 80%,
+      rgba(51, 255, 153, 0.08) 0%,
+      rgba(71, 212, 255, 0.04) 30%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 30% 20%,
+      rgba(179, 136, 255, 0.03) 0%,
+      transparent 40%
+    );
+}
+
+/* -------------------------------------------------------------------------
+   SHIP HOLOGRAM EFFECT
+   ------------------------------------------------------------------------- */
+.ship-display,
+.active-vessel,
+[class*="ship"] img {
+  filter: 
+    drop-shadow(0 0 6px var(--phosphor-cyan))
+    drop-shadow(0 0 15px rgba(71, 212, 255, 0.4))
+    saturate(1.15);
+  animation: holo-pulse 3s ease-in-out infinite;
+}
+
+@keyframes holo-pulse {
+  0%, 100% { 
+    filter: 
+      drop-shadow(0 0 6px var(--phosphor-cyan))
+      drop-shadow(0 0 15px rgba(71, 212, 255, 0.4))
+      saturate(1.15);
+  }
+  50% { 
+    filter: 
+      drop-shadow(0 0 10px var(--phosphor-cyan))
+      drop-shadow(0 0 25px rgba(71, 212, 255, 0.6))
+      saturate(1.25);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   PANEL STYLING — Glass with corner frames
+   ------------------------------------------------------------------------- */
+.panel,
+.card,
+[class*="panel"],
+[class*="section"] {
+  position: relative;
+  background: 
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.02) 0%,
+      transparent 50%
+    );
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 0 20px rgba(51, 255, 153, 0.02);
+  border-radius: 3px;
+}
+
+/* Corner brackets */
+.panel::after,
+[class*="chart-wrapper"]::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  border: 1px solid transparent;
+  background: 
+    linear-gradient(to right, rgba(51, 255, 153, 0.3) 15px, transparent 15px) top left,
+    linear-gradient(to bottom, rgba(51, 255, 153, 0.3) 15px, transparent 15px) top left,
+    linear-gradient(to left, rgba(51, 255, 153, 0.3) 15px, transparent 15px) top right,
+    linear-gradient(to bottom, rgba(51, 255, 153, 0.3) 15px, transparent 15px) top right,
+    linear-gradient(to right, rgba(51, 255, 153, 0.3) 15px, transparent 15px) bottom left,
+    linear-gradient(to top, rgba(51, 255, 153, 0.3) 15px, transparent 15px) bottom left,
+    linear-gradient(to left, rgba(51, 255, 153, 0.3) 15px, transparent 15px) bottom right,
+    linear-gradient(to top, rgba(51, 255, 153, 0.3) 15px, transparent 15px) bottom right;
+  background-size: 1px 1px;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+  z-index: 11;
+}
+
+/* -------------------------------------------------------------------------
+   BUTTONS — Glowing interactive elements
+   ------------------------------------------------------------------------- */
+button,
+.btn,
+[class*="button"],
+[class*="toggle"] {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 4px rgba(51, 255, 153, 0.2);
+  transition: all 0.2s ease;
+}
+
+button:hover,
+.btn:hover {
+  box-shadow: 
+    0 0 10px rgba(51, 255, 153, 0.4),
+    0 0 20px rgba(51, 255, 153, 0.2);
+  text-shadow: 0 0 8px currentColor;
+}
+
+button.active,
+.btn.active {
+  background: rgba(51, 255, 153, 0.15);
+  box-shadow: 
+    0 0 15px rgba(51, 255, 153, 0.5),
+    inset 0 0 8px rgba(51, 255, 153, 0.2);
+}
+
+/* -------------------------------------------------------------------------
+   SCROLLBARS
+   ------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    rgba(51, 255, 153, 0.6),
+    rgba(51, 255, 153, 0.3)
+  );
+  border-radius: 3px;
+}
+
+/* -------------------------------------------------------------------------
+   NOISE OVERLAY — Very subtle film grain
+   ------------------------------------------------------------------------- */
+.noise-overlay {
+  position: fixed;
+  inset: -5%;
+  pointer-events: none;
+  z-index: 10002;
+  opacity: var(--noise-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: noise-drift 0.3s steps(4) infinite;
+}
+
+@keyframes noise-drift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-0.5%, 0.5%); }
+  50% { transform: translate(0.5%, -0.5%); }
+  75% { transform: translate(-0.5%, -0.5%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* -------------------------------------------------------------------------
+   RESPONSIVE — Lighter effects on mobile
+   ------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  :root {
+    --scanline-opacity: 0.04;
+    --bloom-intensity: 1.1;
+    --noise-opacity: 0.01;
+  }
+  
+  .price-chart-wrapper canvas {
+    filter: drop-shadow(0 0 2px var(--phosphor-green)) brightness(1.1);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   REDUCED MOTION
+   ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

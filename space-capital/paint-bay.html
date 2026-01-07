@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paint Bay - Ship Color Customization</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/paint-bay.css">
+  <style>
+    :root {
+      --bg-void: #050608;
+      --bg-deep: #0a0c0f;
+      --phosphor: #33ff99;
+      --phosphor-dim: rgba(51, 255, 153, 0.6);
+      --line: #222;
+      --muted: #888;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: var(--bg-void);
+      color: #ffffff;
+      font-family: 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--phosphor);
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    
+    .back-link {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      color: var(--phosphor-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    
+    .back-link:hover {
+      color: var(--phosphor);
+    }
+    
+    /* Color Theory Info */
+    .color-theory-info {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: rgba(51, 255, 153, 0.05);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 4px;
+    }
+    
+    .color-theory-info h3 {
+      color: var(--phosphor);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
+    .color-theory-info p {
+      color: #ccc;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+    }
+    
+    .color-theory-info code {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      color: var(--phosphor);
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Back to Dashboard</a>
+  
+  <div class="page-header">
+    <h1>▸ PAINT BAY</h1>
+    <p>Ship livery customization using watercolor color theory</p>
+  </div>
+  
+  <div id="paint-bay-container"></div>
+  
+  <div class="color-theory-info">
+    <h3>How It Works</h3>
+    <p>
+      This system uses <strong>watercolor glazing theory</strong> to generate harmonious color palettes. 
+      Unlike simple RGB mixing, glazing simulates how transparent pigment layers interact when painted 
+      over each other—the way real watercolors work.
+    </p>
+    <p>
+      When you select 2-3 base colors, the algorithm calculates <code>glaze combinations</code>: 
+      Color A over B, B over A, and (with 3 colors) all pairwise and triple combinations. 
+      This produces natural-looking palettes that work well together because they're derived from 
+      simulated physical color mixing.
+    </p>
+    <p>
+      The resulting palette is then mapped to your ship sprite by analyzing its original colors 
+      and replacing them based on brightness—shadows stay dark, highlights stay light, but now 
+      using your custom color scheme.
+    </p>
+  </div>
+  
+  <script src="js/ui/paint-bay.js"></script>
+  <script>
+    // Initialize with some example ship data
+    window.SHIP_DATA = [
+      { ticker: 'RKLB', name: 'Flagship' },
+      { ticker: 'LUNR', name: 'Lander' },
+      { ticker: 'JOBY', name: 'eVTOL Light' },
+      { ticker: 'ACHR', name: 'eVTOL' },
+      { ticker: 'GME', name: 'Moonshot' },
+      { ticker: 'BKSY', name: 'Recon' },
+      { ticker: 'ASTS', name: 'Comm Relay' },
+      { ticker: 'PL', name: 'Scout' },
+      { ticker: 'GE', name: 'Stealth Bomber' },
+      { ticker: 'RTX', name: 'Officer Class' },
+      { ticker: 'KTOS', name: 'Fighter' },
+      { ticker: 'LHX', name: 'Drone' },
+      { ticker: 'COHR', name: 'Glass Reflector' },
+      { ticker: 'RDW', name: 'Hauler' },
+      { ticker: 'EVEX', name: 'Transport' },
+    ];
+    
+    // Init UI
+    PaintBay.renderUI('paint-bay-container');
+    
+    // Listen for apply events
+    document.addEventListener('paintbay:apply', (e) => {
+      console.log('Paint applied:', e.detail);
+    });
+  </script>
+</body>
+</html>

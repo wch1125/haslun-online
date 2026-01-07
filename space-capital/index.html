@@ -4,16 +4,62 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a0c0f">
-  <title>HASLUN-BOT \\ PILOT'S COCKPIT</title>
+  <title>SPACE CAPITAL \\ COMMAND INTERFACE</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%230a0c0f' width='100' height='100'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%2333ff99' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='25' fill='none' stroke='%2333ff99' stroke-width='1' opacity='0.5'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%23ffb347'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <!-- Chart.js loaded lazily when DATA tab is accessed -->
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/crt-effects.css">
+  <!-- Ship Brief dialog styles (isolated for modularity) -->
+  <link rel="stylesheet" href="css/ship-brief.css">
+  <link rel="stylesheet" href="css/fleet-command.css">
+  <!-- Ship Select (Mario Kart-style hangar) -->
+  <link rel="stylesheet" href="css/ship-select.css">
+  <!-- Accessibility & keyboard shortcuts styles -->
+  <link rel="stylesheet" href="css/accessibility.css">
+  <!-- Paint Bay (ship color customization) -->
+  <link rel="stylesheet" href="css/paint-bay.css">
+  <!-- Ship Behavior States (reactive animations) -->
+  <link rel="stylesheet" href="css/ship-states.css">
+  <!-- Bey Arena (Beyblade-style ship battles) -->
+  <link rel="stylesheet" href="css/bey-arena.css">
+  <!-- Cockpit HUD (New 3-panel navigation) -->
+  <link rel="stylesheet" href="css/cockpit-hud.css">
+<script src="js/space-scene.js"></script>
 </head>
 <body>
+<script>window.addEventListener('DOMContentLoaded',()=>SpaceScene.mount());</script>
+  <!-- CRT NOISE OVERLAY -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+  
+  <!-- SVG FILTERS FOR ADVANCED EFFECTS -->
+  <svg class="svg-filters" aria-hidden="true">
+    <defs>
+      <filter id="phosphor-glow">
+        <feGaussianBlur stdDeviation="2" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <filter id="crt-warp">
+        <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="1" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="scanline-filter">
+        <feFlood flood-color="#000" flood-opacity="0.1" result="flood"/>
+        <feComposite in="flood" in2="SourceGraphic" operator="in" result="mask"/>
+        <feMerge>
+          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="mask"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+  
   <!-- HOLO FLEET LIBRARY :: refined ship wireframes -->
   <svg id="ship-library" width="0" height="0" style="position:absolute;visibility:hidden;">
     <defs>
@@ -368,8 +414,8 @@
         </g>
       </symbol>
 
-      <!-- BLACK OPS — NIGHT PARALLAX (stealth) -->
-      <symbol id="ship-parallax" viewBox="0 0 120 80">
+      <!-- BLACK OPS — NIGHT SHADOW (stealth) -->
+      <symbol id="ship-shadow" viewBox="0 0 120 80">
         <g class="ship-primary" style="stroke-dasharray:3 4;">
           <polygon points="60,14 96,40 60,66 24,40"/>
         </g>
@@ -402,139 +448,11 @@
   <div class="grid-bg"></div>
   <div class="ambient-particles" id="ambient-particles"></div>
   
-  <!-- LOADING SCREEN -->
-  <div class="loading-screen" id="loading-screen">
-    <!-- Background marching army -->
-    <div class="invader-army" id="invader-army" aria-hidden="true">
-      <!-- Rows will be filled via JS -->
-    </div>
-    
-    <div class="stars"></div>
-    <div class="horizon"></div>
-    
-    <!-- Flying fleet layer (data-driven) - NOW AT SCREEN LEVEL -->
-    <div class="loading-fleet" id="loading-fleet"></div>
-    
-    <div class="loading-inner">
-      <div class="launch-scene">
-        <!-- Pixel Invader Scene -->
-        <div class="pixel-invader-scene">
-          <!-- Background fleet -->
-          <div class="invader-fleet">
-            <svg class="fleet-invader" viewBox="0 0 11 8" fill="var(--phosphor)">
-              <rect x="2" y="0" width="1" height="1"/><rect x="8" y="0" width="1" height="1"/>
-              <rect x="3" y="1" width="1" height="1"/><rect x="7" y="1" width="1" height="1"/>
-              <rect x="2" y="2" width="7" height="1"/>
-              <rect x="1" y="3" width="2" height="1"/><rect x="4" y="3" width="3" height="1"/><rect x="8" y="3" width="2" height="1"/>
-              <rect x="0" y="4" width="11" height="1"/>
-              <rect x="0" y="5" width="1" height="1"/><rect x="2" y="5" width="7" height="1"/><rect x="10" y="5" width="1" height="1"/>
-              <rect x="0" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/>
-              <rect x="3" y="7" width="2" height="1"/><rect x="6" y="7" width="2" height="1"/>
-            </svg>
-            <svg class="fleet-invader" viewBox="0 0 11 8" fill="var(--phosphor)">
-              <rect x="2" y="0" width="1" height="1"/><rect x="8" y="0" width="1" height="1"/>
-              <rect x="3" y="1" width="1" height="1"/><rect x="7" y="1" width="1" height="1"/>
-              <rect x="2" y="2" width="7" height="1"/>
-              <rect x="1" y="3" width="2" height="1"/><rect x="4" y="3" width="3" height="1"/><rect x="8" y="3" width="2" height="1"/>
-              <rect x="0" y="4" width="11" height="1"/>
-              <rect x="0" y="5" width="1" height="1"/><rect x="2" y="5" width="7" height="1"/><rect x="10" y="5" width="1" height="1"/>
-              <rect x="0" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/>
-              <rect x="3" y="7" width="2" height="1"/><rect x="6" y="7" width="2" height="1"/>
-            </svg>
-            <svg class="fleet-invader" viewBox="0 0 11 8" fill="var(--phosphor)">
-              <rect x="2" y="0" width="1" height="1"/><rect x="8" y="0" width="1" height="1"/>
-              <rect x="3" y="1" width="1" height="1"/><rect x="7" y="1" width="1" height="1"/>
-              <rect x="2" y="2" width="7" height="1"/>
-              <rect x="1" y="3" width="2" height="1"/><rect x="4" y="3" width="3" height="1"/><rect x="8" y="3" width="2" height="1"/>
-              <rect x="0" y="4" width="11" height="1"/>
-              <rect x="0" y="5" width="1" height="1"/><rect x="2" y="5" width="7" height="1"/><rect x="10" y="5" width="1" height="1"/>
-              <rect x="0" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/>
-              <rect x="3" y="7" width="2" height="1"/><rect x="6" y="7" width="2" height="1"/>
-            </svg>
-            <svg class="fleet-invader" viewBox="0 0 11 8" fill="var(--phosphor)">
-              <rect x="2" y="0" width="1" height="1"/><rect x="8" y="0" width="1" height="1"/>
-              <rect x="3" y="1" width="1" height="1"/><rect x="7" y="1" width="1" height="1"/>
-              <rect x="2" y="2" width="7" height="1"/>
-              <rect x="1" y="3" width="2" height="1"/><rect x="4" y="3" width="3" height="1"/><rect x="8" y="3" width="2" height="1"/>
-              <rect x="0" y="4" width="11" height="1"/>
-              <rect x="0" y="5" width="1" height="1"/><rect x="2" y="5" width="7" height="1"/><rect x="10" y="5" width="1" height="1"/>
-              <rect x="0" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/>
-              <rect x="3" y="7" width="2" height="1"/><rect x="6" y="7" width="2" height="1"/>
-            </svg>
-            <svg class="fleet-invader" viewBox="0 0 11 8" fill="var(--phosphor)">
-              <rect x="2" y="0" width="1" height="1"/><rect x="8" y="0" width="1" height="1"/>
-              <rect x="3" y="1" width="1" height="1"/><rect x="7" y="1" width="1" height="1"/>
-              <rect x="2" y="2" width="7" height="1"/>
-              <rect x="1" y="3" width="2" height="1"/><rect x="4" y="3" width="3" height="1"/><rect x="8" y="3" width="2" height="1"/>
-              <rect x="0" y="4" width="11" height="1"/>
-              <rect x="0" y="5" width="1" height="1"/><rect x="2" y="5" width="7" height="1"/><rect x="10" y="5" width="1" height="1"/>
-              <rect x="0" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/>
-              <rect x="3" y="7" width="2" height="1"/><rect x="6" y="7" width="2" height="1"/>
-            </svg>
-          </div>
-          
-          <!-- Ship Formation - Wedge (4-3-2-1) using PNG sprites -->
-          <div class="ship-formation" id="ship-formation">
-            <!-- Row 1: 4 ships (back row) -->
-            <div class="formation-row">
-              <img class="formation-ship" src="assets/ships/BKSY-recon-ship.png" alt="BKSY" title="BKSY - Recon">
-              <img class="formation-ship" src="assets/ships/PL-scout-ship.png" alt="PL" title="PL - Scout">
-              <img class="formation-ship" src="assets/ships/RDW-Hauler-ship.png" alt="RDW" title="RDW - Hauler">
-              <img class="formation-ship" src="assets/ships/EVEX-Transport-Ship.png" alt="EVEX" title="EVEX - Transport">
-            </div>
-            <!-- Row 2: 3 ships -->
-            <div class="formation-row">
-              <img class="formation-ship" src="assets/ships/ACHR-eVTOL-ship.png" alt="ACHR" title="ACHR - eVTOL">
-              <img class="formation-ship" src="assets/ships/JOBY-eVTOL-light-class-ship.png" alt="JOBY" title="JOBY - Light eVTOL">
-              <img class="formation-ship" src="assets/ships/GME-moonshot-ship.png" alt="GME" title="GME - Moonshot">
-            </div>
-            <!-- Row 3: 2 ships -->
-            <div class="formation-row">
-              <img class="formation-ship" src="assets/ships/LUNR-lander-ship.png" alt="LUNR" title="LUNR - Lander">
-              <img class="formation-ship" src="assets/ships/ASTS-Communications-Relay-Ship.png" alt="ASTS" title="ASTS - Comms">
-            </div>
-            <!-- Row 4: 1 ship (leader/flagship) -->
-            <div class="formation-row">
-              <img class="formation-ship" src="assets/ships/RKLB-flagship-ship.png" alt="RKLB" title="RKLB - Flagship">
-            </div>
-          </div>
-          
-          <!-- Legacy pixel-invader (hidden, kept for compatibility) -->
-          <svg class="pixel-invader" viewBox="0 0 11 8" fill="var(--phosphor)" style="display:none;">
-            <rect x="2" y="0" width="1" height="1"/>
-            <rect x="8" y="0" width="1" height="1"/>
-            <rect x="3" y="1" width="1" height="1"/>
-            <rect x="7" y="1" width="1" height="1"/>
-            <rect x="2" y="2" width="7" height="1"/>
-            <rect x="1" y="3" width="2" height="1"/>
-            <rect x="4" y="3" width="3" height="1"/>
-            <rect x="8" y="3" width="2" height="1"/>
-            <rect x="0" y="4" width="11" height="1"/>
-            <rect x="0" y="5" width="1" height="1"/>
-            <rect x="2" y="5" width="7" height="1"/>
-            <rect x="10" y="5" width="1" height="1"/>
-            <rect x="0" y="6" width="1" height="1"/>
-            <rect x="2" y="6" width="1" height="1"/>
-            <rect x="8" y="6" width="1" height="1"/>
-            <rect x="10" y="6" width="1" height="1"/>
-            <rect x="3" y="7" width="2" height="1"/>
-            <rect x="6" y="7" width="2" height="1"/>
-          </svg>
-          
-          <!-- Pixel beam -->
-          <div class="pixel-beam" id="pixel-beam"></div>
-          
-          <!-- Ground reflection -->
-          <div class="pixel-ground" id="pixel-ground"></div>
-        </div>
-      </div>
-      <div class="loading-content">
-        <div class="loading-brand">HASLUN-BOT</div>
-        <div class="loading-sub">Pilot's Cockpit</div>
-        <div class="countdown" id="countdown">3</div>
-        <div class="loading-status" id="loading-status">ESTABLISHING UPLINK...</div>
-      </div>
-    </div>
+  <!-- STEP 5: FULLSCREEN FLIGHT LOADING OVERLAY -->
+  <div class="loading-overlay" id="loading-overlay">
+    <canvas id="loading-canvas"></canvas>
+    <!-- Subtle vignette for depth -->
+    <div class="loading-vignette"></div>
   </div>
   
   <!-- APP -->
@@ -555,21 +473,37 @@
             </svg>
           </div>
           <div>
-            <div class="logo-text">HASLUN-BOT</div>
-            <div class="logo-sub">PILOT'S COCKPIT</div>
+            <div class="logo-text">SPACE CAPITAL</div>
+            <div class="logo-sub">FLEET COMMAND</div>
           </div>
         </div>
-        <nav class="nav-tabs">
-          <button class="nav-tab active" data-tab="chart" onclick="switchTab('chart')">TELEMETRY</button>
-          <button class="nav-tab" data-tab="positions" onclick="switchTab('positions')">HOLDINGS</button>
-          <button class="nav-tab" data-tab="options" data-glossary-id="derivatives_tab" onclick="switchTab('options')">DERIVATIVES</button>
-          <button class="nav-tab" data-tab="catalysts" onclick="switchTab('catalysts')">EVENTS</button>
-          <button class="nav-tab arcade-tab" data-tab="arcade" onclick="switchTab('arcade')">🎮 ARCADE</button>
-          <button class="nav-tab mission-cmd-tab" onclick="launchMissionCommand()" title="Derivatives Training Sandbox">🚀 MISSIONS</button>
+        <nav class="nav-tabs" role="tablist" aria-label="Main navigation">
+          <button class="nav-tab active" data-group="hangar" data-tab="hangar" onclick="switchTab('hangar')" role="tab" aria-selected="true" aria-controls="hangar-panel">🚀 HANGAR</button>
+          <button class="nav-tab" data-group="command" data-tab="positions" onclick="switchTab('positions')" role="tab" aria-selected="false" aria-controls="positions-panel">COMMAND</button>
+          <button class="nav-tab" data-group="garage" data-tab="garage" onclick="switchTab('garage')" role="tab" aria-selected="false" aria-controls="garage-panel">GARAGE</button>
+          <button class="nav-tab" data-group="arcade" data-tab="arcade" onclick="switchTab('arcade')" role="tab" aria-selected="false" aria-controls="arcade-panel">ARCADE</button>
+          <button class="nav-tab" data-group="data" data-tab="chart" onclick="switchTab('chart')" role="tab" aria-selected="false" aria-controls="chart-panel">DATA</button>
         </nav>
       </div>
+      
+      <!-- Secondary subtabs for COMMAND (merged Operations + Training decisions) -->
+      <div class="nav-subtabs" id="command-subtabs" style="display:none;">
+        <button class="subtab active" data-tab="positions" onclick="switchTab('positions')">FLEET</button>
+        <button class="subtab" onclick="launchMissionCommand()">MISSIONS</button>
+        <button class="subtab" data-tab="catalysts" onclick="switchTab('catalysts')">EVENTS</button>
+      </div>
+      
+      <!-- Secondary subtabs for GARAGE (Refit Bay + Ship Upgrades) -->
+      <div class="nav-subtabs" id="garage-subtabs" style="display:none;">
+        <button class="subtab active" data-tab="garage" onclick="switchTab('garage')">REFIT BAY</button>
+        <button class="subtab" data-tab="upgrades" onclick="switchTab('upgrades')">UPGRADES</button>
+      </div>
+      
       <div class="header-right">
-        <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileDrawer()">
+        <button class="kbd-hint" onclick="ParallaxA11y.showShortcuts()" title="Keyboard shortcuts (?)">
+          <kbd>?</kbd>
+        </button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileDrawer()" aria-label="Open menu" aria-expanded="false">
           <span>☰</span> MENU
         </button>
         <span class="demo-badge" data-glossary-id="mode_simulation">SIMULATION</span>
@@ -597,19 +531,25 @@
           </div>
         </div>
         <div class="sidebar-section" style="padding-bottom: 0.5rem;">
-          <div class="sidebar-title">Quick Actions</div>
+          <div class="sidebar-title">▲ Operations</div>
         </div>
         <div style="padding: 0 0.5rem 0.5rem;">
-          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('positions');">📊 Holdings</button>
-          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('options');">📈 Derivatives</button>
-          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('catalysts');">📅 Events</button>
+          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('positions');">› Holdings</button>
+          <button class="push-btn primary" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); launchMissionCommand();">› Missions</button>
+          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('catalysts');">› Events</button>
         </div>
         <div class="sidebar-section" style="padding-bottom: 0.5rem;">
-          <div class="sidebar-title">🎮 Arcade</div>
+          <div class="sidebar-title">◇ Training</div>
         </div>
         <div style="padding: 0 0.5rem 0.5rem;">
-          <button class="push-btn primary" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); if(window.SignalInvaders) SignalInvaders.start();">👾 Signal Invaders</button>
-          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); if(window.LandingGame) LandingGame.start();">🚀 Terrain Lander</button>
+          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('arcade');">› Arcade</button>
+        </div>
+        <div class="sidebar-section" style="padding-bottom: 0.5rem;">
+          <div class="sidebar-title">⚙ Garage</div>
+        </div>
+        <div style="padding: 0 0.5rem 0.5rem;">
+          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('garage');">› Refit Bay</button>
+          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('upgrades');">› Ship Upgrades</button>
         </div>
         <div class="sidebar-section" style="padding-bottom: 0.5rem;">
           <div class="sidebar-title">Tracking</div>
@@ -633,6 +573,34 @@
             <span class="mood-copy">Green enough to feel smug, not enough to tweet about.</span>
           </div>
         </div>
+        
+        <!-- Step 4: Mission Status Mini-Panel -->
+        <div class="sidebar-section mission-status-panel" id="mission-status-panel">
+          <div class="sidebar-title">
+            <span>▲ Mission Status</span>
+            <span class="mission-count-badge" id="active-mission-count">0</span>
+          </div>
+          <div class="mission-summary" id="mission-summary">
+            <div class="mission-summary-row">
+              <span class="mission-summary-label">Active</span>
+              <span class="mission-summary-value" id="mission-active-count">0</span>
+            </div>
+            <div class="mission-summary-row">
+              <span class="mission-summary-label">Completed</span>
+              <span class="mission-summary-value" id="mission-complete-count">0</span>
+            </div>
+          </div>
+          <div class="recent-missions" id="recent-missions">
+            <div class="recent-missions-label">Recent:</div>
+            <div class="recent-missions-list" id="recent-missions-list">
+            <div class="no-missions">Launch missions to track regime evolution.</div>
+            </div>
+          </div>
+          <button class="mission-cmd-btn" onclick="launchMissionCommand()">
+            › Open Mission Command
+          </button>
+        </div>
+        
         <div class="sidebar-section">
           <div class="sidebar-title" data-glossary-id="macd">MACD Signal</div>
           <div class="macd-display">
@@ -654,9 +622,9 @@
             </div>
             <div class="trend-detail" id="trend-status-detail">Awaiting data...</div>
             <div class="trend-metrics">
-              <div class="trend-metric"><span class="trend-metric-label">MA-100</span><span class="trend-metric-value" id="ma100-val">--</span></div>
-              <div class="trend-metric"><span class="trend-metric-label">MA-150</span><span class="trend-metric-value" id="ma150-val">--</span></div>
-              <div class="trend-metric"><span class="trend-metric-label">MA-200</span><span class="trend-metric-value" id="ma200-val">--</span></div>
+              <div class="trend-metric"><span class="trend-metric-label">G-100</span><span class="trend-metric-value" id="ma100-val">--</span></div>
+              <div class="trend-metric"><span class="trend-metric-label">G-150</span><span class="trend-metric-value" id="ma150-val">--</span></div>
+              <div class="trend-metric"><span class="trend-metric-label">G-200</span><span class="trend-metric-value" id="ma200-val">--</span></div>
             </div>
           </div>
         </div>
@@ -682,12 +650,180 @@
             <div class="holo-scan-line"></div>
           </div>
         </div>
-        <div class="sidebar-section" style="padding-bottom: 0.5rem;"><div class="sidebar-title">Tracking</div></div>
-        <div class="watchlist" id="watchlist"></div>
+        <div class="sidebar-section" style="padding-bottom: 0.5rem;"><div class="sidebar-title">Fleet Command</div></div>
+        <div id="fleet-command-container"></div>
       </aside>
       
       <div class="content">
-        <div class="tab-panel active" id="chart-panel">
+        <!-- HANGAR PANEL - Default/Home - Dense command interface -->
+        <div class="tab-panel active" id="hangar-panel">
+          <div class="hangar-command-layout">
+            
+            <!-- LEFT: Fleet Command List (Desktop) -->
+            <div class="hangar-fleet-sidebar">
+              <div class="fleet-sidebar-header">
+                <span class="fleet-header-icon">▲</span>
+                <div class="fleet-header-text">
+                  <div class="fleet-header-title">FLEET COMMAND</div>
+                  <div class="fleet-header-sub">ACTIVE VESSEL MANIFEST</div>
+                </div>
+              </div>
+              <div class="fleet-ship-list" id="hangar-fleet-list">
+                <!-- Populated dynamically with ship cards -->
+              </div>
+            </div>
+            
+            <!-- CENTER: Main Viewport + Floating Fleet -->
+            <div class="hangar-main-area">
+              
+              <!-- Top: Portfolio Status -->
+              <div class="hangar-portfolio-strip">
+                <div class="portfolio-stat-box highlight">
+                  <div class="portfolio-label">TODAY P&L</div>
+                  <div class="portfolio-value positive" id="hangar-today-pnl">+$1,172</div>
+                </div>
+                <div class="portfolio-stat-box">
+                  <div class="portfolio-label">TOTAL P&L</div>
+                  <div class="portfolio-value positive" id="hangar-total-pnl">+$34,015</div>
+                </div>
+                <div class="portfolio-stat-box">
+                  <div class="portfolio-label">POSITIONS</div>
+                  <div class="portfolio-value" id="hangar-positions">10</div>
+                </div>
+                <div class="portfolio-stat-box">
+                  <div class="portfolio-label">WIN RATE</div>
+                  <div class="portfolio-value positive" id="hangar-winrate">90%</div>
+                </div>
+              </div>
+              
+              <!-- MOBILE: Ship Carousel (swipeable) -->
+              <div class="hangar-mobile-carousel" id="hangar-mobile-carousel">
+                <div class="carousel-track" id="carousel-track">
+                  <!-- Populated dynamically with ship cards -->
+                </div>
+                <div class="carousel-indicators" id="carousel-indicators">
+                  <!-- Dots populated dynamically -->
+                </div>
+                <div class="carousel-nav">
+                  <button class="carousel-arrow prev" onclick="carouselPrev()">◀</button>
+                  <button class="carousel-arrow next" onclick="carouselNext()">▶</button>
+                </div>
+              </div>
+              
+              <!-- Center: Ship Viewport + Floating Fleet -->
+              <div class="hangar-viewport-area">
+                <!-- Framed ship viewport -->
+                <div class="hangar-ship-viewport" id="hangar-ship-viewport">
+                  <div class="viewport-frame">
+                    <div class="viewport-corner tl"></div>
+                    <div class="viewport-corner tr"></div>
+                    <div class="viewport-corner bl"></div>
+                    <div class="viewport-corner br"></div>
+                    <div class="viewport-grid"></div>
+                    <div class="viewport-scanline"></div>
+                    <!-- Ship animator will be injected here -->
+                    <div class="ship-anim-container" id="hero-ship-container"></div>
+                  </div>
+                  <div class="viewport-label">
+                    <span class="viewport-ticker" id="hangar-callsign">RKLB</span>
+                    <span class="viewport-dot">•</span>
+                    <span class="viewport-class" id="hangar-class">FLAGSHIP</span>
+                  </div>
+                  <div class="viewport-lore" id="hangar-lore">Spearhead command ship. Victory follows in its wake.</div>
+                </div>
+                
+                <!-- Floating fleet formation -->
+                <div class="hangar-floating-fleet" id="hangar-floating-fleet">
+                  <!-- Populated with floating ship sprites -->
+                </div>
+              </div>
+              
+              <!-- Bottom: Ship Dossier Panel -->
+              <div class="hangar-dossier-panel">
+                <div class="dossier-ship-preview">
+                  <img id="dossier-ship-img" class="dossier-ship-sprite" src="assets/ships/RKLB-flagship-ship.png" alt="">
+                  <div class="dossier-class-badge" id="dossier-class-badge">FLAGSHIP</div>
+                  <div class="dossier-hud-msg">◈ COMMAND AUTHORITY ACTIVE</div>
+                </div>
+                
+                <div class="dossier-info-cols">
+                  <div class="dossier-col">
+                    <div class="dossier-ticker" id="dossier-ticker">RKLB</div>
+                    <div class="dossier-name" id="dossier-name">ELECTRON</div>
+                    <div class="dossier-designation" id="dossier-designation">FSC-001</div>
+                    
+                    <div class="dossier-section-title">▸ SYSTEMS STATUS</div>
+                    <div class="dossier-stat-row">
+                      <span class="dossier-stat-label">HULL INTEGRITY</span>
+                      <div class="dossier-stat-bar"><div class="dossier-bar-fill hull" id="dossier-hull" style="width:87%"></div></div>
+                    </div>
+                    <div class="dossier-stat-row">
+                      <span class="dossier-stat-label">CARGO HOLD</span>
+                      <div class="dossier-stat-bar"><div class="dossier-bar-fill cargo" id="dossier-cargo" style="width:65%"></div></div>
+                    </div>
+                    <div class="dossier-stat-row">
+                      <span class="dossier-stat-label">FUEL RESERVES</span>
+                      <div class="dossier-stat-bar"><div class="dossier-bar-fill fuel" id="dossier-fuel" style="width:92%"></div></div>
+                    </div>
+                  </div>
+                  
+                  <div class="dossier-col">
+                    <div class="dossier-section-title">▸ PILOT PROGRESSION</div>
+                    <div class="dossier-level">
+                      <span class="level-badge">LVL 1</span>
+                      <span class="level-xp">0 / 100 XP</span>
+                    </div>
+                    <div class="dossier-skills">
+                      <span class="skill-chip">THR ━</span>
+                      <span class="skill-chip">HULL ━</span>
+                      <span class="skill-chip">SEN ━</span>
+                      <span class="skill-chip">WPN ━</span>
+                      <span class="skill-chip">COM ━</span>
+                    </div>
+                    
+                    <div class="dossier-section-title">▸ OPERATIONS DATA</div>
+                    <div class="dossier-ops-grid">
+                      <div class="dossier-ops-item">
+                        <span class="ops-label">POSITION VALUE</span>
+                        <span class="ops-value" id="dossier-value">$5,460</span>
+                      </div>
+                      <div class="dossier-ops-item">
+                        <span class="ops-label">P&L STATUS</span>
+                        <span class="ops-value positive" id="dossier-pnl">+$326</span>
+                      </div>
+                      <div class="dossier-ops-item">
+                        <span class="ops-label">RETURN</span>
+                        <span class="ops-value" id="dossier-return">+6.4%</span>
+                      </div>
+                      <div class="dossier-ops-item">
+                        <span class="ops-label">MISSION STATUS</span>
+                        <span class="ops-value" id="dossier-mission">STANDBY</span>
+                      </div>
+                    </div>
+                    
+                    <div class="dossier-position-note">
+                      <span class="note-icon">◎</span>
+                      <span class="note-text" id="dossier-note">NO POSITION — OBSERVATION MODE</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Bottom Actions -->
+              <div class="hangar-action-bar">
+                <button class="hangar-action-btn secondary" onclick="launchMissionCommand()">
+                  <span class="action-icon">☆</span> ASSIGN MISSION
+                </button>
+                <button class="hangar-action-btn primary" onclick="switchTab('chart')">
+                  <span class="action-icon">◆</span> VIEW TELEMETRY
+                </button>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-panel" id="chart-panel">
           <!-- Mobile Ticker Carousel -->
           <div class="mobile-ticker-carousel" id="mobile-ticker-carousel">
             <div class="ticker-carousel-inner" id="ticker-carousel-inner">
@@ -731,9 +867,17 @@
                 <div class="telemetry-ship-hud">
                   <div class="telemetry-ship-frame">
                     <div class="telemetry-ship-grid"></div>
+                    <!-- Step 6A: Primary viewport uses actual ship sprite -->
+                    <img 
+                      id="primary-viewport-sprite"
+                      class="telemetry-ship-sprite"
+                      src="assets/ships/RKLB-flagship-ship.png"
+                      alt="Active vessel"
+                      loading="eager">
+                    <!-- Fallback SVG (hidden when sprite loads) -->
                     <svg
                       id="telemetry-ship-svg"
-                      class="telemetry-ship-svg"
+                      class="telemetry-ship-svg hidden"
                       viewBox="0 0 120 80"
                       aria-hidden="true">
                       <!-- renderPixelShip() will paint into here -->
@@ -745,6 +889,9 @@
                   <div class="telemetry-ship-caption" id="telemetry-ship-caption">
                     Spearhead command ship. Victory follows in its wake.
                   </div>
+                  
+                  <!-- Step 4: Mission Context Container -->
+                  <div id="mission-context-container" class="mission-context-container"></div>
                 </div>
                 
                 <div class="telemetry-chart-area">
@@ -763,7 +910,8 @@
                       </div>
                     </div>
                     <div class="chart-tools">
-                      <button class="ctrl-btn active" id="ma-toggle" onclick="toggleMA()">MA</button>
+                      <button class="ctrl-btn active" id="ma-toggle" onclick="toggleMA()" title="EMA Ribbon Overlay">RIBBON</button>
+                      <button class="ctrl-btn active" id="macd-mode-toggle" onclick="toggleMacdMode()" title="MACD Display Mode">ORBIT</button>
                       <div class="tool-divider"></div>
                       <div class="control-group">
                         <button class="ctrl-btn" data-range="1W" onclick="setRange('1W')">1W</button>
@@ -778,7 +926,18 @@
                   
                   <!-- Charts -->
                   <div class="price-chart-wrapper"><canvas id="price-chart"></canvas></div>
-                  <div class="macd-chart-wrapper"><canvas id="macd-chart"></canvas></div>
+                  <div class="macd-chart-wrapper">
+                    <canvas id="macd-chart"></canvas>
+                    <canvas id="macd-orbit-canvas" class="macd-orbit-canvas"></canvas>
+                  </div>
+                  
+                  <!-- Captain's Log (fills dead zone under MACD) -->
+                  <section class="telemetry-logbay">
+                    <div class="logbay-title">// CAPTAIN'S LOG</div>
+                    <div id="captains-log-list" class="captains-log-list">
+                      <div class="log-empty">AWAITING SIGNAL EVENTS…</div>
+                    </div>
+                  </section>
                 </div>
               </div>
               
@@ -793,10 +952,10 @@
                 </div>
                 
                 <div class="console-section">
-                  <div class="console-title">// SENSOR BANK</div>
-                  <div class="console-row"><span>MA-100</span><span id="tm-ma100">--</span></div>
-                  <div class="console-row"><span>MA-150</span><span id="tm-ma150">--</span></div>
-                  <div class="console-row"><span>MA-200</span><span id="tm-ma200">--</span></div>
+                  <div class="console-title">// GUIDE LEVELS</div>
+                  <div class="console-row"><span>G-100</span><span id="tm-ma100">--</span></div>
+                  <div class="console-row"><span>G-150</span><span id="tm-ma150">--</span></div>
+                  <div class="console-row"><span>G-200</span><span id="tm-ma200">--</span></div>
                   <div class="console-row"><span>PRICE</span><span id="tm-price">--</span></div>
                 </div>
 
@@ -837,6 +996,25 @@
                   <div class="console-row" id="tm-histo-row"><span>HISTO</span><span id="tm-histo">--</span></div>
                 </div>
                 
+                <!-- Ship Systems Panel (reactive to indicators) -->
+                <div class="console-section ship-systems-section">
+                  <div class="console-title">// SHIP SYSTEMS</div>
+                  <ul class="ship-systems-list" id="ship-systems-list">
+                    <li class="system-row"><span class="system-name">THRUSTERS</span><span class="system-state system-idle">IDLE</span></li>
+                    <li class="system-row"><span class="system-name">HULL</span><span class="system-state system-stable">STABLE</span></li>
+                    <li class="system-row"><span class="system-name">SENSORS</span><span class="system-state system-idle">NOMINAL</span></li>
+                    <li class="system-row"><span class="system-name">WARP DRIVE</span><span class="system-state system-locked">LOCKED</span></li>
+                  </ul>
+                </div>
+                
+                <!-- Objectives / Milestones -->
+                <div class="console-section objectives-section">
+                  <div class="console-title">// OBJECTIVES</div>
+                  <ul class="objectives-list" id="ship-objectives-list">
+                    <li class="objective-row pending"><span class="objective-icon">◇</span><span class="objective-text">Awaiting signal lock...</span></li>
+                  </ul>
+                </div>
+                
                 <div class="console-section console-log">
                   <div class="console-title">// BRIDGE FEED</div>
                   <div class="console-log-lines" id="telemetry-log">
@@ -852,6 +1030,39 @@
               <span class="status-chip" id="tm-mode-chip"><span class="dot"></span>MODE · TELEMETRY</span>
               <span class="status-chip" id="tm-range-chip"><span class="dot"></span>RANGE · 3M</span>
             </div>
+            
+            <!-- TELEMETRY CONTEXT BAY (responsive) -->
+            <section id="telemetry-context-bay" class="context-bay collapsed" aria-label="Telemetry Context Bay">
+              <button class="context-bay-handle" type="button" onclick="toggleContextBay()" aria-expanded="false">
+                <span class="handle-glyph">≋</span>
+                <span class="handle-title">CONTEXT BAY</span>
+                <span class="handle-state" id="context-bay-state">EXPAND</span>
+              </button>
+              
+              <div class="context-bay-content" role="region" aria-live="polite">
+                <div class="context-bay-grid">
+                  <div class="context-panel" id="panel-ribbon">
+                    <div class="panel-title">RIBBON STATE</div>
+                    <div class="panel-body">
+                      <div class="ribbon-meter">
+                        <div class="ribbon-meter-bar" id="ribbon-meter-bar"></div>
+                      </div>
+                      <div class="ribbon-readout" id="ribbon-readout">—</div>
+                    </div>
+                  </div>
+                  
+                  <div class="context-panel" id="panel-signal">
+                    <div class="panel-title">SIGNAL RADAR</div>
+                    <div class="panel-body" id="signal-radar">—</div>
+                  </div>
+                  
+                  <div class="context-panel" id="panel-feed">
+                    <div class="panel-title">BRIDGE FEED</div>
+                    <div class="panel-body feed-mini" id="bridge-feed-mini">—</div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
           
           <!-- SPIELBERGIAN CONTROL PANEL -->
@@ -1013,12 +1224,16 @@
           </div>
         </div>
         
-        <div class="tab-panel" id="positions-panel">
-          <div class="positions-content">
+        <div class="tab-panel fleet-scene-container" id="positions-panel">
+          <!-- Step 5: Fleet Hangar background canvas -->
+          <canvas class="fleet-bg-canvas" id="fleet-hangar-canvas"></canvas>
+          <div class="hangar-glass-overlay"></div>
+          
+          <div class="fleet-ui-layer positions-content">
             <!-- Fleet Command Header -->
             <div class="fleet-command-header">
               <div class="fleet-command-title">
-                <span class="icon">🚀</span>
+                <span class="icon">▲</span>
                 <div>
                   <h2>FLEET COMMAND</h2>
                   <div class="subtitle">ACTIVE VESSEL MANIFEST</div>
@@ -1073,6 +1288,41 @@
                 <button class="fleet-view-btn" onclick="setFleetView('table')" title="Table View">☰ TABLE</button>
               </div>
             </div>
+            
+            <!-- Command Brief Panel -->
+            <div class="command-brief" id="command-brief">
+              <div class="command-brief-header">
+                <span class="command-brief-icon">◈</span>
+                <span class="command-brief-title">COMMAND BRIEF</span>
+                <span class="command-brief-status" id="brief-status">NOMINAL</span>
+              </div>
+              <div class="command-brief-body">
+                <div class="brief-row">
+                  <span class="brief-label">Fleet Posture</span>
+                  <span class="brief-value" id="brief-posture">Controlled Expansion</span>
+                </div>
+                <div class="brief-row">
+                  <span class="brief-label">Sector Concentration</span>
+                  <span class="brief-value" id="brief-concentration">Space & Defense</span>
+                </div>
+                <div class="brief-row">
+                  <span class="brief-label">Risk Assessment</span>
+                  <span class="brief-value" id="brief-risk">Acceptable</span>
+                </div>
+                <div class="brief-row">
+                  <span class="brief-label">Expected Outcome</span>
+                  <span class="brief-value positive" id="brief-outcome">Favorable Drift</span>
+                </div>
+                <div class="brief-notes" id="brief-notes">
+                  <div class="brief-note">• Fleet momentum aligned with sector trends</div>
+                  <div class="brief-note">• Primary vessels showing hull integrity</div>
+                  <div class="brief-note">• Recommend maintaining current trajectory</div>
+                </div>
+              </div>
+              <div class="command-brief-footer">
+                <span class="brief-link" onclick="launchMissionCommand()">› Launch Mission Command</span>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -1101,7 +1351,7 @@
                 <!-- TRAJECTORY NAVIGATOR -->
                 <div class="trajectory-section">
                   <div class="trajectory-header">
-                    <div class="trajectory-title">🛰 NAVIGATION PATH SIMULATOR</div>
+                    <div class="trajectory-title">◈ NAVIGATION PATH SIMULATOR</div>
                     <div class="trajectory-legend">
                       <span><div class="dot bullish"></div> Bullish</span>
                       <span><div class="dot neutral"></div> Neutral</span>
@@ -1144,77 +1394,205 @@
         </div>
         
         <!-- ARCADE PANEL -->
-        <div class="tab-panel" id="arcade-panel">
-          <div class="arcade-lobby">
+        <div class="tab-panel fleet-scene-container" id="arcade-panel">
+          <!-- Step 5.1: Fleet background canvas -->
+          <canvas class="fleet-bg-canvas" id="arcade-bg-canvas"></canvas>
+          
+          <div class="arcade-lobby fleet-ui-layer">
             <div class="arcade-lobby-header">
               <div class="arcade-lobby-title">
-                <span class="arcade-icon">🕹️</span>
+                <span class="arcade-icon">◈</span>
                 <div>
-                  <h2>HASLUN ARCADE</h2>
-                  <span class="arcade-subtitle">FLEET COMMAND TRAINING SIMULATIONS</span>
+                  <h2>SPACE CAPITAL ARCADE</h2>
+                  <span class="arcade-subtitle">VECTOR RACING SIMULATION</span>
                 </div>
               </div>
               <div class="arcade-stats-bar">
-                <div class="arcade-stat"><span class="label">HIGH SCORE</span><span class="value" id="arcade-high-score">0</span></div>
-                <div class="arcade-stat"><span class="label">GAMES PLAYED</span><span class="value" id="arcade-games-played">0</span></div>
+                <div class="arcade-stat"><span class="label">BEST DISTANCE</span><span class="value" id="arcade-high-score">0 km</span></div>
+                <div class="arcade-stat"><span class="label">RUNS</span><span class="value" id="arcade-games-played">0</span></div>
               </div>
             </div>
             
-            <div class="arcade-games-grid">
-              <!-- Signal Invaders Card -->
-              <div class="arcade-game-card" onclick="window.SignalInvaders && SignalInvaders.start()">
-                <div class="game-card-preview" id="invaders-preview">
-                  <canvas id="invaders-preview-canvas" width="280" height="160"></canvas>
-                  <div class="game-card-overlay">
-                    <span class="play-icon">▶</span>
+            <!-- SPACE RUN - Unified Arcade Experience -->
+            <div class="space-run-launcher">
+              <div class="run-hero-card" onclick="window.SpaceRun && SpaceRun.start()">
+                <div class="run-hero-preview">
+                  <canvas id="run-preview-canvas" width="400" height="200"></canvas>
+                  <div class="run-hero-overlay">
+                    <span class="run-play-icon">▶</span>
+                    <span class="run-play-text">INITIATE RUN</span>
                   </div>
                 </div>
-                <div class="game-card-info">
-                  <div class="game-card-title">👾 SIGNAL INVADERS</div>
-                  <div class="game-card-desc">Defend the array against hostile market signals. Your fleet ships become the enemy waves!</div>
-                  <div class="game-card-controls">
-                    <span>← → MOVE</span>
-                    <span>SPACE FIRE</span>
+                <div class="run-hero-info">
+                  <div class="run-hero-title">SPACE RUN</div>
+                  <div class="run-hero-subtitle">High-Speed Market Corridor</div>
+                  <div class="run-hero-desc">
+                    Thread through the volatility field. Dodge debris, ride momentum streams, 
+                    and push your ship to the limit. The market is the track — speed is survival.
+                  </div>
+                  <div class="run-hero-controls">
+                    <span class="control-hint"><kbd>←</kbd> <kbd>→</kbd> DODGE</span>
+                    <span class="control-hint"><kbd>SPACE</kbd> BOOST</span>
                   </div>
                 </div>
-                <div class="game-card-badge">CLASSIC</div>
               </div>
               
-              <!-- Terrain Lander Card -->
-              <div class="arcade-game-card" onclick="window.LandingGame && LandingGame.start()">
-                <div class="game-card-preview" id="lander-preview">
-                  <canvas id="lander-preview-canvas" width="280" height="160"></canvas>
-                  <div class="game-card-overlay">
-                    <span class="play-icon">▶</span>
+              <div class="run-stats-panel">
+                <div class="run-stat-block">
+                  <span class="run-stat-label">LAST RUN</span>
+                  <span class="run-stat-value" id="run-last-distance">— km</span>
+                </div>
+                <div class="run-stat-block highlight">
+                  <span class="run-stat-label">BEST RUN</span>
+                  <span class="run-stat-value" id="run-best-distance">0 km</span>
+                </div>
+                <div class="run-stat-block">
+                  <span class="run-stat-label">ACTIVE SHIP</span>
+                  <span class="run-stat-value" id="run-active-ship">RKLB</span>
+                </div>
+                <div class="run-stat-block">
+                  <span class="run-stat-label">SQUADRON</span>
+                  <div class="run-squadron-bar" id="run-squadron-strength">
+                    <span class="squadron-fill"></span>
                   </div>
                 </div>
-                <div class="game-card-info">
-                  <div class="game-card-title">🚀 TERRAIN LANDER</div>
-                  <div class="game-card-desc">Navigate treacherous market terrain and land safely on profit zones. Fuel management is critical.</div>
-                  <div class="game-card-controls">
-                    <span>← → STEER</span>
-                    <span>↑ THRUST</span>
+              </div>
+            </div>
+            
+            <!-- BEY ARENA - Telemetry Spin Battle -->
+            <div class="bey-arena-launcher" style="margin-top: 24px;">
+              <div class="run-hero-card" id="bey-arena-launch" style="cursor: pointer;">
+                <div class="run-hero-preview" style="background: radial-gradient(circle at 50% 40%, rgba(28,32,44,0.95), rgba(8,10,14,0.98)); display: flex; align-items: center; justify-content: center;">
+                  <div class="run-hero-overlay">
+                    <span class="run-play-icon" style="font-size: 2.2rem;">⟳</span>
+                    <span class="run-play-text">LAUNCH ARENA</span>
                   </div>
                 </div>
-                <div class="game-card-badge">LUNAR</div>
+                <div class="run-hero-info">
+                  <div class="run-hero-title">BEY ARENA</div>
+                  <div class="run-hero-subtitle">Telemetry Spin Battle</div>
+                  <div class="run-hero-desc">
+                    Ships become spinners. Market behavior becomes physics. Watch your fleet collide 
+                    in an anime-style arena where telemetry drives the action. Ring-outs, burst finishes, 
+                    and momentum clashes — all derived from real trading data.
+                  </div>
+                  <div class="run-hero-controls">
+                    <span class="control-hint">TELEMETRY → PHYSICS</span>
+                    <span class="control-hint">CHAOS GUARANTEED</span>
+                  </div>
+                </div>
               </div>
             </div>
             
             <!-- Ship Selection for Games -->
             <div class="arcade-ship-select">
               <div class="ship-select-header">
-                <span class="ship-select-title">🚀 SELECT YOUR SHIP</span>
-                <span class="ship-select-hint">Choose your vessel for arcade missions</span>
+                <span class="ship-select-title">▲ SELECT YOUR SHIP</span>
+                <span class="ship-select-hint">Your vessel determines your handling characteristics</span>
               </div>
               <div class="ship-select-grid" id="arcade-ship-grid">
                 <!-- Ships will be populated dynamically -->
               </div>
             </div>
+          </div>
+        </div>
+        
+        <!-- GARAGE PANEL - Refit Bay (Ship Livery Customization) -->
+        <div class="tab-panel" id="garage-panel">
+          <div id="paint-bay-container"></div>
+        </div>
+        
+        <!-- UPGRADES PANEL - Visual Ship Upgrades Based on Stats -->
+        <div class="tab-panel" id="upgrades-panel">
+          <div class="upgrades-container">
+            <div class="upgrades-header">
+              <div class="upgrades-title">
+                <span class="upgrades-icon">⚙</span>
+                <div>
+                  <h2>SHIP UPGRADES</h2>
+                  <span class="upgrades-subtitle">Performance-Based Visual Evolution</span>
+                </div>
+              </div>
+              <p class="upgrades-desc">Your ships visually evolve based on their trading performance. Adjust stats to see how upgrades apply.</p>
+            </div>
             
-            <!-- Cheat Codes Section -->
-            <div class="arcade-secrets">
-              <div class="secrets-title">🔐 COMMAND CODES</div>
-              <div class="secrets-hint">Type secret codes anywhere to unlock special features...</div>
+            <div class="upgrades-content">
+              <!-- Stats Controls -->
+              <div class="upgrades-controls">
+                <h3>Simulate Stats</h3>
+                <div class="upgrades-slider-grid">
+                  <div class="upgrade-slider-group">
+                    <label>Today P&L <span id="upgrade-pnl-value">0%</span></label>
+                    <input type="range" id="upgrade-pnl" min="-10" max="10" value="0" step="0.5">
+                  </div>
+                  <div class="upgrade-slider-group">
+                    <label>Win Rate <span id="upgrade-winrate-value">50%</span></label>
+                    <input type="range" id="upgrade-winrate" min="20" max="90" value="50" step="1">
+                  </div>
+                  <div class="upgrade-slider-group">
+                    <label>Volatility <span id="upgrade-volatility-value">3%</span></label>
+                    <input type="range" id="upgrade-volatility" min="0.5" max="10" value="3" step="0.5">
+                  </div>
+                  <div class="upgrade-slider-group">
+                    <label>Volume <span id="upgrade-volume-value">1.0x</span></label>
+                    <input type="range" id="upgrade-volume" min="0.2" max="5" value="1" step="0.1">
+                  </div>
+                  <div class="upgrade-slider-group">
+                    <label>Total Gain <span id="upgrade-gain-value">0%</span></label>
+                    <input type="range" id="upgrade-gain" min="-30" max="80" value="0" step="1">
+                  </div>
+                  <div class="upgrade-slider-group">
+                    <label>Max Drawdown <span id="upgrade-drawdown-value">10%</span></label>
+                    <input type="range" id="upgrade-drawdown" min="0" max="30" value="10" step="1">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Ship Preview -->
+              <div class="upgrades-preview">
+                <div class="upgrade-ship-select">
+                  <label>Ship:</label>
+                  <select id="upgrade-ticker-select">
+                    <option value="RKLB">RKLB - Flagship</option>
+                    <option value="LUNR">LUNR - Lander</option>
+                    <option value="JOBY">JOBY - eVTOL</option>
+                    <option value="GME">GME - Moonshot</option>
+                    <option value="ACHR">ACHR - eVTOL</option>
+                    <option value="BKSY">BKSY - Recon</option>
+                  </select>
+                </div>
+                <div class="upgrade-canvas-container">
+                  <canvas id="upgrade-preview-canvas" width="192" height="192"></canvas>
+                </div>
+                <div class="upgrade-power-display">
+                  <span class="power-label">POWER LEVEL</span>
+                  <span class="power-value" id="upgrade-power-value">50</span>
+                </div>
+                <div class="upgrade-power-bar">
+                  <div class="upgrade-power-fill" id="upgrade-power-bar" style="width: 50%"></div>
+                </div>
+              </div>
+              
+              <!-- Upgrade Breakdown -->
+              <div class="upgrades-breakdown">
+                <h3>Active Upgrades</h3>
+                <div class="upgrade-list" id="upgrade-breakdown-list">
+                  <!-- Populated dynamically -->
+                </div>
+                <div class="upgrade-summary" id="upgrade-summary-text">Stock Configuration</div>
+              </div>
+            </div>
+            
+            <div class="upgrades-info">
+              <h3>How Upgrades Work</h3>
+              <ul>
+                <li><strong>Wings</strong> — Today's P&L drives wing size (fast movers get bigger wings)</li>
+                <li><strong>Engines</strong> — Win rate determines engine power and glow</li>
+                <li><strong>Armor</strong> — Volatility adds protective plating</li>
+                <li><strong>Antenna</strong> — High volume = communication arrays</li>
+                <li><strong>Weapons</strong> — Total gains unlock weapon systems</li>
+                <li><strong>Shield</strong> — Low drawdown enables shields</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -1254,7 +1632,7 @@
             <button class="push-btn dummy-control" data-dummy-action="buy" style="background: rgba(51, 255, 153, 0.1); border-color: var(--phosphor);">BUY</button>
             <button class="push-btn dummy-control" data-dummy-action="sell" style="background: rgba(255, 107, 107, 0.1); border-color: #ff6b6b; color: #ff6b6b;">SELL</button>
           </div>
-          <button class="push-btn dummy-control" data-dummy-action="leverage" style="width: 100%; margin-top: 0.5rem;">⚡ 10X LEVERAGE</button>
+          <button class="push-btn dummy-control" data-dummy-action="leverage" style="width: 100%; margin-top: 0.5rem;">× 10X LEVERAGE</button>
         </div>
         
         <div class="sidebar-section">
@@ -1287,12 +1665,12 @@
         
         <!-- SNOOP TRAP: Fake Admin Access -->
         <div class="sidebar-section" style="border-bottom: 1px solid var(--border);">
-          <div class="sidebar-title" style="color: var(--amber);">⚠ Admin Access</div>
+          <div class="sidebar-title" style="color: var(--amber);">! Admin Access</div>
           <button class="push-btn dummy-control" data-dummy-action="admin" style="width: 100%; border-color: var(--amber); color: var(--amber);">
-            🔐 MISSION CONTROL LOGIN
+            › MISSION CONTROL LOGIN
           </button>
           <button class="push-btn dummy-control" data-dummy-action="withdraw" style="width: 100%; margin-top: 0.5rem;">
-            💰 WITHDRAW FUNDS
+            › WITHDRAW FUNDS
           </button>
         </div>
         
@@ -1301,7 +1679,7 @@
       </aside>
     </main>
     
-    <div class="watermark"><span title="Play money. Real feelings.">SIMULATION MODE</span><a href="https://haslun.ai">← haslun.ai</a></div>
+    <div class="watermark"><span title="Play money. Real feelings.">SIMULATION MODE</span><span class="space-capital-mark">SPACE CAPITAL</span></div>
     
     <div class="status-strip">
       <div class="status-item" title="Everything is fine, which is statistically suspicious."><span class="dot green"></span><span class="value">SYSTEM NOMINAL</span></div>
@@ -1336,6 +1714,16 @@
         </select>
       </div>
       
+      <!-- Performance Mode Toggle -->
+      <div class="status-item perf-toggle">
+        <span class="value" title="Graphics quality">GFX</span>
+        <select id="perf-mode-select" class="perf-select" onchange="setPerformanceMode(this.value)">
+          <option value="full">FULL</option>
+          <option value="balanced" selected>BALANCED</option>
+          <option value="battery">BATTERY</option>
+        </select>
+      </div>
+      
       <!-- Color Profile Control -->
       <div class="status-item" style="min-width: 180px;">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1351,24 +1739,24 @@
          ============================================================ -->
     <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
       <div class="mobile-nav-items">
-        <button class="mobile-nav-item active" data-tab="chart" onclick="switchTabMobile('chart')">
-          <span class="nav-icon">📡</span>
-          <span>Telemetry</span>
-        </button>
-        <button class="mobile-nav-item" data-tab="positions" onclick="switchTabMobile('positions')">
+        <button class="mobile-nav-item active" data-tab="hangar" data-group="hangar" onclick="switchTabMobile('hangar')">
           <span class="nav-icon">🚀</span>
-          <span>Holdings</span>
+          <span>Hangar</span>
         </button>
-        <button class="mobile-nav-item" data-tab="arcade" onclick="switchTabMobile('arcade')">
-          <span class="nav-icon">🎮</span>
+        <button class="mobile-nav-item" data-tab="positions" data-group="command" onclick="switchTabMobile('positions')">
+          <span class="nav-icon">▲</span>
+          <span>Command</span>
+        </button>
+        <button class="mobile-nav-item" data-tab="arcade" data-group="arcade" onclick="switchTabMobile('arcade')">
+          <span class="nav-icon">◇</span>
           <span>Arcade</span>
         </button>
-        <button class="mobile-nav-item" data-tab="catalysts" onclick="switchTabMobile('catalysts')">
-          <span class="nav-icon">📅</span>
-          <span>Events</span>
+        <button class="mobile-nav-item" data-tab="chart" data-group="data" onclick="switchTabMobile('chart')">
+          <span class="nav-icon">◈</span>
+          <span>Data</span>
         </button>
         <button class="mobile-nav-item" onclick="toggleMobileDrawer()">
-          <span class="nav-icon">⚙️</span>
+          <span class="nav-icon">≡</span>
           <span>More</span>
         </button>
       </div>
@@ -1398,33 +1786,10 @@
           <span class="quick-stat-value">CLOSED</span>
         </div>
         <div class="quick-stat">
-          <span class="quick-stat-label">⏱</span>
+          <span class="quick-stat-label">T+</span>
           <span class="quick-stat-value" id="mobile-uptime">00:00</span>
         </div>
       </div>
-    </div>
-    
-    <!-- ============================================================
-         MOBILE FLOATING ACTION BUTTON
-         ============================================================ -->
-    <div class="mobile-fab" id="mobile-fab">
-      <div class="fab-menu" id="fab-menu">
-        <button class="fab-item" id="fab-sfx" onclick="toggleFabSFX()">
-          <span class="fab-icon">🔊</span>
-          <span>SFX ON</span>
-        </button>
-        <button class="fab-item" id="fab-bgm" onclick="toggleFabBGM()">
-          <span class="fab-icon">🎵</span>
-          <span>BGM OFF</span>
-        </button>
-        <button class="fab-item" onclick="showAboutOverlay()">
-          <span class="fab-icon">❓</span>
-          <span>ABOUT</span>
-        </button>
-      </div>
-      <button class="fab-main" id="fab-main" onclick="toggleFabMenu()">
-        <span>⚡</span>
-      </button>
     </div>
     
     <!-- ============================================================
@@ -1452,17 +1817,20 @@
     
     <!-- ARCADE HUD – mini mission list -->
     <div id="arcade-hud" class="arcade-hud hidden">
-      <div class="hud-title">👾 ARCADE MODE</div>
+      <div class="hud-title">[ARCADE MODE]</div>
       <ul id="mission-list"></ul>
       <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem;">
+        <button class="arcade-launch-btn" onclick="window.BeyArena && BeyArena.open('RKLB', 'ACHR')" style="border-color: #ff6b35; color: #ff6b35;">
+          › BEY ARENA
+        </button>
         <button class="arcade-launch-btn" onclick="window.SignalInvaders && SignalInvaders.start()">
-          👾 SIGNAL INVADERS
+          › SIGNAL INVADERS
         </button>
         <button class="arcade-launch-btn" onclick="window.LandingGame && LandingGame.start()">
-          🚀 TERRAIN LANDER
+          › TERRAIN LANDER
         </button>
         <button class="arcade-launch-btn" onclick="window.AdminConsole && AdminConsole.open()" style="border-color: var(--amber); color: var(--amber);">
-          🔐 ADMIN CONSOLE
+          › ADMIN CONSOLE
         </button>
       </div>
     </div>
@@ -1485,7 +1853,7 @@
           <button class="admin-close" id="admin-close">✕</button>
           <div class="admin-header">
             <span>// ACCESS NODE</span>
-            <span class="admin-title">HASLUN MISSION CONTROL</span>
+            <span class="admin-title">PARALLAX MISSION CONTROL</span>
           </div>
           <div class="admin-screen">
             <div class="admin-line">SECURITY SUBSYSTEM v3.1</div>
@@ -1512,57 +1880,98 @@
     </div>
     
     <!-- CHART LANDING GAME -->
-    <div id="landing-game-overlay" class="landing-game-overlay">
-      <div class="landing-game-container">
-        <button class="landing-close" id="landing-close">✕ ESC</button>
-        <div class="landing-game-header">
-          <div class="landing-game-title">🚀 TERRAIN LANDER</div>
-          <div class="landing-game-stats">
-            <span>FUEL: <span id="landing-fuel">100</span>%</span>
-            <span>VELOCITY: <span id="landing-velocity">0.0</span></span>
-            <span>ALT: <span id="landing-alt">100</span></span>
+    <!-- SPACE RUN GAME OVERLAY -->
+    <div id="space-run-overlay" class="space-run-overlay hidden">
+      <div class="run-game-backdrop"></div>
+      <div class="run-game-container">
+        <button class="run-close-btn" id="space-run-close-btn">✕ ESC</button>
+        
+        <div class="run-game-header">
+          <div class="run-game-title">[SPACE RUN]</div>
+          <div class="run-game-stats">
+            <div class="run-stat">
+              <span class="stat-label">DISTANCE</span>
+              <span class="stat-value" id="run-distance">0</span>
+              <span class="stat-unit">km</span>
+            </div>
+            <div class="run-stat">
+              <span class="stat-label">SPEED</span>
+              <span class="stat-value" id="run-speed">0</span>
+            </div>
+            <div class="run-stat multiplier">
+              <span class="stat-label">MULT</span>
+              <span class="stat-value" id="run-multiplier">×1.0</span>
+            </div>
           </div>
         </div>
-        <canvas id="landing-canvas"></canvas>
-        <div class="landing-controls">
-          <span>← → STEER</span>
-          <span>↑ THRUST</span>
+        
+        <div class="run-hud-bars">
+          <div class="run-bar-container hull-bar">
+            <span class="bar-label">HULL</span>
+            <div class="bar-track">
+              <div class="bar-fill" id="run-hull-bar" style="width: 100%"></div>
+            </div>
+            <span class="bar-value" id="run-hull">100</span>
+          </div>
+          <div class="run-bar-container boost-bar">
+            <span class="bar-label">BOOST</span>
+            <div class="bar-track">
+              <div class="bar-fill" id="run-boost-bar" style="width: 100%"></div>
+            </div>
+            <span class="bar-value" id="run-boost">100</span>
+          </div>
+        </div>
+        
+        <canvas id="space-run-canvas" width="700" height="450"></canvas>
+        
+        <div class="run-controls-hint">
+          <span>← → DODGE</span>
+          <span>SPACE / ↑ BOOST</span>
           <span>ESC EXIT</span>
         </div>
-        <div class="landing-touch-controls">
-          <button class="landing-touch-btn" id="land-touch-left">◀</button>
-          <button class="landing-touch-btn thrust" id="land-touch-thrust">▲ THRUST</button>
-          <button class="landing-touch-btn" id="land-touch-right">▶</button>
+        
+        <div class="run-touch-controls">
+          <button class="run-touch-btn" id="run-touch-left">◀</button>
+          <button class="run-touch-btn boost" id="run-touch-boost">▲ BOOST</button>
+          <button class="run-touch-btn" id="run-touch-right">▶</button>
         </div>
-        <div class="landing-message" id="landing-message"></div>
+        
+        <div class="run-message" id="run-message" style="display: none;"></div>
       </div>
     </div>
     
-    <!-- SIGNAL INVADERS ARCADE GAME -->
-    <div id="signal-invaders-overlay" class="arcade-game-overlay hidden">
-      <div class="arcade-game-backdrop"></div>
-      <div class="arcade-game-container">
-        <button class="arcade-close" id="invaders-close-btn">✕ ESC</button>
-        <div class="arcade-header">
-          <div class="arcade-title">👾 SIGNAL INVADERS</div>
-          <div class="arcade-stats">
-            <span class="arcade-score">SCORE: <span id="invaders-score">0</span></span>
-            <span class="arcade-lives">LIVES: <span id="invaders-lives">♥♥♥</span></span>
-            <span class="arcade-wave">WAVE: <span id="invaders-wave">1</span></span>
+    <!-- BEY ARENA OVERLAY -->
+    <div id="bey-arena-overlay" class="bey-arena-overlay">
+      <div class="bey-arena-shell">
+        <div class="bey-arena-topbar">
+          <div>
+            <div class="bey-arena-title">BEY ARENA</div>
+            <div class="bey-arena-sub">TELEMETRY SPIN BATTLE</div>
+          </div>
+          <button class="bey-arena-close" id="bey-arena-close">✕ ESC</button>
+        </div>
+        
+        <div class="bey-arena-stage">
+          <div class="bey-panel left">
+            <h3>PILOT 1</h3>
+            <pre class="bey-readout" id="bey-left-readout">—</pre>
+          </div>
+          
+          <div class="bey-canvas-wrap">
+            <canvas id="bey-arena-canvas" width="520" height="520"></canvas>
+            <div class="bey-banner" id="bey-arena-banner">AWAITING LAUNCH</div>
+            <div class="bey-controls">
+              <button class="bey-btn primary" id="bey-arena-rematch">⟳ REMATCH</button>
+              <button class="bey-btn" id="bey-arena-swap">⇄ SWAP</button>
+            </div>
+            <div class="bey-scanlines"></div>
+          </div>
+          
+          <div class="bey-panel right">
+            <h3>PILOT 2</h3>
+            <pre class="bey-readout" id="bey-right-readout">—</pre>
           </div>
         </div>
-        <canvas id="invaders-canvas" width="600" height="400"></canvas>
-        <div class="arcade-controls">
-          <span>← → MOVE</span>
-          <span>SPACE FIRE</span>
-          <span>ESC EXIT</span>
-        </div>
-        <div class="mobile-touch-controls" id="mobile-controls">
-          <button class="touch-btn" id="touch-left">◀</button>
-          <button class="touch-btn fire" id="touch-fire">FIRE</button>
-          <button class="touch-btn" id="touch-right">▶</button>
-        </div>
-        <div class="arcade-message" id="invaders-message"></div>
       </div>
     </div>
     
@@ -1574,17 +1983,17 @@
 
         <div class="about-header">
           <div class="about-label">SIMULATION DOSSIER</div>
-          <h2 class="about-title">What is Haslun-Bot Pilot's Cockpit?</h2>
+          <h2 class="about-title">What is PARALLAX?</h2>
         </div>
 
         <div class="about-body">
           <p>
-            Haslun-Bot Pilot's Cockpit is a <strong>simulated trading deck</strong> for a fictional research fund.
+            PARALLAX is a <strong>command and telemetry interface</strong> for a fictional research fund.
             It's part data room, part arcade cabinet, and part mood board for how we think about risk,
             storytelling, and markets.
           </p>
           <p>
-            All of the panels you see — portfolio status, trend diagnostics, scenario sliders, derivatives console —
+            All of the panels you see — fleet status, trend diagnostics, scenario sliders, derivatives console —
             are wired to <strong>sandbox data</strong>. Nothing here is a live brokerage account, and nothing on this
             screen is investment advice. It's closer to a flight simulator than an airplane.
           </p>
@@ -1592,7 +2001,7 @@
             The idea is simple:
           </p>
           <ul>
-            <li>Treat a portfolio like a <strong>spaceship</strong>: engines, shields, navigation, and unknown signals.</li>
+            <li>Treat a portfolio like a <strong>fleet of ships</strong>: engines, shields, navigation, and unknown signals.</li>
             <li>Let visitors <strong>twist the knobs</strong> — smoothing, volatility, forecast range — and watch telemetry respond.</li>
             <li>Use playful language and retro graphics to make quantitative ideas feel <strong>legible and human</strong>.</li>
           </ul>
@@ -1633,7 +2042,7 @@
           <button class="pipboy-dial active" data-panel="overview">◈ OVERVIEW</button>
           <button class="pipboy-dial" data-panel="thesis">◉ THESIS</button>
           <button class="pipboy-dial" data-panel="catalysts">▲ CATALYSTS</button>
-          <button class="pipboy-dial" data-panel="risks">⚠ RISKS</button>
+          <button class="pipboy-dial" data-panel="risks">! RISKS</button>
           <button class="pipboy-dial" data-panel="vitals">◐ VITALS</button>
         </nav>
 
@@ -1698,7 +2107,14 @@
     <button class="about-trigger" id="about-trigger-btn">? ABOUT THIS SIMULATION</button>
   </div>
 
-  <!-- VESSEL DOSSIER OVERLAY - Cinematic ship information card -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       LEGACY: Vessel Dossier (DEPRECATED — replaced by ShipBrief module)
+       
+       This HTML is no longer used. The unified ShipBrief dialog (js/ui/shipBrief.js)
+       now handles all ship detail popups across the application.
+       
+       DO NOT DELETE until Step 3 cleanup is complete. Kept for rollback safety.
+       ═══════════════════════════════════════════════════════════════════════════ -->
   <div id="vessel-dossier" class="vessel-dossier hidden">
     <div class="vessel-backdrop"></div>
     <div class="vessel-container">
@@ -1859,10 +2275,319 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       COCKPIT HUD - Persistent Navigation
+       Three pillars: HANGAR | BATTLE ARENA | NEWS
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  
+  <div class="cockpit-hud">
+    <button class="hud-btn active" data-panel="hangar">
+      <span class="hud-btn-icon">🔧</span>
+      <span class="hud-btn-label">HANGAR</span>
+    </button>
+    <button class="hud-btn battle-btn" data-panel="battle">
+      <span class="hud-btn-icon">⚔️</span>
+      <span class="hud-btn-label">BATTLE ARENA</span>
+    </button>
+    <button class="hud-btn" data-panel="news">
+      <span class="hud-btn-icon">📡</span>
+      <span class="hud-btn-label">NEWS</span>
+    </button>
+  </div>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       COCKPIT PANELS
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  
+  <!-- HANGAR PANEL - RPG Character Screen -->
+  <div class="cockpit-panel active" id="hangar-panel-new">
+    <div class="hangar-rpg">
+      
+      <!-- LEFT SIDEBAR: Stats & Equipment -->
+      <div class="hangar-sidebar">
+        
+        <!-- Core Stats -->
+        <div class="stat-block">
+          <div class="stat-block-header">
+            <span class="stat-block-icon">📊</span>
+            <span class="stat-block-title">TELEMETRY STATS</span>
+          </div>
+          
+          <div class="stat-row">
+            <span class="stat-label">THRUST</span>
+            <div class="stat-bar-wrap"><div class="stat-bar" id="stat-bar-thrust" style="width: 50%"></div></div>
+            <span class="stat-value" id="stat-value-thrust">50</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">STABILITY</span>
+            <div class="stat-bar-wrap"><div class="stat-bar" id="stat-bar-stability" style="width: 50%"></div></div>
+            <span class="stat-value" id="stat-value-stability">50</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">HULL</span>
+            <div class="stat-bar-wrap"><div class="stat-bar" id="stat-bar-hull" style="width: 50%"></div></div>
+            <span class="stat-value" id="stat-value-hull">50</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">SIGNAL</span>
+            <div class="stat-bar-wrap"><div class="stat-bar" id="stat-bar-signal" style="width: 50%"></div></div>
+            <span class="stat-value" id="stat-value-signal">50</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">VOLATILITY</span>
+            <div class="stat-bar-wrap"><div class="stat-bar" id="stat-bar-chop" style="width: 50%; background: linear-gradient(90deg, #ff6b35, #ff8f66);"></div></div>
+            <span class="stat-value" id="stat-value-chop" style="color: #ff6b35;">50</span>
+          </div>
+          
+          <div class="stat-source-notice">
+            STATS DERIVED FROM LIVE MARKET DATA
+          </div>
+        </div>
+        
+        <!-- Regime Badge -->
+        <div class="stat-block">
+          <div class="stat-block-header">
+            <span class="stat-block-icon">🎯</span>
+            <span class="stat-block-title">REGIME BIAS</span>
+          </div>
+          <div style="text-align: center; padding: 8px 0;">
+            <span id="ship-regime" class="regime-badge" style="
+              display: inline-block;
+              padding: 8px 20px;
+              background: rgba(51, 255, 153, 0.15);
+              border: 1px solid rgba(51, 255, 153, 0.4);
+              border-radius: 20px;
+              font-family: 'Orbitron', system-ui;
+              font-size: 14px;
+              letter-spacing: 0.15em;
+              color: #33ff99;
+            ">TREND</span>
+          </div>
+        </div>
+        
+        <!-- Equipment Slots (Future) -->
+        <div class="stat-block">
+          <div class="stat-block-header">
+            <span class="stat-block-icon">⚙️</span>
+            <span class="stat-block-title">EQUIPMENT</span>
+          </div>
+          <div class="equipment-grid">
+            <div class="equipment-slot">
+              <span class="equipment-slot-icon">🛡️</span>
+              <span>SHIELD</span>
+            </div>
+            <div class="equipment-slot">
+              <span class="equipment-slot-icon">🔋</span>
+              <span>ENGINE</span>
+            </div>
+            <div class="equipment-slot">
+              <span class="equipment-slot-icon">📡</span>
+              <span>SCANNER</span>
+            </div>
+            <div class="equipment-slot">
+              <span class="equipment-slot-icon">🎨</span>
+              <span>LIVERY</span>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- CENTER: Ship Display -->
+      <div class="hangar-center">
+        <div class="ship-showcase">
+          <div class="ship-showcase-ring"></div>
+          <img src="assets/ships/static/RKLB-flagship-ship.png" 
+               alt="RKLB" 
+               class="ship-showcase-sprite"
+               id="hangar-ship-sprite">
+        </div>
+        
+        <div class="ship-nameplate">
+          <div class="ship-nameplate-ticker" id="hangar-ship-ticker">RKLB</div>
+          <div class="ship-nameplate-class" id="hangar-ship-class">FLAGSHIP CLASS</div>
+        </div>
+        
+        <div class="ship-selector" id="ship-selector-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+      
+      <!-- RIGHT SIDEBAR: Colors & Cosmetics -->
+      <div class="hangar-sidebar">
+        
+        <!-- Color Customization -->
+        <div class="stat-block">
+          <div class="stat-block-header">
+            <span class="stat-block-icon">🎨</span>
+            <span class="stat-block-title">HULL COLORS</span>
+          </div>
+          <div class="color-picker-row">
+            <div class="color-swatch active" style="background: #33ff99;"></div>
+            <div class="color-swatch" style="background: #00d4ff;"></div>
+            <div class="color-swatch" style="background: #ff6b35;"></div>
+            <div class="color-swatch" style="background: #8a2be2;"></div>
+            <div class="color-swatch" style="background: #ffd700;"></div>
+            <div class="color-swatch" style="background: #ff1493;"></div>
+            <div class="color-swatch" style="background: #ffffff;"></div>
+            <div class="color-swatch" style="background: #1a1a2e;"></div>
+          </div>
+        </div>
+        
+        <!-- Accent Color -->
+        <div class="stat-block">
+          <div class="stat-block-header">
+            <span class="stat-block-icon">✨</span>
+            <span class="stat-block-title">ACCENT COLOR</span>
+          </div>
+          <div class="color-picker-row">
+            <div class="color-swatch active" style="background: #33ff99;"></div>
+            <div class="color-swatch" style="background: #00d4ff;"></div>
+            <div class="color-swatch" style="background: #ff6b35;"></div>
+            <div class="color-swatch" style="background: #8a2be2;"></div>
+            <div class="color-swatch" style="background: #ffd700;"></div>
+          </div>
+        </div>
+        
+        <!-- Battle Stats Preview -->
+        <div class="stat-block">
+          <div class="stat-block-header">
+            <span class="stat-block-icon">⚔️</span>
+            <span class="stat-block-title">ARENA RECORD</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center;">
+            <div>
+              <div style="font-family: 'Orbitron', system-ui; font-size: 24px; color: #33ff99;">0</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.1em;">WINS</div>
+            </div>
+            <div>
+              <div style="font-family: 'Orbitron', system-ui; font-size: 24px; color: #ff6b35;">0</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.1em;">LOSSES</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="stat-block">
+          <div class="stat-block-header">
+            <span class="stat-block-icon">⚡</span>
+            <span class="stat-block-title">QUICK ACTIONS</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button onclick="CockpitNav.switchPanel('battle')" style="
+              padding: 12px;
+              background: linear-gradient(180deg, #ff6b35 0%, #e55a2b 100%);
+              border: none;
+              border-radius: 8px;
+              font-family: 'Orbitron', system-ui;
+              font-size: 11px;
+              letter-spacing: 0.1em;
+              color: white;
+              cursor: pointer;
+            ">⚔️ ENTER ARENA</button>
+            <button onclick="switchTab('garage')" style="
+              padding: 12px;
+              background: rgba(51, 255, 153, 0.15);
+              border: 1px solid rgba(51, 255, 153, 0.3);
+              border-radius: 8px;
+              font-family: 'Orbitron', system-ui;
+              font-size: 11px;
+              letter-spacing: 0.1em;
+              color: #33ff99;
+              cursor: pointer;
+            ">🎨 PAINT BAY</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  <!-- BATTLE ARENA PANEL -->
+  <div class="cockpit-panel" id="battle-panel">
+    <div class="battle-arena-panel">
+      <div class="battle-ready-screen">
+        <h1 class="battle-title">BATTLE ARENA</h1>
+        <p class="battle-subtitle">TELEMETRY-DRIVEN SPIN COMBAT</p>
+        
+        <div class="battle-matchup">
+          <div class="battle-ship-card">
+            <img src="assets/ships/static/RKLB-flagship-ship.png" alt="Player Ship" id="battle-player-sprite">
+            <span class="ticker" id="battle-player-ticker">RKLB</span>
+            <span style="font-size: 10px; color: rgba(255,255,255,0.5);">YOUR SHIP</span>
+          </div>
+          
+          <span class="battle-vs">VS</span>
+          
+          <div class="battle-ship-card">
+            <img src="assets/ships/static/ACHR-eVTOL-ship.png" alt="Opponent Ship" id="battle-opponent-sprite">
+            <span class="ticker" id="battle-opponent-ticker">ACHR</span>
+            <span style="font-size: 10px; color: rgba(255,255,255,0.5);">OPPONENT</span>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 20px;">
+          <button id="battle-random-btn" style="
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+          ">🎲 RANDOMIZE</button>
+        </div>
+        
+        <button id="battle-start-btn" class="battle-start-btn">
+          ▶ START BATTLE
+        </button>
+        
+        <p style="margin-top: 24px; font-size: 11px; color: rgba(255,255,255,0.4);">
+          Press <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">B</kbd> to quick-launch
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- NEWS PANEL -->
+  <div class="cockpit-panel" id="news-panel">
+    <div class="news-panel">
+      <div class="news-header">
+        <h2 class="news-title">📡 FLEET TRANSMISSIONS</h2>
+        <span style="font-size: 11px; color: rgba(255,255,255,0.4);">Live market events & fleet lore</span>
+      </div>
+      
+      <div class="news-feed" id="news-feed">
+        <!-- Populated dynamically by CockpitNav -->
+      </div>
+    </div>
+  </div>
+
   <!-- Data modules (load before app.js) -->
+  <script>
+    // Global UI sound configuration (default: OFF for accessibility)
+    // Set to true to enable Ship Brief and other UI sounds
+    window.UI_SOUND_ENABLED = false;
+  </script>
+  
+  <!-- Step 8: Progression Architecture (must load early) -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/bus.js"></script>
+  <script src="js/core/store.js"></script>
+  <script src="js/state/upgrades.js"></script>
+  <script src="js/state/progression.js"></script>
+  <script src="js/state/liveries.js"></script>
+
+  <!-- Livery Rendering -->
+  <script src="js/sprites/livery-renderer.js"></script>
+  
   <script src="js/data/ticker-profiles.js"></script>
   <script src="js/data/glossary.js"></script>
+  <script src="js/data/pixel-icons.js"></script>
   <script src="js/data/ship-data.js"></script>
+  <script src="js/data/telemetry.js"></script>
+  <script src="js/data/ship-animator.js"></script>
   <script src="js/data/holo-ships.js"></script>
   
   <!-- Audio system -->
@@ -1870,6 +2595,46 @@
   
   <!-- Mini-games -->
   <script src="js/games/mini-games.js"></script>
+  
+  <!-- Step 4: Mission Bridge (read-only adapter for dashboard) -->
+  <script src="js/mission-bridge.js"></script>
+  
+  <!-- Step 5: Flight Scene Engine (loading + fleet backgrounds) -->
+  <script src="js/flight-scene.js"></script>
+  
+  <!-- Unified Ship Brief Dialog -->
+  <script src="js/ui/shipBrief.js"></script>
+  
+  <!-- Fleet Command UI -->
+  <script src="js/ui/fleet-command.js"></script>
+  
+  <!-- Context Focus (Page-Behind Awareness) -->
+  <script src="js/ui/contextFocus.js"></script>
+  
+  <!-- Accessibility & Keyboard Shortcuts -->
+  <script src="js/ui/accessibility.js"></script>
+  
+  <!-- Ship Select (Mario Kart-style stats) -->
+  <script src="js/ui/ship-select.js"></script>
+  
+  <!-- Paint Bay (ship color customization) -->
+  <script src="js/ui/paint-bay.js"></script>
+  
+  <!-- Ship Idle Animation (hero ship life) -->
+  <script src="js/ui/ship-idle.js"></script>
+  
+  <!-- SPACE RUN Racing Game -->
+  <script src="js/games/space-run.js"></script>
+  
+  <!-- BEY ARENA Spin Battle Game -->
+  <script src="js/games/bey-arena.js"></script>
+  
+  <!-- Cockpit Navigation Controller -->
+  <script src="js/cockpit-nav.js"></script>
+  
+  <!-- Ship Behavior System (reactive animations) -->
+  <script src="js/ships/ship-behavior.js"></script>
+  <script src="js/ships/ship-behavior-bridge.js"></script>
   
   <!-- Main application -->
   <script src="js/app.js"></script>

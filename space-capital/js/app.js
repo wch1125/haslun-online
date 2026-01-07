@@ -1,11 +1,11 @@
     // =========================================================================
-    // HASLUN-BOT :: Main Application
+    // PARALLAX :: Main Application
     // External data modules loaded via separate scripts (see index.html)
     // =========================================================================
     
     // Alias externally loaded data modules
     const TICKER_PROFILES = window.TICKER_PROFILES || {};
-    const HASLUN_GLOSSARY = window.HASLUN_GLOSSARY || {};
+    const PARALLAX_GLOSSARY = window.PARALLAX_GLOSSARY || {};
     const PORTFOLIO_MOODS = window.PORTFOLIO_MOODS || {};
     const MACD_STATES = window.MACD_STATES || {};
     const SHIP_LORE = window.SHIP_LORE || {};
@@ -13,7 +13,83 @@
     const PIXEL_SHIP_LORE = window.PIXEL_SHIP_LORE || {};
     const SHIP_NAMES = window.SHIP_NAMES || {};
     const SHIP_SPRITES = window.SHIP_SPRITES || {};
-    const DEFAULT_SHIP_SPRITE = window.DEFAULT_SHIP_SPRITE || 'assets/ships/Unclaimed-Drone-ship.png';
+    const DEFAULT_SHIP_SPRITE = window.DEFAULT_SHIP_SPRITE || 'assets/ships/static/Unclaimed-Drone-ship.png';
+
+    // =========================================================================
+    // MOBILE VIEWPORT HEIGHT HELPER
+    // Fixes iOS address-bar "jump" that breaks vh-based layouts.
+    // Use: height: calc(var(--vh, 1vh) * 100)
+    // =========================================================================
+    function setViewportUnits() {
+      try {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      } catch (e) {
+        // Non-fatal
+      }
+    }
+
+    window.addEventListener('resize', setViewportUnits, { passive: true });
+    window.addEventListener('orientationchange', setViewportUnits, { passive: true });
+    document.addEventListener('DOMContentLoaded', setViewportUnits);
+    
+    // =========================================================================
+    // CHART.JS LAZY LOADER
+    // Only loads Chart.js when DATA tab is accessed (saves ~200KB initial load)
+    // =========================================================================
+    const ChartLoader = {
+      loaded: false,
+      loading: false,
+      callbacks: [],
+      
+      async load() {
+        if (this.loaded) return Promise.resolve();
+        if (this.loading) {
+          return new Promise(resolve => this.callbacks.push(resolve));
+        }
+        
+        this.loading = true;
+        console.log('[PERF] Lazy-loading Chart.js...');
+        
+        try {
+          // Load Chart.js
+          await this.loadScript('https://cdn.jsdelivr.net/npm/chart.js');
+          // Load date adapter
+          await this.loadScript('https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns');
+          
+          this.loaded = true;
+          this.loading = false;
+          console.log('[PERF] Chart.js loaded successfully');
+          
+          // Resolve all waiting callbacks
+          this.callbacks.forEach(cb => cb());
+          this.callbacks = [];
+          
+          return Promise.resolve();
+        } catch (err) {
+          this.loading = false;
+          console.error('[PERF] Failed to load Chart.js:', err);
+          return Promise.reject(err);
+        }
+      },
+      
+      loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      },
+      
+      // Check if Chart is available
+      isReady() {
+        return this.loaded && typeof Chart !== 'undefined';
+      }
+    };
+    
+    window.ChartLoader = ChartLoader;
     
     // Loading screen countdown (data-driven fleet)
     function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
@@ -194,7 +270,7 @@
         // Ship badge
         const badge = document.createElement('div');
         badge.className = 'ship-badge';
-        badge.textContent = eliteSet.has(ticker) ? (ticker + ' ★') : ticker;
+        badge.innerHTML = eliteSet.has(ticker) ? (ticker + ' ' + PixelIcons.toSvg('star', '#ffaa33', 10)) : ticker;
 
         // Sprite
         const img = document.createElement('img');
@@ -209,45 +285,73 @@
     }
 
     async function runCountdown() {
-      const countdown = document.getElementById('countdown');
-      const status = document.getElementById('loading-status');
-      const beam = document.getElementById('pixel-beam');
-      const ground = document.getElementById('pixel-ground');
-      const loadingScreen = document.getElementById('loading-screen');
+      const loadingOverlay = document.getElementById('loading-overlay');
+      const loadingCanvas = document.getElementById('loading-canvas');
       const app = document.getElementById('app');
+      
+      // Also handle old loading-screen if still in DOM
+      const oldLoadingScreen = document.getElementById('loading-screen');
 
-      let count = 3;
-
-      const arcadeMessages = [
-        'ESTABLISHING UPLINK...',
-        'SYNCHING FLEET TELEMETRY...',
-        'CALIBRATING THRUST VECTORS...'
-      ];
-
-      // Start the animated, data-driven fleet
-      createLoadingFleet();
-
-      const interval = setInterval(() => {
-        count--;
-        if (count > 0) {
-          countdown.textContent = count;
-          status.textContent = arcadeMessages[3 - count - 1] || 'INITIALIZING...';
-        } else if (count === 0) {
-          countdown.textContent = 'GO';
-          countdown.classList.add('go');
-          if (beam) beam.classList.add('active');
-          if (ground) ground.classList.add('active');
-          status.textContent = 'COCKPIT ONLINE — CLEAR FOR LAUNCH';
-        } else {
-          clearInterval(interval);
-          loadingScreen.classList.add('hidden');
+      // Step 5: Start canvas flight scene
+      let flightController = null;
+      
+      if (loadingCanvas && window.FlightScene) {
+        try {
+          // Build ship roster from mission/manifest data
+          const ships = await FlightScene.buildShipRoster();
+          
+          flightController = FlightScene.create({
+            canvas: loadingCanvas,
+            ships: ships,
+            mode: 'loading',
+            intensity: 1.0,
+            minDisplayTime: 2000, // 2 second minimum display
+            onReady: () => {
+              // Fade out loading overlay
+              if (loadingOverlay) loadingOverlay.classList.add('hidden');
+              if (oldLoadingScreen) oldLoadingScreen.classList.add('hidden');
+              app.classList.add('visible');
+              
+              // Stop flight scene after fade
+              setTimeout(() => {
+                if (flightController) flightController.stop();
+                // Remove overlay from DOM after animation
+                if (loadingOverlay) loadingOverlay.remove();
+              }, 600);
+              
+              // Initialize app
+              init();
+            }
+          });
+          
+          // Signal ready after init tasks complete (data loads, etc.)
+          // For now, trigger after a short delay to allow basic setup
+          setTimeout(() => {
+            if (flightController) flightController.signalReady();
+          }, 800);
+          
+        } catch (e) {
+          console.warn('[Loading] Flight scene failed, falling back:', e);
+          // Fallback: just show app after delay
+          setTimeout(() => {
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            if (oldLoadingScreen) oldLoadingScreen.classList.add('hidden');
+            app.classList.add('visible');
+            init();
+          }, 1500);
+        }
+      } else {
+        // No FlightScene available, fallback to simple timer
+        setTimeout(() => {
+          if (loadingOverlay) loadingOverlay.classList.add('hidden');
+          if (oldLoadingScreen) oldLoadingScreen.classList.add('hidden');
           app.classList.add('visible');
           init();
-        }
-      }, 1000);
+        }, 1500);
+      }
     }
 
-    // Start countdown on load
+    // Start loading on DOM ready
 
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(runCountdown, 500);
@@ -255,6 +359,7 @@
     
     let currentTicker = 'RKLB', currentTimeframe = '1D', currentRange = '3M', showMA = true;
     let priceChart = null, macdChart = null, tickerData = {}, statsData = {};
+    let macdOrbitMode = true; // MACD orbital visualization mode (default: ORBIT)
     
     const tickerColors = {
       'RKLB': '#33ff99', 'LUNR': '#47d4ff', 'ASTS': '#ffb347', 'ACHR': '#ff6b9d',
@@ -276,33 +381,600 @@
     const rangeDays = { '1W': 7, '1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': 9999 };
     
     // =========================================================================
+    // EMA RIBBON CONFIGURATION (Step 3A - Telemetry Upgrade)
+    // =========================================================================
+    
+    // Doubled EMA ribbon for pronounced effect (12 bands)
+    const RIBBON_PERIODS = [5, 8, 10, 13, 16, 21, 26, 34, 42, 55, 70, 89];
+    const RIBBON_COLORS = [
+      '#33ff99', // phosphor green (fast)
+      '#2de8a0', // mint
+      '#47d4ff', // cyan
+      '#5ac8ff', // light cyan
+      '#8cb4ff', // periwinkle
+      '#b388ff', // violet
+      '#d070ff', // orchid
+      '#ff4fd8', // magenta
+      '#ff6b9d', // rose
+      '#ffb347', // amber
+      '#ffd447', // gold
+      '#e8ff47', // lime (slow)
+    ];
+    
+    /**
+     * Calculate Exponential Moving Average
+     */
+    function calcEMA(values, period) {
+      const k = 2 / (period + 1);
+      const out = new Array(values.length).fill(null);
+      
+      // find first finite value
+      let i0 = values.findIndex(v => Number.isFinite(v));
+      if (i0 < 0) return out;
+      
+      let ema = values[i0];
+      out[i0] = ema;
+      
+      for (let i = i0 + 1; i < values.length; i++) {
+        const v = values[i];
+        if (!Number.isFinite(v)) { out[i] = ema; continue; }
+        ema = v * k + ema * (1 - k);
+        out[i] = ema;
+      }
+      return out;
+    }
+    
+    /**
+     * Convert hex color to rgba with alpha
+     */
+    function hexToRgba(hex, a) {
+      const h = (hex || '').replace('#', '');
+      if (h.length !== 6) return `rgba(51,255,153,${a})`;
+      const r = parseInt(h.slice(0, 2), 16);
+      const g = parseInt(h.slice(2, 4), 16);
+      const b = parseInt(h.slice(4, 6), 16);
+      return `rgba(${r},${g},${b},${a})`;
+    }
+    
+    /**
+     * Chart.js plugin for topographic terrain effect
+     * Creates altitude-map aesthetic beneath the price ribbon
+     */
+    const terrainPlugin = {
+      id: 'terrainPlugin',
+      beforeDraw(chart) {
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+        
+        // Only for price chart
+        if (chart.canvas.id !== 'price-chart') return;
+        
+        const w = chartArea.right - chartArea.left;
+        const h = chartArea.bottom - chartArea.top;
+        
+        ctx.save();
+        
+        // Terrain gradient from bottom (deep) to ribbon area (high altitude)
+        const terrainGrad = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+        terrainGrad.addColorStop(0, 'rgba(51, 255, 153, 0.08)');
+        terrainGrad.addColorStop(0.2, 'rgba(71, 212, 255, 0.05)');
+        terrainGrad.addColorStop(0.4, 'rgba(179, 136, 255, 0.03)');
+        terrainGrad.addColorStop(0.7, 'rgba(51, 255, 153, 0.02)');
+        terrainGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        
+        ctx.fillStyle = terrainGrad;
+        ctx.fillRect(chartArea.left, chartArea.top, w, h);
+        
+        // Subtle horizontal contour lines (like topographic map)
+        ctx.strokeStyle = 'rgba(51, 255, 153, 0.03)';
+        ctx.lineWidth = 1;
+        const contourSpacing = 40;
+        for (let y = chartArea.bottom; y > chartArea.top; y -= contourSpacing) {
+          ctx.beginPath();
+          ctx.moveTo(chartArea.left, y);
+          ctx.lineTo(chartArea.right, y);
+          ctx.stroke();
+        }
+        
+        ctx.restore();
+      }
+    };
+    
+    /**
+     * Chart.js plugin for arcade CRT glow + scanlines
+     * ENHANCED: Stronger glow for EM frequency aesthetic
+     */
+    const arcadeCRTPlugin = {
+      id: 'arcadeCRTPlugin',
+      beforeDatasetDraw(chart, args) {
+        const ds = chart.data.datasets[args.index];
+        if (!ds || !ds.borderColor) return;
+        
+        // Only glow line datasets (not bands/fills)
+        const isLine = (ds.type || chart.config.type) === 'line';
+        const isBand = ds.label && ds.label.startsWith('BAND');
+        if (!isLine || isBand) return;
+        
+        ds.__glowSaved = true;
+        const ctx = chart.ctx;
+        ctx.save();
+        
+        // ENHANCED: Much stronger phosphor glow
+        if (ds.isRibbon) {
+          ctx.shadowBlur = 20;
+          ctx.shadowColor = ds.borderColor;
+          ctx.globalCompositeOperation = 'lighter';
+        } else {
+          // Main price line gets HEAVY bloom
+          ctx.shadowBlur = 25;
+          ctx.shadowColor = ds.borderColor;
+          ctx.globalCompositeOperation = 'lighter';
+        }
+      },
+      afterDatasetDraw(chart, args) {
+        const ds = chart.data.datasets[args.index];
+        if (ds && ds.__glowSaved) {
+          ds.__glowSaved = false;
+          chart.ctx.restore();
+        }
+      },
+      afterDraw(chart) {
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+        
+        const now = performance.now() * 0.001;
+        const w = chartArea.right - chartArea.left;
+        const h = chartArea.bottom - chartArea.top;
+        
+        // ============================================
+        // SCANLINES — More visible
+        // ============================================
+        ctx.save();
+        ctx.globalAlpha = 0.08;
+        ctx.fillStyle = '#000';
+        for (let y = chartArea.top; y < chartArea.bottom; y += 3) {
+          ctx.fillRect(chartArea.left, y, w, 1);
+        }
+        ctx.restore();
+        
+        // ============================================
+        // PHOSPHOR BLOOM — Ambient glow overlay
+        // ============================================
+        ctx.save();
+        const gradient = ctx.createRadialGradient(
+          chartArea.left + w/2, chartArea.top + h/2, 0,
+          chartArea.left + w/2, chartArea.top + h/2, Math.max(w, h) * 0.7
+        );
+        gradient.addColorStop(0, 'rgba(51, 255, 153, 0.06)');
+        gradient.addColorStop(0.5, 'rgba(51, 255, 153, 0.03)');
+        gradient.addColorStop(1, 'rgba(51, 255, 153, 0)');
+        
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.5 + Math.sin(now * 0.8) * 0.15;
+        ctx.fillStyle = gradient;
+        ctx.fillRect(chartArea.left, chartArea.top, w, h);
+        ctx.restore();
+        
+        // ============================================
+        // VERTICAL SYNC SWEEP — Continuous scan line
+        // ============================================
+        ctx.save();
+        const sweepY = chartArea.top + ((now * 80) % h);
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.15;
+        
+        const sweepGrad = ctx.createLinearGradient(0, sweepY - 30, 0, sweepY + 30);
+        sweepGrad.addColorStop(0, 'rgba(51, 255, 153, 0)');
+        sweepGrad.addColorStop(0.4, 'rgba(51, 255, 153, 0.4)');
+        sweepGrad.addColorStop(0.5, 'rgba(71, 212, 255, 0.6)');
+        sweepGrad.addColorStop(0.6, 'rgba(51, 255, 153, 0.4)');
+        sweepGrad.addColorStop(1, 'rgba(51, 255, 153, 0)');
+        
+        ctx.fillStyle = sweepGrad;
+        ctx.fillRect(chartArea.left, sweepY - 30, w, 60);
+        ctx.restore();
+        
+        // ============================================
+        // CORNER VIGNETTE — CRT tube curve simulation
+        // ============================================
+        ctx.save();
+        const vignetteGrad = ctx.createRadialGradient(
+          chartArea.left + w/2, chartArea.top + h/2, Math.min(w, h) * 0.3,
+          chartArea.left + w/2, chartArea.top + h/2, Math.max(w, h) * 0.8
+        );
+        vignetteGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        vignetteGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.1)');
+        vignetteGrad.addColorStop(1, 'rgba(0, 0, 0, 0.4)');
+        
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = vignetteGrad;
+        ctx.fillRect(chartArea.left, chartArea.top, w, h);
+        ctx.restore();
+      }
+    };
+    
+    /**
+     * Step 6B: CRT interference jitter plugin for EMA ribbon
+     * ENHANCED: Heavy EM frequency stabilization effect
+     * Each band jitters independently like unstable radio frequencies
+     */
+    // =========================================================================
+    // EMA ELECTROMAGNETIC GLITCH PLUGIN — True Signal Lock Effect
+    // Creates authentic 80s EM interference / signal stabilization on ribbon
+    // Price trace stays clean; ribbon looks like energy being wrangled
+    // Mobile-optimized: reduced effects to prevent performance issues
+    // =========================================================================
+    
+    // Noise helpers for EM displacement
+    function hashNoise(n) {
+      // Deterministic pseudo-noise 0..1
+      return Math.abs((Math.sin(n * 999.123) * 43758.5453) % 1);
+    }
+    
+    function smoothNoise(y, t) {
+      // y in pixels, t in seconds — creates organic wave pattern
+      const a = Math.sin((y * 0.035) + (t * 2.4));
+      const b = Math.sin((y * 0.011) + (t * 7.2));
+      const c = Math.sin((y * 0.003) + (t * 16.0));
+      return (a * 0.55 + b * 0.30 + c * 0.15);
+    }
+    
+    // Compute Y bounds of ribbon datasets only
+    function getRibbonBounds(chart) {
+      let top = Infinity;
+      let bottom = -Infinity;
+      
+      chart.data.datasets.forEach((ds, i) => {
+        if (!ds || !ds.isRibbon) return;
+        const meta = chart.getDatasetMeta(i);
+        if (!meta || !meta.data) return;
+        meta.data.forEach(pt => {
+          if (!pt || !Number.isFinite(pt.y)) return;
+          top = Math.min(top, pt.y);
+          bottom = Math.max(bottom, pt.y);
+        });
+      });
+      
+      if (!Number.isFinite(top) || !Number.isFinite(bottom)) return null;
+      
+      // Pad so fills/bands are included
+      const pad = 12;
+      top -= pad;
+      bottom += pad;
+      
+      return { top, bottom };
+    }
+    
+    const ribbonEMGlitchPlugin = {
+      id: 'ribbonEMGlitchPlugin',
+
+      // Internal state for burst scheduling
+      _state: {
+        nextBurstAt: 0,
+        burstUntil: 0,
+        burstSeed: 0,
+        phase: 0,
+      },
+
+      afterDatasetsDraw(chart, args, pluginOpts) {
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+
+        // Only for the price chart
+        const canvas = chart.canvas;
+        if (!canvas || canvas.id !== 'price-chart') return;
+
+        // Determine if ribbon is visible (MA/RIBBON toggle)
+        const anyRibbon = chart.data.datasets.some(ds => ds && ds.isRibbon);
+        if (!anyRibbon) return;
+
+        // PERFORMANCE: skip on very small canvases
+        const w = chartArea.right - chartArea.left;
+        const h = chartArea.bottom - chartArea.top;
+        if (w < 200 || h < 120) return;
+        
+        // Get ribbon-only bounds (price line stays clean!)
+        const rb = getRibbonBounds(chart);
+        if (!rb) return;
+
+        const now = performance.now();
+        const t = now * 0.001;
+
+        // Mobile detection - be conservative
+        const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
+        const intensity = isMobile ? 0.4 : 1.0;
+        
+        // On mobile: skip heavy effects entirely during normal operation
+        // Only show effects during bursts, and keep them minimal
+
+        // Burst scheduling: more frequent for dynamic visuals
+        const st = this._state;
+        if (now > st.nextBurstAt) {
+          // Next burst in 1.5s–4s (more frequent for visual interest)
+          st.nextBurstAt = now + (isMobile ? 2500 : 1200) + Math.random() * (isMobile ? 3500 : 2800);
+          // Burst lasts 150–400ms (longer for more impact)
+          st.burstUntil = now + (150 + Math.random() * 250);
+          st.burstSeed = Math.random() * 1000;
+        }
+
+        const inBurst = now < st.burstUntil;
+        
+        // On mobile: only render during bursts to save performance
+        if (isMobile && !inBurst) return;
+
+        // ENHANCED: Higher base intensity for constant visible effects
+        const base = isMobile ? 0.1 : 0.25;
+        const burst = inBurst ? (0.85 * intensity) : 0.0;
+        const amt = base + burst;
+        if (amt <= 0) return;
+        
+        // Ribbon band dimensions
+        const bandTop = Math.max(chartArea.top, rb.top);
+        const bandBottom = Math.min(chartArea.bottom, rb.bottom);
+        const bandH = Math.max(1, bandBottom - bandTop);
+        
+        // Sanity check - don't process if band is too large (prevents runaway)
+        if (bandH > 800) return;
+
+        // ============================================================
+        // CLIP TO RIBBON BAND ONLY — Price line stays perfectly clean
+        // ============================================================
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(chartArea.left, bandTop, w, bandH);
+        ctx.clip();
+
+        // ============================================================
+        // A) SCANLINE DISPLACEMENT — Simplified for mobile
+        // On mobile: just do a few strategic strips, not per-scanline
+        // ============================================================
+        ctx.globalCompositeOperation = 'lighter';
+        
+        if (isMobile) {
+          // MOBILE: Just 3-5 horizontal tear strips (not per-scanline)
+          const numStrips = inBurst ? 4 : 2;
+          for (let i = 0; i < numStrips; i++) {
+            const stripY = bandTop + (bandH * (i + 0.5)) / numStrips;
+            const stripH = 8 + Math.random() * 12;
+            const shift = smoothNoise(stripY, t) * 6 * amt;
+            
+            ctx.globalAlpha = 0.15 * intensity;
+            try {
+              ctx.drawImage(
+                canvas,
+                chartArea.left, stripY, w, stripH,
+                chartArea.left + shift, stripY, w, stripH
+              );
+            } catch (e) { /* ignore */ }
+          }
+        } else {
+          // DESKTOP: Full scanline displacement — MORE VISIBLE
+          const step = 3;
+          const maxShift = 12 * amt;
+          const maxIterations = Math.min(Math.floor(bandH / step), 150); // Cap iterations
+          
+          for (let i = 0; i < maxIterations; i++) {
+            const y = i * step;
+            const yy = bandTop + y;
+            
+            let shift = smoothNoise(yy, t) * maxShift;
+            
+            if (inBurst && Math.random() < 0.08) {
+              shift += (Math.random() - 0.5) * (maxShift * 4);
+            }
+            
+            ctx.globalAlpha = inBurst ? (0.25 * intensity) : (0.12 * intensity);
+            
+            try {
+              ctx.drawImage(
+                canvas,
+                chartArea.left, yy, w, step,
+                chartArea.left + shift, yy, w, step
+              );
+            } catch (e) { /* ignore */ }
+          }
+        }
+
+        // ============================================================
+        // B) CHROMATIC SPLIT — Desktop only, MORE VISIBLE
+        // ============================================================
+        if (!isMobile && amt > 0.08) {
+          const cs = (inBurst ? 3.0 : 1.5) * amt;
+          ctx.globalCompositeOperation = 'screen';
+          
+          try {
+            ctx.globalAlpha = inBurst ? 0.12 : 0.07;
+            ctx.filter = 'hue-rotate(30deg) saturate(1.4)';
+            ctx.drawImage(canvas, chartArea.left, bandTop, w, bandH, 
+                          chartArea.left + cs, bandTop, w, bandH);
+            
+            ctx.filter = 'hue-rotate(-30deg) saturate(1.4)';
+            ctx.drawImage(canvas, chartArea.left, bandTop, w, bandH,
+                          chartArea.left - cs, bandTop, w, bandH);
+            
+            ctx.filter = 'none';
+          } catch (e) {
+            ctx.filter = 'none';
+          }
+        }
+
+        // ============================================================
+        // C) FIELD LOCK LINE SWEEP — CONTINUOUS + burst enhancement
+        // ============================================================
+        // Always show at least one sweep line
+        const sweepPhase = (t * 1.5) % 1;
+        const sweepY = bandTop + (sweepPhase * bandH);
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.18 * intensity;
+        ctx.fillStyle = '#33ff99';
+        ctx.fillRect(chartArea.left, sweepY, w, 2);
+        
+        // Secondary sweep (slower)
+        const sweepPhase2 = ((t * 0.7) + 0.5) % 1;
+        const sweepY2 = bandTop + (sweepPhase2 * bandH);
+        ctx.globalAlpha = 0.10 * intensity;
+        ctx.fillStyle = '#47d4ff';
+        ctx.fillRect(chartArea.left, sweepY2, w, 1);
+        
+        if (inBurst) {
+          // Extra glitch lines during burst
+          const glitchY = bandTop + (hashNoise(t * 3.0) * bandH);
+          ctx.globalAlpha = 0.25 * intensity;
+          ctx.fillStyle = '#ff4fd8';
+          ctx.fillRect(chartArea.left, glitchY, w, 2);
+          
+          if (Math.random() < 0.4) {
+            const glitchY2 = bandTop + (hashNoise(t * 7.0 + 100) * bandH);
+            ctx.globalAlpha = 0.15 * intensity;
+            ctx.fillStyle = '#ffb347';
+            ctx.fillRect(chartArea.left, glitchY2, w, 1);
+          }
+        }
+
+        // ============================================================
+        // D) PHOSPHOR ECHO — Continuous ghosting effect
+        // ============================================================
+        // Always have a subtle echo (persistence simulation)
+        const baseEchoShift = 1.0;
+        ctx.globalAlpha = 0.04 * intensity;
+        ctx.globalCompositeOperation = 'screen';
+        try {
+          ctx.drawImage(
+            canvas,
+            chartArea.left, bandTop, w, bandH,
+            chartArea.left + baseEchoShift, bandTop + 0.3, w, bandH
+          );
+        } catch (e) { /* ignore */ }
+        
+        if (inBurst) {
+          const echoShift = 2.5 * amt;
+          ctx.globalAlpha = 0.10 * intensity;
+          try {
+            ctx.drawImage(
+              canvas,
+              chartArea.left, bandTop, w, bandH,
+              chartArea.left + echoShift, bandTop + 0.8, w, bandH
+            );
+          } catch (e) { /* ignore */ }
+        }
+
+        ctx.restore();
+      }
+    };
+    
+    // =========================================================================
+    // SHIP OVERLAY PLUGIN — Draws active ship sprite at last price point
+    // =========================================================================
+    
+    // Cache for the ship overlay image
+    let shipOverlayImage = null;
+    let shipOverlayTicker = null;
+    
+    /**
+     * Load ship image for overlay (cached)
+     */
+    function loadShipOverlayImage(ticker) {
+      if (shipOverlayTicker === ticker && shipOverlayImage) {
+        return Promise.resolve(shipOverlayImage);
+      }
+      
+      return new Promise((resolve) => {
+        // Use SHIP_SPRITES for sprite paths
+        const spritePath = (window.SHIP_SPRITES && window.SHIP_SPRITES[ticker]) || window.DEFAULT_SHIP_SPRITE;
+        if (!spritePath) {
+          resolve(null);
+          return;
+        }
+        
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          shipOverlayImage = img;
+          shipOverlayTicker = ticker;
+          resolve(img);
+        };
+        img.onerror = () => {
+          console.warn('Failed to load ship overlay for', ticker);
+          resolve(null);
+        };
+        img.src = spritePath;
+      });
+    }
+    
+    const shipOverlayPlugin = {
+      id: 'shipOverlayPlugin',
+      
+      afterDatasetsDraw(chart) {
+        // Only draw on the main price dataset (index 0)
+        const meta = chart.getDatasetMeta(0);
+        if (!meta || !meta.data || !meta.data.length) return;
+        
+        const lastPoint = meta.data[meta.data.length - 1];
+        if (!lastPoint) return;
+        
+        const img = shipOverlayImage;
+        if (!img) return;
+        
+        const ctx = chart.ctx;
+        const x = lastPoint.x;
+        const y = lastPoint.y;
+        
+        // Ship size (responsive)
+        const size = 28;
+        const halfSize = size / 2;
+        
+        // Subtle hover animation
+        const t = performance.now() * 0.002;
+        const hoverOffset = Math.sin(t) * 2;
+        
+        ctx.save();
+        
+        // Glow effect behind ship
+        ctx.shadowColor = tickerColors[currentTicker] || '#33ff99';
+        ctx.shadowBlur = 12;
+        ctx.globalAlpha = 0.85;
+        
+        // Draw ship sprite
+        ctx.drawImage(
+          img,
+          x - halfSize,
+          y - halfSize + hoverOffset,
+          size,
+          size
+        );
+        
+        ctx.restore();
+      }
+    };
+    
+    // =========================================================================
     // TICKER_PROFILES — Loaded from js/data/ticker-profiles.js
     // Access via: window.TICKER_PROFILES
     // =========================================================================
     
     // =========================================================================
-    // HASLUN_GLOSSARY, PORTFOLIO_MOODS, MACD_STATES — Loaded from js/data/glossary.js
-    // Access via: window.HASLUN_GLOSSARY, window.PORTFOLIO_MOODS, window.MACD_STATES
+    // PARALLAX_GLOSSARY, PORTFOLIO_MOODS, MACD_STATES — Loaded from js/data/glossary.js
+    // Access via: window.PARALLAX_GLOSSARY, window.PORTFOLIO_MOODS, window.MACD_STATES
     // =========================================================================
     
     // Glossary helper functions
     function getGlossary(id) {
-      return HASLUN_GLOSSARY[id] || null;
+      return PARALLAX_GLOSSARY[id] || null;
     }
     
     function getTooltip(id) {
-      const entry = HASLUN_GLOSSARY[id];
+      const entry = PARALLAX_GLOSSARY[id];
       return entry ? entry.tooltip : '';
     }
     
     function getFlavor(id) {
-      const entry = HASLUN_GLOSSARY[id];
+      const entry = PARALLAX_GLOSSARY[id];
       return entry ? entry.flavor : '';
     }
     
     // Get trend state based on price, MACD data, and volatility
     function getTrendState(price, ma100, ma150, ma200, macdVal, volScore) {
-      if (!price || !ma200) return HASLUN_GLOSSARY.trend_analyzing;
+      if (!price || !ma200) return PARALLAX_GLOSSARY.trend_analyzing;
       
       const aboveMa100 = price > ma100;
       const aboveMa150 = price > ma150;
@@ -313,26 +985,26 @@
       
       // FULL THRUST: Above all MAs with positive momentum and calm vol
       if (aboveMa200 && aboveMa150 && macdPositive && !volHigh) {
-        return HASLUN_GLOSSARY.trend_full_thrust;
+        return PARALLAX_GLOSSARY.trend_full_thrust;
       }
       
       // REVERSAL ATTEMPT: Above short-term but below long-term, calm vol
       if (aboveMa100 && !aboveMa200 && macdPositive && !volHigh) {
-        return HASLUN_GLOSSARY.trend_reversal_attempt;
+        return PARALLAX_GLOSSARY.trend_reversal_attempt;
       }
       
       // DRIFTING: Near MAs with weak momentum and tame vol
       if (nearMa100 && Math.abs(macdVal) < 0.1 && !volHigh) {
-        return HASLUN_GLOSSARY.trend_drifting;
+        return PARALLAX_GLOSSARY.trend_drifting;
       }
       
       // REENTRY RISK: Below long-term with negative momentum
       if (!aboveMa200 && !macdPositive && !volHigh) {
-        return HASLUN_GLOSSARY.trend_reentry_risk;
+        return PARALLAX_GLOSSARY.trend_reentry_risk;
       }
       
       // NEBULOUS: High volatility OR mixed signals
-      return HASLUN_GLOSSARY.trend_nebula;
+      return PARALLAX_GLOSSARY.trend_nebula;
     }
     
     // Get MACD status
@@ -375,7 +1047,7 @@
     function attachGlossaryTooltips() {
       document.querySelectorAll('[data-glossary-id]').forEach(el => {
         const id = el.getAttribute('data-glossary-id');
-        const entry = HASLUN_GLOSSARY[id];
+        const entry = PARALLAX_GLOSSARY[id];
         if (!entry) return;
         
         // Build tooltip with both serious and flavor text
@@ -594,7 +1266,7 @@
       if (/earth|geo|observation/i.test(sector)) return { symbol: "#ship-drone", label: "FIREFLY DRONE", isHero: false };
       if (/cellular|comms|relay|satellite/i.test(sector)) return { symbol: "#ship-relay", label: "COMM RELAY", isHero: false };
       if (/lunar/i.test(sector)) return { symbol: "#ship-lander", label: "LUNAR LANDER", isHero: false };
-      if (/stealth|black|secret/i.test(sector)) return { symbol: "#ship-parallax", label: "NIGHT PARALLAX", isHero: false };
+      if (/stealth|black|secret/i.test(sector)) return { symbol: "#ship-shadow", label: "NIGHT SHADOW", isHero: false };
       if (/experimental|biotech|pharma/i.test(sector)) return { symbol: "#ship-phantom", label: "PHANTOM NODE", isHero: false };
 
       // Default
@@ -873,8 +1545,8 @@
       });
       
       if (caption) {
-        const label = meta.hero ? lore.label + " ★" : lore.label;
-        caption.textContent = `${ticker.toUpperCase()} · ${label}`;
+        const heroMark = meta.hero ? ' ' + PixelIcons.toSvg('star', '#ffaa33', 10) : '';
+        caption.innerHTML = `${ticker.toUpperCase()} · ${lore.label}${heroMark}`;
       }
       
       // Update status based on P&L
@@ -903,14 +1575,15 @@
       }
     }
     
-    // Telemetry HUD ship – uses the same pixel mech system
+    // Telemetry HUD ship – uses actual ship sprite (Step 6A)
     function updateTelemetryShipSprite(ticker) {
       const svgEl      = document.getElementById("telemetry-ship-svg");
+      const spriteEl   = document.getElementById("primary-viewport-sprite");
       const labelEl    = document.getElementById("telemetry-ship-label");
       const captionEl  = document.getElementById("telemetry-ship-caption");
       const headerName = document.getElementById("telemetry-ship-name"); // existing title text
 
-      if (!svgEl) return;
+      if (!svgEl && !spriteEl) return;
 
       const upper = (ticker || "").toUpperCase();
 
@@ -926,12 +1599,21 @@
         typeof stats.return_3m    === "number" ? stats.return_3m    :
         0);
 
-      // Map into a sprite pattern
+      // Step 6A: Use actual ship sprite from SHIP_SPRITES
+      const spriteSrc = SHIP_SPRITES[upper] || DEFAULT_SHIP_SPRITE;
+      if (spriteEl) {
+        spriteEl.src = spriteSrc;
+        spriteEl.alt = `${upper} vessel`;
+      }
+      
+      // Fallback: render pixel ship to SVG if sprite fails
       const meta = mapTickerToPixelShip(upper, sector, pnl);
-      renderPixelShip(svgEl, meta.pattern, {
-        hero: meta.hero,
-        pnlPercent: pnl
-      });
+      if (svgEl) {
+        renderPixelShip(svgEl, meta.pattern, {
+          hero: meta.hero,
+          pnlPercent: pnl
+        });
+      }
 
       const lore = getPixelShipLore(meta.pattern);
       const shipName = `${upper} · ${lore.label}`;
@@ -1043,7 +1725,7 @@
         const lore = getPixelShipLore(ship.pattern);
 
         nameEl.textContent = `${ship.ticker} · ${ship.codename}`;
-        classEl.textContent = ship.shipClass + (ship.isHero ? ' ★' : '');
+        classEl.innerHTML = ship.shipClass + (ship.isHero ? ' ' + PixelIcons.toSvg('star', '#ffaa33', 10) : '');
         sectorEl.textContent = lore.hud; // Show HUD tag instead of sector
 
         const health = pnlToHealth(ship.pnlNum);
@@ -1101,6 +1783,11 @@
       // Initialize Fleet HoloBay
       initFleetHolobay();
       
+      // Initialize Fleet Command panel (new UI)
+      if (window.FleetCommand) {
+        FleetCommand.init('fleet-command-container');
+      }
+      
       // Initialize glossary tooltips
       attachGlossaryTooltips();
       
@@ -1141,14 +1828,18 @@
         const change = stats.return_1d || 0;
         const theme = tickerThemes[t] || '';
         const color = tickerColors[t] || '#33ff99';
-        return '<div class="watchlist-item ' + (t === currentTicker ? 'active' : '') + '" onclick="selectTicker(\'' + t + '\'); if(window.innerWidth <= 768) toggleMobileDrawer();">' +
+        return '<div class="watchlist-item ' + (t === currentTicker ? 'active' : '') + '" data-ticker="' + t + '" onclick="selectTicker(\'' + t + '\'); if(window.innerWidth <= 768) toggleMobileDrawer();">' +
           '<div class="watchlist-info"><div class="watchlist-ticker" style="color: ' + color + '">' + t + '</div>' +
           '<div class="watchlist-meta">' + theme + '</div></div>' +
           '<div class="watchlist-data"><div class="watchlist-price">$' + (stats.current || 0).toFixed(2) + '</div>' +
           '<div class="watchlist-change ' + (change >= 0 ? 'positive' : 'negative') + '">' + (change >= 0 ? '+' : '') + change.toFixed(2) + '%</div></div></div>';
       }).join('');
       
-      document.getElementById('watchlist').innerHTML = watchlistHTML;
+      // Update watchlist if it exists (may be replaced by Fleet Command)
+      const watchlistEl = document.getElementById('watchlist');
+      if (watchlistEl) {
+        watchlistEl.innerHTML = watchlistHTML;
+      }
       
       // Also populate mobile watchlist
       const mobileWatchlist = document.getElementById('mobile-watchlist');
@@ -1165,10 +1856,17 @@
     function toggleMobileDrawer() {
       const drawer = document.getElementById('mobile-drawer');
       const backdrop = document.getElementById('mobile-drawer-backdrop');
+      const menuBtn = document.getElementById('mobile-menu-btn');
+      
       if (drawer && backdrop) {
         const isOpening = !drawer.classList.contains('open');
         drawer.classList.toggle('open');
         backdrop.classList.toggle('open');
+        
+        // Update ARIA expanded state
+        if (menuBtn) {
+          menuBtn.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+        }
         
         if (isOpening) {
           // Save scroll position and lock body
@@ -1220,6 +1918,14 @@
       if (typeof updateTelemetryShipSprite === 'function') {
         updateTelemetryShipSprite(ticker);
       }
+      
+      // Load ship image for chart overlay
+      loadShipOverlayImage(ticker).then(() => {
+        // Redraw chart to show ship overlay
+        if (priceChart) {
+          priceChart.update('none');
+        }
+      });
       
       document.querySelectorAll('.watchlist-item').forEach(el => {
         const tickerEl = el.querySelector('.watchlist-ticker');
@@ -1405,11 +2111,11 @@
       
       // Determine CSS mode class
       let mode = 'neutral';
-      if (trendState === HASLUN_GLOSSARY.trend_full_thrust) mode = 'bull';
-      else if (trendState === HASLUN_GLOSSARY.trend_reentry_risk) mode = 'bear';
-      else if (trendState === HASLUN_GLOSSARY.trend_nebula) mode = 'volatile';
-      else if (trendState === HASLUN_GLOSSARY.trend_reversal_attempt) mode = 'neutral';
-      else if (trendState === HASLUN_GLOSSARY.trend_drifting) mode = 'neutral';
+      if (trendState === PARALLAX_GLOSSARY.trend_full_thrust) mode = 'bull';
+      else if (trendState === PARALLAX_GLOSSARY.trend_reentry_risk) mode = 'bear';
+      else if (trendState === PARALLAX_GLOSSARY.trend_nebula) mode = 'volatile';
+      else if (trendState === PARALLAX_GLOSSARY.trend_reversal_attempt) mode = 'neutral';
+      else if (trendState === PARALLAX_GLOSSARY.trend_drifting) mode = 'neutral';
       
       // Update UI with glossary content
       labelEl.textContent = trendState.label;
@@ -1495,7 +2201,101 @@
       updateCharts();
     }
     
+    // =========================================================================
+    // CONTEXT BAY (Step 4)
+    // =========================================================================
+    
+    function toggleContextBay(force) {
+      const bay = document.getElementById('telemetry-context-bay');
+      if (!bay) return;
+      
+      const shouldOpen = (typeof force === 'boolean')
+        ? force
+        : bay.classList.contains('collapsed');
+      
+      bay.classList.toggle('collapsed', !shouldOpen);
+      
+      const btn = bay.querySelector('.context-bay-handle');
+      const state = document.getElementById('context-bay-state');
+      if (btn) btn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+      if (state) state.textContent = shouldOpen ? 'COLLAPSE' : 'EXPAND';
+    }
+    
+    function updateContextBay() {
+      const bar = document.getElementById('ribbon-meter-bar');
+      const readout = document.getElementById('ribbon-readout');
+      const radar = document.getElementById('signal-radar');
+      const feed = document.getElementById('bridge-feed-mini');
+      
+      if (!bar || !readout || !radar || !feed) return;
+      if (!window.currentTicker) return;
+      
+      const closes = window.currentSeriesCloses || [];
+      if (!closes.length) {
+        readout.textContent = 'NO DATA';
+        bar.style.width = '0%';
+        return;
+      }
+      
+      // Calculate EMA spread for ribbon state
+      const ema8 = calcEMA(closes, 8);
+      const ema89 = calcEMA(closes, 89);
+      const last = closes[closes.length - 1];
+      const a = ema8[ema8.length - 1];
+      const b = ema89[ema89.length - 1];
+      
+      if (!Number.isFinite(last) || !Number.isFinite(a) || !Number.isFinite(b)) {
+        readout.textContent = 'CALIBRATING...';
+        bar.style.width = '0%';
+        return;
+      }
+      
+      // Calculate spread as percentage of price
+      const spread = Math.abs(a - b) / Math.max(1e-6, last);
+      // Map to 0..1 (tuned for visual feel)
+      const norm = Math.max(0, Math.min(1, spread / 0.15));
+      const pct = Math.round(norm * 100);
+      
+      bar.style.width = `${pct}%`;
+      const state = (pct < 25) ? 'COMPRESSED' : (pct < 60) ? 'NEUTRAL' : 'EXPANDING';
+      readout.textContent = state;
+      
+      // Signal radar: aggregate from existing UI elements
+      const volBadge = document.querySelector('.vol-badge');
+      const signalStatus = document.querySelector('.signal-status');
+      const vol = volBadge ? volBadge.textContent.trim() : '—';
+      const signal = signalStatus ? signalStatus.textContent.trim() : '—';
+      radar.textContent = `VOL: ${vol}  |  SIGNAL: ${signal}  |  RIBBON: ${state}`;
+      
+      // Bridge feed mini: pull recent log entries
+      const logLines = Array.from(document.querySelectorAll('#telemetry-log .log-entry'))
+        .slice(-3)
+        .map(el => el.textContent.trim())
+        .filter(Boolean);
+      
+      if (logLines.length) {
+        feed.innerHTML = logLines.map(l => `<div class="feed-line">${escapeHtml(l)}</div>`).join('');
+      } else {
+        feed.innerHTML = '<div class="feed-line">AWAITING TELEMETRY...</div>';
+      }
+    }
+    
+    // Simple HTML sanitizer
+    function escapeHtml(s) {
+      return (s || '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+    
     function updateCharts() {
+      // Lazy load Chart.js if not yet loaded
+      if (!ChartLoader.isReady()) {
+        ChartLoader.load().then(() => {
+          updateCharts(); // Retry after loading
+        });
+        return;
+      }
+      
       const data = tickerData[currentTicker];
       if (!data) return;
       let source = currentTimeframe === '1D' ? data.daily : data.intraday;
@@ -1525,6 +2325,9 @@
       const closes = source.map(d => d.c);
       const color = tickerColors[currentTicker] || '#33ff99';
       
+      // Store closes for Context Bay access
+      window.currentSeriesCloses = closes;
+      
       // Calculate proper Y-axis bounds with padding
       const minPrice = Math.min(...closes);
       const maxPrice = Math.max(...closes);
@@ -1536,22 +2339,76 @@
       const yPadding = isShortRange ? padding * 0.5 : padding;
       
       if (priceChart) priceChart.destroy();
-      const datasets = [{ 
+      
+      // Calculate EMA series for ribbon
+      const emaSeries = RIBBON_PERIODS.map((p, i) => ({
+        period: p,
+        color: RIBBON_COLORS[i % RIBBON_COLORS.length],
+        data: calcEMA(closes, p)
+      }));
+      
+      const datasets = [];
+      
+      // Main price trace (hero line)
+      datasets.push({ 
         label: currentTicker, 
         data: closes, 
         borderColor: color, 
-        backgroundColor: color + '15', 
+        backgroundColor: 'rgba(0,0,0,0)', // Let ribbon provide the fill vibe
         borderWidth: 2, 
-        fill: true, 
-        tension: 0.1, 
+        fill: false, 
+        tension: 0.12, 
         pointRadius: 0, 
-        pointHoverRadius: 4 
-      }];
+        pointHoverRadius: 4,
+        isPrice: true,    // Step: Tag as price (not ribbon)
+        isRibbon: false
+      });
       
       if (showMA) {
-        if (source.some(d => d.g100)) datasets.push({ label: 'MA 100', data: source.map(d => d.g100), borderColor: '#ffb347', borderWidth: 1, fill: false, tension: 0.1, pointRadius: 0 });
-        if (source.some(d => d.g150)) datasets.push({ label: 'MA 150', data: source.map(d => d.g150), borderColor: '#b388ff', borderWidth: 1, fill: false, tension: 0.1, pointRadius: 0 });
-        if (source.some(d => d.g200)) datasets.push({ label: 'MA 200', data: source.map(d => d.g200), borderColor: '#47d4ff', borderWidth: 1, fill: false, tension: 0.1, pointRadius: 0 });
+        // 1) EMA lines (thin, glowing) - track indices for band fill targets
+        const emaLineIdx = [];
+        emaSeries.forEach((s, idx) => {
+          emaLineIdx.push(datasets.length);
+          datasets.push({
+            label: `EMA ${s.period}`,
+            data: s.data,
+            borderColor: s.color,
+            borderWidth: 0.8, // Thin lines for EM frequency effect
+            fill: false,
+            tension: 0.15, // Slightly more curve
+            pointRadius: 0,
+            isRibbon: true,  // Step 6B: Tag for CRT jitter plugin
+            // Faster EMAs = more reactive jitter
+            jitterAmplitude: 1 + (1 - idx / emaSeries.length) * 0.5
+          });
+        });
+        
+        // 2) Filled "bands" between adjacent EMAs (ribbon effect)
+        for (let i = 0; i < emaSeries.length - 1; i++) {
+          const slowIdx = emaLineIdx[i + 1];
+          const c = emaSeries[i].color;
+          
+          datasets.push({
+            label: `BAND ${emaSeries[i].period}-${emaSeries[i + 1].period}`,
+            data: emaSeries[i].data,
+            borderColor: 'rgba(0,0,0,0)',
+            pointRadius: 0,
+            tension: 0.15,
+            fill: { target: slowIdx },
+            isRibbon: true,  // Step 6B: Tag for CRT jitter plugin
+            backgroundColor: (ctx) => {
+              const chart = ctx.chart;
+              const { ctx: c2, chartArea } = chart;
+              if (!chartArea) return hexToRgba(c, 0.06);
+              const g = c2.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+              // Slightly more transparent with more bands
+              g.addColorStop(0, hexToRgba(c, 0.10));
+              g.addColorStop(0.6, hexToRgba(c, 0.05));
+              g.addColorStop(1, hexToRgba(c, 0.00));
+              return g;
+            }
+          });
+        }
       }
       
       priceChart = new Chart(document.getElementById('price-chart'), {
@@ -1562,8 +2419,43 @@
           maintainAspectRatio: false, 
           interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: { display: showMA, position: 'top', labels: { boxWidth: 12, font: { size: 10, family: "'IBM Plex Mono', monospace" }, color: '#5a7068' } },
-            tooltip: { backgroundColor: 'rgba(10, 12, 15, 0.95)', titleColor: '#e8f4f0', bodyColor: '#a8c0b8', borderColor: '#1e2832', borderWidth: 1, titleFont: { family: "'IBM Plex Mono', monospace" }, bodyFont: { family: "'IBM Plex Mono', monospace" }, callbacks: { label: i => i.dataset.label + ': $' + i.parsed.y.toFixed(2) } }
+            legend: { 
+              display: showMA, 
+              position: 'top', 
+              labels: { 
+                boxWidth: 12, 
+                font: { size: 10, family: "'IBM Plex Mono', monospace" }, 
+                color: '#5a7068',
+                // Filter out band datasets from legend
+                filter: (item) => !item.text.startsWith('BAND')
+              } 
+            },
+            tooltip: { 
+              backgroundColor: 'rgba(10, 12, 15, 0.92)', 
+              titleColor: '#33ff99', 
+              bodyColor: '#e8f4f0', 
+              borderColor: '#33ff99', 
+              borderWidth: 1,
+              padding: 8,
+              titleFont: { family: "'IBM Plex Mono', monospace", size: 11 }, 
+              bodyFont: { family: "'IBM Plex Mono', monospace", size: 12, weight: 'bold' }, 
+              displayColors: false,
+              callbacks: { 
+                title: (items) => {
+                  if (!items.length) return '';
+                  const d = new Date(items[0].parsed.x);
+                  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                },
+                label: (item) => {
+                  // Only show main price line, hide everything else
+                  if (item.dataset.label === 'RKLB' || item.datasetIndex === 0) {
+                    return '$' + item.parsed.y.toFixed(2);
+                  }
+                  return null;
+                }
+              },
+              filter: (item) => item.datasetIndex === 0 // Only price, no EMAs
+            }
           },
           scales: {
             x: { 
@@ -1579,7 +2471,8 @@
               ticks: { color: '#5a7068', font: { family: "'IBM Plex Mono', monospace", size: 10 }, callback: v => '$' + v.toFixed(2) } 
             }
           }
-        }
+        },
+        plugins: [terrainPlugin, arcadeCRTPlugin, ribbonEMGlitchPlugin, shipOverlayPlugin]
       });
       
       if (macdChart) macdChart.destroy();
@@ -1595,6 +2488,801 @@
       
       // Update telemetry side console
       updateTelemetryConsole(source, closes);
+      updateContextBay();
+      
+      // Update Captain's Log from MACD events
+      try {
+        const events = buildCaptainsLog({ labels, macd: macdData, signal: signalData, hist: histData });
+        renderCaptainsLog(events);
+      } catch (e) {
+        // non-fatal, log for debugging
+        console.warn('Captain\'s Log update failed:', e);
+      }
+      
+      // Update Ship Systems panel (reactive to indicators)
+      try {
+        updateShipSystems(source, closes);
+      } catch (e) {
+        console.warn('Ship Systems update failed:', e);
+      }
+      
+      // Update MACD Orbit Visualization
+      const macdWrapper = document.querySelector('.macd-chart-wrapper');
+      if (macdWrapper) {
+        macdWrapper.classList.toggle('orbit-mode', macdOrbitMode);
+      }
+      if (macdOrbitMode) {
+        renderMacdOrbit({ macd: macdData, signal: signalData, hist: histData, labels });
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MACD ORBITAL VISUALIZATION — Star/Planet/Moon system from MACD data
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    // Animation state for smooth orbital motion
+    let macdOrbitAnimFrame = null;
+    let macdOrbitData = null;
+    
+    /**
+     * Clamp value between min and max
+     */
+    function orbitClamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    
+    /**
+     * Normalize value to 0-1 range
+     */
+    function normFromRange(v, min, max) {
+      if (max - min === 0) return 0;
+      return (v - min) / (max - min);
+    }
+    
+    /**
+     * Get min/max from array
+     */
+    function getMinMax(arr) {
+      let min = Infinity, max = -Infinity;
+      for (const v of arr) {
+        if (v == null || !Number.isFinite(v)) continue;
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
+      if (min === Infinity) return { min: 0, max: 1 };
+      return { min, max };
+    }
+    
+    /**
+     * Toggle MACD display mode (ORBIT / LINES)
+     */
+    function toggleMacdMode() {
+      macdOrbitMode = !macdOrbitMode;
+      const btn = document.getElementById('macd-mode-toggle');
+      if (btn) {
+        btn.classList.toggle('active', macdOrbitMode);
+        btn.textContent = macdOrbitMode ? 'ORBIT' : 'LINES';
+      }
+      
+      const macdWrapper = document.querySelector('.macd-chart-wrapper');
+      if (macdWrapper) {
+        macdWrapper.classList.toggle('orbit-mode', macdOrbitMode);
+      }
+      
+      // If switching to orbit mode and we have cached data, start animation
+      if (macdOrbitMode && macdOrbitData) {
+        startMacdOrbitAnimation();
+      } else {
+        stopMacdOrbitAnimation();
+      }
+      
+      // Play UI sound
+      if (typeof playSound === 'function') playSound('click');
+    }
+    window.toggleMacdMode = toggleMacdMode;
+    
+    /**
+     * Render MACD Orbital Visualization
+     * Star = market center (zero line)
+     * Planet = MACD line (orbit radius)
+     * Moon = Signal line (sub-orbit)
+     * Histogram = thrust flare intensity
+     */
+    function renderMacdOrbit({ macd, signal, hist, labels }) {
+      // Cache data for animation loop
+      macdOrbitData = { macd, signal, hist, labels };
+      
+      // Start animation if in orbit mode
+      if (macdOrbitMode) {
+        startMacdOrbitAnimation();
+      }
+    }
+    
+    /**
+     * Start continuous animation loop for orbit
+     */
+    function startMacdOrbitAnimation() {
+      if (macdOrbitAnimFrame) return; // Already running
+      
+      // Mobile detection for frame throttling
+      const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
+      let lastFrame = 0;
+      const targetFps = isMobile ? 30 : 60; // Throttle on mobile
+      const frameInterval = 1000 / targetFps;
+      
+      function animate(timestamp) {
+        // Throttle frame rate on mobile
+        if (isMobile && timestamp - lastFrame < frameInterval) {
+          macdOrbitAnimFrame = requestAnimationFrame(animate);
+          return;
+        }
+        lastFrame = timestamp;
+        
+        drawMacdOrbitFrame();
+        macdOrbitAnimFrame = requestAnimationFrame(animate);
+      }
+      animate(0);
+    }
+    
+    /**
+     * Stop animation loop
+     */
+    function stopMacdOrbitAnimation() {
+      if (macdOrbitAnimFrame) {
+        cancelAnimationFrame(macdOrbitAnimFrame);
+        macdOrbitAnimFrame = null;
+      }
+    }
+    
+    /**
+     * Draw a single frame of the orbital visualization
+     * ENHANCED: Larger, more atmospheric, topographic feel
+     */
+    function drawMacdOrbitFrame() {
+      if (!macdOrbitData) return;
+      
+      const { macd, signal, hist, labels } = macdOrbitData;
+      
+      const wrapper = document.querySelector('.macd-chart-wrapper');
+      const canvas = document.getElementById('macd-orbit-canvas');
+      if (!wrapper || !canvas) return;
+      
+      const rect = wrapper.getBoundingClientRect();
+      if (rect.width < 100 || rect.height < 60) return;
+      
+      const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
+      const dpr = isMobile ? Math.min(window.devicePixelRatio, 2) : (window.devicePixelRatio || 1);
+      
+      const targetW = Math.max(1, Math.floor(rect.width * dpr));
+      const targetH = Math.max(1, Math.floor(rect.height * dpr));
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      
+      if (!macd?.length || !signal?.length) return;
+      
+      const N = Math.min(isMobile ? 60 : 120, macd.length);
+      const start = macd.length - N;
+      
+      const macdSlice = macd.slice(start);
+      const sigSlice = signal.slice(start);
+      const histSlice = (hist || []).slice(start);
+      
+      const mmM = getMinMax(macdSlice);
+      const mmS = getMinMax(sigSlice);
+      const mmH = getMinMax(histSlice);
+      
+      // ENHANCED: Larger orbital elements, more centered
+      const cx = rect.width * 0.5;
+      const cy = rect.height * 0.48;
+      const baseR = Math.min(rect.width, rect.height) * 0.18;
+      const maxR = Math.min(rect.width, rect.height) * 0.42;
+      
+      const t = performance.now() * 0.001;
+      
+      const i = N - 1;
+      const m = macdSlice[i] ?? 0;
+      const s = sigSlice[i] ?? 0;
+      const h = histSlice[i] ?? 0;
+      
+      const mN = normFromRange(m, mmM.min, mmM.max) * 2 - 1;
+      const sN = normFromRange(s, mmS.min, mmS.max) * 2 - 1;
+      const hN = normFromRange(h, mmH.min, mmH.max) * 2 - 1;
+      
+      const planetR = baseR + (maxR - baseR) * orbitClamp(Math.abs(mN), 0, 1);
+      const moonR = planetR * (0.25 + 0.20 * orbitClamp(Math.abs(sN), 0, 1));
+      
+      const orbitSpeed = 0.10 + Math.abs(hN) * 0.06;
+      const angle = t * orbitSpeed;
+      
+      const moonOrbitSpeed = 1.65;
+      const moonAngle = angle * moonOrbitSpeed + sN * 0.9;
+      
+      const thrust = orbitClamp(Math.abs(hN), 0, 1);
+      const ecc = 1 - thrust * 0.15;
+      
+      const px = cx + Math.cos(angle) * planetR;
+      const py = cy + Math.sin(angle) * (planetR * ecc);
+      
+      const mx = px + Math.cos(moonAngle) * moonR;
+      const my = py + Math.sin(moonAngle) * (moonR * 0.9);
+      
+      // --- DRAW ---
+      ctx.save();
+      
+      // ENHANCED: Deep space nebula background
+      const nebulaGrad = ctx.createRadialGradient(
+        cx * 0.7, cy * 0.6, 0,
+        cx, cy, rect.width * 0.6
+      );
+      nebulaGrad.addColorStop(0, 'rgba(71, 212, 255, 0.04)');
+      nebulaGrad.addColorStop(0.3, 'rgba(179, 136, 255, 0.025)');
+      nebulaGrad.addColorStop(0.6, 'rgba(51, 255, 153, 0.015)');
+      nebulaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = nebulaGrad;
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      
+      // ENHANCED: More stars, varying sizes
+      ctx.globalAlpha = 0.06;
+      const starSeed = Math.floor(t * 0.3);
+      for (let k = 0; k < 40; k++) {
+        const sx = ((k * 137.5 + starSeed * 0.3) % rect.width);
+        const sy = ((k * 173.3 + starSeed * 0.7) % rect.height);
+        const starSize = k % 5 === 0 ? 2 : 1;
+        const twinkle = 0.5 + 0.5 * Math.sin(t * 3 + k);
+        ctx.globalAlpha = 0.03 + twinkle * 0.04;
+        ctx.fillStyle = k % 4 === 0 ? '#47d4ff' : k % 3 === 0 ? '#b388ff' : '#33ff99';
+        ctx.beginPath();
+        ctx.arc(sx, sy, starSize, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      
+      // ENHANCED: Central star with corona
+      const starPulse = 1 + Math.sin(t * 2.2) * 0.12;
+      
+      // Outer corona
+      const coronaGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * 2.5 * starPulse);
+      coronaGrad.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+      coronaGrad.addColorStop(0.1, 'rgba(51, 255, 153, 0.25)');
+      coronaGrad.addColorStop(0.25, 'rgba(71, 212, 255, 0.15)');
+      coronaGrad.addColorStop(0.5, 'rgba(179, 136, 255, 0.06)');
+      coronaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = coronaGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, baseR * 2.5 * starPulse, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Inner star glow
+      const starGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * 0.8 * starPulse);
+      starGlow.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+      starGlow.addColorStop(0.3, 'rgba(51, 255, 153, 0.6)');
+      starGlow.addColorStop(0.7, 'rgba(71, 212, 255, 0.2)');
+      starGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = starGlow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, baseR * 0.8 * starPulse, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Star core
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      
+      // ENHANCED: Multiple orbit rings (like altitude contours)
+      ctx.setLineDash([3, 5]);
+      for (let ring = 0; ring < 3; ring++) {
+        const ringR = baseR + (maxR - baseR) * (ring / 2);
+        const ringAlpha = 0.04 + (ring === 0 ? 0.04 : 0);
+        ctx.strokeStyle = `rgba(51, 255, 153, ${ringAlpha})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, ringR, ringR * ecc, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      
+      // Active orbit ring (brighter)
+      ctx.strokeStyle = `rgba(51, 255, 153, ${0.12 + thrust * 0.15})`;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, planetR, planetR * ecc, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // ENHANCED: Orbit trail with gradient fade
+      ctx.globalCompositeOperation = 'screen';
+      const trailStep = isMobile ? 3 : 2;
+      for (let j = 0; j < N; j += trailStep) {
+        const mj = macdSlice[j] ?? 0;
+        const hj = histSlice[j] ?? 0;
+        
+        const mjN = normFromRange(mj, mmM.min, mmM.max) * 2 - 1;
+        const hjN = normFromRange(hj, mmH.min, mmH.max) * 2 - 1;
+        
+        const rj = baseR + (maxR - baseR) * orbitClamp(Math.abs(mjN), 0, 1);
+        const aj = (j / Math.max(1, N - 1)) * Math.PI * 2 + t * orbitSpeed;
+        const eccJ = 1 - orbitClamp(Math.abs(hjN), 0, 1) * 0.15;
+        
+        const xj = cx + Math.cos(aj) * rj;
+        const yj = cy + Math.sin(aj) * (rj * eccJ);
+        
+        const age = j / (N - 1);
+        const trailColor = hjN > 0 ? '51, 255, 153' : '255, 107, 107';
+        ctx.fillStyle = `rgba(${trailColor}, ${0.02 + age * 0.12})`;
+        ctx.beginPath();
+        ctx.arc(xj, yj, 1.5 + age * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      
+      // ENHANCED: Planet with atmosphere
+      ctx.save();
+      
+      // Atmospheric glow
+      const atmosGrad = ctx.createRadialGradient(px, py, 0, px, py, 20 + thrust * 15);
+      const planetColor = thrust > 0.5 ? 'rgba(51, 255, 153' : 'rgba(71, 212, 255';
+      atmosGrad.addColorStop(0, planetColor + ', 0.9)');
+      atmosGrad.addColorStop(0.4, planetColor + ', 0.4)');
+      atmosGrad.addColorStop(0.7, planetColor + ', 0.15)');
+      atmosGrad.addColorStop(1, planetColor + ', 0)');
+      ctx.fillStyle = atmosGrad;
+      ctx.beginPath();
+      ctx.arc(px, py, 20 + thrust * 15, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Planet core
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = thrust > 0.5 ? 'rgba(51, 255, 153, 0.9)' : 'rgba(71, 212, 255, 0.8)';
+      ctx.fillStyle = thrust > 0.5 ? '#33ff99' : '#47d4ff';
+      ctx.beginPath();
+      ctx.arc(px, py, 6 + thrust * 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      
+      // ENHANCED: Thrust flare with gradient
+      if (thrust > 0.06) {
+        const dir = h >= 0 ? 1 : -1;
+        const flareLen = 20 + thrust * 40;
+        const flareGrad = ctx.createLinearGradient(
+          px, py,
+          px - Math.cos(angle) * flareLen, 
+          py - Math.sin(angle) * flareLen * ecc
+        );
+        const flareColor = dir > 0 ? '51, 255, 153' : '255, 107, 107';
+        flareGrad.addColorStop(0, `rgba(${flareColor}, 0.8)`);
+        flareGrad.addColorStop(0.5, `rgba(${flareColor}, 0.3)`);
+        flareGrad.addColorStop(1, `rgba(${flareColor}, 0)`);
+        
+        ctx.strokeStyle = flareGrad;
+        ctx.lineWidth = 3 + thrust * 2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px - Math.cos(angle) * flareLen, py - Math.sin(angle) * flareLen * ecc);
+        ctx.stroke();
+      }
+      
+      // ENHANCED: Moon with glow
+      ctx.save();
+      const moonGlow = ctx.createRadialGradient(mx, my, 0, mx, my, 10 + thrust * 6);
+      moonGlow.addColorStop(0, 'rgba(255, 179, 71, 0.9)');
+      moonGlow.addColorStop(0.4, 'rgba(255, 179, 71, 0.4)');
+      moonGlow.addColorStop(1, 'rgba(255, 179, 71, 0)');
+      ctx.fillStyle = moonGlow;
+      ctx.beginPath();
+      ctx.arc(mx, my, 10 + thrust * 6, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = 'rgba(255, 179, 71, 0.8)';
+      ctx.fillStyle = '#ffb347';
+      ctx.beginPath();
+      ctx.arc(mx, my, 3.5 + thrust * 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      
+      // Tether line
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(mx, my);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // ENHANCED: Status readout (minimal, just momentum direction)
+      ctx.font = "9px 'IBM Plex Mono', monospace";
+      ctx.textAlign = 'center';
+      const momentum = h >= 0 ? '▲ THRUST' : '▼ DRAG';
+      const momentumColor = h >= 0 ? 'rgba(51, 255, 153, 0.6)' : 'rgba(255, 107, 107, 0.6)';
+      ctx.fillStyle = momentumColor;
+      ctx.fillText(momentum, cx, rect.height - 8);
+      
+      // Divergence arc indicator
+      const divergence = Math.abs(m - s);
+      const maxDiv = Math.max(Math.abs(mmM.max - mmS.min), Math.abs(mmM.min - mmS.max)) || 1;
+      const divNorm = orbitClamp(divergence / maxDiv, 0, 1);
+      if (divNorm > 0.4) {
+        ctx.globalAlpha = (divNorm - 0.4) * 0.5;
+        ctx.strokeStyle = m > s ? 'rgba(51, 255, 153, 0.7)' : 'rgba(255, 107, 107, 0.7)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, planetR + 14, angle - 0.35, angle + 0.35);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      
+      ctx.restore();
+    }
+    
+    // Resize handler for MACD orbit canvas
+    window.addEventListener('resize', () => {
+      // Canvas will auto-resize on next frame draw
+      // Just trigger a redraw if we're in orbit mode
+      if (macdOrbitMode && macdOrbitData) {
+        drawMacdOrbitFrame();
+      }
+    });
+    
+    // Initialize MACD mode button state on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('macd-mode-toggle');
+      if (btn) {
+        btn.classList.toggle('active', macdOrbitMode);
+        btn.textContent = macdOrbitMode ? 'ORBIT' : 'LINES';
+      }
+      const wrapper = document.querySelector('.macd-chart-wrapper');
+      if (wrapper) {
+        wrapper.classList.toggle('orbit-mode', macdOrbitMode);
+      }
+    });
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CAPTAIN'S LOG — Truth-rooted event generation from MACD data
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    /**
+     * Build Captain's Log events from MACD arrays
+     * Detects: MACD/Signal crossovers, histogram zero-crosses, momentum acceleration
+     */
+    function buildCaptainsLog({ labels, macd, signal, hist }) {
+      const events = [];
+      const n = labels.length;
+      
+      function push(i, kind, dir, strength) {
+        // Format time label from Date object
+        const date = labels[i];
+        let timeLabel;
+        if (date instanceof Date) {
+          const mo = (date.getMonth() + 1).toString().padStart(2, '0');
+          const dy = date.getDate().toString().padStart(2, '0');
+          const hr = date.getHours().toString().padStart(2, '0');
+          const mn = date.getMinutes().toString().padStart(2, '0');
+          timeLabel = `${mo}/${dy} ${hr}:${mn}`;
+        } else {
+          timeLabel = `T-${n - i}`;
+        }
+        
+        events.push({
+          i,
+          t: timeLabel,
+          kind,
+          dir,
+          strength
+        });
+      }
+      
+      for (let i = 2; i < n; i++) {
+        const m0 = macd[i - 1], m1 = macd[i];
+        const s0 = signal[i - 1], s1 = signal[i];
+        const h0 = hist[i - 1], h1 = hist[i];
+        
+        // Skip if data is not valid
+        if (![m0, m1, s0, s1, h0, h1].every(Number.isFinite)) continue;
+        
+        // 1) MACD crosses Signal (bullish/bearish crossover)
+        const prevDiff = m0 - s0;
+        const nextDiff = m1 - s1;
+        if (prevDiff <= 0 && nextDiff > 0) {
+          push(i, 'CROSSOVER', 'BULL', Math.abs(h1));
+        } else if (prevDiff >= 0 && nextDiff < 0) {
+          push(i, 'CROSSOVER', 'BEAR', Math.abs(h1));
+        }
+        
+        // 2) Histogram crosses zero (momentum regime flip)
+        if (h0 <= 0 && h1 > 0) {
+          push(i, 'MOMENTUM', 'BULL', Math.abs(h1));
+        } else if (h0 >= 0 && h1 < 0) {
+          push(i, 'MOMENTUM', 'BEAR', Math.abs(h1));
+        }
+        
+        // 3) Surge / exhaustion (acceleration detection)
+        if (i >= 2) {
+          const h_prev2 = hist[i - 2];
+          if (Number.isFinite(h_prev2)) {
+            const dh0 = h0 - h_prev2;
+            const dh1 = h1 - h0;
+            const accel = dh1 - dh0;
+            const threshold = 0.02 * Math.max(1e-6, Math.abs(h0));
+            
+            if (accel > threshold && Math.abs(accel) > 0.01) {
+              // Momentum building
+              push(i, 'THRUST', h1 >= 0 ? 'BULL' : 'BEAR', Math.abs(accel));
+            } else if (accel < -threshold && Math.abs(accel) > 0.01) {
+              // Momentum fading
+              push(i, 'DRAG', h1 >= 0 ? 'BULL' : 'BEAR', Math.abs(accel));
+            }
+          }
+        }
+      }
+      
+      // Return newest first, cap at 10 events for readability
+      events.sort((a, b) => b.i - a.i);
+      return events.slice(0, 10);
+    }
+    
+    /**
+     * Render Captain's Log events to the DOM
+     */
+    function renderCaptainsLog(events) {
+      const el = document.getElementById('captains-log-list');
+      if (!el) return;
+      
+      if (!events || !events.length) {
+        el.innerHTML = `<div class="log-empty">AWAITING SIGNAL EVENTS…</div>`;
+        return;
+      }
+      
+      el.innerHTML = events.map(e => {
+        const isGood = e.dir === 'BULL';
+        const tagClass = isGood ? 'good' : 'bad';
+        
+        // Generate cockpit-style phrasing based on event type
+        let msg;
+        switch (e.kind) {
+          case 'CROSSOVER':
+            msg = isGood 
+              ? 'MACD crossed above signal. Trend ignition.' 
+              : 'MACD crossed below signal. Trend decay.';
+            break;
+          case 'MOMENTUM':
+            msg = isGood 
+              ? 'Histogram flipped positive. Momentum aligned.' 
+              : 'Histogram flipped negative. Momentum degraded.';
+            break;
+          case 'THRUST':
+            msg = 'Momentum acceleration detected. Thrust building.';
+            break;
+          case 'DRAG':
+            msg = 'Momentum deceleration detected. Thrust fading.';
+            break;
+          default:
+            msg = 'Signal event registered.';
+        }
+        
+        return `
+          <div class="log-row">
+            <div class="log-time">${escapeHtml(String(e.t))}</div>
+            <div class="log-msg">${escapeHtml(msg)}</div>
+            <div class="log-tag ${tagClass}">${escapeHtml(e.kind)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SHIP SYSTEMS — Reactive state derived from indicators
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    /**
+     * Compute ship systems state from chart data
+     * Systems react to EMA spread, MACD histogram, volatility
+     */
+    function computeShipSystems(source, closes) {
+      if (!source || source.length < 20) {
+        return getDefaultSystems();
+      }
+      
+      const n = source.length;
+      const latest = source[n - 1];
+      
+      // Compute EMA values for spread calculation
+      const ema21 = calcEMA(closes, 21);
+      const ema55 = calcEMA(closes, 55);
+      const currentEma21 = ema21[ema21.length - 1] || 0;
+      const currentEma55 = ema55[ema55.length - 1] || 0;
+      const currentPrice = latest.c;
+      
+      // EMA spread (normalized)
+      const emaSpread = currentEma55 > 0 ? (currentEma21 - currentEma55) / currentEma55 : 0;
+      
+      // MACD metrics
+      const macdHist = latest.hist || 0;
+      const macd = latest.macd || 0;
+      const signal = latest.signal || 0;
+      
+      // Volatility (simple measure: range vs price)
+      const recentBars = source.slice(-14);
+      const highs = recentBars.map(d => d.h || d.c);
+      const lows = recentBars.map(d => d.l || d.c);
+      const avgRange = highs.reduce((s, h, i) => s + (h - lows[i]), 0) / recentBars.length;
+      const volatility = currentPrice > 0 ? (avgRange / currentPrice) * 100 : 0;
+      
+      // Trend strength (count bars where EMA21 > EMA55)
+      let trendBars = 0;
+      for (let i = Math.max(0, n - 20); i < n; i++) {
+        if (ema21[i] > ema55[i]) trendBars++;
+      }
+      const sustainedTrend = trendBars >= 15;
+      
+      // Build systems state
+      const systems = [];
+      
+      // THRUSTERS: EMA expanding + positive momentum
+      if (emaSpread > 0.03 && macdHist > 0) {
+        systems.push({ name: 'THRUSTERS', state: 'UPGRADED', stateClass: 'system-upgraded' });
+      } else if (emaSpread > 0 && macd > signal) {
+        systems.push({ name: 'THRUSTERS', state: 'ACTIVE', stateClass: 'system-stable' });
+      } else {
+        systems.push({ name: 'THRUSTERS', state: 'IDLE', stateClass: 'system-idle' });
+      }
+      
+      // HULL: Volatility stress
+      if (volatility > 4) {
+        systems.push({ name: 'HULL', state: 'DAMAGED', stateClass: 'system-damaged' });
+      } else if (volatility > 2.5) {
+        systems.push({ name: 'HULL', state: 'STRAINED', stateClass: 'system-strained' });
+      } else {
+        systems.push({ name: 'HULL', state: 'STABLE', stateClass: 'system-stable' });
+      }
+      
+      // SENSORS: Vol spike + clean crossover
+      const recentCrossover = Math.abs(macd - signal) > 0.1 && macdHist !== 0;
+      if (volatility > 2 && recentCrossover) {
+        systems.push({ name: 'SENSORS', state: 'ENHANCED', stateClass: 'system-enhanced' });
+      } else if (macdHist !== 0) {
+        systems.push({ name: 'SENSORS', state: 'NOMINAL', stateClass: 'system-stable' });
+      } else {
+        systems.push({ name: 'SENSORS', state: 'SCANNING', stateClass: 'system-idle' });
+      }
+      
+      // WARP DRIVE: Sustained trend unlocks it
+      if (sustainedTrend && emaSpread > 0.02) {
+        systems.push({ name: 'WARP DRIVE', state: 'ACQUIRED', stateClass: 'system-acquired' });
+      } else if (trendBars >= 10) {
+        systems.push({ name: 'WARP DRIVE', state: 'CHARGING', stateClass: 'system-strained' });
+      } else {
+        systems.push({ name: 'WARP DRIVE', state: 'LOCKED', stateClass: 'system-locked' });
+      }
+      
+      return systems;
+    }
+    
+    function getDefaultSystems() {
+      return [
+        { name: 'THRUSTERS', state: 'IDLE', stateClass: 'system-idle' },
+        { name: 'HULL', state: 'STABLE', stateClass: 'system-stable' },
+        { name: 'SENSORS', state: 'NOMINAL', stateClass: 'system-stable' },
+        { name: 'WARP DRIVE', state: 'LOCKED', stateClass: 'system-locked' }
+      ];
+    }
+    
+    /**
+     * Render ship systems to the sidebar panel
+     */
+    function renderShipSystems(systems) {
+      const el = document.getElementById('ship-systems-list');
+      if (!el) return;
+      
+      el.innerHTML = systems.map(s => `
+        <li class="system-row">
+          <span class="system-name">${escapeHtml(s.name)}</span>
+          <span class="system-state ${s.stateClass}">${escapeHtml(s.state)}</span>
+        </li>
+      `).join('');
+    }
+    
+    /**
+     * Compute objectives/milestones from systems and signals
+     */
+    function computeObjectives(systems, source) {
+      const objectives = [];
+      
+      // Find system states
+      const thrusters = systems.find(s => s.name === 'THRUSTERS');
+      const hull = systems.find(s => s.name === 'HULL');
+      const warp = systems.find(s => s.name === 'WARP DRIVE');
+      const sensors = systems.find(s => s.name === 'SENSORS');
+      
+      // Thrusters upgraded achievement
+      if (thrusters && thrusters.state === 'UPGRADED') {
+        objectives.push({
+          icon: '◆',
+          text: 'Thrusters upgraded (trend acceleration)',
+          type: 'achieved'
+        });
+      }
+      
+      // Hull stress warning
+      if (hull && (hull.state === 'STRAINED' || hull.state === 'DAMAGED')) {
+        objectives.push({
+          icon: '⚠',
+          text: `Hull ${hull.state.toLowerCase()} (volatility spike)`,
+          type: 'warning'
+        });
+      }
+      
+      // Warp drive milestone
+      if (warp && warp.state === 'ACQUIRED') {
+        objectives.push({
+          icon: PixelIcons.toSvg('star', '#ffaa33', 12),
+          text: 'Warp capability unlocked (macro trend)',
+          type: 'milestone'
+        });
+      } else if (warp && warp.state === 'CHARGING') {
+        objectives.push({
+          icon: '◇',
+          text: 'Warp drive charging (trend forming)',
+          type: 'pending'
+        });
+      }
+      
+      // Sensors enhanced
+      if (sensors && sensors.state === 'ENHANCED') {
+        objectives.push({
+          icon: '◆',
+          text: 'Sensors enhanced (signal clarity)',
+          type: 'achieved'
+        });
+      }
+      
+      // If no notable objectives, show default
+      if (objectives.length === 0) {
+        objectives.push({
+          icon: '◇',
+          text: 'Monitoring signal conditions...',
+          type: 'pending'
+        });
+      }
+      
+      return objectives.slice(0, 4); // Cap at 4 objectives
+    }
+    
+    /**
+     * Render objectives to the sidebar panel
+     */
+    function renderObjectives(objectives) {
+      const el = document.getElementById('ship-objectives-list');
+      if (!el) return;
+      
+      el.innerHTML = objectives.map(o => `
+        <li class="objective-row ${o.type}">
+          <span class="objective-icon">${o.icon}</span>
+          <span class="objective-text">${escapeHtml(o.text)}</span>
+        </li>
+      `).join('');
+    }
+    
+    /**
+     * Master update function for Ship Systems panel
+     */
+    function updateShipSystems(source, closes) {
+      const systems = computeShipSystems(source, closes);
+      renderShipSystems(systems);
+      
+      const objectives = computeObjectives(systems, source);
+      renderObjectives(objectives);
     }
     
     // Update the telemetry side console with current data
@@ -1889,9 +3577,93 @@
       }
     }
     
+    /**
+     * Get primary group for a tab
+     */
+    function getPrimaryGroup(tab) {
+      if (tab === 'hangar') return 'hangar';
+      if (tab === 'chart') return 'data';
+      if (tab === 'arcade') return 'arcade';
+      if (tab === 'garage' || tab === 'upgrades') return 'garage';
+      if (tab === 'positions' || tab === 'options' || tab === 'catalysts') return 'command';
+      return 'hangar'; // Default to hangar
+    }
+    
     function switchTab(tabName) {
-      document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+      // Toggle panel visibility
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tabName + '-panel'));
+      
+      // Auto-collapse Context Bay when leaving Telemetry
+      if (tabName !== 'chart') {
+        toggleContextBay(false);
+      }
+      
+      // Preload Chart.js when switching to data/chart tab
+      if (tabName === 'chart' && !ChartLoader.isReady()) {
+        ChartLoader.load().then(() => {
+          updateCharts();
+        });
+      }
+      
+      // Determine which group this tab belongs to
+      const group = getPrimaryGroup(tabName);
+      
+      // Update primary nav buttons (data-group) and ARIA states
+      document.querySelectorAll('.nav-tab[data-group]').forEach(btn => {
+        const isActive = btn.dataset.group === group;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+      
+      // Show/hide subtabs based on group
+      const commandSubtabs = document.getElementById('command-subtabs');
+      const garageSubtabs = document.getElementById('garage-subtabs');
+      
+      if (commandSubtabs) {
+        commandSubtabs.style.display = (group === 'command') ? 'flex' : 'none';
+      }
+      
+      if (garageSubtabs) {
+        garageSubtabs.style.display = (group === 'garage') ? 'flex' : 'none';
+      }
+      
+      // Update subtab active states
+      document.querySelectorAll('#command-subtabs .subtab[data-tab]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      
+      document.querySelectorAll('#garage-subtabs .subtab[data-tab]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      
+      // Initialize Paint Bay when switching to garage
+      if (tabName === 'garage' && window.PaintBay) {
+        setTimeout(() => {
+          const container = document.getElementById('paint-bay-container');
+          if (container && !container.dataset.initialized) {
+            PaintBay.init('paint-bay-container');
+            container.dataset.initialized = 'true';
+          }
+        }, 100);
+      }
+      
+      // Initialize Upgrades panel when switching to upgrades
+      if (tabName === 'upgrades' && window.initUpgradesPanel) {
+        setTimeout(() => initUpgradesPanel(), 100);
+      }
+      
+      // Step 5.1: Start/stop fleet background animation
+      handleFleetBackground(tabName);
+      
+      // Initialize hangar when switching to it
+      if (tabName === 'hangar' && window.initHangarPanel) {
+        window.initHangarPanel();
+      }
+      
+      // Set SpaceScene mode based on current tab
+      if (window.SpaceScene && window.SpaceScene.setMode) {
+        SpaceScene.setMode(group);
+      }
       
       // Refresh arcade previews when switching to arcade tab
       if (tabName === 'arcade' && window.SpriteCache && SpriteCache.loaded) {
@@ -1901,6 +3673,88 @@
       // Re-initialize trajectory canvas when switching to holdings/options tab
       if (tabName === 'options' && window.initTrajectoryCanvas) {
         setTimeout(() => window.initTrajectoryCanvas(), 100);
+      }
+      
+      // Update URL hash (without triggering hashchange)
+      if (history.replaceState) {
+        history.replaceState(null, '', '#' + tabName);
+      }
+    }
+    
+    // Hash-based navigation support
+    function handleHashNavigation() {
+      const hash = window.location.hash.slice(1); // Remove #
+      if (hash) {
+        const validTabs = ['hangar', 'positions', 'arcade', 'garage', 'upgrades', 'chart', 'catalysts', 'options'];
+        if (validTabs.includes(hash)) {
+          switchTab(hash);
+        }
+      }
+    }
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashNavigation);
+    
+    // Handle initial hash on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(handleHashNavigation, 500); // Allow other init to complete first
+    });
+    
+    // Step 5.1: Fleet background controller
+    let arcadeFlightController = null;
+    let hangarFlightController = null; // Step 5: Fleet Hangar
+    
+    async function handleFleetBackground(tabName) {
+      if (!window.FlightScene) return;
+      
+      const arcadeCanvas = document.getElementById('arcade-bg-canvas');
+      const hangarCanvas = document.getElementById('fleet-hangar-canvas');
+      
+      // Step 5: Fleet Hangar background for positions panel
+      if (tabName === 'positions' && hangarCanvas) {
+        if (!hangarFlightController) {
+          try {
+            const ships = await FlightScene.buildShipRoster();
+            hangarFlightController = FlightScene.create({
+              canvas: hangarCanvas,
+              ships: ships,
+              mode: 'hangar', // Step 5: depth bands mode
+              intensity: 0.55
+            });
+          } catch (e) {
+            console.warn('[FleetBg] Failed to start hangar background:', e);
+          }
+        }
+      } else {
+        // Stop hangar background when leaving positions
+        if (hangarFlightController) {
+          hangarFlightController.stop();
+          hangarFlightController = null;
+          FlightScene.clearFocus();
+        }
+      }
+      
+      if (tabName === 'arcade' && arcadeCanvas) {
+        // Start fleet background for arcade
+        if (!arcadeFlightController) {
+          try {
+            const ships = await FlightScene.buildShipRoster();
+            arcadeFlightController = FlightScene.create({
+              canvas: arcadeCanvas,
+              ships: ships,
+              mode: 'fleet', // Reduced intensity
+              intensity: 0.6
+            });
+          } catch (e) {
+            console.warn('[FleetBg] Failed to start arcade background:', e);
+          }
+        }
+      } else {
+        // Stop fleet background when leaving arcade
+        if (arcadeFlightController) {
+          arcadeFlightController.stop();
+          arcadeFlightController = null;
+        }
       }
     }
     
@@ -1931,65 +3785,45 @@
     // =========================================================================
     
     function switchTabMobile(tabName) {
-      // Update mobile bottom nav
+      // Update mobile bottom nav (by group)
+      const group = getPrimaryGroup(tabName);
       document.querySelectorAll('.mobile-nav-item').forEach(t => {
-        t.classList.toggle('active', t.dataset.tab === tabName);
+        // Support both data-tab and data-group
+        const btnGroup = t.dataset.group || getPrimaryGroup(t.dataset.tab);
+        t.classList.toggle('active', btnGroup === group);
       });
-      // Update desktop nav tabs (keep in sync)
-      document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+      
+      // Update desktop nav tabs (keep in sync - use group)
+      document.querySelectorAll('.nav-tab[data-group]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.group === group);
+      });
+      
+      // Update desktop subtabs
+      const opsSubtabs = document.getElementById('ops-subtabs');
+      const trainingSubtabs = document.getElementById('training-subtabs');
+      if (opsSubtabs) opsSubtabs.style.display = (group === 'ops') ? 'flex' : 'none';
+      if (trainingSubtabs) trainingSubtabs.style.display = (group === 'training') ? 'flex' : 'none';
+      
+      document.querySelectorAll('#ops-subtabs .subtab[data-tab]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      document.querySelectorAll('#training-subtabs .subtab[data-tab]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      
       // Update panels
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tabName + '-panel'));
+      
       // Play sound
       if (window.SoundFX) SoundFX.play('click');
+      
+      // Step 5.1: Start/stop fleet background animation
+      handleFleetBackground(tabName);
       
       // Re-initialize trajectory canvas when switching to holdings/options tab
       if (tabName === 'options' && window.initTrajectoryCanvas) {
         setTimeout(() => window.initTrajectoryCanvas(), 150);
       }
-    }
-    
-    function toggleFabMenu() {
-      const fabMain = document.getElementById('fab-main');
-      const fabMenu = document.getElementById('fab-menu');
-      if (fabMain && fabMenu) {
-        fabMain.classList.toggle('open');
-        fabMenu.classList.toggle('open');
-        if (window.SoundFX) SoundFX.play('click');
-      }
-    }
-    
-    function toggleFabSFX() {
-      const sfxToggle = document.getElementById('sfx-toggle');
-      const fabSfx = document.getElementById('fab-sfx');
-      if (sfxToggle) {
-        sfxToggle.checked = !sfxToggle.checked;
-        sfxToggle.dispatchEvent(new Event('change'));
-        if (fabSfx) {
-          fabSfx.innerHTML = '<span class="fab-icon">🔊</span><span>SFX ' + (sfxToggle.checked ? 'ON' : 'OFF') + '</span>';
-          fabSfx.classList.toggle('active', sfxToggle.checked);
-        }
-      }
-    }
-    
-    function toggleFabBGM() {
-      const bgmToggle = document.getElementById('bgm-toggle');
-      const fabBgm = document.getElementById('fab-bgm');
-      if (bgmToggle) {
-        bgmToggle.checked = !bgmToggle.checked;
-        bgmToggle.dispatchEvent(new Event('change'));
-        if (fabBgm) {
-          fabBgm.innerHTML = '<span class="fab-icon">🎵</span><span>BGM ' + (bgmToggle.checked ? 'ON' : 'OFF') + '</span>';
-          fabBgm.classList.toggle('active', bgmToggle.checked);
-        }
-      }
-    }
-    
-    function showAboutOverlay() {
-      const aboutTrigger = document.getElementById('about-trigger-btn');
-      if (aboutTrigger) {
-        aboutTrigger.click();
-      }
-      toggleFabMenu();
     }
     
     function populateMobileTickerCarousel() {
@@ -2245,11 +4079,18 @@
         grid.innerHTML = tickers.map(ticker => {
           const color = tickerColors[ticker] || '#33ff99';
           const isSelected = ticker === this.selectedPlayerShip;
+          
+          // Step 8: Get ship level for display
+          const summary = window.Progression?.getShipSummary(ticker);
+          const level = summary?.level || 1;
+          const levelColor = level >= 5 ? '#ffd700' : level >= 3 ? '#47d4ff' : '#33ff99';
+          
           return `
             <div class="ship-select-item ${isSelected ? 'selected' : ''}" 
                  style="--ship-color: ${color}"
                  onclick="SpriteCache.selectShip('${ticker}')"
                  data-ticker="${ticker}">
+              <div class="ship-select-level" style="color: ${levelColor}">LVL ${level}</div>
               <img src="${SHIP_SPRITES[ticker]}" alt="${ticker}">
               <span class="ship-ticker">${ticker}</span>
             </div>
@@ -2367,6 +4208,104 @@
     // Initialize sprite cache on load
     SpriteCache.preload();
     
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Step 8: Progression System Event Listeners
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    if (window.PARALLAX_BUS) {
+      // Training game results → XP
+      window.PARALLAX_BUS.on('training:result', (e) => {
+        const t = e?.ticker;
+        if (!t || !window.Progression) return;
+        
+        // Base XP: WIN = 80, LOSS = 30
+        // Bonus: up to 120 based on score (10 XP per 100 points, capped at 1200 score)
+        const base = e.outcome === 'WIN' ? 80 : 30;
+        const bonus = Math.min(120, Math.floor((e.score || 0) / 10));
+        const totalXP = base + bonus;
+        
+        window.Progression.awardXP(t, totalXP, 'Training Simulation', {
+          gameId: e.gameId,
+          score: e.score,
+          outcome: e.outcome
+        });
+        
+        // Feedback
+        if (typeof logTerminal === 'function') {
+          logTerminal(`[PROGRESS] ${t} earned ${totalXP} XP from training`);
+        }
+      });
+      
+      // Mission completions → XP + random upgrade drop
+      window.PARALLAX_BUS.on('mission:complete', (e) => {
+        const t = e?.ticker;
+        if (!t || !window.Progression) return;
+        
+        // Base: 120 + difficulty * 40
+        const difficulty = e.difficulty || 1;
+        const amt = 120 + Math.floor(difficulty * 40);
+        
+        window.Progression.awardXP(t, amt, 'Mission Complete', {
+          missionType: e.missionType,
+          difficulty: difficulty,
+          duration: e.duration
+        });
+        
+        // 20% chance to drop an upgrade
+        if (Math.random() < 0.20 && window.ShipUpgrades?.getAllUpgrades) {
+          const shipEffects = window.Progression.computeEffects(t);
+          const shipLevel = shipEffects?.level || 1;
+          
+          // Pool = upgrades available at level + 1 (gives something to grow into)
+          const pool = window.ShipUpgrades.getAllUpgrades().filter(u => u.reqLevel <= shipLevel + 1);
+          if (pool.length > 0) {
+            const pick = pool[Math.floor(Math.random() * pool.length)];
+            const result = window.Progression.equipUpgrade(t, pick.id);
+            if (result.ok) {
+              if (typeof showToast === 'function') {
+                showToast(`🎁 ${t} acquired: ${pick.name}!`, 'alert');
+              }
+              if (typeof logTerminal === 'function') {
+                logTerminal(`[LOOT] ${t} received ${pick.name} upgrade`);
+              }
+            }
+          }
+        }
+        
+        // Feedback
+        if (typeof logTerminal === 'function') {
+          logTerminal(`[PROGRESS] ${t} earned ${amt} XP from mission`);
+        }
+      });
+      
+      // Mission damaged/aborted → small XP for participation
+      window.PARALLAX_BUS.on('mission:damaged', (e) => {
+        const t = e?.ticker;
+        if (!t || !window.Progression) return;
+        
+        // Small consolation XP (20)
+        window.Progression.awardXP(t, 20, 'Mission Aborted', {
+          missionType: e.missionType
+        });
+        
+        if (typeof logTerminal === 'function') {
+          logTerminal(`[PROGRESS] ${t} earned 20 XP (mission aborted)`);
+        }
+      });
+      
+      // Level up notifications
+      window.PARALLAX_BUS.on('progress:level', (e) => {
+        if (typeof showToast === 'function') {
+          showToast(`${PixelIcons.toSvg('medal', '#ffaa33', 14)} ${e.ticker} reached Level ${e.to}!`, 'alert');
+        }
+        if (window.MechSFX) {
+          MechSFX.success();
+        }
+      });
+      
+      console.log('[App] Progression event listeners registered');
+    }
+    
     function renderFleetGrid() {
       const fleetGrid = document.getElementById('fleet-grid');
       if (!fleetGrid) return;
@@ -2410,7 +4349,7 @@
         const shipVisualMarkup = `<img src="${spritePath}" alt="${pos.ticker} ship" loading="lazy" decoding="async">`;
         
         return `
-          <div class="ship-card ${isOperational ? '' : 'negative'}" style="--ship-color: ${color}" onclick="openVesselDossier('${pos.ticker}');">
+          <div class="ship-card ${isOperational ? '' : 'negative'}" data-ticker="${pos.ticker}" style="--ship-color: ${color}" onclick="openVesselDossier('${pos.ticker}');">
             <div class="ship-card-inner">
               <div class="ship-visual">
                 ${shipVisualMarkup}
@@ -2482,6 +4421,135 @@
       if (opCount) opCount.textContent = operational;
       if (dmgCount) dmgCount.textContent = damaged;
       if (winRate) winRate.textContent = Math.round((operational / DEMO_STOCK_POSITIONS.length) * 100) + '%';
+      
+      // Update Command Brief
+      updateCommandBrief(totalPnl, operational, damaged, DEMO_STOCK_POSITIONS);
+      
+      // Step 5: Add hover handlers for hangar focus
+      bindFleetCardHoverHandlers();
+    }
+    
+    /**
+     * Update Command Brief panel with fleet intelligence
+     */
+    function updateCommandBrief(totalPnl, operational, damaged, positions) {
+      const statusEl = document.getElementById('brief-status');
+      const postureEl = document.getElementById('brief-posture');
+      const concentrationEl = document.getElementById('brief-concentration');
+      const riskEl = document.getElementById('brief-risk');
+      const outcomeEl = document.getElementById('brief-outcome');
+      const notesEl = document.getElementById('brief-notes');
+      
+      if (!statusEl) return;
+      
+      // Determine overall status
+      const winRate = operational / (operational + damaged);
+      const pnlPositive = totalPnl >= 0;
+      
+      let status = 'NOMINAL';
+      let statusClass = '';
+      if (winRate < 0.6 || totalPnl < -500) {
+        status = 'CAUTION';
+        statusClass = 'warning';
+      }
+      if (winRate < 0.4 || totalPnl < -2000) {
+        status = 'ALERT';
+        statusClass = 'alert';
+      }
+      statusEl.textContent = status;
+      statusEl.className = 'command-brief-status ' + statusClass;
+      
+      // Determine posture
+      const postures = [
+        { threshold: 0.9, label: 'Aggressive Expansion' },
+        { threshold: 0.75, label: 'Controlled Expansion' },
+        { threshold: 0.5, label: 'Defensive Positioning' },
+        { threshold: 0, label: 'Damage Control' }
+      ];
+      const posture = postures.find(p => winRate >= p.threshold)?.label || 'Unknown';
+      if (postureEl) postureEl.textContent = posture;
+      
+      // Analyze sector concentration
+      const sectors = {};
+      positions.forEach(p => {
+        const sector = p.sector || 'Unknown';
+        sectors[sector] = (sectors[sector] || 0) + 1;
+      });
+      const topSectors = Object.entries(sectors)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(([s]) => s);
+      if (concentrationEl) concentrationEl.textContent = topSectors.join(' & ') || 'Diversified';
+      
+      // Risk assessment
+      const riskLevels = [
+        { threshold: 0.85, label: 'Minimal', cls: 'positive' },
+        { threshold: 0.7, label: 'Acceptable', cls: '' },
+        { threshold: 0.5, label: 'Elevated', cls: 'warning' },
+        { threshold: 0, label: 'Critical', cls: 'negative' }
+      ];
+      const risk = riskLevels.find(r => winRate >= r.threshold);
+      if (riskEl) {
+        riskEl.textContent = risk?.label || 'Unknown';
+        riskEl.className = 'brief-value ' + (risk?.cls || '');
+      }
+      
+      // Expected outcome
+      const outcomes = [
+        { pnl: 1000, rate: 0.8, label: 'Strong Favorable Drift', cls: 'positive' },
+        { pnl: 0, rate: 0.6, label: 'Favorable Drift', cls: 'positive' },
+        { pnl: -500, rate: 0.4, label: 'Uncertain Trajectory', cls: 'warning' },
+        { pnl: -Infinity, rate: 0, label: 'Recovery Mode', cls: 'negative' }
+      ];
+      const outcome = outcomes.find(o => totalPnl >= o.pnl && winRate >= o.rate);
+      if (outcomeEl) {
+        outcomeEl.textContent = outcome?.label || 'Uncertain';
+        outcomeEl.className = 'brief-value ' + (outcome?.cls || '');
+      }
+      
+      // Generate dynamic notes
+      const notes = [];
+      if (pnlPositive && winRate > 0.7) {
+        notes.push('• Fleet momentum aligned with sector trends');
+      } else if (!pnlPositive) {
+        notes.push('• Temporary headwinds affecting fleet performance');
+      }
+      
+      if (operational > damaged * 3) {
+        notes.push('• Primary vessels showing hull integrity');
+      } else if (damaged > 0) {
+        notes.push('• ' + damaged + ' vessel(s) require attention');
+      }
+      
+      if (winRate > 0.8) {
+        notes.push('• Recommend maintaining current trajectory');
+      } else if (winRate > 0.5) {
+        notes.push('• Consider rebalancing underperformers');
+      } else {
+        notes.push('• Strategic review recommended');
+      }
+      
+      if (notesEl) {
+        notesEl.innerHTML = notes.map(n => `<div class="brief-note">${n}</div>`).join('');
+      }
+    }
+    
+    // Step 5: Bind hover handlers to fleet cards for hangar focus
+    function bindFleetCardHoverHandlers() {
+      if (!window.FlightScene) return;
+      
+      const cards = document.querySelectorAll('.ship-card[data-ticker]');
+      cards.forEach(card => {
+        const ticker = card.dataset.ticker;
+        
+        card.addEventListener('mouseenter', () => {
+          FlightScene.setFocus(ticker, 1500); // Focus for 1.5s after hover ends
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          // Focus will auto-clear after 1.5s via setFocus duration
+        });
+      });
     }
     
     // Generate SVG string for a pixel ship
@@ -2926,7 +4994,7 @@
         { id:'simulation', text:'Run P&L simulation', done:false },
         { id:'find_invader', text:'Find the hidden invader', done:false },
         { id:'arcade_score', text:'Score 500+ in Signal Invaders', done:false },
-        { id:'terrain_lander', text:'Soft land on the terrain', done:false },
+        { id:'space_run', text:'Complete a Space Run of 5000+ km', done:false },
         { id:'snoop_master', text:'Trigger 5 access denials', done:false }
       ];
       
@@ -2952,7 +5020,8 @@
         if (!container) return;
         const div = document.createElement('div');
         div.className = 'toast' + (level !== 'info' ? ' ' + level : '');
-        div.textContent = message;
+        // Use innerHTML to support pixel icon SVGs
+        div.innerHTML = message;
         container.appendChild(div);
         requestAnimationFrame(() => div.classList.add('show'));
         setTimeout(() => {
@@ -3014,7 +5083,7 @@
         // Check if all missions complete
         if (ARCADE_MISSIONS.every(m => m.done)) {
           setTimeout(() => {
-            showToast('🏆 ALL MISSIONS COMPLETE!', 'alert');
+            showToast(PixelIcons.toSvg('trophy', '#ffaa33', 14) + ' ALL MISSIONS COMPLETE!', 'alert');
             beep(1000, 0.15);
           }, 500);
         }
@@ -3367,9 +5436,16 @@
       }
       
       // =========================================================================
-      // VESSEL DOSSIER CONTROLLER — Cinematic Ship Information Card
+      // VESSEL DOSSIER CONTROLLER — (DEPRECATED: Now uses unified ShipBrief)
       // =========================================================================
       function initVesselDossier() {
+        // If ShipBrief module is loaded, skip legacy vessel dossier
+        // ShipBrief provides a unified dialog component across all pages
+        if (window.ShipBrief) {
+          logTerminal('vessel dossier → using unified ShipBrief module');
+          return;
+        }
+        
         const overlay = document.getElementById('vessel-dossier');
         const closeBtn = document.getElementById('vessel-close-btn');
         const bootOverlay = document.getElementById('vessel-boot');
@@ -3720,7 +5796,7 @@
         let interactionTimeout;
 
         function setStatus(text, mode) {
-          status.textContent = text;
+          status.innerHTML = text;
           status.className = 'signal-status ' + mode;
         }
 
@@ -3735,7 +5811,7 @@
           } else if (value < 80) {
             setStatus("LISTENING…", "");
           } else {
-            setStatus("⚡ COMMS LOCKED ⚡", "locked");
+            setStatus(PixelIcons.toSvg('lightning', '#ffaa33', 12) + " COMMS LOCKED " + PixelIcons.toSvg('lightning', '#ffaa33', 12), "locked");
             if (typeof beep === 'function') beep(660, 0.08);
           }
         }
@@ -4175,12 +6251,12 @@
 
         // Toast notification
         if (typeof showToast === 'function') {
-          showToast('🛸 INVADER ATTACK DETECTED!', 'alert');
+          showToast(PixelIcons.toSvg('ufo', '#ff4444', 14) + ' INVADER ATTACK DETECTED!', 'alert');
         }
 
         // Log to terminal
         if (typeof logTerminal === 'function') {
-          logTerminal('⚠ ALERT: Hostile formation detected! Shields up!');
+          logTerminal(PixelIcons.toSvg('warning', '#ffaa33', 12) + ' ALERT: Hostile formation detected! Shields up!');
         }
 
         // Create invader wave
@@ -4226,7 +6302,7 @@
 
       // =========================================================================
       // MINI-GAMES — Loaded from js/games/mini-games.js
-      // SignalInvaders, AdminConsole, LandingGame exposed via window object
+      // SpaceRun exposed via window object
       // =========================================================================
 
       // =========================================================================
@@ -4320,7 +6396,7 @@
       initKonamiCode();
       initRippleEffects();
       
-      // SignalInvaders, AdminConsole, LandingGame loaded from js/games/mini-games.js
+      // SpaceRun loaded from js/games/mini-games.js
       
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initArcade);
@@ -4330,10 +6406,35 @@
         document.addEventListener('DOMContentLoaded', initTrajectoryCanvas);
         document.addEventListener('DOMContentLoaded', initLoreEngine);
         document.addEventListener('DOMContentLoaded', initEnhancedCatalysts);
-        document.addEventListener('DOMContentLoaded', () => window.SignalInvaders && window.SignalInvaders.init());
+        document.addEventListener('DOMContentLoaded', () => window.SpaceRun && window.SpaceRun.init());
         document.addEventListener('DOMContentLoaded', () => window.AdminConsole && window.AdminConsole.init());
-        document.addEventListener('DOMContentLoaded', () => window.LandingGame && window.LandingGame.init());
+        
+        // Livery system integration - redraw sprites when colors change
+        document.addEventListener('paintbay:apply', (e) => {
+          if (e.detail?.ticker) {
+            console.log(`[APP] Livery applied to ${e.detail.ticker}, triggering sprite refresh`);
+            // Refresh hangar display if showing this ship
+            if (typeof updateHangarDisplay === 'function') {
+              updateHangarDisplay();
+            }
+          }
+        });
+        
+        // Listen for sprite redraw requests
+        document.addEventListener('sprite:redraw', (e) => {
+          if (e.detail?.ticker) {
+            console.log(`[APP] Sprite redraw requested for ${e.detail.ticker}`);
+            // Force hangar refresh
+            if (typeof updateHangarDisplay === 'function') {
+              updateHangarDisplay();
+            }
+          }
+        });
+        
         document.addEventListener('DOMContentLoaded', initConsoleShip);
+        document.addEventListener('DOMContentLoaded', initMissionPanel); // Step 4
+        document.addEventListener('DOMContentLoaded', initHangarFocusEvents); // Step 5
+        document.addEventListener('DOMContentLoaded', () => window.initHangarPanel && window.initHangarPanel()); // Step 6: Living Hangar
       } else {
         initArcade();
         initTubeOverload();
@@ -4342,9 +6443,1203 @@
         initTrajectoryCanvas();
         initLoreEngine();
         initEnhancedCatalysts();
-        window.SignalInvaders && window.SignalInvaders.init();
+        window.SpaceRun && window.SpaceRun.init();
         window.AdminConsole && window.AdminConsole.init();
-        window.LandingGame && window.LandingGame.init();
         initConsoleShip();
+        initMissionPanel(); // Step 4
+        initHangarFocusEvents(); // Step 5
+        window.initHangarPanel && window.initHangarPanel(); // Step 6: Living Hangar
       }
     })();
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // STEP 5: HANGAR FOCUS EVENTS (ShipBrief ↔ Fleet Highlight)
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function initHangarFocusEvents() {
+      if (!window.FlightScene) return;
+      
+      // ShipBrief opens → focus that ticker in hangar
+      window.addEventListener('shipbrief:open', (e) => {
+        const ticker = e.detail?.ticker;
+        if (ticker) {
+          FlightScene.setFocus(ticker, 0); // Focus until close
+        }
+      });
+      
+      // ShipBrief closes → clear focus
+      window.addEventListener('shipbrief:close', () => {
+        FlightScene.clearFocus();
+      });
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // STEP 4: MISSION PANEL (Dashboard Mission Awareness)
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function initMissionPanel() {
+      if (!window.MissionBridge) {
+        console.warn('[MissionPanel] MissionBridge not loaded');
+        return;
+      }
+      
+      // Initial render
+      updateMissionPanel();
+      
+      // Poll every 2 seconds for mission state changes
+      setInterval(updateMissionPanel, 2000);
+    }
+    
+    function updateMissionPanel() {
+      if (!window.MissionBridge) return;
+      
+      try {
+        const counts = MissionBridge.getCounts();
+        const recentCompleted = MissionBridge.getRecentCompleted(3);
+        
+        // Update active count badge
+        const countBadge = document.getElementById('active-mission-count');
+        if (countBadge) {
+          countBadge.textContent = counts.active;
+          countBadge.classList.toggle('zero', counts.active === 0);
+        }
+        
+        // Update summary counts
+        const activeCount = document.getElementById('mission-active-count');
+        const completeCount = document.getElementById('mission-complete-count');
+        if (activeCount) activeCount.textContent = counts.active;
+        if (completeCount) completeCount.textContent = counts.complete;
+        
+        // Update recent missions list
+        const recentList = document.getElementById('recent-missions-list');
+        if (recentList) {
+          if (recentCompleted.length === 0) {
+            // Polish: Improved zero state copy
+            recentList.innerHTML = '<div class="no-missions">Launch missions to track regime evolution over time.</div>';
+          } else {
+            recentList.innerHTML = recentCompleted.map(m => {
+              const grade = m.outcome?.grade || '?';
+              return `
+                <div class="recent-mission-item grade-${grade}">
+                  <div>
+                    <span class="recent-mission-ticker">${m.ticker}</span>
+                    <span class="recent-mission-type">${m.typeName || m.type}</span>
+                  </div>
+                  <span class="recent-mission-grade ${grade}">${grade}</span>
+                </div>
+              `;
+            }).join('');
+          }
+        }
+        
+        // Update mission context for selected ticker (if telemetry is showing)
+        updateMissionContext();
+        
+      } catch (e) {
+        console.warn('[MissionPanel] Update failed:', e);
+      }
+    }
+    
+    /**
+     * Update mission context card in telemetry for selected ticker
+     */
+    function updateMissionContext() {
+      if (!window.MissionBridge) return;
+      
+      const contextContainer = document.getElementById('mission-context-container');
+      if (!contextContainer) return;
+      
+      // Get currently selected ticker from app state
+      const ticker = window.currentTicker || null;
+      if (!ticker) {
+        contextContainer.innerHTML = '<div class="mission-context-none">Select a ticker to see mission context</div>';
+        return;
+      }
+      
+      const activeMission = MissionBridge.getActiveForTicker(ticker);
+      
+      if (!activeMission) {
+        contextContainer.innerHTML = `
+          <div class="mission-context-none">
+            No active mission for ${ticker}
+            <br><a href="derivatives.html?ticker=${ticker}" style="color:var(--cyan);font-size:0.65rem;">Launch from Mission Command →</a>
+          </div>
+        `;
+        return;
+      }
+      
+      // Render active mission context
+      const progress = MissionBridge.getMissionProgress(activeMission);
+      const supports = MissionBridge.getSupportSummary(activeMission);
+      const recentLogs = MissionBridge.getRecentLogs(activeMission, 3);
+      const stars = PixelIcons.starRating(activeMission.difficulty || 2, 3);
+      
+      let supportsHtml = '';
+      if (supports.length > 0) {
+        supportsHtml = `
+          <div class="mission-context-supports">
+            ${supports.map(s => `<span class="mission-support-badge">${s.ticker} (${s.role})</span>`).join('')}
+          </div>
+        `;
+      }
+      
+      let logsHtml = '';
+      if (recentLogs.length > 0) {
+        logsHtml = `
+          <div class="mission-context-logs">
+            ${recentLogs.map(l => `<div class="mission-context-log">${PixelIcons.replaceEmojis(l.msg)}</div>`).join('')}
+          </div>
+        `;
+      }
+      
+      const missionIcon = activeMission.icon ? PixelIcons.replaceEmojis(activeMission.icon) : PixelIcons.toSvg('rocket', '#33ff99', 14);
+      
+      contextContainer.innerHTML = `
+        <div class="mission-context-card">
+          <div class="mission-context-header">
+            <span class="mission-context-type">${missionIcon} ${activeMission.typeName || activeMission.type}</span>
+            <span class="mission-context-difficulty">${stars}</span>
+          </div>
+          <div class="mission-context-progress">
+            <div class="mission-context-progress-fill" style="width:${(progress?.progress || 0) * 100}%"></div>
+          </div>
+          <div class="mission-context-meta">
+            <span>${progress?.barsElapsed || 0} / ${activeMission.end?.targetBars || activeMission.duration?.targetBars || '?'} bars</span>
+            <span>${progress?.timeRemaining || '--'}</span>
+          </div>
+          ${supportsHtml}
+          ${logsHtml}
+          <a href="derivatives.html?ticker=${ticker}" style="color:var(--cyan);font-size:0.65rem;display:block;text-align:center;margin-top:0.5rem;">
+            Open Mission Command →
+          </a>
+        </div>
+      `;
+    }
+    
+    /**
+     * Get mission badge for a ticker (for fleet display)
+     * Returns { type: 'deployed'|'escorting'|'benchmark'|null, label: string }
+     */
+    function getMissionBadgeForTicker(ticker) {
+      if (!window.MissionBridge) return null;
+      
+      // Check if ticker is XAR (benchmark)
+      if (ticker === 'XAR') {
+        return { type: 'benchmark', label: 'BENCHMARK' };
+      }
+      
+      // Check if ticker is deployed (has active mission)
+      const activeMission = MissionBridge.getActiveForTicker(ticker);
+      if (activeMission) {
+        return { type: 'deployed', label: 'DEPLOYED' };
+      }
+      
+      // Check if ticker is escorting (assigned as support)
+      const supportInfo = MissionBridge.getAssignedSupportForTicker(ticker);
+      if (supportInfo) {
+        return { type: 'escorting', label: supportInfo.role || 'ESCORTING' };
+      }
+      
+      return null;
+    }
+    
+    // Make getMissionBadgeForTicker available globally for fleet rendering
+    window.getMissionBadgeForTicker = getMissionBadgeForTicker;
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // HANGAR BAY :: Ship Selection Modal
+    // ═══════════════════════════════════════════════════════════════════
+    
+    /**
+     * Open the Hangar Bay ship selection modal
+     * Uses real financial data to generate Mario Kart-style stats
+     */
+    function openHangarBay() {
+      // Check if ShipSelect module is loaded
+      if (!window.ShipSelect) {
+        console.warn('[Hangar] ShipSelect module not loaded');
+        // Fallback: navigate to standalone page
+        window.location.href = 'ship-select.html';
+        return;
+      }
+      
+      // Get stats data (should be loaded by now)
+      const statsData = window.statsData || {};
+      
+      // Show the modal
+      ShipSelect.showShipSelectModal(statsData, (ticker, shipData) => {
+        console.log('[Hangar] Ship selected:', ticker, shipData);
+        
+        // Store selection
+        localStorage.setItem('space_capital_selected_ship', ticker);
+        
+        // Update the current ticker display if available
+        if (typeof selectTicker === 'function') {
+          selectTicker(ticker);
+        } else if (typeof window.selectTicker === 'function') {
+          window.selectTicker(ticker);
+        }
+        
+        // Play selection sound if audio system available
+        if (window.MechaAudio && MechaAudio.ctx) {
+          MechaAudio.playUISound('select');
+        }
+        
+        // Flash notification
+        if (typeof showNotification === 'function') {
+          showNotification(`${ticker} selected as primary vessel`, 'success');
+        }
+      });
+    }
+    
+    // Make openHangarBay globally available
+    window.openHangarBay = openHangarBay;
+    
+    /**
+     * Get currently selected ship from localStorage
+     */
+    function getSelectedShip() {
+      return localStorage.getItem('space_capital_selected_ship') || null;
+    }
+    
+    window.getSelectedShip = getSelectedShip;
+    
+    /**
+     * HANGAR PANEL - Dense Command Interface
+     * Fleet Command sidebar + Framed viewport + Bottom dossier
+     * Mobile carousel + Touch swipe + Animated sprites
+     */
+    let hangarShipIndex = 0;
+    let hangarShipList = [];
+    let carouselTouchStartX = 0;
+    let carouselTouchEndX = 0;
+    let heroAnimator = null; // ShipAnimator instance for viewport
+    let floatingAnimators = []; // Animators for floating fleet
+    
+    // Performance mode settings
+    const perfModes = {
+      full: { animatedSprites: true, fleetFlybys: true, parallax: true, debris: true, scanlines: true },
+      balanced: { animatedSprites: true, fleetFlybys: true, parallax: true, debris: true, scanlines: false },
+      battery: { animatedSprites: false, fleetFlybys: false, parallax: false, debris: false, scanlines: false }
+    };
+    let currentPerfMode = 'balanced';
+    
+    function setPerformanceMode(mode) {
+      currentPerfMode = mode;
+      const settings = perfModes[mode];
+      
+      // Update space scene
+      if (window.SpaceScene && SpaceScene.setPerformance) {
+        SpaceScene.setPerformance(settings);
+      }
+      
+      // Toggle scanlines
+      document.body.classList.toggle('no-scanlines', !settings.scanlines);
+      
+      // Update hero animator - switch between frame animation and static
+      if (heroAnimator) {
+        if (settings.animatedSprites) {
+          heroAnimator.play('idle');
+        } else {
+          heroAnimator.stop();
+          heroAnimator._loadStaticFallback();
+        }
+      }
+      
+      // Update floating animators
+      floatingAnimators.forEach(anim => {
+        if (settings.animatedSprites) {
+          anim.play('idle');
+        } else {
+          anim.stop();
+          anim._loadStaticFallback();
+        }
+      });
+      
+      // Save preference
+      localStorage.setItem('space_capital_perf_mode', mode);
+      
+      console.log(`[PERF] Mode set to: ${mode}`, settings);
+    }
+    
+    async function initHangarPanel() {
+      // Build ship roster if not already done
+      if (hangarShipList.length === 0) {
+        hangarShipList = await buildHangarShipList();
+      }
+      
+      // Get current selected ship or default to first
+      const selectedTicker = getSelectedShip() || (hangarShipList[0]?.ticker || 'RKLB');
+      hangarShipIndex = Math.max(0, hangarShipList.findIndex(s => s.ticker === selectedTicker));
+      
+      // Populate all sections
+      populateFleetSidebar();
+      populateFloatingFleet();
+      populateMobileCarousel();
+      
+      // Initialize hero ship animator
+      initHeroAnimator();
+      
+      updateHangarDisplay();
+      
+      // Initialize touch swipe for viewport
+      initViewportSwipe();
+      
+      // Load saved performance mode
+      const savedPerfMode = localStorage.getItem('space_capital_perf_mode');
+      if (savedPerfMode && perfModes[savedPerfMode]) {
+        currentPerfMode = savedPerfMode;
+        const selector = document.getElementById('perf-mode-select');
+        if (selector) selector.value = savedPerfMode;
+        setPerformanceMode(savedPerfMode);
+      }
+    }
+    
+    function initHeroAnimator() {
+      const animContainer = document.getElementById('hero-ship-container');
+      if (!animContainer || !window.ShipAnimator) {
+        console.warn('[HANGAR] ShipAnimator not available, using static images');
+        return;
+      }
+      
+      const ship = hangarShipList[hangarShipIndex];
+      if (!ship) return;
+      
+      // Destroy old animator
+      if (heroAnimator) {
+        heroAnimator.destroy();
+      }
+      
+      // Clear container
+      animContainer.innerHTML = '';
+      
+      // Create new animator with frame-by-frame animation
+      heroAnimator = new ShipAnimator(ship.ticker, animContainer, {
+        autoplay: perfModes[currentPerfMode].animatedSprites,
+        defaultAnimation: 'idle',
+        preloadAll: true  // Preload all frames for smooth animation
+      });
+      
+      // Style the animated image
+      setTimeout(() => {
+        const img = animContainer.querySelector('img.ship-sprite');
+        if (img) {
+          img.style.width = '140px';
+          img.style.height = 'auto';
+          img.style.filter = 'drop-shadow(0 0 20px var(--phosphor-glow))';
+          img.style.imageRendering = 'pixelated';
+          img.id = 'hangar-hero-sprite';
+        }
+      }, 50);
+      
+      console.log(`[HANGAR] Hero animator initialized for ${ship.ticker}`);
+    }
+    
+    async function buildHangarShipList() {
+      const ships = [];
+      
+      // Ship type mappings from ticker to sprite filename
+      const shipTypeMap = {
+        'RKLB': 'flagship-ship',
+        'LUNR': 'lander-ship',
+        'JOBY': 'eVTOL-light-class-ship',
+        'ACHR': 'eVTOL-ship',
+        'ASTS': 'Communications-Relay-Ship',
+        'GME': 'moonshot-ship',
+        'BKSY': 'recon-ship',
+        'PL': 'scout-ship',
+        'KTOS': 'Fighter-Ship',
+        'RDW': 'Hauler-ship',
+        'RTX': 'Officer-Class-Ship',
+        'LHX': 'Drone-ship',
+        'GE': 'Stealth-Bomber-ship',
+        'COHR': 'Glass-Reflector-ship',
+        'EVEX': 'Transport-Ship'
+      };
+      
+      // Ship class mappings
+      const shipClassMap = {
+        'RKLB': 'FLAGSHIP',
+        'LUNR': 'LANDER',
+        'GME': 'DREADNOUGHT',
+        'ASTS': 'RELAY',
+        'JOBY': 'EVTOL',
+        'ACHR': 'CARRIER',
+        'BKSY': 'DRONE',
+        'PL': 'SCOUT',
+        'KTOS': 'FIGHTER',
+        'RDW': 'HAULER',
+        'RTX': 'OFFICER',
+        'LHX': 'DRONE',
+        'GE': 'STEALTH',
+        'COHR': 'REFLECTOR',
+        'EVEX': 'TRANSPORT'
+      };
+      
+      // Codename mappings
+      const codenameMap = {
+        'RKLB': 'ELECTRON',
+        'LUNR': 'MOONSHOT',
+        'JOBY': 'SKYPORT',
+        'ACHR': 'MIDNIGHT',
+        'ASTS': 'BLUEBIRD',
+        'GME': 'DIAMOND',
+        'BKSY': 'BLACKSKY',
+        'PL': 'PELICAN',
+        'KTOS': 'KRATOS',
+        'RDW': 'REDWIRE',
+        'RTX': 'RAYTHEON',
+        'LHX': 'L3HARRIS',
+        'GE': 'VERNOVA',
+        'COHR': 'COHERENT',
+        'EVEX': 'EVEX'
+      };
+      
+      // Lore mappings
+      const loreMap = {
+        'RKLB': 'Spearhead command ship. Victory follows in its wake.',
+        'LUNR': 'Lunar descent specialist. Hope and precision in equal measure.',
+        'JOBY': 'Sky taxi of the future. Vertical freedom.',
+        'ACHR': 'Urban air mobility pioneer. The city is now 3D.',
+        'ASTS': 'Direct-to-cell satellite constellation. Signal from the void.',
+        'GME': 'Meme-forged dreadnought. Refuses to die.',
+        'BKSY': 'Eyes in the sky. Watching. Always watching.',
+        'PL': 'Earth observation fleet. Data is the new oil.',
+        'KTOS': 'Defense systems online. Autonomous and relentless.',
+        'RDW': 'Space infrastructure backbone. Quietly essential.',
+        'RTX': 'Aerospace titan. When you need it done right.',
+        'LHX': 'Multi-domain ops. From seabed to orbit.',
+        'GE': 'Energy transition flagship. Powering tomorrow.',
+        'COHR': 'Photonics mastery. Light becomes leverage.',
+        'EVEX': 'Electric aviation pioneer. Silent thunder.'
+      };
+      
+      // Get ticker profiles and stats
+      const profiles = window.tickerProfiles || window.TICKER_PROFILES || {};
+      let statsData = {};
+      
+      if (window.statsData && window.statsData.stats) {
+        statsData = window.statsData.stats;
+      }
+      
+      // Priority tickers to show
+      const priorityTickers = ['RKLB', 'BKSY', 'ACHR', 'LUNR', 'JOBY', 'ASTS', 'GME', 'PL', 'KTOS', 'RDW'];
+      
+      for (const ticker of priorityTickers) {
+        const profile = profiles[ticker] || {};
+        const stats = statsData[ticker] || {};
+        const shipType = shipTypeMap[ticker] || 'ship';
+        
+        // Generate random but consistent stats based on ticker
+        const seed = ticker.charCodeAt(0) + ticker.charCodeAt(1);
+        const hull = 60 + (seed % 30);
+        const cargo = 50 + ((seed * 3) % 45);
+        const fuel = 70 + ((seed * 7) % 25);
+        
+        ships.push({
+          ticker,
+          name: codenameMap[ticker] || profile.codename || ticker,
+          class: shipClassMap[ticker] || 'STANDARD',
+          designation: `${shipClassMap[ticker]?.substring(0,3) || 'STD'}-${String(seed % 100).padStart(3, '0')}`,
+          sector: profile.sector || 'SPACE SYSTEMS',
+          sprite: `assets/ships/${ticker}-${shipType}.png`,
+          animatedSprite: `assets/ships/animated/gifs/${ticker}_idle.gif`,
+          fallbackSprite: `assets/ships/static/${ticker}-${shipType}.png`,
+          value: stats.value || Math.round((stats.current || 10) * (50 + seed % 100)),
+          pnl: Math.round((stats.return_1d || (Math.random() * 10 - 3)) * 30),
+          pnlPercent: stats.return_1d || (Math.random() * 10 - 3),
+          status: (stats.return_1d || 0) >= 0 ? 'OPERATIONAL' : 'CAUTIONARY',
+          hull,
+          cargo,
+          fuel,
+          cargoUnits: Math.round(cargo * 2.5),
+          lore: loreMap[ticker] || profile.lore || 'Status nominal.'
+        });
+      }
+      
+      return ships;
+    }
+    
+    function populateFleetSidebar() {
+      const container = document.getElementById('hangar-fleet-list');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      hangarShipList.forEach((ship, idx) => {
+        const card = document.createElement('div');
+        card.className = `fleet-ship-card ${idx === hangarShipIndex ? 'active' : ''}`;
+        card.onclick = () => selectHangarShip(idx);
+        
+        const pnlClass = ship.pnl >= 0 ? 'positive' : 'negative';
+        const pnlStr = ship.pnl >= 0 ? `+$${ship.pnl}` : `-$${Math.abs(ship.pnl)}`;
+        const pnlPctStr = ship.pnlPercent >= 0 ? `+${ship.pnlPercent.toFixed(1)}%` : `${ship.pnlPercent.toFixed(1)}%`;
+        
+        card.innerHTML = `
+          <div>
+            <img class="fleet-card-sprite" src="${ship.sprite}" alt="${ship.ticker}" onerror="this.src='${ship.fallbackSprite}'">
+            <div class="fleet-card-class">${ship.class}</div>
+          </div>
+          <div class="fleet-card-info">
+            <div class="fleet-card-ticker">${ship.ticker}</div>
+            <div class="fleet-card-name">${ship.name} · ${ship.designation}</div>
+            <div class="fleet-card-bars">
+              <div class="fleet-bar-row">
+                <span class="fleet-bar-label">HULL</span>
+                <div class="fleet-bar-track"><div class="fleet-bar-fill hull" style="width:${ship.hull}%"></div></div>
+                <span class="fleet-bar-val">${ship.hull}%</span>
+              </div>
+              <div class="fleet-bar-row">
+                <span class="fleet-bar-label">CARGO</span>
+                <div class="fleet-bar-track"><div class="fleet-bar-fill cargo" style="width:${ship.cargo}%"></div></div>
+                <span class="fleet-bar-val">${ship.cargoUnits} UNITS</span>
+              </div>
+              <div class="fleet-bar-row">
+                <span class="fleet-bar-label">FUEL</span>
+                <div class="fleet-bar-track"><div class="fleet-bar-fill fuel" style="width:${ship.fuel}%"></div></div>
+                <span class="fleet-bar-val">${ship.fuel}%</span>
+              </div>
+            </div>
+          </div>
+          <div class="fleet-card-status">
+            <span class="fleet-status-badge">● ${ship.status}</span>
+            <div class="fleet-card-value">$${ship.value.toLocaleString()}</div>
+            <div class="fleet-card-pnl ${pnlClass}">${pnlStr} ${pnlPctStr}</div>
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
+    }
+    
+    function populateMobileCarousel() {
+      const track = document.getElementById('carousel-track');
+      const indicators = document.getElementById('carousel-indicators');
+      if (!track || !indicators) return;
+      
+      track.innerHTML = '';
+      indicators.innerHTML = '';
+      
+      hangarShipList.forEach((ship, idx) => {
+        // Ship card
+        const card = document.createElement('div');
+        card.className = `carousel-ship-card ${idx === hangarShipIndex ? 'active' : ''}`;
+        card.onclick = () => selectHangarShip(idx);
+        card.dataset.index = idx;
+        
+        const pnlClass = ship.pnl >= 0 ? 'positive' : 'negative';
+        const pnlStr = ship.pnl >= 0 ? `+$${ship.pnl}` : `-$${Math.abs(ship.pnl)}`;
+        
+        card.innerHTML = `
+          <img class="carousel-ship-sprite" src="${ship.sprite}" alt="${ship.ticker}" onerror="this.src='${ship.fallbackSprite}'">
+          <div class="carousel-ship-ticker">${ship.ticker}</div>
+          <div class="carousel-ship-class">${ship.class}</div>
+          <div class="carousel-ship-pnl ${pnlClass}">${pnlStr}</div>
+        `;
+        
+        track.appendChild(card);
+        
+        // Indicator dot
+        const dot = document.createElement('div');
+        dot.className = `carousel-dot ${idx === hangarShipIndex ? 'active' : ''}`;
+        dot.onclick = () => {
+          selectHangarShip(idx);
+          scrollCarouselTo(idx);
+        };
+        indicators.appendChild(dot);
+      });
+      
+      // Touch swipe handlers for carousel
+      track.addEventListener('touchstart', (e) => {
+        carouselTouchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+      
+      track.addEventListener('touchend', (e) => {
+        carouselTouchEndX = e.changedTouches[0].screenX;
+        handleCarouselSwipe();
+      }, { passive: true });
+    }
+    
+    function handleCarouselSwipe() {
+      const diff = carouselTouchStartX - carouselTouchEndX;
+      const threshold = 50;
+      
+      if (Math.abs(diff) > threshold) {
+        if (diff > 0) {
+          carouselNext();
+        } else {
+          carouselPrev();
+        }
+      }
+    }
+    
+    function scrollCarouselTo(index) {
+      const track = document.getElementById('carousel-track');
+      const card = track?.querySelector(`[data-index="${index}"]`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+    
+    function carouselNext() {
+      const newIndex = (hangarShipIndex + 1) % hangarShipList.length;
+      selectHangarShip(newIndex);
+      scrollCarouselTo(newIndex);
+    }
+    
+    function carouselPrev() {
+      const newIndex = (hangarShipIndex - 1 + hangarShipList.length) % hangarShipList.length;
+      selectHangarShip(newIndex);
+      scrollCarouselTo(newIndex);
+    }
+    
+    window.carouselNext = carouselNext;
+    window.carouselPrev = carouselPrev;
+    
+    // Touch swipe for main viewport
+    function initViewportSwipe() {
+      const viewport = document.getElementById('hangar-ship-viewport');
+      if (!viewport) return;
+      
+      let touchStartX = 0;
+      
+      viewport.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+      
+      viewport.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        const threshold = 50;
+        
+        if (Math.abs(diff) > threshold) {
+          if (diff > 0) {
+            cycleHangarShip(1);
+          } else {
+            cycleHangarShip(-1);
+          }
+        }
+      }, { passive: true });
+    }
+    
+    function populateFloatingFleet() {
+      const container = document.getElementById('hangar-floating-fleet');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      // Destroy old floating animators
+      floatingAnimators.forEach(a => a.destroy());
+      floatingAnimators = [];
+      
+      // Create formation: 1 top, 2 middle, 1 bottom
+      const formation = [
+        [hangarShipList[0]],
+        [hangarShipList[1], hangarShipList[2]],
+        [hangarShipList[3]]
+      ];
+      
+      formation.forEach((row, rowIdx) => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'floating-ship-row';
+        
+        row.forEach((ship, shipIdx) => {
+          if (!ship) return;
+          
+          const shipDiv = document.createElement('div');
+          shipDiv.className = 'floating-ship';
+          shipDiv.onclick = () => {
+            const idx = hangarShipList.findIndex(s => s.ticker === ship.ticker);
+            if (idx >= 0) selectHangarShip(idx);
+          };
+          
+          // Create animator container
+          const animContainer = document.createElement('div');
+          animContainer.className = 'floating-ship-anim';
+          animContainer.dataset.ticker = ship.ticker;
+          shipDiv.appendChild(animContainer);
+          
+          // Add label
+          const label = document.createElement('span');
+          label.className = 'floating-ship-label';
+          label.textContent = ship.class;
+          shipDiv.appendChild(label);
+          
+          rowDiv.appendChild(shipDiv);
+          
+          // Create animator for this floating ship
+          if (window.ShipAnimator && perfModes[currentPerfMode].animatedSprites) {
+            const anim = new ShipAnimator(ship.ticker, animContainer, {
+              autoplay: true,
+              defaultAnimation: 'idle'
+            });
+            // Style the floating ship
+            const img = animContainer.querySelector('img');
+            if (img) {
+              img.style.width = '64px';
+              img.style.height = '64px';
+              img.style.objectFit = 'contain';
+              img.classList.add('floating-ship-sprite');
+            }
+            floatingAnimators.push(anim);
+          } else {
+            // Fallback to static image
+            animContainer.innerHTML = `<img class="floating-ship-sprite" src="${ship.sprite}" alt="${ship.ticker}" onerror="this.src='${ship.fallbackSprite}'">`;
+          }
+        });
+        
+        container.appendChild(rowDiv);
+      });
+    }
+    
+    function selectHangarShip(index) {
+      const previousIndex = hangarShipIndex;
+      hangarShipIndex = index;
+      
+      // Trigger special animation on selection
+      if (heroAnimator && previousIndex !== index) {
+        heroAnimator.triggerSpecial();
+      }
+      
+      updateHangarDisplay();
+      
+      // Update sidebar active states
+      document.querySelectorAll('.fleet-ship-card').forEach((el, idx) => {
+        el.classList.toggle('active', idx === index);
+      });
+      
+      // Update carousel active states
+      document.querySelectorAll('.carousel-ship-card').forEach((el, idx) => {
+        el.classList.toggle('active', idx === index);
+      });
+      document.querySelectorAll('.carousel-dot').forEach((el, idx) => {
+        el.classList.toggle('active', idx === index);
+      });
+      
+      // Store selection
+      const ship = hangarShipList[index];
+      if (ship) {
+        localStorage.setItem('space_capital_selected_ship', ship.ticker);
+        window.currentHangarTicker = ship.ticker;
+        
+        // Update global ticker selection if available
+        if (typeof selectTicker === 'function') {
+          selectTicker(ship.ticker);
+        }
+        
+        // Initialize ship behavior system
+        if (window.ShipBehaviorBridge) {
+          setTimeout(() => ShipBehaviorBridge.initHangarHero(), 150);
+        }
+        
+        // Emit selection event for other systems
+        document.dispatchEvent(new CustomEvent('hangar:shipSelected', {
+          detail: { ticker: ship.ticker, index }
+        }));
+      }
+      
+      // Play UI sound
+      if (window.MechaAudio && MechaAudio.ctx) {
+        MechaAudio.playUISound('blip');
+      }
+    }
+    
+    function cycleHangarShip(direction) {
+      const newIndex = (hangarShipIndex + direction + hangarShipList.length) % hangarShipList.length;
+      selectHangarShip(newIndex);
+      scrollCarouselTo(newIndex);
+    }
+    
+    function updateHangarDisplay() {
+      const ship = hangarShipList[hangarShipIndex];
+      if (!ship) return;
+      
+      // Update hero animator to new ship
+      const animContainer = document.getElementById('hero-ship-container');
+      
+      if (animContainer && window.ShipAnimator) {
+        // Check if we need to create a new animator for a different ship
+        if (!heroAnimator || heroAnimator.ticker !== ship.ticker) {
+          if (heroAnimator) {
+            heroAnimator.destroy();
+          }
+          
+          animContainer.innerHTML = '';
+          
+          heroAnimator = new ShipAnimator(ship.ticker, animContainer, {
+            autoplay: perfModes[currentPerfMode].animatedSprites,
+            defaultAnimation: 'idle',
+            preloadAll: true
+          });
+          
+          // Style after a brief delay to ensure image is created
+          setTimeout(() => {
+            const img = animContainer.querySelector('img.ship-sprite');
+            if (img) {
+              img.style.width = '140px';
+              img.style.height = 'auto';
+              img.style.filter = 'drop-shadow(0 0 20px var(--phosphor-glow))';
+              img.style.imageRendering = 'pixelated';
+            }
+          }, 50);
+          
+          console.log(`[HANGAR] Switched to ${ship.ticker} with frame animation`);
+        }
+        
+        // NEW: Start idle animation on the hero ship container
+        if (window.ShipIdleAnimation) {
+          ShipIdleAnimation.attachToHeroShip(animContainer, {
+            ticker: ship.ticker,
+            class: ship.class
+          });
+        }
+      } else if (animContainer) {
+        // Fallback: use static image if ShipAnimator not available
+        const staticPath = ship.sprite;
+        animContainer.innerHTML = `<img class="ship-sprite" src="${staticPath}" alt="${ship.ticker}" style="width:140px;height:auto;image-rendering:pixelated;">`;
+        
+        // Still apply idle animation to static sprite
+        if (window.ShipIdleAnimation) {
+          setTimeout(() => {
+            ShipIdleAnimation.attachToHeroShip(animContainer, {
+              ticker: ship.ticker,
+              class: ship.class
+            });
+          }, 50);
+        }
+      }
+      
+      // Update viewport labels
+      const callsign = document.getElementById('hangar-callsign');
+      const shipClass = document.getElementById('hangar-class');
+      const lore = document.getElementById('hangar-lore');
+      
+      if (callsign) callsign.textContent = ship.ticker;
+      if (shipClass) shipClass.textContent = ship.class;
+      if (lore) lore.textContent = ship.lore;
+      
+      // Update dossier panel
+      const dossierImg = document.getElementById('dossier-ship-img');
+      const dossierBadge = document.getElementById('dossier-class-badge');
+      const dossierTicker = document.getElementById('dossier-ticker');
+      const dossierName = document.getElementById('dossier-name');
+      const dossierDesig = document.getElementById('dossier-designation');
+      const dossierHull = document.getElementById('dossier-hull');
+      const dossierCargo = document.getElementById('dossier-cargo');
+      const dossierFuel = document.getElementById('dossier-fuel');
+      const dossierValue = document.getElementById('dossier-value');
+      const dossierPnl = document.getElementById('dossier-pnl');
+      const dossierReturn = document.getElementById('dossier-return');
+      const dossierMission = document.getElementById('dossier-mission');
+      const dossierNote = document.getElementById('dossier-note');
+      
+      if (dossierImg) {
+        dossierImg.src = ship.sprite;
+        dossierImg.onerror = () => { dossierImg.src = ship.fallbackSprite; };
+      }
+      if (dossierBadge) dossierBadge.textContent = ship.class;
+      if (dossierTicker) dossierTicker.textContent = ship.ticker;
+      if (dossierName) dossierName.textContent = ship.name;
+      if (dossierDesig) dossierDesig.textContent = ship.designation;
+      if (dossierHull) dossierHull.style.width = `${ship.hull}%`;
+      if (dossierCargo) dossierCargo.style.width = `${ship.cargo}%`;
+      if (dossierFuel) dossierFuel.style.width = `${ship.fuel}%`;
+      if (dossierValue) dossierValue.textContent = `$${ship.value.toLocaleString()}`;
+      if (dossierPnl) {
+        const pnlStr = ship.pnl >= 0 ? `+$${ship.pnl}` : `-$${Math.abs(ship.pnl)}`;
+        dossierPnl.textContent = pnlStr;
+        dossierPnl.className = `ops-value ${ship.pnl >= 0 ? 'positive' : 'negative'}`;
+      }
+      if (dossierReturn) {
+        const retStr = ship.pnlPercent >= 0 ? `+${ship.pnlPercent.toFixed(1)}%` : `${ship.pnlPercent.toFixed(1)}%`;
+        dossierReturn.textContent = retStr;
+      }
+      if (dossierMission) dossierMission.textContent = ship.status === 'OPERATIONAL' ? 'STANDBY' : 'CAUTION';
+      if (dossierNote) {
+        dossierNote.textContent = ship.value > 0 ? `POSITION ACTIVE — ${ship.sector}` : 'NO POSITION — OBSERVATION MODE';
+      }
+      
+      // Store current ticker
+      window.currentHangarTicker = ship.ticker;
+    }
+    
+    // Trigger special animation on hero ship (callable from anywhere)
+    function triggerHeroSpecial() {
+      if (heroAnimator) {
+        heroAnimator.triggerSpecial();
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // UPGRADES PANEL - Interactive ship upgrade preview
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    let upgradesPanelInitialized = false;
+    
+    function initUpgradesPanel() {
+      if (upgradesPanelInitialized) return;
+      upgradesPanelInitialized = true;
+      
+      const canvas = document.getElementById('upgrade-preview-canvas');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      
+      // Sliders
+      const sliders = {
+        pnl: document.getElementById('upgrade-pnl'),
+        winrate: document.getElementById('upgrade-winrate'),
+        volatility: document.getElementById('upgrade-volatility'),
+        volume: document.getElementById('upgrade-volume'),
+        gain: document.getElementById('upgrade-gain'),
+        drawdown: document.getElementById('upgrade-drawdown')
+      };
+      
+      // Value displays
+      const values = {
+        pnl: document.getElementById('upgrade-pnl-value'),
+        winrate: document.getElementById('upgrade-winrate-value'),
+        volatility: document.getElementById('upgrade-volatility-value'),
+        volume: document.getElementById('upgrade-volume-value'),
+        gain: document.getElementById('upgrade-gain-value'),
+        drawdown: document.getElementById('upgrade-drawdown-value')
+      };
+      
+      const tickerSelect = document.getElementById('upgrade-ticker-select');
+      const powerValue = document.getElementById('upgrade-power-value');
+      const powerBar = document.getElementById('upgrade-power-bar');
+      const upgradeList = document.getElementById('upgrade-breakdown-list');
+      const upgradeSummary = document.getElementById('upgrade-summary-text');
+      
+      // Stat thresholds for upgrades (simplified version)
+      const UPGRADE_TIERS = {
+        wings: [
+          { min: -Infinity, max: 0.25, id: 'wing_small', label: 'Scout Wings' },
+          { min: 0.25, max: 0.50, id: 'wing_mid', label: 'Standard Wings' },
+          { min: 0.50, max: 0.75, id: 'wing_large', label: 'Combat Wings' },
+          { min: 0.75, max: Infinity, id: 'wing_elite', label: 'Elite Wings' }
+        ],
+        engines: [
+          { min: -Infinity, max: 0.33, id: 'thruster_1', label: 'Basic Thruster' },
+          { min: 0.33, max: 0.66, id: 'thruster_2', label: 'Ion Drive' },
+          { min: 0.66, max: Infinity, id: 'thruster_3', label: 'Plasma Core' }
+        ],
+        armor: [
+          { min: -Infinity, max: 0.40, id: null, label: 'No Armor' },
+          { min: 0.40, max: 0.70, id: 'plate_1', label: 'Light Plating' },
+          { min: 0.70, max: Infinity, id: 'plate_2', label: 'Heavy Armor' }
+        ],
+        antenna: [
+          { min: -Infinity, max: 0.50, id: null, label: 'No Antenna' },
+          { min: 0.50, max: 0.80, id: 'antenna_1', label: 'Comm Array' },
+          { min: 0.80, max: Infinity, id: 'antenna_2', label: 'Command Array' }
+        ],
+        weapons: [
+          { min: -Infinity, max: 0.60, id: null, label: 'Unarmed' },
+          { min: 0.60, max: 0.85, id: 'weapon_1', label: 'Laser Banks' },
+          { min: 0.85, max: Infinity, id: 'weapon_2', label: 'Missile Pods' }
+        ],
+        shield: [
+          { min: -Infinity, max: 0.70, id: null, label: 'No Shield' },
+          { min: 0.70, max: Infinity, id: 'shield_1', label: 'Energy Shield' }
+        ]
+      };
+      
+      function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+      function mapRange(v, a, b) { return a === b ? 0 : (v - a) / (b - a); }
+      
+      function pickTier(tiers, val) {
+        for (const t of tiers) {
+          if (val >= t.min && val < t.max) return t;
+        }
+        return tiers[tiers.length - 1];
+      }
+      
+      function getCurrentStats() {
+        return {
+          todayPnlPct: parseFloat(sliders.pnl?.value || 0),
+          winRate: parseFloat(sliders.winrate?.value || 50) / 100,
+          volatility: parseFloat(sliders.volatility?.value || 3) / 100,
+          relativeVolume: parseFloat(sliders.volume?.value || 1),
+          totalGainPct: parseFloat(sliders.gain?.value || 0),
+          maxDrawdownPct: parseFloat(sliders.drawdown?.value || 10)
+        };
+      }
+      
+      function updateValueDisplays() {
+        if (values.pnl) values.pnl.textContent = (sliders.pnl?.value || 0) + '%';
+        if (values.winrate) values.winrate.textContent = (sliders.winrate?.value || 50) + '%';
+        if (values.volatility) values.volatility.textContent = (sliders.volatility?.value || 3) + '%';
+        if (values.volume) values.volume.textContent = parseFloat(sliders.volume?.value || 1).toFixed(1) + 'x';
+        if (values.gain) values.gain.textContent = (sliders.gain?.value || 0) + '%';
+        if (values.drawdown) values.drawdown.textContent = (sliders.drawdown?.value || 10) + '%';
+      }
+      
+      function mapStatsToUpgrades(stats) {
+        const momentum = clamp01(mapRange(stats.todayPnlPct, -5, 5));
+        const strength = clamp01(mapRange(stats.winRate, 0.3, 0.8));
+        const risk = clamp01(mapRange(stats.volatility, 0.01, 0.08));
+        const activity = clamp01(mapRange(stats.relativeVolume, 0.5, 3.0));
+        const magnitude = clamp01(mapRange(stats.totalGainPct, -20, 50));
+        const consistency = clamp01(mapRange(20 - stats.maxDrawdownPct, 0, 20));
+        
+        return {
+          wings: { ...pickTier(UPGRADE_TIERS.wings, momentum), val: momentum },
+          engines: { ...pickTier(UPGRADE_TIERS.engines, strength), val: strength },
+          armor: { ...pickTier(UPGRADE_TIERS.armor, risk), val: risk },
+          antenna: { ...pickTier(UPGRADE_TIERS.antenna, activity), val: activity },
+          weapons: { ...pickTier(UPGRADE_TIERS.weapons, magnitude), val: magnitude },
+          shield: { ...pickTier(UPGRADE_TIERS.shield, consistency), val: consistency }
+        };
+      }
+      
+      function calculatePowerLevel(upgrades) {
+        const weights = { engines: 1.5, wings: 1.2, weapons: 1.3, armor: 1.0, antenna: 0.8, shield: 1.4 };
+        let total = 0, count = 0;
+        for (const [slot, data] of Object.entries(upgrades)) {
+          const w = weights[slot] || 1;
+          total += (data.val || 0) * w;
+          count += w;
+        }
+        return Math.round((total / count) * 100);
+      }
+      
+      function renderUpgradeList(upgrades) {
+        if (!upgradeList) return;
+        const slots = ['wings', 'engines', 'armor', 'antenna', 'weapons', 'shield'];
+        upgradeList.innerHTML = slots.map(slot => {
+          const tier = upgrades[slot];
+          const hasUpgrade = tier?.id != null;
+          return `<div class="upgrade-item">
+            <span class="upgrade-slot">${slot}</span>
+            <span class="upgrade-value ${hasUpgrade ? '' : 'none'}">${tier?.label || 'None'}</span>
+          </div>`;
+        }).join('');
+      }
+      
+      function getSummary(upgrades) {
+        const parts = [];
+        for (const [slot, tier] of Object.entries(upgrades)) {
+          if (tier?.id) parts.push(tier.label);
+        }
+        return parts.join(', ') || 'Stock Configuration';
+      }
+      
+      async function updatePreview() {
+        const ticker = tickerSelect?.value || 'RKLB';
+        const stats = getCurrentStats();
+        const upgrades = mapStatsToUpgrades(stats);
+        const power = calculatePowerLevel(upgrades);
+        
+        // Update UI
+        if (powerValue) powerValue.textContent = power;
+        if (powerBar) powerBar.style.width = power + '%';
+        if (upgradeSummary) upgradeSummary.textContent = getSummary(upgrades);
+        renderUpgradeList(upgrades);
+        
+        // Draw ship preview (placeholder with procedural upgrades)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Try to load base ship image
+        const baseSrc = `assets/ships/animated/${ticker}/${ticker}_base.png`;
+        try {
+          const img = new Image();
+          img.src = baseSrc;
+          await new Promise((res, rej) => {
+            img.onload = res;
+            img.onerror = () => {
+              // Fallback to static
+              img.src = `assets/ships/static/${ticker}-flagship-ship.png`;
+              img.onload = res;
+              img.onerror = rej;
+            };
+          });
+          
+          // Draw scaled up 3x
+          const scale = 3;
+          const x = (canvas.width - img.width * scale) / 2;
+          const y = (canvas.height - img.height * scale) / 2;
+          ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+          
+          // Draw procedural upgrade indicators
+          drawUpgradeEffects(ctx, upgrades, canvas.width / 2, canvas.height / 2);
+        } catch (e) {
+          // Draw placeholder
+          drawPlaceholderShip(ctx, canvas.width / 2, canvas.height / 2, upgrades);
+        }
+      }
+      
+      function drawUpgradeEffects(ctx, upgrades, cx, cy) {
+        ctx.save();
+        
+        // Engine glow
+        if (upgrades.engines?.id) {
+          const glow = upgrades.engines.val || 0.5;
+          const gradient = ctx.createRadialGradient(cx, cy + 40, 0, cx, cy + 40, 30 * glow);
+          gradient.addColorStop(0, `rgba(255, ${150 + glow * 100}, 50, ${glow * 0.8})`);
+          gradient.addColorStop(1, 'rgba(255, 50, 0, 0)');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(cx - 40, cy + 20, 80, 60);
+        }
+        
+        // Shield effect
+        if (upgrades.shield?.id) {
+          ctx.strokeStyle = `rgba(51, 255, 153, ${0.3 + upgrades.shield.val * 0.3})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, 70, 60, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        
+        ctx.restore();
+      }
+      
+      function drawPlaceholderShip(ctx, cx, cy, upgrades) {
+        ctx.save();
+        ctx.fillStyle = '#334455';
+        ctx.strokeStyle = '#556677';
+        ctx.lineWidth = 2;
+        
+        // Basic ship shape
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 50);
+        ctx.lineTo(cx + 30, cy + 30);
+        ctx.lineTo(cx + 10, cy + 40);
+        ctx.lineTo(cx, cy + 25);
+        ctx.lineTo(cx - 10, cy + 40);
+        ctx.lineTo(cx - 30, cy + 30);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        drawUpgradeEffects(ctx, upgrades, cx, cy);
+        ctx.restore();
+      }
+      
+      // Bind events
+      Object.values(sliders).forEach(slider => {
+        if (slider) {
+          slider.addEventListener('input', () => {
+            updateValueDisplays();
+            updatePreview();
+          });
+        }
+      });
+      
+      if (tickerSelect) {
+        tickerSelect.addEventListener('change', updatePreview);
+      }
+      
+      // Initial render
+      updateValueDisplays();
+      updatePreview();
+    }
+    
+    // Make functions globally available
+    window.initHangarPanel = initHangarPanel;
+    window.cycleHangarShip = cycleHangarShip;
+    window.selectHangarShip = selectHangarShip;
+    window.setPerformanceMode = setPerformanceMode;
+    window.triggerHeroSpecial = triggerHeroSpecial;
+    window.initUpgradesPanel = initUpgradesPanel;

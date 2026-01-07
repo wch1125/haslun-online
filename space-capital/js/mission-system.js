@@ -1,5 +1,5 @@
 /**
- * HASLUN-BOT Mission System v2
+ * PARALLAX Mission System v2
  * NMS-inspired expedition system for derivatives training
  * 
  * STEP 2: Full play loop with simulation, logs, and scoring
@@ -15,7 +15,21 @@
 const MissionSystem = (function() {
   'use strict';
   
-  const STORAGE_KEY = 'HASLUN_MISSIONS_V1';
+  // Pixel icon helper - uses PixelIcons if available, else returns text fallback
+  function pxIcon(name, color = '#33ff99', size = 12) {
+    if (window.PixelIcons) {
+      return window.PixelIcons.toSvg(name, color, size);
+    }
+    // Fallback text symbols
+    const fallbacks = {
+      scout: '[SCT]', shield: '[SHD]', fuel: '[FUL]', wrench: '[UTL]',
+      rocket: '[RKT]', warning: '[!]', lightning: '[ZAP]', fire: '[FIR]',
+      satellite: '[SAT]', target: '[TGT]', sword: '[ATK]'
+    };
+    return fallbacks[name] || '[?]';
+  }
+  
+  const STORAGE_KEY = 'PARALLAX_MISSIONS_V1';
   const DEFAULT_LOOKBACK = 32; // bars for stat computation
   
   // ═══════════════════════════════════════════════════════════════════
@@ -42,6 +56,263 @@ const MissionSystem = (function() {
   };
   
   // ═══════════════════════════════════════════════════════════════════
+  // STEP 3: SUPPORT ROLES & MODIFIERS
+  // ═══════════════════════════════════════════════════════════════════
+  
+  const SUPPORT_ROLES = {
+    SCOUT: {
+      id: 'SCOUT',
+      name: 'Scout Wing',
+      get icon() { return pxIcon('scout', '#47d4ff', 14); },
+      description: 'Improves signal clarity and recon quality',
+      mods: {
+        sensorsBoost: 0.15,
+        threatDamp: 1.0,
+        stabilityBoost: 0,
+        timeBuffer: 0
+      },
+      get launchLog() { return pxIcon('scout', '#47d4ff', 12) + ' Scout wing expanded sensor range (+15% flow clarity)'; },
+      get interventionLog() { return pxIcon('scout', '#47d4ff', 12) + ' Scout interpreted flow anomaly'; }
+    },
+    ESCORT: {
+      id: 'ESCORT',
+      name: 'Escort Formation',
+      get icon() { return pxIcon('shield', '#47d4ff', 14); },
+      description: 'Reduces storm damage and turbulence impact',
+      mods: {
+        sensorsBoost: 0,
+        threatDamp: 0.85,
+        stabilityBoost: 0.10,
+        timeBuffer: 0
+      },
+      get launchLog() { return pxIcon('shield', '#47d4ff', 12) + ' Escort formation deployed (storm impact -15%)'; },
+      get interventionLog() { return pxIcon('shield', '#47d4ff', 12) + ' Escort dampened storm impact'; }
+    },
+    CARRIER: {
+      id: 'CARRIER',
+      name: 'Carrier Resupply',
+      get icon() { return pxIcon('fuel', '#ffaa33', 14); },
+      description: 'Extends operational endurance and patience buffer',
+      mods: {
+        sensorsBoost: 0,
+        threatDamp: 1.0,
+        stabilityBoost: 0.05,
+        timeBuffer: 0.10
+      },
+      get launchLog() { return pxIcon('fuel', '#ffaa33', 12) + ' Carrier resupply extended operational endurance'; },
+      get interventionLog() { return pxIcon('fuel', '#ffaa33', 12) + ' Carrier reserves maintained mission stability'; }
+    },
+    UTILITY: {
+      id: 'UTILITY',
+      name: 'Utility Craft',
+      get icon() { return pxIcon('wrench', '#ffaa33', 14); },
+      description: 'General mission support and resilience',
+      mods: {
+        sensorsBoost: 0,
+        threatDamp: 1.0,
+        stabilityBoost: 0.05,
+        timeBuffer: 0
+      },
+      get launchLog() { return pxIcon('wrench', '#ffaa33', 12) + ' Utility craft improved mission resilience'; },
+      get interventionLog() { return pxIcon('wrench', '#ffaa33', 12) + ' Utility craft provided auxiliary support'; }
+    }
+  };
+  
+  // Fleet environment cache (computed once, reused)
+  const FleetCache = {
+    envs: {},        // ticker -> env object
+    roles: {},       // ticker -> role id
+    loaded: false
+  };
+  
+  /**
+   * Classify a ticker's support role based on its environment stats
+   */
+  function classifyRole(env) {
+    const { hull, sensors, fuel, threat } = env;
+    
+    // SCOUT: Sensors is highest stat and >= 60
+    if (sensors >= 60 && sensors >= hull && sensors >= fuel) {
+      return 'SCOUT';
+    }
+    
+    // ESCORT: Hull high AND Threat moderate/high
+    if (hull >= 60 && threat >= 45) {
+      return 'ESCORT';
+    }
+    
+    // CARRIER: Fuel high AND Hull moderate
+    if (fuel >= 60 && hull >= 50) {
+      return 'CARRIER';
+    }
+    
+    // Default: UTILITY
+    return 'UTILITY';
+  }
+  
+  /**
+   * Get support role info for a ticker
+   */
+  function getTickerRole(ticker) {
+    const roleId = FleetCache.roles[ticker] || 'UTILITY';
+    return SUPPORT_ROLES[roleId];
+  }
+  
+  /**
+   * Check if a ticker is locked to an ACTIVE mission
+   */
+  function isTickerLocked(ticker) {
+    const missions = loadMissions();
+    for (const m of missions) {
+      if (m.status !== 'ACTIVE') continue;
+      if (!m.support?.slots) continue;
+      for (const slot of m.support.slots) {
+        if (slot.ticker === ticker) {
+          return { locked: true, missionId: m.id, missionType: m.typeName };
+        }
+      }
+    }
+    return { locked: false };
+  }
+  
+  /**
+   * Get all locked tickers (for UI display)
+   */
+  function getLockedTickers() {
+    const locked = {};
+    const missions = loadMissions();
+    for (const m of missions) {
+      if (m.status !== 'ACTIVE') continue;
+      if (!m.support?.slots) continue;
+      for (const slot of m.support.slots) {
+        if (slot.ticker) {
+          locked[slot.ticker] = { missionId: m.id, missionType: m.typeName };
+        }
+      }
+    }
+    return locked;
+  }
+  
+  /**
+   * Assign a support ship to a mission slot
+   */
+  function assignSupport(missionId, slotIndex, ticker) {
+    if (slotIndex < 0 || slotIndex > 1) throw new Error('Invalid slot index');
+    
+    // Check if ticker is locked
+    const lockStatus = isTickerLocked(ticker);
+    if (lockStatus.locked && lockStatus.missionId !== missionId) {
+      throw new Error(`${ticker} is already assigned to ${lockStatus.missionType}`);
+    }
+    
+    const missions = loadMissions();
+    const mission = missions.find(m => m.id === missionId);
+    if (!mission) throw new Error('Mission not found');
+    if (mission.status !== 'ACTIVE') throw new Error('Can only assign supports to active missions');
+    
+    // Can't assign the mission's own ticker as support
+    if (ticker === mission.ticker) {
+      throw new Error('Cannot assign mission ticker as its own support');
+    }
+    
+    // Initialize support structure if needed
+    if (!mission.support) {
+      mission.support = {
+        slots: [
+          { ticker: null, role: null, mods: null },
+          { ticker: null, role: null, mods: null }
+        ]
+      };
+    }
+    
+    // Check if ticker is already in the other slot
+    const otherSlot = slotIndex === 0 ? 1 : 0;
+    if (mission.support.slots[otherSlot].ticker === ticker) {
+      throw new Error(`${ticker} is already in slot ${otherSlot === 0 ? 'A' : 'B'}`);
+    }
+    
+    const role = getTickerRole(ticker);
+    mission.support.slots[slotIndex] = {
+      ticker: ticker,
+      role: role.id,
+      mods: { ...role.mods }
+    };
+    
+    // Add log entry
+    mission.logs.push({
+      tMs: Date.now(),
+      barIndex: mission._lastProcessedBarIndex || mission.start?.barIndex || 0,
+      kind: 'EVENT',
+      msg: pxIcon('satellite', '#47d4ff', 12) + ` Support assigned: ${ticker} (${role.name})`
+    });
+    
+    saveMissions(missions);
+    return mission;
+  }
+  
+  /**
+   * Remove a support ship from a mission slot
+   */
+  function removeSupport(missionId, slotIndex) {
+    if (slotIndex < 0 || slotIndex > 1) throw new Error('Invalid slot index');
+    
+    const missions = loadMissions();
+    const mission = missions.find(m => m.id === missionId);
+    if (!mission) throw new Error('Mission not found');
+    
+    if (!mission.support?.slots?.[slotIndex]?.ticker) {
+      return mission; // Already empty
+    }
+    
+    const removedTicker = mission.support.slots[slotIndex].ticker;
+    mission.support.slots[slotIndex] = { ticker: null, role: null, mods: null };
+    
+    // Add log entry
+    mission.logs.push({
+      tMs: Date.now(),
+      barIndex: mission._lastProcessedBarIndex || mission.start?.barIndex || 0,
+      kind: 'INFO',
+      msg: pxIcon('satellite', '#47d4ff', 12) + ` Support detached: ${removedTicker}`
+    });
+    
+    saveMissions(missions);
+    return mission;
+  }
+  
+  /**
+   * Compute combined modifiers from all support slots
+   */
+  function getCombinedMods(mission) {
+    const mods = {
+      sensorsBoost: 0,
+      threatDamp: 1.0,
+      stabilityBoost: 0,
+      timeBuffer: 0
+    };
+    
+    if (!mission.support?.slots) return mods;
+    
+    for (const slot of mission.support.slots) {
+      if (!slot.mods) continue;
+      mods.sensorsBoost += slot.mods.sensorsBoost || 0;
+      mods.threatDamp *= slot.mods.threatDamp || 1.0;
+      mods.stabilityBoost += slot.mods.stabilityBoost || 0;
+      mods.timeBuffer += slot.mods.timeBuffer || 0;
+    }
+    
+    return mods;
+  }
+  
+  /**
+   * Check if mission has a specific support role
+   */
+  function hasRole(mission, roleId) {
+    if (!mission.support?.slots) return false;
+    return mission.support.slots.some(s => s.role === roleId);
+  }
+  
+  
+  // ═══════════════════════════════════════════════════════════════════
   // MISSION ARCHETYPES
   // ═══════════════════════════════════════════════════════════════════
   
@@ -49,7 +320,7 @@ const MissionSystem = (function() {
     RECON: {
       id: 'RECON',
       name: 'RECON SWEEP',
-      icon: '🛰️',
+      get icon() { return pxIcon('scout', '#47d4ff', 14); },
       concept: 'Teaches regime/flow awareness',
       description: 'Scout the sector for signal clarity and flow patterns. High sensor readings improve success.',
       teaches: 'How to read market flow and identify regime changes before committing capital.',
@@ -62,7 +333,7 @@ const MissionSystem = (function() {
     CARGO: {
       id: 'CARGO',
       name: 'CARGO RUN',
-      icon: '📦',
+      get icon() { return pxIcon('fuel', '#ffaa33', 14); },
       concept: 'Teaches theta/time cost',
       description: 'Transport value across time. Stable hull and fuel reserves are critical for the journey.',
       teaches: 'How time decay (theta) erodes option value, and why patience has a cost.',
@@ -75,7 +346,7 @@ const MissionSystem = (function() {
     ESCORT: {
       id: 'ESCORT',
       name: 'ESCORT FORMATION',
-      icon: '🛡️',
+      get icon() { return pxIcon('shield', '#47d4ff', 14); },
       concept: 'Teaches structure/hedging reduces variance',
       description: 'Protect the convoy with coordinated positioning. Spreads and hedges reduce damage exposure.',
       teaches: 'How structured positions (spreads) trade upside for reduced risk.',
@@ -88,7 +359,7 @@ const MissionSystem = (function() {
     STRIKE: {
       id: 'STRIKE',
       name: 'DEEP SPACE STRIKE',
-      icon: '⚔️',
+      get icon() { return pxIcon('sword', '#ff4444', 14); },
       concept: 'Teaches convexity/asymmetry sizing',
       description: 'High-risk assault on distant targets. Requires firepower and directional conviction.',
       teaches: 'How to size asymmetric bets where small losses can lead to large gains.',
@@ -101,7 +372,7 @@ const MissionSystem = (function() {
     HARVEST: {
       id: 'HARVEST',
       name: 'HARVEST OPERATION',
-      icon: '🌾',
+      get icon() { return pxIcon('target', '#33ff99', 14); },
       concept: 'Teaches range/mean reversion / premium intuition',
       description: 'Extract value from stable zones. Low volatility and clear boundaries maximize yield.',
       teaches: 'How to profit from range-bound conditions by selling premium.',
@@ -555,6 +826,14 @@ const MissionSystem = (function() {
       },
       end: null,    // Set when launched
       
+      // Step 3: Support slots
+      support: {
+        slots: [
+          { ticker: null, role: null, mods: null },
+          { ticker: null, role: null, mods: null }
+        ]
+      },
+      
       status: 'PLANNING',
       logs: [],
       outcome: null,
@@ -605,7 +884,7 @@ const MissionSystem = (function() {
       tMs: Date.now(),
       barIndex: startBarIndex,
       kind: 'EVENT',
-      msg: `🚀 Mission launched from ${mission.ticker} @ $${rows[startBarIndex].close.toFixed(2)}`
+      msg: pxIcon('rocket', '#33ff99', 12) + ` Mission launched from ${mission.ticker} @ $${rows[startBarIndex].close.toFixed(2)}`
     });
     
     // Warn if mission window was shortened due to limited data
@@ -614,7 +893,7 @@ const MissionSystem = (function() {
         tMs: Date.now(),
         barIndex: startBarIndex,
         kind: 'INFO',
-        msg: `📋 Note: Mission window shortened to ${effectiveTargetBars} bars due to limited chart history`
+        msg: pxIcon('satellite', '#47d4ff', 12) + ` Note: Mission window shortened to ${effectiveTargetBars} bars due to limited chart history`
       });
     }
     
@@ -704,6 +983,10 @@ const MissionSystem = (function() {
     
     if (!mission) return null;
     
+    // Store ticker before changing status for event
+    const missionTicker = mission.ticker;
+    const missionType = mission.type;
+    
     mission.status = 'DAMAGED';
     mission.outcome = {
       grade: 'D',
@@ -716,10 +999,19 @@ const MissionSystem = (function() {
       tMs: Date.now(),
       barIndex: mission._lastProcessedBarIndex || 0,
       kind: 'WARN',
-      msg: '⚠️ Mission aborted by operator command'
+      msg: pxIcon('warning', '#ffaa33', 12) + ' Mission aborted by operator command'
     });
     
     saveMissions(missions);
+    
+    // Step 8: Emit mission:damaged event for progression system
+    if (window.PARALLAX_BUS) {
+      window.PARALLAX_BUS.emit('mission:damaged', {
+        ticker: missionTicker,
+        missionType: missionType
+      });
+    }
+    
     return mission;
   }
   
@@ -751,6 +1043,12 @@ const MissionSystem = (function() {
     
     const newLogs = [];
     
+    // Step 3: Track support intervention cooldowns (1 per role per mission)
+    if (!mission._supportInterventionCount) {
+      mission._supportInterventionCount = { SCOUT: 0, ESCORT: 0, CARRIER: 0, UTILITY: 0 };
+    }
+    const MAX_INTERVENTIONS_PER_ROLE = 2;
+    
     // Process each new bar
     for (let i = lastProcessed + 1; i <= currentBarIndex && i < rows.length; i++) {
       if (mission.logs.length >= MAX_LOGS_PER_MISSION) break;
@@ -774,11 +1072,58 @@ const MissionSystem = (function() {
         newLogs.push(log);
         mission.logs.push(log);
         logsThisBar++;
+        
+        // Step 3: Add support intervention log if applicable
+        if (mission.logs.length < MAX_LOGS_PER_MISSION && logsThisBar < 2) {
+          const intervention = generateSupportIntervention(mission, trigger, mission._supportInterventionCount, MAX_INTERVENTIONS_PER_ROLE);
+          if (intervention) {
+            const interventionLog = {
+              tMs: Date.now(),
+              barIndex: i,
+              kind: 'INFO',
+              msg: intervention.msg
+            };
+            newLogs.push(interventionLog);
+            mission.logs.push(interventionLog);
+            mission._supportInterventionCount[intervention.role]++;
+            logsThisBar++;
+          }
+        }
       }
     }
     
     mission._lastProcessedBarIndex = currentBarIndex;
     return newLogs;
+  }
+  
+  /**
+   * Generate a support intervention log based on trigger type (Step 3)
+   */
+  function generateSupportIntervention(mission, trigger, counts, maxPerRole) {
+    if (!mission.support?.slots) return null;
+    
+    // Storm triggers → ESCORT intervenes
+    if (trigger.msg.includes('Storm front') || trigger.msg.includes('Turbulence') || trigger.msg.includes('Engine burn')) {
+      if (hasRole(mission, 'ESCORT') && counts.ESCORT < maxPerRole) {
+        return { role: 'ESCORT', msg: SUPPORT_ROLES.ESCORT.interventionLog };
+      }
+    }
+    
+    // Flow triggers → SCOUT intervenes
+    if (trigger.msg.includes('flow') || trigger.msg.includes('Sensors')) {
+      if (hasRole(mission, 'SCOUT') && counts.SCOUT < maxPerRole) {
+        return { role: 'SCOUT', msg: SUPPORT_ROLES.SCOUT.interventionLog };
+      }
+    }
+    
+    // Time/endurance triggers → CARRIER intervenes
+    if (trigger.msg.includes('Course correction') || trigger.msg.includes('Signal flare')) {
+      if (hasRole(mission, 'CARRIER') && counts.CARRIER < maxPerRole) {
+        return { role: 'CARRIER', msg: SUPPORT_ROLES.CARRIER.interventionLog };
+      }
+    }
+    
+    return null;
   }
   
   /**
@@ -799,9 +1144,9 @@ const MissionSystem = (function() {
       if (range > 0) {
         const pos = (bar.close - lower) / range;
         if (pos > 0.95) {
-          triggers.push({ kind: 'WARN', msg: '⚠️ Storm front: price approaching upper envelope extreme' });
+          triggers.push({ kind: 'WARN', msg: pxIcon('warning', '#ffaa33', 12) + ' Storm front: price approaching upper envelope extreme' });
         } else if (pos < 0.05) {
-          triggers.push({ kind: 'WARN', msg: '⚠️ Storm front: price approaching lower envelope extreme' });
+          triggers.push({ kind: 'WARN', msg: pxIcon('warning', '#ffaa33', 12) + ' Storm front: price approaching lower envelope extreme' });
         }
       }
     }
@@ -811,7 +1156,7 @@ const MissionSystem = (function() {
       const currSign = bar.histogram >= 0;
       const prevSign = prevBar.histogram >= 0;
       if (currSign !== prevSign) {
-        triggers.push({ kind: 'WARN', msg: '⚡ Turbulence: momentum flip detected (histogram sign change)' });
+        triggers.push({ kind: 'WARN', msg: pxIcon('lightning', '#ffaa33', 12) + ' Turbulence: momentum flip detected (histogram sign change)' });
       }
     }
     
@@ -837,12 +1182,12 @@ const MissionSystem = (function() {
           const threshold = recentATRs[p80Index];
           
           if (currentATR > threshold && currentATR > 0.02) { // Also require minimum 2%
-            triggers.push({ kind: 'EVENT', msg: `🔥 Engine burn: high volatility bar (${(currentATR * 100).toFixed(1)}% range, above 80th percentile)` });
+            triggers.push({ kind: 'EVENT', msg: pxIcon('fire', '#ffaa33', 12) + ` Engine burn: high volatility bar (${(currentATR * 100).toFixed(1)}% range, above 80th percentile)` });
           }
         }
       } else if (currentATR > 0.05) {
         // Fallback for insufficient history
-        triggers.push({ kind: 'EVENT', msg: `🔥 Engine burn: high volatility bar (${(currentATR * 100).toFixed(1)}% range)` });
+        triggers.push({ kind: 'EVENT', msg: pxIcon('fire', '#ffaa33', 12) + ` Engine burn: high volatility bar (${(currentATR * 100).toFixed(1)}% range)` });
       }
     }
     
@@ -850,9 +1195,9 @@ const MissionSystem = (function() {
     if (bar.volume != null && bar.volumeMA != null && bar.volumeMA > 0) {
       const ratio = bar.volume / bar.volumeMA;
       if (ratio > 1.5) {
-        triggers.push({ kind: 'INFO', msg: `📡 Sensors: flow surge detected (${ratio.toFixed(2)}x Volume MA)` });
+        triggers.push({ kind: 'INFO', msg: pxIcon('satellite', '#47d4ff', 12) + ` Sensors: flow surge detected (${ratio.toFixed(2)}x Volume MA)` });
       } else if (ratio < 0.7) {
-        triggers.push({ kind: 'INFO', msg: `📡 Sensors: flow drought (${ratio.toFixed(2)}x Volume MA)` });
+        triggers.push({ kind: 'INFO', msg: pxIcon('satellite', '#47d4ff', 12) + ` Sensors: flow drought (${ratio.toFixed(2)}x Volume MA)` });
       }
     }
     
@@ -862,7 +1207,7 @@ const MissionSystem = (function() {
       const prevAbove = prevBar.close > prevBar.kernelRegression;
       if (currAbove !== prevAbove) {
         const direction = currAbove ? 'above' : 'below';
-        triggers.push({ kind: 'EVENT', msg: `🎯 Course correction: price crossed ${direction} trend line` });
+        triggers.push({ kind: 'EVENT', msg: pxIcon('target', '#33ff99', 12) + ` Course correction: price crossed ${direction} trend line` });
       }
     }
     
@@ -973,7 +1318,7 @@ const MissionSystem = (function() {
   }
   
   /**
-   * Score mission by type
+   * Score mission by type (Step 3: Support modifiers applied)
    */
   function scoreMission(mission, features) {
     const type = mission.type;
@@ -981,6 +1326,16 @@ const MissionSystem = (function() {
     const startingSensors = mission.env?.sensors || 50;
     const startingHull = mission.env?.hull || 50;
     const startingFirepower = mission.env?.firepower || 50;
+    
+    // Step 3: Get combined modifiers from support slots
+    const mods = getCombinedMods(mission);
+    const hasSupport = mission.support?.slots?.some(s => s.ticker);
+    
+    // Apply sensorsBoost to flow quality
+    const flowAvgEffective = features.flowAvg * (1 + mods.sensorsBoost);
+    
+    // Track penalty dampening for explanation
+    let penaltiesDampened = 0;
     
     let score = 50; // Base score
     const whatHelped = [];
@@ -997,15 +1352,17 @@ const MissionSystem = (function() {
           score += 25;
           whatHelped.push('Threat assessment matched realized conditions');
         } else {
-          score -= 15;
+          const penalty = Math.round(15 * mods.threatDamp);
+          score -= penalty;
+          if (penalty < 15) penaltiesDampened += (15 - penalty);
           whatHurt.push('Threat prediction did not match market behavior');
         }
         
-        // Reward high flow
-        if (features.flowAvg > 1.2) {
+        // Reward high flow (using effective flow with sensors boost)
+        if (flowAvgEffective > 1.2) {
           score += 15;
-          whatHelped.push(`Strong flow quality (${features.flowAvg.toFixed(2)}x MA)`);
-        } else if (features.flowAvg < 0.8) {
+          whatHelped.push(`Strong flow quality (${flowAvgEffective.toFixed(2)}x effective)`);
+        } else if (flowAvgEffective < 0.8) {
           score -= 10;
           whatHurt.push('Low flow quality degraded reconnaissance');
         }
@@ -1019,28 +1376,39 @@ const MissionSystem = (function() {
       }
       
       case 'CARGO': {
+        // Apply time buffer to volatility penalty threshold
+        const volThreshold = 0.05 * (1 + mods.timeBuffer);
+        
         // Reward quiet markets
         if (features.rangePct < 0.025) {
           score += 25;
           whatHelped.push('Low volatility—smooth passage');
-        } else if (features.rangePct > 0.05) {
-          score -= 20;
+        } else if (features.rangePct > volThreshold) {
+          const penalty = Math.round(20 * mods.threatDamp);
+          score -= penalty;
+          if (penalty < 20) penaltiesDampened += (20 - penalty);
           whatHurt.push('High volatility disrupted cargo transport');
         }
         
+        // Extremes penalty dampened by threat damp
         if (features.extremes <= 1) {
           score += 15;
           whatHelped.push('Price stayed within safe corridor');
         } else if (features.extremes >= 5) {
-          score -= 15;
+          const penalty = Math.round(15 * mods.threatDamp);
+          score -= penalty;
+          if (penalty < 15) penaltiesDampened += (15 - penalty);
           whatHurt.push('Multiple envelope breaches caused damage');
         }
         
+        // Chop penalty dampened by time buffer
         if (features.chop <= 4) {
           score += 10;
           whatHelped.push('Consistent direction minimized time cost');
         } else if (features.chop >= 10) {
-          score -= 10;
+          const penalty = Math.round(10 * (1 - mods.timeBuffer));
+          score -= penalty;
+          if (penalty < 10) penaltiesDampened += (10 - penalty);
           whatHurt.push('Excessive chop eroded time value');
         }
         break;
@@ -1048,19 +1416,25 @@ const MissionSystem = (function() {
       
       case 'ESCORT': {
         // Reward low drawdown
-        if (features.maxDrawdown < 0.02) {
+        const drawdownThreshold = 0.02 * (1 + mods.stabilityBoost);
+        if (features.maxDrawdown < drawdownThreshold) {
           score += 30;
           whatHelped.push('Excellent risk control—minimal adverse excursion');
         } else if (features.maxDrawdown > 0.08) {
-          score -= 25;
+          const penalty = Math.round(25 * mods.threatDamp);
+          score -= penalty;
+          if (penalty < 25) penaltiesDampened += (25 - penalty);
           whatHurt.push('Large drawdown exceeded hedge coverage');
         }
         
+        // Extremes penalty dampened
         if (features.extremes <= 2) {
           score += 15;
           whatHelped.push('Stable path within formation parameters');
         } else {
-          score -= 10;
+          const penalty = Math.round(10 * mods.threatDamp);
+          score -= penalty;
+          if (penalty < 10) penaltiesDampened += (10 - penalty);
           whatHurt.push('Envelope breaches stressed formation');
         }
         
@@ -1079,7 +1453,9 @@ const MissionSystem = (function() {
           score += 30;
           whatHelped.push(`Strong directional move (${(features.returnPct * 100).toFixed(1)}%)`);
         } else if (absReturn < 0.02) {
-          score -= 20;
+          const penalty = Math.round(20 * (1 - mods.timeBuffer));
+          score -= penalty;
+          if (penalty < 20) penaltiesDampened += (20 - penalty);
           whatHurt.push('Insufficient directional movement');
         }
         
@@ -1089,9 +1465,11 @@ const MissionSystem = (function() {
           whatHelped.push('Clear trend supported strike trajectory');
         }
         
-        // Penalize chop
+        // Penalize chop (dampened by threat damp)
         if (features.chop >= 8) {
-          score -= 15;
+          const penalty = Math.round(15 * mods.threatDamp);
+          score -= penalty;
+          if (penalty < 15) penaltiesDampened += (15 - penalty);
           whatHurt.push('Choppy conditions wasted strike energy');
         } else if (features.chop <= 3) {
           score += 10;
@@ -1101,12 +1479,14 @@ const MissionSystem = (function() {
       }
       
       case 'HARVEST': {
-        // Reward staying in range
+        // Reward staying in range (dampened by threat damp)
         if (features.extremes <= 1) {
           score += 30;
           whatHelped.push('Price remained within harvest zone');
         } else if (features.extremes >= 5) {
-          score -= 25;
+          const penalty = Math.round(25 * mods.threatDamp);
+          score -= penalty;
+          if (penalty < 25) penaltiesDampened += (25 - penalty);
           whatHurt.push('Multiple breakouts ruined harvest conditions');
         }
         
@@ -1115,7 +1495,9 @@ const MissionSystem = (function() {
           score += 20;
           whatHelped.push('Low volatility maximized premium capture');
         } else if (features.rangePct > 0.05) {
-          score -= 20;
+          const penalty = Math.round(20 * mods.threatDamp);
+          score -= penalty;
+          if (penalty < 20) penaltiesDampened += (20 - penalty);
           whatHurt.push('High volatility exceeded harvest parameters');
         }
         
@@ -1125,6 +1507,27 @@ const MissionSystem = (function() {
           whatHelped.push('Stable regime supported range strategy');
         }
         break;
+      }
+    }
+    
+    // Step 3: Add support effects to score and explanations
+    if (hasSupport) {
+      // Bonus for having support
+      const stabilityBonus = Math.round(mods.stabilityBoost * 50);
+      score += stabilityBonus;
+      
+      // Add support-specific "what helped" entries
+      if (hasRole(mission, 'SCOUT') && mods.sensorsBoost > 0) {
+        whatHelped.push('Scout wing increased effective flow quality');
+      }
+      if (hasRole(mission, 'ESCORT') && penaltiesDampened > 0) {
+        whatHelped.push('Escort formation reduced turbulence penalties');
+      }
+      if (hasRole(mission, 'CARRIER') && mods.timeBuffer > 0) {
+        whatHelped.push('Carrier resupply extended operational endurance');
+      }
+      if (hasRole(mission, 'UTILITY')) {
+        whatHelped.push('Utility craft improved overall resilience');
       }
     }
     
@@ -1139,7 +1542,7 @@ const MissionSystem = (function() {
     else if (score >= 60) grade = 'C';
     else grade = 'D';
     
-    return { score, grade, whatHelped, whatHurt };
+    return { score, grade, whatHelped, whatHurt, supportApplied: hasSupport };
   }
   
   /**
@@ -1207,6 +1610,19 @@ const MissionSystem = (function() {
     });
     
     saveMissions(missions);
+    
+    // Step 8: Emit mission:complete event for progression system
+    if (window.PARALLAX_BUS) {
+      window.PARALLAX_BUS.emit('mission:complete', {
+        ticker: mission.ticker,
+        missionType: mission.type,
+        difficulty: mission.difficulty || 1,
+        duration: mission.duration?.label || null,
+        grade: scoreResult.grade,
+        score: scoreResult.score
+      });
+    }
+    
     return mission;
   }
   
@@ -1256,6 +1672,7 @@ const MissionSystem = (function() {
     DEFAULT_SIM_SPEED,
     DEFAULT_LOOKBACK,
     MISSION_TYPES,
+    SUPPORT_ROLES,
     
     // Stat computation
     computeEnvironment,
@@ -1284,6 +1701,17 @@ const MissionSystem = (function() {
     getMission,
     getActiveMissions,
     getActiveMissionForTicker,
+    
+    // Step 3: Fleet Support
+    FleetCache,
+    classifyRole,
+    getTickerRole,
+    isTickerLocked,
+    getLockedTickers,
+    assignSupport,
+    removeSupport,
+    getCombinedMods,
+    hasRole,
     
     // Mission type info
     getMissionType: (type) => MISSION_TYPES[type] || null,
