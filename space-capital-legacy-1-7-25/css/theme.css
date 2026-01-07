@@ -1,0 +1,157 @@
+/* =========================================================================
+   SPACE CAPITAL - Canonical Theme Variables
+   Hotline Miami aesthetic design system
+   ========================================================================= */
+
+:root {
+  /* ═══════════════════════════════════════════════════════════════════════
+     PRIMARY COLORS - Hot Magenta
+     ═══════════════════════════════════════════════════════════════════════ */
+  --magenta: #FF2975;
+  --magenta-dark: #CC1F5C;
+  --magenta-glow: rgba(255, 41, 117, 0.4);
+  --magenta-ghost: rgba(255, 41, 117, 0.15);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     ACCENT COLORS
+     ═══════════════════════════════════════════════════════════════════════ */
+  /* Electric Cyan */
+  --cyan: #00FFFF;
+  --cyan-dark: #00CCCC;
+  --cyan-dim: rgba(0, 255, 255, 0.3);
+  
+  /* Neon Yellow - Data/Warning */
+  --yellow: #FFE600;
+  --yellow-dim: rgba(255, 230, 0, 0.3);
+  
+  /* Toxic Green - Success/Positive */
+  --green-neon: #39FF14;
+  --green-dim: rgba(57, 255, 20, 0.3);
+  
+  /* Blood Orange - Action/Danger */
+  --orange: #FF6B35;
+  --orange-dim: rgba(255, 107, 53, 0.3);
+  
+  /* Alert Red */
+  --red-alert: #FF0040;
+  --red-dim: rgba(255, 0, 64, 0.3);
+  
+  /* Psychedelic Purple */
+  --purple: #9D4EDD;
+  --purple-dim: rgba(157, 78, 221, 0.3);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     BACKGROUNDS - Deep Purple-Black
+     ═══════════════════════════════════════════════════════════════════════ */
+  --bg-void: #0A0A0F;
+  --bg-panel: #12121A;
+  --bg-surface: #1A1A24;
+  --bg-elevated: #22222E;
+  --bg-card: #181820;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     TEXT HIERARCHY
+     ═══════════════════════════════════════════════════════════════════════ */
+  --text-primary: #F0F0F0;
+  --text-secondary: #CCCCDD;
+  --text-dim: #888899;
+  --text-muted: #555566;
+  --text-ghost: #333344;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     BORDERS
+     ═══════════════════════════════════════════════════════════════════════ */
+  --border-harsh: var(--magenta);
+  --border-active: rgba(255, 41, 117, 0.6);
+  --border-dim: #333344;
+  --border-panel: #2A2A3A;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     SEMANTIC COLORS
+     ═══════════════════════════════════════════════════════════════════════ */
+  --signal-positive: var(--green-neon);
+  --signal-negative: var(--red-alert);
+  --signal-warning: var(--yellow);
+  --signal-neutral: var(--text-dim);
+  --signal-bull: var(--green-neon);
+  --signal-bear: var(--red-alert);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     TYPOGRAPHY
+     ═══════════════════════════════════════════════════════════════════════ */
+  --font-display: 'VT323', 'Courier New', monospace;
+  --font-body: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-data: 'IBM Plex Mono', 'Courier New', monospace;
+  
+  /* Font sizes */
+  --text-xs: 0.625rem;   /* 10px */
+  --text-sm: 0.75rem;    /* 12px */
+  --text-base: 0.875rem; /* 14px */
+  --text-md: 1rem;       /* 16px */
+  --text-lg: 1.25rem;    /* 20px */
+  --text-xl: 1.5rem;     /* 24px */
+  --text-2xl: 2rem;      /* 32px */
+  --text-3xl: 2.5rem;    /* 40px */
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     EFFECTS & ANIMATION
+     ═══════════════════════════════════════════════════════════════════════ */
+  --scanline-opacity: 0.03;
+  --noise-opacity: 0.02;
+  --glow-spread: 20px;
+  --glow-spread-sm: 10px;
+  --glow-spread-lg: 40px;
+  
+  /* Timing */
+  --transition-fast: 0.1s;
+  --transition-normal: 0.2s;
+  --transition-slow: 0.4s;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     SPACING
+     ═══════════════════════════════════════════════════════════════════════ */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     BORDER RADIUS - Keep it sharp/industrial
+     ═══════════════════════════════════════════════════════════════════════ */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Glow effects */
+.glow-magenta { 
+  box-shadow: 0 0 var(--glow-spread) var(--magenta-glow);
+}
+.glow-cyan { 
+  box-shadow: 0 0 var(--glow-spread) var(--cyan-dim);
+}
+.glow-green { 
+  box-shadow: 0 0 var(--glow-spread) var(--green-dim);
+}
+
+/* Text colors */
+.text-magenta { color: var(--magenta); }
+.text-cyan { color: var(--cyan); }
+.text-green { color: var(--green-neon); }
+.text-yellow { color: var(--yellow); }
+.text-orange { color: var(--orange); }
+.text-red { color: var(--red-alert); }
+.text-purple { color: var(--purple); }
+
+/* Signal states */
+.text-positive { color: var(--signal-positive); }
+.text-negative { color: var(--signal-negative); }
+.text-warning { color: var(--signal-warning); }
+.text-neutral { color: var(--signal-neutral); }

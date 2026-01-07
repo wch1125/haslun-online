@@ -1,129 +1,98 @@
-# PARALLAX Directory Cleanup Summary
+# Space Capital Cleanup Summary
 
-## Before → After
+## Changes Made
 
-### Root Files: 14 → 5 (64% reduction!)
+### Pages Deleted (Incomplete/Not Needed)
+- `paint-bay.html` — Only showed explanation text, no actual functionality
+- `sprite-upgrades.html` — Technical demo, not needed for main app
+- `parallax-run.html` — Game, deprioritized
+- `index-legacy.html` — Old cockpit version, superseded
 
-| Status | File | Reason |
-|--------|------|--------|
-| ✅ KEEP | `index.html` | Main application |
-| ✅ KEEP | `paint-bay.html` | Ship color customization tool |
-| ✅ KEEP | `parallax-run.html` | Racing mini-game |
-| ✅ KEEP | `README.md` | Project documentation (renamed from PARALLAX-README.md) |
-| 🔧 NEW | `cleanup.sh` | This cleanup script (can delete after use) |
+### CSS Files Deleted
+- `paint-bay.css`
+- `bey-arena.css`
+- `cockpit-hud.css`
+- `cockpit-hud-legacy.css`
 
----
+### JS Files Deleted
+- `cockpit-nav.js`
+- `cockpit-nav-legacy.js`
+- `games/bey-arena.js`
+- `games/parallax-run.js`
+- `ui/paint-bay.js`
 
-## Archived Files
+### Path Fixes Applied
+All files in `/html/` were loading JS/CSS/assets with incorrect paths (e.g., `js/` instead of `../js/`).
 
-### `_archive/html-legacy/` — Old HTML Pages
-These were superseded by the new cockpit HUD architecture in `index.html`:
+**Fixed files:**
+1. **derivatives.html** — Fixed all script/css/data paths
+2. **ship-behavior-demo.html** — Fixed CSS and asset paths
+3. **ship-data.js** — Added auto-detection for path prefix based on page location
+4. **indicator-loader.js** — Added auto-detection for data path prefix
+5. **ship-select.js** — Fixed asset paths
 
-| File | What It Was |
-|------|-------------|
-| `derivatives.html` | Old 2000-line full-page variant |
-| `ship-select.html` | Legacy ship selection interface |
-| `index-legacy.html` | Backup of pre-cockpit index.html |
-
-### `_archive/html-demos/` — Development Test Pages
-These are dev tools, not user-facing pages:
-
-| File | Purpose |
-|------|---------|
-| `ship-behavior-demo.html` | Testing ship animation states |
-| `sprite-upgrades.html` | Sprite upgrade system testing |
-
-### `_archive/docs-legacy/` — Old Documentation
-Superseded READMEs and analysis docs:
-
-| File | Why Archived |
-|------|--------------|
-| `HASLUN-BOT-README.md` | Old project name (now PARALLAX) |
-| `HASLUN-BOT-Structure-Analysis.md` | One-time analysis document |
-| `SPACE-CAPITAL-README.md` | Duplicate of PARALLAX-README.md |
-
-### `_archive/docs-dev-logs/` — Build Logs
-Historical records of development work:
-
-| File | Contents |
-|------|----------|
-| `MODULARIZATION-LOG.md` | CSS/JS modularization history |
-| `OPTIMIZATION-REPORT.md` | Performance optimization notes |
-| `FLEET-ANIMATION-INTEGRATION.md` | Animation system integration guide |
+### Module Viewer Updated
+Reduced from 7 modules to 3 working modules:
+- 📊 Derivatives Console
+- 🚀 Ship Select  
+- ⚡ Behavior Demo
 
 ---
 
-## Clean Folder Structure
+## Final Structure
 
 ```
-trading/
-├── index.html              ← Main app (cockpit HUD)
-├── paint-bay.html          ← Color customization
-├── parallax-run.html       ← Racing game
-├── README.md               ← Documentation
-│
-├── assets/
-│   └── ships/              ← All ship sprites (static + animated)
-│
+space-capital/
+├── index.html                  ← Redirects to html/space-capital.html
+├── html/
+│   ├── space-capital.html     ← Main fleet dashboard (Hotline Miami)
+│   ├── derivatives.html       ← Options console (FIXED)
+│   ├── ship-select.html       ← Ship selection screen (FIXED)
+│   └── ship-behavior-demo.html← Behavior system demo (FIXED)
 ├── css/
-│   ├── styles.css          ← Main styles
-│   ├── cockpit-hud.css     ← HUD navigation
-│   ├── bey-arena.css       ← Battle arena
-│   └── ... (10 total)
-│
-├── data/
-│   ├── *.json              ← Market data files
-│   └── indicators/
-│
+│   ├── theme.css              ← Canonical Hotline Miami palette
+│   ├── module-viewer.css      ← Module overlay styles
+│   ├── ship-select.css
+│   ├── ship-states.css
+│   ├── ship-brief.css
+│   ├── crt-effects.css
+│   ├── fleet-command.css
+│   ├── styles.css
+│   └── accessibility.css
 ├── js/
-│   ├── app.js              ← Main application
-│   ├── cockpit-nav.js      ← HUD controller
-│   ├── core/               ← State management
-│   ├── data/               ← Telemetry & profiles
-│   ├── games/              ← Mini-games
-│   ├── ships/              ← Ship behavior
-│   ├── sprites/            ← Sprite rendering
-│   ├── state/              ← Progression system
-│   └── ui/                 ← UI components
-│
-└── _archive/               ← Archived files (safe to delete)
-    ├── html-legacy/
-    ├── html-demos/
-    ├── docs-legacy/
-    └── docs-dev-logs/
+│   ├── ui/
+│   │   ├── module-viewer.js   ← Updated (3 modules)
+│   │   ├── ship-animator.js
+│   │   ├── ship-select.js     ← FIXED paths
+│   │   └── ...
+│   ├── data/
+│   │   ├── ship-data.js       ← FIXED auto-detect paths
+│   │   ├── indicator-loader.js← FIXED auto-detect paths
+│   │   └── ...
+│   └── ...
+├── assets/
+│   └── ships/
+│       ├── animated/gifs/     ← All ticker GIFs
+│       └── static/            ← Static PNG sprites
+└── data/
+    ├── telemetry/fleet.json
+    └── timeseries/*.json
 ```
 
 ---
 
-## How to Apply
+## How the Path Fix Works
 
-### Option 1: Run the Script
-```bash
-cd trading/
-chmod +x cleanup.sh
-./cleanup.sh
+Added auto-detection in key JS files:
+
+```javascript
+// Detects if page is in /html/ subdirectory
+const PATH_PREFIX = window.location.pathname.includes('/html/') ? '../' : '';
+
+// Then uses it for asset paths
+const ASSET_PATH = PATH_PREFIX + 'assets/ships/...';
 ```
 
-### Option 2: Manual Moves
-Follow the "Archived Files" tables above and move files manually.
-
----
-
-## After Verification
-
-Once you've confirmed everything works:
-
-```bash
-# Remove the archive folder entirely
-rm -rf _archive/
-
-# Remove the cleanup script
-rm cleanup.sh
-```
-
-This leaves you with a clean 5-file root:
-- `index.html`
-- `paint-bay.html`  
-- `parallax-run.html`
-- `README.md`
-- (folders: assets, css, data, js)
+This allows the same JS files to work from both:
+- Root pages: `assets/ships/...`
+- /html/ pages: `../assets/ships/...`

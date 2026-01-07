@@ -1,0 +1,851 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * FLEET COMMAND — Active Vessel Manifest UI
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * Implements the Fleet Command panel design with:
+ * - Ship cards with stats bars (Hull, Cargo, Fuel)
+ * - CRT-framed ship display
+ * - Price and P&L per vessel
+ * - Operational status badges
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   FLEET COMMAND PANEL
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fleet-command {
+  background: linear-gradient(180deg, #0d1218 0%, #080c10 100%);
+  border: 1px solid rgba(51, 255, 153, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fleet-command-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(90deg, rgba(51, 255, 153, 0.08) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(51, 255, 153, 0.15);
+}
+
+.fleet-command-icon {
+  color: #33ff99;
+  font-size: 0.9rem;
+}
+
+.fleet-command-titles {
+  flex: 1;
+}
+
+.fleet-command-title {
+  color: #33ff99;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(51, 255, 153, 0.4);
+  margin: 0;
+}
+
+.fleet-command-subtitle {
+  color: #6a7a8a;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 0.15rem;
+}
+
+.fleet-command-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VESSEL CARD — Individual Ship Entry
+   ═══════════════════════════════════════════════════════════════════ */
+
+.vessel-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(13, 18, 24, 0.9) 0%, rgba(8, 12, 16, 0.95) 100%);
+  border: 1px solid rgba(51, 255, 153, 0.15);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vessel-card:hover {
+  border-color: rgba(51, 255, 153, 0.4);
+  background: linear-gradient(135deg, rgba(51, 255, 153, 0.05) 0%, rgba(13, 18, 24, 0.95) 100%);
+  box-shadow: 
+    0 0 20px rgba(51, 255, 153, 0.1),
+    inset 0 0 30px rgba(51, 255, 153, 0.02);
+}
+
+.vessel-card.active {
+  border-color: rgba(51, 255, 153, 0.5);
+  box-shadow: 0 0 25px rgba(51, 255, 153, 0.15);
+}
+
+/* Corner brackets on vessel card */
+.vessel-card::before,
+.vessel-card::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: #33ff99;
+  border-style: solid;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.vessel-card::before {
+  top: 4px;
+  left: 4px;
+  border-width: 1px 0 0 1px;
+}
+
+.vessel-card::after {
+  bottom: 4px;
+  right: 4px;
+  border-width: 0 1px 1px 0;
+}
+
+.vessel-card:hover::before,
+.vessel-card:hover::after {
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VESSEL SPRITE DISPLAY
+   ═══════════════════════════════════════════════════════════════════ */
+
+.vessel-sprite-frame {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(51, 255, 153, 0.03) 100%);
+  border: 1px solid rgba(51, 255, 153, 0.2);
+  border-radius: 4px;
+}
+
+/* Corner brackets on sprite frame */
+.vessel-sprite-corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: #33ff99;
+  border-style: solid;
+  opacity: 0.5;
+}
+
+.vessel-sprite-corner.tl { top: 3px; left: 3px; border-width: 1px 0 0 1px; }
+.vessel-sprite-corner.tr { top: 3px; right: 3px; border-width: 1px 1px 0 0; }
+.vessel-sprite-corner.bl { bottom: 3px; left: 3px; border-width: 0 0 1px 1px; }
+.vessel-sprite-corner.br { bottom: 3px; right: 3px; border-width: 0 1px 1px 0; }
+
+.vessel-sprite-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 8px rgba(71, 212, 255, 0.5));
+}
+
+.vessel-sprite-class {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0d1218;
+  border: 1px solid rgba(51, 255, 153, 0.3);
+  padding: 0.15rem 0.5rem;
+  font-size: 0.55rem;
+  color: #47d4ff;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VESSEL INFO SECTION
+   ═══════════════════════════════════════════════════════════════════ */
+
+.vessel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vessel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.vessel-identity {
+  flex: 1;
+}
+
+.vessel-ticker {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e0e0e0;
+  letter-spacing: 0.05em;
+}
+
+.vessel-designation {
+  font-size: 0.65rem;
+  color: #6a7a8a;
+  letter-spacing: 0.05em;
+  margin-top: 0.1rem;
+}
+
+/* Status Badge */
+.vessel-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(51, 255, 153, 0.15);
+  border: 1px solid rgba(51, 255, 153, 0.3);
+  border-radius: 2px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vessel-status.operational {
+  color: #33ff99;
+  background: rgba(51, 255, 153, 0.1);
+  border-color: rgba(51, 255, 153, 0.3);
+}
+
+.vessel-status.standby {
+  color: #ffb347;
+  background: rgba(255, 179, 71, 0.1);
+  border-color: rgba(255, 179, 71, 0.3);
+}
+
+.vessel-status.damaged {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.vessel-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VESSEL STATS BARS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.vessel-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.vessel-stat {
+  display: grid;
+  grid-template-columns: 50px 1fr 35px;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vessel-stat-label {
+  font-size: 0.65rem;
+  color: #6a7a8a;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.vessel-stat-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative;
+}
+
+.vessel-stat-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+/* Hull - Cyan/Blue */
+.vessel-stat-fill.hull {
+  background: linear-gradient(90deg, #47d4ff, #33aaff);
+  box-shadow: 0 0 8px rgba(71, 212, 255, 0.5);
+}
+
+/* Cargo - Amber/Orange */
+.vessel-stat-fill.cargo {
+  background: linear-gradient(90deg, #ffb347, #ff9933);
+  box-shadow: 0 0 8px rgba(255, 179, 71, 0.5);
+}
+
+/* Fuel - Blue */
+.vessel-stat-fill.fuel {
+  background: linear-gradient(90deg, #5588ff, #3366cc);
+  box-shadow: 0 0 8px rgba(85, 136, 255, 0.5);
+}
+
+.vessel-stat-value {
+  font-size: 0.7rem;
+  color: #c8d4e0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VESSEL FOOTER — Price & P&L
+   ═══════════════════════════════════════════════════════════════════ */
+
+.vessel-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(51, 255, 153, 0.1);
+}
+
+.vessel-price {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.vessel-pnl {
+  text-align: right;
+}
+
+.vessel-pnl-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.vessel-pnl-value.positive {
+  color: #33ff99;
+  text-shadow: 0 0 10px rgba(51, 255, 153, 0.4);
+}
+
+.vessel-pnl-value.negative {
+  color: #ff6b6b;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+}
+
+.vessel-pnl-percent {
+  font-size: 0.7rem;
+  margin-left: 0.4rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ENHANCED SHIP BRIEF DIALOG — CRT Frame Style
+   ═══════════════════════════════════════════════════════════════════ */
+
+.ship-brief-crt-frame {
+  position: relative;
+  background: linear-gradient(145deg, #0a0d10 0%, #0d1218 50%, #080a0d 100%);
+  border: 2px solid rgba(51, 255, 153, 0.4);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* CRT glow effect */
+.ship-brief-crt-frame::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: 
+    0 0 30px rgba(51, 255, 153, 0.15),
+    inset 0 0 60px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* Screen reflection */
+.ship-brief-crt-frame::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(
+    180deg,
+    rgba(51, 255, 153, 0.03) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Scanning line effect */
+.ship-brief-crt-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(51, 255, 153, 0.1),
+    transparent
+  );
+  pointer-events: none;
+  animation: crt-scan 3s linear infinite;
+  z-index: 5;
+}
+
+@keyframes crt-scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* Large ship display in CRT frame */
+.ship-brief-large-display {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ship-brief-large-sprite {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: 
+    drop-shadow(0 0 15px rgba(71, 212, 255, 0.6))
+    drop-shadow(0 0 30px rgba(51, 255, 153, 0.3));
+  animation: ship-hover 3s ease-in-out infinite;
+}
+
+@keyframes ship-hover {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Large corner brackets */
+.ship-brief-corner {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border-color: #33ff99;
+  border-style: solid;
+  opacity: 0.6;
+}
+
+.ship-brief-corner.tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.ship-brief-corner.tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+.ship-brief-corner.bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.ship-brief-corner.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+/* Ship name and tagline */
+.ship-brief-identity {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.ship-brief-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #33ff99;
+  letter-spacing: 0.1em;
+  text-shadow: 
+    0 0 15px rgba(51, 255, 153, 0.5),
+    0 0 30px rgba(51, 255, 153, 0.3);
+}
+
+.ship-brief-tagline {
+  font-size: 0.85rem;
+  color: #c8d4e0;
+  margin-top: 0.5rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHIP BRIEF DETAILS SECTION
+   ═══════════════════════════════════════════════════════════════════ */
+
+.ship-brief-details {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1.5rem;
+  padding: 1.25rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(51, 255, 153, 0.1);
+  border-radius: 4px;
+}
+
+.ship-brief-mini-sprite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ship-brief-mini-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 8px rgba(71, 212, 255, 0.4));
+}
+
+.ship-brief-class-badge {
+  background: rgba(51, 255, 153, 0.15);
+  border: 1px solid rgba(51, 255, 153, 0.4);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #33ff99;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ship-brief-authority {
+  font-size: 0.6rem;
+  color: #ffb347;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+/* Systems Status */
+.ship-brief-systems {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ship-brief-section-title {
+  font-size: 0.65rem;
+  color: #6a7a8a;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.ship-brief-system-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ship-brief-system-label {
+  width: 100px;
+  font-size: 0.7rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ship-brief-system-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ship-brief-system-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #33ff99, #47d4ff);
+  box-shadow: 0 0 6px rgba(51, 255, 153, 0.5);
+}
+
+/* Pilot Progression */
+.ship-brief-progression {
+  margin-top: 0.5rem;
+}
+
+.ship-brief-level {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ship-brief-level-badge {
+  background: rgba(179, 136, 255, 0.2);
+  border: 1px solid rgba(179, 136, 255, 0.4);
+  color: #b388ff;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.ship-brief-xp-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ship-brief-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #b388ff, #9966ff);
+  box-shadow: 0 0 6px rgba(179, 136, 255, 0.5);
+}
+
+.ship-brief-xp-text {
+  font-size: 0.65rem;
+  color: #6a7a8a;
+  white-space: nowrap;
+}
+
+/* Skill badges */
+.ship-brief-skills {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.ship-brief-skill {
+  padding: 0.2rem 0.4rem;
+  background: rgba(51, 255, 153, 0.08);
+  border: 1px solid rgba(51, 255, 153, 0.2);
+  font-size: 0.55rem;
+  color: #6a7a8a;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ship-brief-skill.active {
+  background: rgba(51, 255, 153, 0.15);
+  border-color: rgba(51, 255, 153, 0.4);
+  color: #33ff99;
+}
+
+/* Operations Data */
+.ship-brief-ops {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.ship-brief-ops-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.ship-brief-ops-label {
+  font-size: 0.6rem;
+  color: #6a7a8a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ship-brief-ops-value {
+  font-size: 0.85rem;
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.ship-brief-ops-value.standby {
+  color: #ffb347;
+}
+
+/* Warning message */
+.ship-brief-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  background: rgba(255, 179, 71, 0.1);
+  border: 1px solid rgba(255, 179, 71, 0.3);
+  border-radius: 2px;
+  margin-top: 1rem;
+  font-size: 0.7rem;
+  color: #ffb347;
+  letter-spacing: 0.05em;
+}
+
+.ship-brief-warning-icon {
+  font-size: 0.8rem;
+}
+
+/* Action Buttons */
+.ship-brief-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.ship-brief-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.25rem;
+  background: transparent;
+  border: 1px solid rgba(51, 255, 153, 0.3);
+  border-radius: 2px;
+  color: #c8d4e0;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ship-brief-btn:hover {
+  background: rgba(51, 255, 153, 0.1);
+  border-color: rgba(51, 255, 153, 0.5);
+  color: #33ff99;
+}
+
+.ship-brief-btn.primary {
+  background: linear-gradient(180deg, rgba(51, 255, 153, 0.2) 0%, rgba(51, 255, 153, 0.1) 100%);
+  border-color: rgba(51, 255, 153, 0.5);
+  color: #33ff99;
+}
+
+.ship-brief-btn.primary:hover {
+  background: linear-gradient(180deg, rgba(51, 255, 153, 0.3) 0%, rgba(51, 255, 153, 0.15) 100%);
+  box-shadow: 0 0 20px rgba(51, 255, 153, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PORTFOLIO STATUS PANEL
+   ═══════════════════════════════════════════════════════════════════ */
+
+.portfolio-status {
+  background: linear-gradient(180deg, #0d1218 0%, #080c10 100%);
+  border: 1px solid rgba(51, 255, 153, 0.2);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.portfolio-status-title {
+  font-size: 0.65rem;
+  color: #6a7a8a;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.portfolio-status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.portfolio-stat {
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(51, 255, 153, 0.1);
+}
+
+.portfolio-stat-label {
+  font-size: 0.6rem;
+  color: #6a7a8a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+
+.portfolio-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-stat-value.positive {
+  color: #33ff99;
+  text-shadow: 0 0 15px rgba(51, 255, 153, 0.5);
+}
+
+.portfolio-stat-value.neutral {
+  color: #e0e0e0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .vessel-card {
+    grid-template-columns: 70px 1fr;
+    padding: 0.75rem;
+  }
+  
+  .vessel-sprite-frame {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .vessel-sprite-img {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .vessel-ticker {
+    font-size: 0.95rem;
+  }
+  
+  .vessel-stat {
+    grid-template-columns: 40px 1fr 30px;
+  }
+  
+  .ship-brief-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .ship-brief-mini-sprite {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .ship-brief-actions {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,855 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * SHIP BRIEF — Unified Ship Dialog Component Styles
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * Dedicated stylesheet for the Ship Brief dialog component.
+ * This file can be removed without affecting other pages.
+ * 
+ * Dependencies:
+ *   - CSS variables from styles.css (--phosphor, --amber, --bg-panel, etc.)
+ *   - Font families from styles.css (--font-mono, --font-display)
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+.ship-brief-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 30000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.ship-brief-dialog.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ship-brief-dialog.hidden {
+  display: none;
+}
+
+.ship-brief-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.ship-brief-container {
+  position: relative;
+  width: 90%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow: hidden;
+  background: 
+    linear-gradient(135deg, rgba(51, 255, 153, 0.03) 0%, transparent 50%),
+    linear-gradient(225deg, rgba(255, 179, 71, 0.02) 0%, transparent 50%),
+    var(--bg-panel);
+  border: 1px solid rgba(51, 255, 153, 0.3);
+  border-radius: 4px;
+  box-shadow: 
+    0 0 60px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(51, 255, 153, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.ship-brief-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--ship-color, var(--phosphor)), transparent);
+}
+
+/* Boot Animation */
+.ship-brief-boot {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-void);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+}
+
+.ship-brief-boot.done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ship-brief-boot-line {
+  width: 60%;
+  height: 2px;
+  background: var(--phosphor);
+  animation: ship-brief-scan 0.6s ease-out;
+}
+
+.ship-brief-boot-text {
+  margin-top: 1rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--phosphor);
+  opacity: 0.7;
+}
+
+@keyframes ship-brief-scan {
+  0% { width: 0; opacity: 1; }
+  100% { width: 60%; opacity: 0.5; }
+}
+
+/* Close Button */
+.ship-brief-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ship-brief-close:hover {
+  background: rgba(51, 255, 153, 0.1);
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+}
+
+.ship-brief-close-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.ship-brief-close-text {
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+/* Content Layout */
+.ship-brief-content {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  padding-top: 3rem;
+}
+
+/* Left Panel: Visual */
+.ship-brief-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ship-brief-display {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* CRT Frame styling */
+  background: linear-gradient(145deg, #080a0d 0%, #0d1218 50%, #080a0d 100%);
+  border: 2px solid rgba(51, 255, 153, 0.5);
+  border-radius: 8px;
+  box-shadow: 
+    0 0 30px rgba(51, 255, 153, 0.15),
+    inset 0 0 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(51, 255, 153, 0.1);
+}
+
+/* CRT screen curvature reflection */
+.ship-brief-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(
+    180deg,
+    rgba(51, 255, 153, 0.04) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Inner screen edge */
+.ship-brief-display::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 6px;
+  border: 1px solid rgba(51, 255, 153, 0.15);
+  pointer-events: none;
+}
+
+/* Scan Frame */
+.ship-brief-scan-frame {
+  position: absolute;
+  inset: 10px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ship-brief-scan-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--ship-color, var(--phosphor));
+  border-style: solid;
+  border-width: 0;
+  opacity: 0.7;
+}
+
+.ship-brief-scan-corner.tl { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; }
+.ship-brief-scan-corner.tr { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; }
+.ship-brief-scan-corner.bl { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; }
+.ship-brief-scan-corner.br { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
+
+.ship-brief-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--ship-color, var(--phosphor)), transparent);
+  animation: ship-brief-scan-sweep 3s ease-in-out infinite;
+  z-index: 3;
+}
+
+@keyframes ship-brief-scan-sweep {
+  0%, 100% { top: 0; opacity: 0.3; }
+  50% { top: calc(100% - 3px); opacity: 0.6; }
+}
+
+.ship-brief-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: 
+    drop-shadow(0 0 15px rgba(71, 212, 255, 0.5))
+    drop-shadow(0 0 30px rgba(51, 255, 153, 0.3));
+  animation: ship-brief-hover 4s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes ship-brief-hover {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Ship Name & Tagline (below CRT display) */
+.ship-brief-title-section {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.ship-brief-title-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--phosphor);
+  letter-spacing: 0.1em;
+  text-shadow: 
+    0 0 15px rgba(51, 255, 153, 0.5),
+    0 0 30px rgba(51, 255, 153, 0.3);
+}
+
+.ship-brief-title-tagline {
+  font-size: 0.85rem;
+  color: #c8d4e0;
+  margin-top: 0.5rem;
+  font-style: italic;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+/* Role Badge */
+.ship-brief-role {
+  padding: 0.35rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--ship-color, var(--phosphor));
+  border: 1px solid var(--ship-color, var(--phosphor));
+  border-radius: 2px;
+  background: rgba(51, 255, 153, 0.1);
+  box-shadow: 0 0 10px rgba(51, 255, 153, 0.2);
+}
+
+/* Authority Line */
+.ship-brief-authority {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--phosphor);
+  opacity: 0.7;
+}
+
+.ship-brief-authority-icon {
+  animation: ship-brief-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ship-brief-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Right Panel: Data */
+.ship-brief-data {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ship-brief-section {
+  animation: ship-brief-fade-in 0.4s ease-out both;
+}
+
+.ship-brief-section:nth-child(1) { animation-delay: 0.1s; }
+.ship-brief-section:nth-child(2) { animation-delay: 0.2s; }
+.ship-brief-section:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes ship-brief-fade-in {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.ship-brief-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+.ship-brief-marker {
+  color: var(--phosphor);
+}
+
+/* Identity */
+.ship-brief-identity {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+
+.ship-brief-ticker {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--ship-color, var(--phosphor));
+  line-height: 1;
+}
+
+.ship-brief-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-top: 0.25rem;
+}
+
+.ship-brief-designation {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  letter-spacing: 0.1em;
+}
+
+/* Status Bars */
+.ship-brief-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ship-brief-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.ship-brief-stat-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.ship-brief-stat-value {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text);
+}
+
+.ship-brief-stat-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ship-brief-stat-fill {
+  height: 100%;
+  transition: width 0.6s ease-out;
+  border-radius: 2px;
+}
+
+.ship-brief-stat-fill.hull { background: var(--phosphor); }
+.ship-brief-stat-fill.hull.damaged { background: var(--red); }
+.ship-brief-stat-fill.cargo { background: var(--amber); }
+.ship-brief-stat-fill.fuel { background: var(--cyan); }
+
+/* Operations Data */
+.ship-brief-ops {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.ship-brief-ops-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ship-brief-ops-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.ship-brief-ops-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ship-brief-ops-value.positive { color: var(--green); }
+.ship-brief-ops-value.negative { color: var(--red); }
+.ship-brief-ops-value.status-operational { color: var(--phosphor); }
+.ship-brief-ops-value.status-damaged { color: var(--red); }
+.ship-brief-ops-value.status-standby { color: var(--text-muted); }
+
+/* Observation Mode Notice */
+.ship-brief-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 179, 71, 0.1);
+  border: 1px dashed rgba(255, 179, 71, 0.3);
+  border-radius: 2px;
+  font-size: 0.65rem;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+}
+
+.ship-brief-notice-icon {
+  opacity: 0.7;
+}
+
+/* Footer Actions */
+.ship-brief-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid var(--border);
+}
+
+.ship-brief-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ship-brief-action.secondary {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.ship-brief-action.secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.ship-brief-action.primary {
+  background: rgba(51, 255, 153, 0.1);
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+}
+
+.ship-brief-action.primary:hover {
+  background: rgba(51, 255, 153, 0.2);
+  box-shadow: 0 0 20px rgba(51, 255, 153, 0.2);
+}
+
+.ship-brief-action-icon {
+  font-size: 0.9rem;
+}
+
+/* Body scroll lock */
+body.ship-brief-open {
+  overflow: hidden !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .ship-brief-container {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .ship-brief-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    padding-top: 3rem;
+  }
+  
+  .ship-brief-visual {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .ship-brief-display {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .ship-brief-img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .ship-brief-ticker {
+    font-size: 1.4rem;
+  }
+  
+  .ship-brief-ops {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .ship-brief-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  .ship-brief-action {
+    width: 100%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Step 8: Pilot Progression Section
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ship-brief-progression {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ship-brief-level-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ship-brief-level-badge {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #33ff99;
+  background: rgba(51, 255, 153, 0.1);
+  border: 1px solid rgba(51, 255, 153, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  text-shadow: 0 0 8px rgba(51, 255, 153, 0.5);
+  min-width: 52px;
+  text-align: center;
+}
+
+.ship-brief-xp-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ship-brief-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #33ff99, #47d4ff);
+  box-shadow: 0 0 8px rgba(51, 255, 153, 0.5);
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+.ship-brief-xp-text {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.5);
+  min-width: 80px;
+  text-align: right;
+}
+
+.ship-brief-upgrades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ship-brief-upgrade-slot {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 2px;
+  cursor: default;
+  transition: all 0.2s ease;
+}
+
+.ship-brief-upgrade-slot.equipped {
+  color: #ffb347;
+  background: rgba(255, 179, 71, 0.1);
+  border-color: rgba(255, 179, 71, 0.3);
+}
+
+.ship-brief-upgrade-slot:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile adjustments for progression */
+@media (max-width: 600px) {
+  .ship-brief-level-row {
+    flex-wrap: wrap;
+  }
+  
+  .ship-brief-xp-bar {
+    flex: 0 0 100%;
+    order: 3;
+    margin-top: 0.3rem;
+  }
+  
+  .ship-brief-xp-text {
+    min-width: auto;
+  }
+  
+  .ship-brief-upgrades {
+    justify-content: flex-start;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SHIP MOOD INDICATOR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ship-brief-mood {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  border-left: 2px solid var(--phosphor-dim);
+}
+
+.ship-brief-mood .mood-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: mood-pulse 2s ease-in-out infinite;
+}
+
+.ship-brief-mood .mood-indicator.mood-confident {
+  background: #33ff99;
+  box-shadow: 0 0 8px rgba(51, 255, 153, 0.5);
+}
+
+.ship-brief-mood .mood-indicator.mood-optimistic {
+  background: #66ffbb;
+}
+
+.ship-brief-mood .mood-indicator.mood-neutral {
+  background: #888;
+}
+
+.ship-brief-mood .mood-indicator.mood-cautious {
+  background: #ffcc00;
+}
+
+.ship-brief-mood .mood-indicator.mood-defensive {
+  background: #ff9900;
+}
+
+.ship-brief-mood .mood-indicator.mood-strained {
+  background: #ff6666;
+  animation: mood-alert 1s ease-in-out infinite;
+}
+
+.ship-brief-mood .mood-indicator.mood-critical {
+  background: #ff3333;
+  animation: mood-alert 0.5s ease-in-out infinite;
+}
+
+.ship-brief-mood .mood-text {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+@keyframes mood-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes mood-alert {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TELEMETRY TRAITS (Language that mirrors data)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ship-brief-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.trait-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem 0;
+  cursor: help;
+  transition: background 0.15s;
+}
+
+.trait-row:hover {
+  background: rgba(51, 255, 153, 0.05);
+}
+
+.trait-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trait-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Trait mood colors */
+.trait-row[data-mood="confident"] .trait-value {
+  color: var(--phosphor);
+}
+
+.trait-row[data-mood="aggressive"] .trait-value {
+  color: #ff9933;
+}
+
+.trait-row[data-mood="neutral"] .trait-value {
+  color: var(--text);
+}
+
+.trait-row[data-mood="cautious"] .trait-value {
+  color: var(--amber);
+}
+
+.trait-row[data-mood="strained"] .trait-value {
+  color: #ff9999;
+}
+
+.trait-row[data-mood="critical"] .trait-value {
+  color: var(--red);
+  animation: trait-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes trait-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Personality section */
+.trait-personality {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.5rem;
+  margin-top: 0.35rem;
+  border-top: 1px dashed var(--border);
+  cursor: help;
+}
+
+.personality-archetype {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--phosphor);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.personality-summary {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.4;
+}

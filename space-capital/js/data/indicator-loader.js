@@ -16,7 +16,9 @@
 const IndicatorLoader = (function() {
   'use strict';
   
-  const BASE_PATH = 'data/indicators/45m/';
+  // Auto-detect if we're in a subdirectory and adjust paths
+  const PATH_PREFIX = window.location.pathname.includes('/html/') ? '../' : '';
+  const BASE_PATH = PATH_PREFIX + 'data/indicators/45m/';
   let manifest = null;
   let cache = {};
   

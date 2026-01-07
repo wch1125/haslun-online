@@ -11,15 +11,12 @@
   // ─────────────────────────────────────────────────────────────────────────
   // MODULE REGISTRY
   // Paths are relative to html/space-capital.html
+  // Only includes functional, maintained modules
   // ─────────────────────────────────────────────────────────────────────────
   const MODULES = [
     { id: 'derivatives',   label: '📊 Derivatives Console', url: 'derivatives.html' },
     { id: 'ship-select',   label: '🚀 Ship Select',         url: 'ship-select.html' },
-    { id: 'paint-bay',     label: '🎨 Paint Bay',           url: 'paint-bay.html' },
-    { id: 'sprite-tests',  label: '🔧 Sprite Tests',        url: 'sprite-upgrades.html' },
-    { id: 'behavior-demo', label: '⚡ Behavior Demo',       url: 'ship-behavior-demo.html' },
-    { id: 'parallax-run',  label: '🏁 Parallax Run',        url: 'parallax-run.html' },
-    { id: 'legacy',        label: '📁 Legacy Index',        url: 'index-legacy.html' }
+    { id: 'behavior-demo', label: '⚡ Behavior Demo',       url: 'ship-behavior-demo.html' }
   ];
 
   // ─────────────────────────────────────────────────────────────────────────

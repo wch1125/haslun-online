@@ -164,12 +164,12 @@
   // ─────────────────────────────────────────────────────────────────────────
 
   function getShipGif(ticker, type = 'idle') {
-    return `assets/ships/animated/gifs/${ticker}_${type}.gif`;
+    return `../assets/ships/animated/gifs/${ticker}_${type}.gif`;
   }
 
   function getShipStatic(ticker) {
     const sprites = window.SHIP_SPRITES || {};
-    return sprites[ticker] || window.DEFAULT_SHIP_SPRITE || 'assets/ships/static/Unclaimed-Drone-ship.png';
+    return sprites[ticker] || window.DEFAULT_SHIP_SPRITE || '../assets/ships/static/Unclaimed-Drone-ship.png';
   }
 
   function renderStatBar(stat, animate = true) {

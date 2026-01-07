@@ -1,0 +1,830 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SHIP SELECT :: Mario Kart-style ship selection screen
+   Retro CRT aesthetic with data-driven stat visualization
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   VARIABLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-screen {
+  --ss-bg: #0a0c0f;
+  --ss-panel: rgba(15, 25, 20, 0.95);
+  --ss-border: rgba(51, 255, 153, 0.3);
+  --ss-glow: rgba(51, 255, 153, 0.6);
+  --ss-text: rgba(200, 255, 220, 0.95);
+  --ss-text-dim: rgba(150, 200, 170, 0.7);
+  --ss-accent: #33ff99;
+  --ss-amber: #ffb347;
+  --ss-cyan: #4ecdc4;
+  --ss-red: #ff6b6b;
+  --ss-card-bg: linear-gradient(145deg, rgba(20, 35, 25, 0.98), rgba(10, 20, 15, 0.98));
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MAIN SCREEN LAYOUT
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-screen {
+  min-height: 100vh;
+  background: var(--ss-bg);
+  padding: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--ss-text);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.ship-select-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.15) 2px,
+      rgba(0, 0, 0, 0.15) 4px
+    );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--ss-border);
+}
+
+.ship-select-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--ss-accent);
+  text-shadow: 
+    0 0 10px var(--ss-glow),
+    0 0 20px var(--ss-glow),
+    0 0 40px rgba(51, 255, 153, 0.3);
+  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { text-shadow: 0 0 10px var(--ss-glow), 0 0 20px var(--ss-glow); }
+  50% { text-shadow: 0 0 20px var(--ss-glow), 0 0 40px var(--ss-glow), 0 0 60px var(--ss-glow); }
+}
+
+.title-icon {
+  font-size: 1.5em;
+  animation: rocketBounce 1.5s ease-in-out infinite;
+}
+
+.title-icon:last-child {
+  animation-delay: -0.75s;
+}
+
+@keyframes rocketBounce {
+  0%, 100% { transform: translateY(0) rotate(-15deg); }
+  50% { transform: translateY(-8px) rotate(15deg); }
+}
+
+.ship-select-subtitle {
+  font-size: 0.75rem;
+  color: var(--ss-text-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LEGEND
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--ss-panel);
+  border: 1px solid var(--ss-border);
+  border-radius: 4px;
+}
+
+.legend-item {
+  font-size: 0.65rem;
+  color: var(--ss-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.legend-icon {
+  font-size: 0.9em;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD GRID
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 0.5rem;
+}
+
+@media (min-width: 1200px) {
+  .ship-select-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SHIP CARD
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-card {
+  background: var(--ss-card-bg);
+  border: 1px solid var(--ss-border);
+  border-radius: 8px;
+  padding: 1rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.ship-select-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(51, 255, 153, 0.05) 0%,
+    transparent 50%,
+    rgba(51, 255, 153, 0.02) 100%
+  );
+  pointer-events: none;
+}
+
+.ship-select-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(51, 255, 153, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.ship-select-card:hover {
+  border-color: var(--ss-accent);
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(51, 255, 153, 0.2),
+    inset 0 0 20px rgba(51, 255, 153, 0.05);
+}
+
+.ship-select-card:hover::after {
+  left: 100%;
+}
+
+.ship-select-card.selected {
+  border-color: var(--ss-amber);
+  box-shadow: 
+    0 0 30px rgba(255, 179, 71, 0.3),
+    inset 0 0 30px rgba(255, 179, 71, 0.1);
+}
+
+.ship-select-card.selected::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 179, 71, 0.1) 0%,
+    transparent 50%,
+    rgba(255, 179, 71, 0.05) 100%
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD HEADER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(51, 255, 153, 0.15);
+}
+
+.ship-card-tier {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--tier-color, #888);
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--tier-color, #888);
+  border-radius: 4px;
+  text-shadow: 0 0 10px var(--tier-color);
+  box-shadow: 
+    0 0 10px rgba(0, 0, 0, 0.5),
+    inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.ship-card-class {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ss-accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ship-card-designation {
+  margin-left: auto;
+  font-size: 0.6rem;
+  color: var(--ss-text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD VISUAL (SHIP SPRITE)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-card-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+  min-height: 120px;
+  position: relative;
+}
+
+.ship-card-sprite-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ship-card-sprite {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 8px var(--ss-glow));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.ship-select-card:hover .ship-card-sprite {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 15px var(--ss-glow));
+}
+
+.ship-select-card.selected .ship-card-sprite {
+  filter: drop-shadow(0 0 20px rgba(255, 179, 71, 0.8));
+}
+
+.ship-card-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(
+    circle at center,
+    rgba(51, 255, 153, 0.15) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.ship-select-card.selected .ship-card-glow {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 179, 71, 0.2) 0%,
+    transparent 70%
+  );
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD INFO
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-card-info {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.ship-card-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ss-text);
+  margin-bottom: 0.25rem;
+}
+
+.ship-card-ticker {
+  font-size: 0.9rem;
+  color: var(--ss-accent);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.ship-card-specialty {
+  font-size: 0.65rem;
+  color: var(--ss-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-top: 0.25rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STAT BARS (MARIO KART STYLE)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.ship-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ship-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.ship-stat-icon {
+  font-size: 0.8rem;
+  width: 18px;
+  text-align: center;
+}
+
+.ship-stat-name {
+  font-size: 0.55rem;
+  color: var(--ss-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ship-stat-bar-container {
+  flex: 1;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(51, 255, 153, 0.2);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ship-stat-bar {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--stat-color) 0%,
+    color-mix(in srgb, var(--stat-color) 70%, white) 100%
+  );
+  border-radius: 1px;
+  position: relative;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: var(--anim-delay, 0s);
+  box-shadow: 
+    0 0 8px var(--stat-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.ship-stat-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 4px,
+    rgba(0, 0, 0, 0.2) 4px,
+    rgba(0, 0, 0, 0.2) 5px
+  );
+}
+
+.ship-stat-value {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--ss-text);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   OVERALL RATING
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-card-overall {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--ss-border);
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.overall-label {
+  font-size: 0.65rem;
+  color: var(--ss-text-dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.overall-value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ss-amber);
+  text-shadow: 0 0 10px rgba(255, 179, 71, 0.6);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD FOOTER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-card-footer {
+  text-align: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(51, 255, 153, 0.1);
+  margin-bottom: 0.75rem;
+}
+
+.ship-card-codename {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--ss-cyan);
+  margin-bottom: 0.25rem;
+}
+
+.ship-card-sector {
+  font-size: 0.55rem;
+  color: var(--ss-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SELECT BUTTON
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-btn {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--ss-bg);
+  background: linear-gradient(180deg, var(--ss-accent), #28cc7a);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.ship-select-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px var(--ss-glow);
+}
+
+.ship-select-btn:active {
+  transform: scale(0.98);
+}
+
+.ship-select-btn .btn-text {
+  position: relative;
+  z-index: 1;
+}
+
+.ship-select-btn .btn-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+.ship-select-btn:hover .btn-glow {
+  transform: translateX(100%);
+}
+
+.ship-select-card.selected .ship-select-btn {
+  background: linear-gradient(180deg, var(--ss-amber), #e6952a);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FOOTER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ss-border);
+}
+
+.footer-hint {
+  font-size: 0.7rem;
+  color: var(--ss-text-dim);
+  margin-bottom: 0.5rem;
+}
+
+.footer-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  font-size: 0.6rem;
+  color: var(--ss-text-dim);
+  opacity: 0.7;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MODAL OVERLAY
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ship-select-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.ship-select-modal.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ship-select-modal.closing {
+  opacity: 0;
+}
+
+.ship-select-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(4px);
+}
+
+.ship-select-modal-content {
+  position: relative;
+  width: 95vw;
+  max-width: 1400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--ss-bg);
+  border: 1px solid var(--ss-border);
+  border-radius: 8px;
+  box-shadow: 0 0 60px rgba(51, 255, 153, 0.2);
+}
+
+.ship-select-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--ss-text-dim);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--ss-border);
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.ship-select-modal-close:hover {
+  color: var(--ss-accent);
+  border-color: var(--ss-accent);
+}
+
+.ship-select-modal-body {
+  padding: 0;
+}
+
+.ship-select-modal-body .ship-select-screen {
+  min-height: auto;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMPACT CARD (FOR INLINE USE)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.compact-ship-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--ss-panel);
+  border: 1px solid var(--ss-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.compact-ship-card:hover {
+  border-color: var(--ss-accent);
+  background: rgba(51, 255, 153, 0.05);
+}
+
+.compact-tier {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  width: 24px;
+  text-align: center;
+}
+
+.compact-sprite {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.compact-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.compact-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ss-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compact-class {
+  font-size: 0.55rem;
+  color: var(--ss-text-dim);
+  text-transform: uppercase;
+}
+
+.compact-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 60px;
+}
+
+.mini-stat {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.mini-stat-fill {
+  height: 100%;
+  border-radius: 1px;
+}
+
+.compact-overall {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ss-amber);
+  width: 36px;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .ship-select-screen {
+    padding: 1rem 0.5rem;
+  }
+  
+  .ship-select-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .ship-select-legend {
+    font-size: 0.55rem;
+    gap: 0.5rem 1rem;
+  }
+  
+  .ship-card-sprite-container {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .ship-stat-label {
+    width: 60px;
+  }
+  
+  .ship-stat-name {
+    font-size: 0.5rem;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ANIMATIONS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ship-select-card {
+  animation: cardEnter 0.5s ease backwards;
+}
+
+.ship-select-card:nth-child(1) { animation-delay: 0.05s; }
+.ship-select-card:nth-child(2) { animation-delay: 0.1s; }
+.ship-select-card:nth-child(3) { animation-delay: 0.15s; }
+.ship-select-card:nth-child(4) { animation-delay: 0.2s; }
+.ship-select-card:nth-child(5) { animation-delay: 0.25s; }
+.ship-select-card:nth-child(6) { animation-delay: 0.3s; }
+.ship-select-card:nth-child(7) { animation-delay: 0.35s; }
+.ship-select-card:nth-child(8) { animation-delay: 0.4s; }
+.ship-select-card:nth-child(9) { animation-delay: 0.45s; }
+.ship-select-card:nth-child(10) { animation-delay: 0.5s; }
+.ship-select-card:nth-child(11) { animation-delay: 0.55s; }
+.ship-select-card:nth-child(12) { animation-delay: 0.6s; }
+.ship-select-card:nth-child(13) { animation-delay: 0.65s; }
+.ship-select-card:nth-child(14) { animation-delay: 0.7s; }
+.ship-select-card:nth-child(15) { animation-delay: 0.75s; }

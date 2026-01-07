@@ -310,27 +310,30 @@ const SHIP_NAMES = {
 
 // =========================================================================
 // SHIP SPRITES — PNG sprite paths for each ticker
+// Detect if we're in a subdirectory and adjust paths accordingly
 // =========================================================================
+const ASSET_PREFIX = window.location.pathname.includes('/html/') ? '../' : '';
+
 const SHIP_SPRITES = {
-  ACHR: 'assets/ships/static/ACHR-eVTOL-ship.png',
-  ASTS: 'assets/ships/static/ASTS-Communications-Relay-Ship.png',
-  BKSY: 'assets/ships/static/BKSY-recon-ship.png',
-  COHR: 'assets/ships/static/COHR-Glass-Reflector-ship.png',
-  EVEX: 'assets/ships/static/EVEX-Transport-Ship.png',
-  GE: 'assets/ships/static/GE-Stealth-Bomber-ship.png',
-  GME: 'assets/ships/static/GME-moonshot-ship.png',
-  JOBY: 'assets/ships/static/JOBY-eVTOL-light-class-ship.png',
-  KTOS: 'assets/ships/static/KTOS-Fighter-Ship.png',
-  LHX: 'assets/ships/static/LHX-Drone-ship.png',
-  LUNR: 'assets/ships/static/LUNR-lander-ship.png',
-  PL: 'assets/ships/static/PL-scout-ship.png',
-  RDW: 'assets/ships/static/RDW-Hauler-ship.png',
-  RKLB: 'assets/ships/static/RKLB-flagship-ship.png',
-  RTX: 'assets/ships/static/RTX-Officer-Class-Ship.png'
+  ACHR: `${ASSET_PREFIX}assets/ships/static/ACHR-eVTOL-ship.png`,
+  ASTS: `${ASSET_PREFIX}assets/ships/static/ASTS-Communications-Relay-Ship.png`,
+  BKSY: `${ASSET_PREFIX}assets/ships/static/BKSY-recon-ship.png`,
+  COHR: `${ASSET_PREFIX}assets/ships/static/COHR-Glass-Reflector-ship.png`,
+  EVEX: `${ASSET_PREFIX}assets/ships/static/EVEX-Transport-Ship.png`,
+  GE: `${ASSET_PREFIX}assets/ships/static/GE-Stealth-Bomber-ship.png`,
+  GME: `${ASSET_PREFIX}assets/ships/static/GME-moonshot-ship.png`,
+  JOBY: `${ASSET_PREFIX}assets/ships/static/JOBY-eVTOL-light-class-ship.png`,
+  KTOS: `${ASSET_PREFIX}assets/ships/static/KTOS-Fighter-Ship.png`,
+  LHX: `${ASSET_PREFIX}assets/ships/static/LHX-Drone-ship.png`,
+  LUNR: `${ASSET_PREFIX}assets/ships/static/LUNR-lander-ship.png`,
+  PL: `${ASSET_PREFIX}assets/ships/static/PL-scout-ship.png`,
+  RDW: `${ASSET_PREFIX}assets/ships/static/RDW-Hauler-ship.png`,
+  RKLB: `${ASSET_PREFIX}assets/ships/static/RKLB-flagship-ship.png`,
+  RTX: `${ASSET_PREFIX}assets/ships/static/RTX-Officer-Class-Ship.png`
 };
 
 // Default fallback sprite for tickers without custom ships
-const DEFAULT_SHIP_SPRITE = 'assets/ships/static/Unclaimed-Drone-ship.png';
+const DEFAULT_SHIP_SPRITE = `${ASSET_PREFIX}assets/ships/static/Unclaimed-Drone-ship.png`;
 
 // =========================================================================
   // Expose globally for use by other modules
