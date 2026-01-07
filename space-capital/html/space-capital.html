@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPACE CAPITAL // FLEET COMMAND</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Shared theme variables -->
+  <link rel="stylesheet" href="../css/theme.css">
+  <!-- Module viewer overlay -->
+  <link rel="stylesheet" href="../css/module-viewer.css">
   <style>
     /* =========================================================================
        HOTLINE MIAMI AESTHETIC - SPACE CAPITAL
@@ -976,6 +980,7 @@
         </div>
       </div>
       <div class="header-status">
+        <button id="openModulesBtn" class="moduleViewer__trigger">🧰 MODULES</button>
         <div class="status-item">
           <span class="status-dot online" id="system-status"></span>
           <span>SYSTEMS ONLINE</span>
@@ -1649,5 +1654,23 @@
     // Start
     init();
   </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MODULE VIEWER OVERLAY
+       Iframe-based viewer for orphan pages without CSS conflicts
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="moduleViewer" class="moduleViewer" aria-hidden="true">
+    <div class="moduleViewer__panel" role="dialog" aria-modal="true" aria-label="Module Viewer">
+      <div class="moduleViewer__bar">
+        <div class="moduleViewer__title">MODULE VIEWER</div>
+        <select id="moduleViewerSelect" class="moduleViewer__select" aria-label="Choose module"></select>
+        <button id="moduleViewerClose" class="moduleViewer__btn moduleViewer__btn--close">✕ CLOSE</button>
+      </div>
+      <iframe id="moduleViewerFrame" class="moduleViewer__frame" title="Module content"></iframe>
+    </div>
+  </div>
+
+  <!-- Module Viewer Script -->
+  <script src="../js/ui/module-viewer.js"></script>
 </body>
 </html>
