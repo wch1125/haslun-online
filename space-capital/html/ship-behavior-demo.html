@@ -596,6 +596,43 @@
     
     // Initial update
     updatePreview();
+
+    // Listen for messages from parent (module viewer)
+    // Allows fleet dashboard to open this page with specific ship context
+    window.addEventListener('message', (e) => {
+      if (!e.data || e.data.type !== 'SHIP_BEHAVIOR_SET') return;
+      
+      const { ticker, stats } = e.data;
+      console.log('[BehaviorDemo] Received ship data:', ticker, stats);
+
+      // Update preview image to show the selected ship
+      const img = document.getElementById('preview-img');
+      if (img && ticker) {
+        img.src = `../assets/ships/animated/${ticker}/${ticker}_base.png`;
+        img.onerror = () => {
+          img.src = `../assets/ships/static/${ticker}-flagship-ship.png`;
+        };
+      }
+
+      // Update sliders to match the ship's current stats
+      if (stats) {
+        if (sliders.pnl && stats.pnlPercent !== undefined) {
+          sliders.pnl.value = Math.max(-20, Math.min(20, stats.pnlPercent));
+        }
+        if (sliders.vol && stats.volatility !== undefined) {
+          sliders.vol.value = Math.min(10, stats.volatility * 100);
+        }
+        if (sliders.hull && stats.hull !== undefined) {
+          sliders.hull.value = stats.hull;
+        }
+        if (sliders.fuel && stats.fuel !== undefined) {
+          sliders.fuel.value = stats.fuel;
+        }
+        
+        // Trigger update to apply new values
+        updatePreview();
+      }
+    });
   </script>
 </body>
 </html>

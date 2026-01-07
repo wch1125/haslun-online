@@ -223,7 +223,9 @@
           <div class="ship-card-sprite-container">
             <img src="${getShipGif(ticker, 'idle')}" 
                  alt="${ticker}" 
-                 class="ship-card-sprite"
+                 class="ship-card-sprite ship-behavior"
+                 data-ticker="${ticker}"
+                 data-ship-class="${classData.class}"
                  onerror="this.src='${getShipStatic(ticker)}'">
             <div class="ship-card-glow"></div>
           </div>
@@ -324,6 +326,42 @@
         const value = bar.dataset.value;
         bar.style.width = value + '%';
       });
+
+      // Initialize ShipBehavior on each ship sprite
+      if (window.ShipBehavior) {
+        container.querySelectorAll('.ship-card-sprite').forEach(img => {
+          const ticker = img.dataset.ticker;
+          const shipClass = img.dataset.shipClass || 'Ship';
+          const shipStats = shipData.find(s => s.ticker === ticker)?.stats;
+          
+          if (!img._behaviorController) {
+            img._behaviorController = ShipBehavior.create(img, {
+              ticker,
+              shipClass
+            });
+          }
+
+          // Use calculated stats to drive behavior
+          if (img._behaviorController && shipStats) {
+            // Map ship stats to behavior inputs:
+            // - POWER (1Y return) → P&L proxy
+            // - LUCK (volatility) → volatility
+            // - ARMOR (52W position) → hull proxy
+            // - Overall → fuel proxy
+            const pnlPercent = (shipStats.POWER?.value ?? 50) - 50; // Center at 0
+            const volatility = Math.max(0.01, (100 - (shipStats.LUCK?.value ?? 50)) / 1000); // Lower luck = more volatile
+            const hull = shipStats.ARMOR?.value ?? 75;
+            const fuel = shipStats.OVERALL ?? 50;
+
+            img._behaviorController.updateStats({
+              pnlPercent,
+              volatility,
+              hull,
+              fuel
+            });
+          }
+        });
+      }
     });
 
     // Attach event listeners

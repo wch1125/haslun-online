@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Shared theme variables -->
   <link rel="stylesheet" href="../css/theme.css">
+  <!-- Ship behavior states (thrust, volatility, hull effects) -->
+  <link rel="stylesheet" href="../css/ship-states.css">
   <!-- Module viewer overlay -->
   <link rel="stylesheet" href="../css/module-viewer.css">
   <style>
@@ -649,6 +651,93 @@
     @keyframes critical-flash {
       0%, 100% { filter: drop-shadow(0 0 8px var(--red-alert)); }
       50% { filter: drop-shadow(0 0 20px var(--red-alert)) brightness(1.2); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       BEHAVIOR STATUS BADGES
+       Visual state indicators below ship display
+       ═══════════════════════════════════════════════════════════════════════ */
+    
+    .behavior-badges {
+      display: flex;
+      gap: 0.25rem;
+      justify-content: center;
+      margin-top: 0.25rem;
+      padding: 0.25rem;
+      background: var(--bg-void);
+      border: 1px solid var(--border-dim);
+      font-size: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+    
+    .behavior-badge {
+      padding: 0.15rem 0.35rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dim);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+    }
+    
+    /* Thrust states */
+    .behavior-badge[data-state="THRUST++"] {
+      color: var(--green-neon);
+      border-color: var(--green-neon);
+      box-shadow: 0 0 4px rgba(57, 255, 20, 0.3);
+    }
+    .behavior-badge[data-state="THRUST+"] {
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+    .behavior-badge[data-state="DRIFT"] {
+      color: var(--orange);
+      border-color: var(--orange);
+    }
+    .behavior-badge[data-state="FAIL"] {
+      color: var(--red-alert);
+      border-color: var(--red-alert);
+      animation: badge-pulse 0.5s ease-in-out infinite;
+    }
+    
+    /* Stability states */
+    .behavior-badge[data-state="STABLE"] {
+      color: var(--cyan);
+    }
+    .behavior-badge[data-state="ELEV"] {
+      color: var(--yellow);
+      border-color: var(--yellow);
+    }
+    .behavior-badge[data-state="HIGH"] {
+      color: var(--orange);
+      border-color: var(--orange);
+    }
+    .behavior-badge[data-state="EXTREME"] {
+      color: var(--red-alert);
+      border-color: var(--red-alert);
+      animation: badge-pulse 0.3s ease-in-out infinite;
+    }
+    
+    /* Hull states */
+    .behavior-badge[data-state="HULL OK"] {
+      color: var(--green-neon);
+    }
+    .behavior-badge[data-state="STRESS"] {
+      color: var(--yellow);
+      border-color: var(--yellow);
+    }
+    .behavior-badge[data-state="CRIT"] {
+      color: var(--orange);
+      border-color: var(--orange);
+    }
+    .behavior-badge[data-state="HULL!"] {
+      color: var(--red-alert);
+      border-color: var(--red-alert);
+      animation: badge-pulse 0.3s ease-in-out infinite;
+    }
+    
+    @keyframes badge-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
     /* Telemetry bars - mini horizontal indicators */
@@ -1436,8 +1525,9 @@
         <div class="ship-display">
           <div class="signal-indicator" style="background: ${signalColor}; box-shadow: 0 0 10px ${signalColor};"></div>
           <div class="ship-sprite-wrap" style="--ship-color: ${config.color};">
-            <img class="ship-sprite-img" 
+            <img class="ship-sprite-img ship-behavior" 
                  data-ticker="${position.ticker}"
+                 data-ship-class="${config.class}"
                  data-pnl-pct="${displayPct}"
                  data-volatility="${volatility}"
                  data-trend="${trend}"
@@ -1453,6 +1543,12 @@
             height: ${thrustLength}px;
             opacity: ${0.4 + activity * 0.6};
           "></div>
+        </div>
+
+        <div class="behavior-badges">
+          <span class="behavior-badge" data-badge="thrust" data-state="">--</span>
+          <span class="behavior-badge" data-badge="stability" data-state="">--</span>
+          <span class="behavior-badge" data-badge="hull" data-state="">--</span>
         </div>
 
         <div class="telemetry-bars">
@@ -1521,32 +1617,94 @@
 
       document.getElementById('ship-count').textContent = positions.length;
       
-      // Hydrate animated sprites after DOM update
-      // Use retry in case ShipAnimator hasn't loaded yet
+      // Hydrate animated sprites and behavior controllers after DOM update
       function hydrateSprites() {
-        if (window.ShipAnimator) {
-          ShipAnimator.hydrateShipSprites((ticker) => {
-            const pos = window._fleetPositions[ticker];
-            if (!pos) return {};
+        if (!window.ShipAnimator) {
+          return setTimeout(hydrateSprites, 100);
+        }
+
+        // 1) Hydrate GIF animations via ShipAnimator
+        ShipAnimator.hydrateShipSprites((ticker) => {
+          const pos = window._fleetPositions[ticker];
+          if (!pos) return {};
+          
+          const cost = pos.entry_cost * pos.contracts * 100;
+          const value = pos.current_price * pos.contracts * 100;
+          const pnlPct = cost > 0 ? ((value - cost) / cost * 100) : pos.chgPct;
+          
+          return {
+            pnlPct: pnlPct,
+            volatility: pos.volatility ?? 0.5,
+            trend: pos.trend ?? 0,
+            momentum: pos.momentum ?? 0,
+            activity: pos.activity ?? 0.5,
+            signalState: pos.signalState || 'neutral',
+            damage: pos.visual?.damage ?? 0
+          };
+        });
+
+        // 2) Apply ShipBehavior state machine to each ship
+        if (window.ShipBehavior) {
+          document.querySelectorAll('.ship-sprite-img').forEach((img) => {
+            const ticker = img.dataset.ticker;
+            const pos = window._fleetPositions?.[ticker];
+            if (!pos) return;
+
+            // Get ship class from TICKER_CONFIG
+            const cfg = (window.TICKER_CONFIG && window.TICKER_CONFIG[ticker]) || {};
             
-            // Calculate P&L percentage for animation state
+            // Create behavior controller once per image
+            if (!img._behaviorController) {
+              img._behaviorController = ShipBehavior.create(img, {
+                ticker,
+                shipClass: cfg.class || 'Ship'
+              });
+            }
+
+            // Calculate derived stats
             const cost = pos.entry_cost * pos.contracts * 100;
             const value = pos.current_price * pos.contracts * 100;
             const pnlPct = cost > 0 ? ((value - cost) / cost * 100) : pos.chgPct;
             
-            return {
-              pnlPct: pnlPct,
-              volatility: pos.volatility ?? 0.5,
-              trend: pos.trend ?? 0,
-              momentum: pos.momentum ?? 0,
-              activity: pos.activity ?? 0.5,
-              signalState: pos.signalState || 'neutral',
-              damage: pos.visual?.damage ?? 0
-            };
+            // Map telemetry to behavior inputs
+            const hull = Math.max(0, Math.min(100, 100 - ((pos.visual?.damage ?? 0) * 100)));
+            const fuel = Math.max(0, Math.min(100, (pos.activity ?? 0.5) * 100));
+            const vol = pos.volatility ?? 0.02;
+
+            // Update behavior controller
+            if (img._behaviorController) {
+              img._behaviorController.updateStats({
+                pnlPercent: pnlPct,
+                volatility: vol,
+                hull,
+                fuel
+              });
+            }
+
+            // 3) Update behavior badges on the card
+            const card = img.closest('.ship-card');
+            if (card) {
+              const thrustBadge = card.querySelector('[data-badge="thrust"]');
+              const stabilityBadge = card.querySelector('[data-badge="stability"]');
+              const hullBadge = card.querySelector('[data-badge="hull"]');
+
+              if (thrustBadge) {
+                const state = pnlPct >= 5 ? 'THRUST++' : pnlPct > 0 ? 'THRUST+' : pnlPct > -5 ? 'DRIFT' : 'FAIL';
+                thrustBadge.textContent = state;
+                thrustBadge.dataset.state = state;
+              }
+              if (stabilityBadge) {
+                const state = vol >= 0.08 ? 'EXTREME' : vol >= 0.05 ? 'HIGH' : vol >= 0.03 ? 'ELEV' : 'STABLE';
+                stabilityBadge.textContent = state;
+                stabilityBadge.dataset.state = state;
+              }
+              if (hullBadge) {
+                const state = hull >= 80 ? 'HULL OK' : hull >= 50 ? 'STRESS' : hull >= 25 ? 'CRIT' : 'HULL!';
+                hullBadge.textContent = state;
+                hullBadge.dataset.state = state;
+              }
+            }
           });
-        } else {
-          // Retry after script loads
-          setTimeout(hydrateSprites, 100);
         }
       }
       
@@ -1788,6 +1946,53 @@
       await new Promise(r => setTimeout(r, 500));
       loadingScreen.classList.add('hidden');
 
+      // Ship card click → open behavior demo with context
+      document.getElementById('fleet-grid').addEventListener('click', (e) => {
+        const card = e.target.closest('.ship-card');
+        if (!card) return;
+        
+        const img = card.querySelector('.ship-sprite-img');
+        if (!img) return;
+        
+        const ticker = img.dataset.ticker;
+        const pos = window._fleetPositions?.[ticker];
+        if (!pos) return;
+
+        // Calculate stats for the behavior demo
+        const cost = pos.entry_cost * pos.contracts * 100;
+        const value = pos.current_price * pos.contracts * 100;
+        const pnlPct = cost > 0 ? ((value - cost) / cost * 100) : pos.chgPct;
+        const hull = Math.max(0, Math.min(100, 100 - ((pos.visual?.damage ?? 0) * 100)));
+        const fuel = Math.max(0, Math.min(100, (pos.activity ?? 0.5) * 100));
+        const vol = pos.volatility ?? 0.02;
+
+        // Open module viewer with behavior demo
+        if (window.ModuleViewer) {
+          ModuleViewer.open('behavior-demo');
+          
+          // Wait for iframe to load, then send ship data
+          const frame = document.getElementById('moduleViewerFrame');
+          const sendData = () => {
+            if (frame.contentWindow) {
+              frame.contentWindow.postMessage({
+                type: 'SHIP_BEHAVIOR_SET',
+                ticker,
+                stats: {
+                  pnlPercent: pnlPct,
+                  volatility: vol,
+                  hull,
+                  fuel
+                }
+              }, '*');
+            }
+          };
+          
+          // Send after a delay to ensure iframe is loaded
+          frame.addEventListener('load', sendData, { once: true });
+          setTimeout(sendData, 500); // Fallback
+        }
+      });
+
       // Set up polling for updates
       setInterval(async () => {
         const freshData = await loadData();
@@ -1814,6 +2019,9 @@
       <iframe id="moduleViewerFrame" class="moduleViewer__frame" title="Module content"></iframe>
     </div>
   </div>
+
+  <!-- Ship Behavior Engine - State machine for reactive sprites -->
+  <script src="../js/ships/ship-behavior.js"></script>
 
   <!-- Ship Animator - Telemetry-driven sprite animations -->
   <script src="../js/ui/ship-animator.js"></script>
