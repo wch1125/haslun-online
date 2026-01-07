@@ -1,0 +1,32 @@
+{
+  "symbol": "GE",
+  "tf": "15m",
+  "asOf": 1767621600000,
+  "price": 322.05,
+  "chgPct": 0.1057,
+  "trend": 0.801,
+  "momentum": 0.0756,
+  "volatility": 0.0007,
+  "activity": 0.9463,
+  "signalState": "bull",
+  "relativePerformance": 0,
+  "risk": {
+    "drawdown": -0.0008,
+    "stress": 0.0027
+  },
+  "indicators": {
+    "macd": 0.1467,
+    "signal": 0.1084,
+    "hist": 0.0383,
+    "g100": 314.9679888660966,
+    "g150": 313.87625727602045,
+    "g200": 313.39915626201247
+  },
+  "visual": {
+    "glow": 0.6851,
+    "jitter": 0.001,
+    "thrust": 0.1512,
+    "cohesion": 0.9986,
+    "ring": 0.0005
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "symbol": "ASTS",
+  "tf": "45m",
+  "asOf": 1767385800000,
+  "price": 83.2225,
+  "chgPct": 0.8941,
+  "trend": 0.8972,
+  "momentum": 0.989,
+  "volatility": 0.0129,
+  "activity": 0.6724,
+  "signalState": "bull",
+  "relativePerformance": 0.2361,
+  "risk": {
+    "drawdown": -0.1044,
+    "stress": 0.3196
+  },
+  "indicators": {
+    "macd": 1.9267,
+    "signal": 0.4695,
+    "hist": 1.4572,
+    "g100": 74.0,
+    "g150": 74.62,
+    "g200": 71.82
+  },
+  "visual": {
+    "glow": 0.7673,
+    "jitter": 0.0194,
+    "thrust": 1,
+    "cohesion": 0.8827,
+    "ring": 0.0103
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "symbol": "RKLB",
+  "tf": "15m",
+  "asOf": 1767621600000,
+  "price": 75.0225,
+  "chgPct": 0.08,
+  "trend": 0.7951,
+  "momentum": 0.0571,
+  "volatility": 0.0018,
+  "activity": 0.2614,
+  "signalState": "bull",
+  "relativePerformance": -0.0662,
+  "risk": {
+    "drawdown": -0.0185,
+    "stress": 0.0565
+  },
+  "indicators": {
+    "macd": -0.1111,
+    "signal": -0.1638,
+    "hist": 0.0527,
+    "g100": 72.91781157105393,
+    "g150": 72.2445497575345,
+    "g200": 72.1175426342818
+  },
+  "visual": {
+    "glow": 0.2001,
+    "jitter": 0.0027,
+    "thrust": 0.1143,
+    "cohesion": 0.9796,
+    "ring": 0.0015
+  }
+}

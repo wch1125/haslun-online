@@ -1,0 +1,32 @@
+{
+  "symbol": "BKSY",
+  "tf": "15m",
+  "asOf": 1767621600000,
+  "price": 21.69,
+  "chgPct": 0.4632,
+  "trend": 0.4361,
+  "momentum": -0.0212,
+  "volatility": 0.0054,
+  "activity": 0.4132,
+  "signalState": "neutral",
+  "relativePerformance": 0.0702,
+  "risk": {
+    "drawdown": -0.0141,
+    "stress": 0.045
+  },
+  "indicators": {
+    "macd": 0.1385,
+    "signal": 0.1685,
+    "hist": -0.03,
+    "g100": 19.91696519971133,
+    "g150": 19.713539123159684,
+    "g200": 19.589300601599067
+  },
+  "visual": {
+    "glow": 0.2956,
+    "jitter": 0.0081,
+    "thrust": 0.0424,
+    "cohesion": 0.9805,
+    "ring": 0.0043
+  }
+}

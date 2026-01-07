@@ -1,0 +1,32 @@
+{
+  "symbol": "LHX",
+  "tf": "45m",
+  "asOf": 1767385800000,
+  "price": 303.89,
+  "chgPct": 0.2966,
+  "trend": 0.8268,
+  "momentum": 0.9722,
+  "volatility": 0.0031,
+  "activity": 1,
+  "signalState": "bull",
+  "relativePerformance": 0,
+  "risk": {
+    "drawdown": -0.0022,
+    "stress": 0.0081
+  },
+  "indicators": {
+    "macd": 1.8145,
+    "signal": 0.7616,
+    "hist": 1.053,
+    "g100": 291.67,
+    "g150": 289.81,
+    "g200": 286.52
+  },
+  "visual": {
+    "glow": 0.9917,
+    "jitter": 0.0047,
+    "thrust": 1,
+    "cohesion": 0.9947,
+    "ring": 0.0025
+  }
+}

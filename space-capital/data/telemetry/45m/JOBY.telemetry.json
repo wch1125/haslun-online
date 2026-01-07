@@ -1,0 +1,32 @@
+{
+  "symbol": "JOBY",
+  "tf": "45m",
+  "asOf": 1767385800000,
+  "price": 14.2538,
+  "chgPct": 1.0009,
+  "trend": 0.0767,
+  "momentum": 0.2055,
+  "volatility": 0.0067,
+  "activity": 1,
+  "signalState": "bull",
+  "relativePerformance": 0.1677,
+  "risk": {
+    "drawdown": -0.0197,
+    "stress": 0.0624
+  },
+  "indicators": {
+    "macd": 0.1865,
+    "signal": 0.0597,
+    "hist": 0.1268,
+    "g100": 13.92,
+    "g150": 14.31,
+    "g200": 14.38
+  },
+  "visual": {
+    "glow": 0.7616,
+    "jitter": 0.01,
+    "thrust": 0.411,
+    "cohesion": 0.9736,
+    "ring": 0.0054
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "symbol": "EVEX",
+  "tf": "45m",
+  "asOf": 1767385800000,
+  "price": 4.1787,
+  "chgPct": 0.7231,
+  "trend": -0.3517,
+  "momentum": 0.0327,
+  "volatility": 0.0056,
+  "activity": 1,
+  "signalState": "neutral",
+  "relativePerformance": 0,
+  "risk": {
+    "drawdown": -0.0629,
+    "stress": 0.1914
+  },
+  "indicators": {
+    "macd": 0.0297,
+    "signal": 0.0094,
+    "hist": 0.0202,
+    "g100": 4.45,
+    "g150": 4.56,
+    "g200": 4.6
+  },
+  "visual": {
+    "glow": 0.7098,
+    "jitter": 0.0084,
+    "thrust": 0.0655,
+    "cohesion": 0.9315,
+    "ring": 0.0045
+  }
+}

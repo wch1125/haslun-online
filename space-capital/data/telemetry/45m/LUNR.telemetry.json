@@ -1,0 +1,32 @@
+{
+  "symbol": "LUNR",
+  "tf": "45m",
+  "asOf": 1767385800000,
+  "price": 17.835,
+  "chgPct": 0.8624,
+  "trend": 0.8954,
+  "momentum": 0.1744,
+  "volatility": 0.0141,
+  "activity": 0.5296,
+  "signalState": "bull",
+  "relativePerformance": 0.2303,
+  "risk": {
+    "drawdown": -0.0152,
+    "stress": 0.0526
+  },
+  "indicators": {
+    "macd": 0.3569,
+    "signal": 0.2706,
+    "hist": 0.0863,
+    "g100": 14.5,
+    "g150": 13.61,
+    "g200": 12.79
+  },
+  "visual": {
+    "glow": 0.423,
+    "jitter": 0.0211,
+    "thrust": 0.3487,
+    "cohesion": 0.9707,
+    "ring": 0.0113
+  }
+}

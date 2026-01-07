@@ -1,0 +1,32 @@
+{
+  "symbol": "RTX",
+  "tf": "45m",
+  "asOf": 1767385800000,
+  "price": 186.9725,
+  "chgPct": 0.2641,
+  "trend": 0.8166,
+  "momentum": 0.7269,
+  "volatility": 0.0017,
+  "activity": 1,
+  "signalState": "bull",
+  "relativePerformance": 0,
+  "risk": {
+    "drawdown": -0.0016,
+    "stress": 0.0056
+  },
+  "indicators": {
+    "macd": 0.5697,
+    "signal": 0.1116,
+    "hist": 0.4582,
+    "g100": 183.02,
+    "g150": 180.83,
+    "g200": 178.04
+  },
+  "visual": {
+    "glow": 0.9181,
+    "jitter": 0.0026,
+    "thrust": 1,
+    "cohesion": 0.9967,
+    "ring": 0.0014
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "portfolio",
+  "asOf": 1767385800000,
+  "healthScore": 0.775,
+  "volatility": 0.008,
+  "drawdown": -0.0312,
+  "sentiment": 0.9925,
+  "dayChange": 0.0492,
+  "summary": {
+    "avgMomentum": 0.4925,
+    "avgVolatility": 0.008,
+    "avgStress": 0.1039,
+    "tickerCount": 15
+  }
+}

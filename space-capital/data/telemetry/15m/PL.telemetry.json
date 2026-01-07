@@ -1,0 +1,32 @@
+{
+  "symbol": "PL",
+  "tf": "15m",
+  "asOf": 1767621600000,
+  "price": 20.5425,
+  "chgPct": 0.134,
+  "trend": 0.4037,
+  "momentum": -0.0115,
+  "volatility": 0.0014,
+  "activity": 0.2963,
+  "signalState": "neutral",
+  "relativePerformance": -0.0378,
+  "risk": {
+    "drawdown": -0.0129,
+    "stress": 0.0392
+  },
+  "indicators": {
+    "macd": 0.0053,
+    "signal": 0.0141,
+    "hist": -0.0088,
+    "g100": 20.202748897279537,
+    "g150": 20.0667490223682,
+    "g200": 20.03795024570884
+  },
+  "visual": {
+    "glow": 0.2109,
+    "jitter": 0.002,
+    "thrust": 0.023,
+    "cohesion": 0.9858,
+    "ring": 0.0011
+  }
+}

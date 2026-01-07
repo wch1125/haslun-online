@@ -4,7 +4,7 @@
  * ═══════════════════════════════════════════════════════════════════════════
  * 
  * Connects the OrbitalObservatory to:
- * - Existing Telemetry system
+ * - Real Telemetry data from TelemetryData loader
  * - Ship sprite rendering
  * - Selection panel UI
  * - Cockpit navigation
@@ -22,6 +22,7 @@
     container: null,
     isInitialized: false,
     updateInterval: null,
+    currentTimeframe: '1D',
     
     // ─────────────────────────────────────────────────────────────────────────
     // INITIALIZATION
@@ -52,8 +53,17 @@
       this.resize();
       window.addEventListener('resize', () => this.resize());
       
-      // Add portfolio tickers as fleets
-      this.initializeFleets();
+      // Wait for telemetry data to load, then add fleets
+      if (window.TelemetryData?.isLoaded) {
+        this.initializeFleets();
+      } else {
+        window.addEventListener('telemetry-loaded', () => {
+          this.initializeFleets();
+          this.updateTelemetry();
+        });
+        // Also try after a short delay as fallback
+        setTimeout(() => this.initializeFleets(), 500);
+      }
       
       // Set up callbacks
       this.observatory.onSelect = (body) => this.onBodySelect(body);
@@ -90,18 +100,26 @@
     // ─────────────────────────────────────────────────────────────────────────
     
     initializeFleets() {
-      // Get tickers from existing data
+      // Get tickers from real telemetry data
       const tickers = this.getPortfolioTickers();
+      
+      // Clear existing fleets
+      this.observatory.fleets = [];
       
       tickers.forEach(symbol => {
         const benchmark = this.observatory.getBenchmarkForTicker(symbol);
         this.observatory.addFleet(symbol, benchmark);
       });
       
-      console.log(`[ObservatoryController] Added ${tickers.length} fleets`);
+      console.log(`[ObservatoryController] Added ${tickers.length} fleets from telemetry data`);
     },
     
     getPortfolioTickers() {
+      // Use TelemetryData if available
+      if (window.TelemetryData?.isLoaded) {
+        return window.TelemetryData.getSymbols();
+      }
+      
       // Try to get from TICKER_PROFILES or SHIP_SPRITES
       if (window.TICKER_PROFILES) {
         return Object.keys(window.TICKER_PROFILES);
@@ -109,8 +127,36 @@
       if (window.SHIP_SPRITES) {
         return Object.keys(window.SHIP_SPRITES);
       }
+      
       // Fallback default list
       return ['RKLB', 'ACHR', 'LUNR', 'JOBY', 'ASTS', 'BKSY', 'GME', 'GE', 'KTOS', 'PL', 'RDW', 'RTX', 'LHX', 'COHR', 'EVEX'];
+    },
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // TIMEFRAME SWITCHING
+    // ─────────────────────────────────────────────────────────────────────────
+    
+    setTimeframe(tf) {
+      if (['1D', '45m', '15m'].includes(tf)) {
+        this.currentTimeframe = tf;
+        if (window.TelemetryData) {
+          window.TelemetryData.setTimeframe(tf);
+        }
+        this.updateTelemetry();
+        
+        // Update UI
+        const tfBtn = document.getElementById('obs-timeframe');
+        if (tfBtn) {
+          tfBtn.textContent = tf;
+        }
+      }
+    },
+    
+    cycleTimeframe() {
+      const timeframes = ['1D', '45m', '15m'];
+      const currentIndex = timeframes.indexOf(this.currentTimeframe);
+      const nextIndex = (currentIndex + 1) % timeframes.length;
+      this.setTimeframe(timeframes[nextIndex]);
     },
     
     // ─────────────────────────────────────────────────────────────────────────
@@ -134,18 +180,20 @@
     },
     
     buildTelemetrySnapshot() {
-      const snapshot = {};
+      // Use real TelemetryData if available
+      if (window.TelemetryData) {
+        return window.TelemetryData.buildSnapshot(this.currentTimeframe);
+      }
       
-      // Portfolio summary
+      // Fallback to simulated data
+      const snapshot = {};
       snapshot._portfolio = this.getPortfolioMetrics();
       
-      // Individual tickers
       const tickers = this.getPortfolioTickers();
       tickers.forEach(symbol => {
         snapshot[symbol] = this.getTickerTelemetry(symbol);
       });
       
-      // Benchmarks
       ['SPY', 'XAR', 'QQQ'].forEach(symbol => {
         snapshot[symbol] = this.getBenchmarkTelemetry(symbol);
       });
@@ -154,53 +202,53 @@
     },
     
     getPortfolioMetrics() {
-      // Try to get real portfolio data
-      const portfolioData = window.portfolioData || {};
+      if (window.TelemetryData?.isLoaded) {
+        return window.TelemetryData.getPortfolio(this.currentTimeframe);
+      }
       
+      // Fallback
       return {
-        healthScore: portfolioData.healthScore || 0.75,
-        volatility: portfolioData.volatility || 0.25,
-        drawdown: portfolioData.drawdown || -0.05,
-        sentiment: portfolioData.sentiment || 0.6,
-        totalValue: portfolioData.totalValue || 100000,
-        dayChange: portfolioData.dayChange || 0.012
+        healthScore: 0.75,
+        volatility: 0.25,
+        drawdown: -0.05,
+        sentiment: 0.6,
+        totalValue: 100000,
+        dayChange: 0.012
       };
     },
     
     getTickerTelemetry(symbol) {
-      // Get from existing Telemetry module if available
-      const telem = window.Telemetry?.get(symbol) || {};
-      const profile = window.TICKER_PROFILES?.[symbol] || {};
+      if (window.TelemetryData) {
+        return window.TelemetryData.get(symbol, this.currentTimeframe);
+      }
       
+      // Fallback simulated
       return {
-        // Performance
-        relativePerformance: telem.relativePerformance || (Math.random() - 0.5) * 0.4,
-        momentum: telem.momentum || (Math.random() - 0.5) * 0.2,
-        drawdown: telem.drawdown || -Math.random() * 0.1,
-        
-        // Activity
-        volumePercentile: telem.volumePercentile || Math.random(),
-        volumeZ: telem.volumeZ || (Math.random() - 0.5) * 2,
-        realizedVol: telem.realizedVol || 0.2 + Math.random() * 0.3,
-        
-        // Options
-        ivRank: telem.ivRank || Math.random() * 0.6,
-        gammaExposure: telem.gammaExposure || Math.random(),
-        skew: telem.skew || (Math.random() - 0.5) * 0.3,
-        
-        // Position
-        portfolioWeight: profile.weight || 0.1,
-        price: telem.price || 50,
-        dayChange: telem.dayChange || (Math.random() - 0.5) * 0.06
+        relativePerformance: (Math.random() - 0.5) * 0.4,
+        momentum: (Math.random() - 0.5) * 0.2,
+        drawdown: -Math.random() * 0.1,
+        volumePercentile: Math.random(),
+        volumeZ: (Math.random() - 0.5) * 2,
+        realizedVol: 0.2 + Math.random() * 0.3,
+        ivRank: Math.random() * 0.6,
+        portfolioWeight: 0.1,
+        price: 50,
+        dayChange: (Math.random() - 0.5) * 0.06
       };
     },
     
     getBenchmarkTelemetry(symbol) {
-      const telem = window.Telemetry?.get(symbol) || {};
+      if (window.TelemetryData) {
+        const data = window.TelemetryData.get(symbol, this.currentTimeframe);
+        return {
+          momentum: data?.momentum || 0,
+          volatility: data?.volatility || 0.15
+        };
+      }
       
       return {
-        momentum: telem.momentum || (Math.random() - 0.5) * 0.1,
-        volatility: telem.volatility || 0.15 + Math.random() * 0.1
+        momentum: (Math.random() - 0.5) * 0.1,
+        volatility: 0.15 + Math.random() * 0.1
       };
     },
     
@@ -216,6 +264,10 @@
         <div class="observatory-header">
           <div class="observatory-title">ORBITAL OBSERVATORY</div>
           <div class="observatory-stats">
+            <div class="observatory-stat">
+              <span class="observatory-stat-label">Timeframe</span>
+              <span class="observatory-stat-value" id="obs-timeframe">1D</span>
+            </div>
             <div class="observatory-stat">
               <span class="observatory-stat-label">Portfolio Health</span>
               <span class="observatory-stat-value" id="obs-health">—</span>
@@ -233,6 +285,7 @@
         
         <!-- Controls -->
         <div class="observatory-controls">
+          <button class="observatory-btn" id="obs-tf-cycle" title="Cycle Timeframe (T)">◷</button>
           <button class="observatory-btn" id="obs-zoom-in" title="Zoom In">+</button>
           <button class="observatory-btn" id="obs-zoom-out" title="Zoom Out">−</button>
           <button class="observatory-btn" id="obs-home" title="Reset View">⌂</button>
@@ -271,6 +324,10 @@
             <div class="legend-icon fleet"></div>
             <span>Fleet (Position)</span>
           </div>
+          <div class="legend-divider"></div>
+          <div class="legend-item" id="obs-data-source">
+            <span style="font-size: 9px; opacity: 0.6;">Loading data...</span>
+          </div>
         </div>
         
         <!-- Tooltip -->
@@ -279,9 +336,39 @@
       
       this.container.appendChild(hud);
       this.bindHUDEvents();
+      
+      // Update data source indicator
+      this.updateDataSourceIndicator();
+    },
+    
+    updateDataSourceIndicator() {
+      const indicator = document.getElementById('obs-data-source');
+      if (indicator) {
+        if (window.TelemetryData?.isLoaded) {
+          const count = window.TelemetryData.getSymbols().length;
+          indicator.innerHTML = `<span style="font-size: 9px; color: var(--hotline-green, #33ff99);">◉ LIVE DATA (${count} tickers)</span>`;
+        } else {
+          indicator.innerHTML = `<span style="font-size: 9px; color: var(--hotline-amber, #ffb347);">◎ SIMULATED</span>`;
+        }
+      }
     },
     
     bindHUDEvents() {
+      // Timeframe cycle
+      document.getElementById('obs-tf-cycle')?.addEventListener('click', () => {
+        this.cycleTimeframe();
+      });
+      
+      // Keyboard shortcut for timeframe
+      document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 't' && !e.ctrlKey && !e.metaKey) {
+          const panel = document.getElementById('fleet-status-panel');
+          if (panel && panel.classList.contains('active')) {
+            this.cycleTimeframe();
+          }
+        }
+      });
+      
       // Zoom controls
       document.getElementById('obs-zoom-in')?.addEventListener('click', () => {
         this.observatory.camera.zoomBy(1.3, this.observatory.camera.centerX, this.observatory.camera.centerY);

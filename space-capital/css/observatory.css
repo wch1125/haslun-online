@@ -326,6 +326,12 @@
   border-radius: 0;
 }
 
+.legend-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
 /* Zoom indicator */
 .observatory-zoom {
   position: absolute;

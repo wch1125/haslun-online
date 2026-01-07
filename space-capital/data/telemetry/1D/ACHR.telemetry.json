@@ -1,0 +1,32 @@
+{
+  "symbol": "ACHR",
+  "tf": "1D",
+  "asOf": 1767364200000,
+  "price": 7.8663,
+  "chgPct": 4.6392,
+  "trend": -0.889,
+  "momentum": -0.0878,
+  "volatility": 0.0292,
+  "activity": 0.7363,
+  "signalState": "neutral",
+  "relativePerformance": -0.5361,
+  "risk": {
+    "drawdown": -0.3349,
+    "stress": 1
+  },
+  "indicators": {
+    "macd": -0.1221,
+    "signal": -0.0725,
+    "hist": -0.0496,
+    "g100": 9.41,
+    "g150": 9.83,
+    "g200": 9.49
+  },
+  "visual": {
+    "glow": 0.5417,
+    "jitter": 0.0439,
+    "thrust": 0.1755,
+    "cohesion": 0.6359,
+    "ring": 0.0234
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "symbol": "RDW",
+  "tf": "15m",
+  "asOf": 1767621600000,
+  "price": 9.2375,
+  "chgPct": 0.0,
+  "trend": 0.4129,
+  "momentum": -0.0004,
+  "volatility": 0.0037,
+  "activity": 0.244,
+  "signalState": "neutral",
+  "relativePerformance": -0.007,
+  "risk": {
+    "drawdown": -0.0173,
+    "stress": 0.0537
+  },
+  "indicators": {
+    "macd": 0.0177,
+    "signal": 0.0198,
+    "hist": -0.0021,
+    "g100": 8.471995775541952,
+    "g150": 8.265030322820131,
+    "g200": 8.113653016422711
+  },
+  "visual": {
+    "glow": 0.1709,
+    "jitter": 0.0056,
+    "thrust": 0.0007,
+    "cohesion": 0.979,
+    "ring": 0.003
+  }
+}
