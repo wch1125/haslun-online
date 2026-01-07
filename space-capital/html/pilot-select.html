@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PILOT SELECT | SPACE CAPITAL</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0a0c0f;
+      font-family: 'VT323', monospace;
+      color: #e0e0e0;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       BACKGROUND EFFECTS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 41, 117, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 41, 117, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.6) 100%);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       LAYOUT
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      color: #FF2975;
+      text-shadow: 
+        0 0 10px rgba(255, 41, 117, 0.8),
+        0 0 30px rgba(255, 41, 117, 0.4),
+        0 0 60px rgba(255, 41, 117, 0.2);
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #00FFFF;
+      letter-spacing: 0.3em;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       PILOT GRID
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .pilot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      max-width: 900px;
+      margin-bottom: 2rem;
+    }
+
+    .pilot-slot {
+      position: relative;
+      width: 180px;
+      height: 220px;
+      background: rgba(10, 12, 15, 0.9);
+      border: 2px solid #333;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .pilot-slot:hover {
+      border-color: #FF2975;
+      box-shadow: 0 0 20px rgba(255, 41, 117, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .pilot-slot.selected {
+      border-color: #00FFFF;
+      box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.5),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    }
+
+    .pilot-slot.empty {
+      border-style: dashed;
+      opacity: 0.5;
+    }
+
+    .pilot-slot.empty:hover {
+      opacity: 1;
+      border-color: #39FF14;
+      box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+    }
+
+    .pilot-avatar {
+      width: 120px;
+      height: 120px;
+      background: #111;
+      border: 2px solid #444;
+      margin-bottom: 0.75rem;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .pilot-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .pilot-avatar .empty-icon {
+      font-size: 3rem;
+      color: #333;
+    }
+
+    .pilot-name {
+      font-size: 1.1rem;
+      color: #FF2975;
+      text-align: center;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+
+    .pilot-callsign {
+      font-size: 0.9rem;
+      color: #666;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    .pilot-slot.empty .pilot-name {
+      color: #39FF14;
+    }
+
+    .pilot-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      background: rgba(0, 255, 255, 0.2);
+      border: 1px solid #00FFFF;
+      color: #00FFFF;
+      letter-spacing: 0.1em;
+    }
+
+    .pilot-badge.demo {
+      background: rgba(255, 165, 0, 0.2);
+      border-color: orange;
+      color: orange;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       ACTIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-launch {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 1rem 3rem;
+      background: linear-gradient(180deg, #FF2975 0%, #cc1f5c 100%);
+      border: 2px solid #FF2975;
+      color: #fff;
+      cursor: pointer;
+      letter-spacing: 0.2em;
+      transition: all 0.2s ease;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-launch:hover {
+      background: linear-gradient(180deg, #FF69B4 0%, #FF2975 100%);
+      box-shadow: 0 0 30px rgba(255, 41, 117, 0.5);
+      transform: scale(1.05);
+    }
+
+    .btn-launch:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .selected-info {
+      text-align: center;
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .selected-info .callsign {
+      color: #00FFFF;
+      font-size: 1.2rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      text-align: center;
+    }
+
+    .privacy-notice {
+      font-size: 0.8rem;
+      color: #666;
+      max-width: 500px;
+      line-height: 1.4;
+    }
+
+    .privacy-notice a {
+      color: #00FFFF;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CREATE PROFILE MODAL
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: #0a0c0f;
+      border: 2px solid #FF2975;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 0 60px rgba(255, 41, 117, 0.3);
+    }
+
+    .modal-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: #FF2975;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      color: #888;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      background: #111;
+      border: 1px solid #333;
+      color: #fff;
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #FF2975;
+    }
+
+    .avatar-picker {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+
+    .avatar-option {
+      width: 80px;
+      height: 80px;
+      background: #111;
+      border: 2px solid #333;
+      cursor: pointer;
+      padding: 0.25rem;
+      transition: all 0.2s;
+    }
+
+    .avatar-option:hover {
+      border-color: #FF2975;
+    }
+
+    .avatar-option.selected {
+      border-color: #00FFFF;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .avatar-option img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    .btn-modal {
+      padding: 0.75rem 1.5rem;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border: 1px solid;
+      transition: all 0.2s;
+    }
+
+    .btn-modal.primary {
+      background: #FF2975;
+      border-color: #FF2975;
+      color: #fff;
+    }
+
+    .btn-modal.primary:hover {
+      background: #FF69B4;
+    }
+
+    .btn-modal.secondary {
+      background: transparent;
+      border-color: #666;
+      color: #888;
+    }
+
+    .btn-modal.secondary:hover {
+      border-color: #FF2975;
+      color: #FF2975;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 800px) {
+      .pilot-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .pilot-slot {
+        width: 150px;
+        height: 190px;
+        padding: 0.75rem;
+      }
+
+      .pilot-avatar {
+        width: 90px;
+        height: 90px;
+      }
+
+      .avatar-picker {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .avatar-option {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .pilot-slot {
+        width: 130px;
+        height: 170px;
+      }
+
+      .pilot-avatar {
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       ANIMATIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.8); }
+    }
+
+    .pilot-slot.selected {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .pilot-slot.selected .pilot-avatar {
+      animation: float 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="vignette"></div>
+  <div class="scanlines"></div>
+
+  <div class="container">
+    <header class="header">
+      <h1 class="title">PILOT SELECT</h1>
+      <p class="subtitle">CHOOSE YOUR COMMANDER</p>
+    </header>
+
+    <div class="pilot-grid" id="pilotGrid">
+      <!-- Slots populated by JS -->
+    </div>
+
+    <div class="actions">
+      <div class="selected-info" id="selectedInfo">
+        Select a pilot to continue
+      </div>
+      <button class="btn-launch" id="launchBtn" disabled>
+        LAUNCH FLEET COMMAND
+      </button>
+    </div>
+
+    <footer class="footer">
+      <p class="privacy-notice">
+        ⚠️ All position data is stored locally in your browser only. 
+        We never see or store your financial information. 
+        Export your profile to create a backup.
+      </p>
+    </footer>
+  </div>
+
+  <!-- Create Profile Modal -->
+  <div class="modal-overlay" id="createModal">
+    <div class="modal">
+      <h2 class="modal-title">CREATE NEW PILOT</h2>
+      
+      <div class="form-group">
+        <label class="form-label">PILOT NAME</label>
+        <input type="text" class="form-input" id="newPilotName" placeholder="COMMANDER" maxlength="20">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CALLSIGN</label>
+        <input type="text" class="form-input" id="newCallsign" placeholder="GHOST-01" maxlength="15">
+        <button type="button" style="margin-top: 0.5rem; background: none; border: 1px solid #666; color: #888; padding: 0.25rem 0.5rem; cursor: pointer; font-family: inherit;" id="randomCallsign">🎲 RANDOM</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">SELECT AVATAR</label>
+        <div class="avatar-picker" id="avatarPicker">
+          <!-- Avatars populated by JS -->
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-modal secondary" id="cancelCreate">CANCEL</button>
+        <button class="btn-modal primary" id="confirmCreate">CREATE PILOT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player Manager -->
+  <script src="../js/data/player-manager.js"></script>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════════════
+    // PILOT SELECT CONTROLLER
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    (function() {
+      'use strict';
+
+      let selectedSlotIndex = null;
+      let newPilotAvatar = 'ghost';
+
+      // ─────────────────────────────────────────────────────────────────────────
+      // RENDER PILOT GRID
+      // ─────────────────────────────────────────────────────────────────────────
+
+      function renderPilotGrid() {
+        const grid = document.getElementById('pilotGrid');
+        const slots = PlayerManager.getAllSlots();
+        const activeId = PlayerManager.getActiveId();
+
+        grid.innerHTML = slots.map((profile, index) => {
+          if (profile) {
+            const isActive = profile.id === activeId;
+            const avatarPath = PlayerManager.getAvatarPath(profile.avatar);
+            
+            return `
+              <div class="pilot-slot ${isActive ? 'selected' : ''}" data-index="${index}" data-id="${profile.id}">
+                ${profile.isDemo ? '<span class="pilot-badge demo">DEMO</span>' : ''}
+                <div class="pilot-avatar">
+                  <img src="${avatarPath}" alt="${profile.name}" onerror="this.parentElement.innerHTML='<span class=\\'empty-icon\\'>👤</span>'">
+                </div>
+                <div class="pilot-name">${profile.name}</div>
+                <div class="pilot-callsign">${profile.callsign}</div>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="pilot-slot empty" data-index="${index}" data-id="">
+                <div class="pilot-avatar">
+                  <span class="empty-icon">+</span>
+                </div>
+                <div class="pilot-name">NEW PILOT</div>
+                <div class="pilot-callsign">Empty Slot</div>
+              </div>
+            `;
+          }
+        }).join('');
+
+        // Update selected info
+        updateSelectedInfo();
+      }
+
+      function updateSelectedInfo() {
+        const active = PlayerManager.getActive();
+        const info = document.getElementById('selectedInfo');
+        const btn = document.getElementById('launchBtn');
+
+        if (active) {
+          info.innerHTML = `Selected: <span class="callsign">${active.callsign}</span>`;
+          btn.disabled = false;
+        } else {
+          info.textContent = 'Select a pilot to continue';
+          btn.disabled = true;
+        }
+      }
+
+      // ─────────────────────────────────────────────────────────────────────────
+      // AVATAR PICKER
+      // ─────────────────────────────────────────────────────────────────────────
+
+      function renderAvatarPicker() {
+        const picker = document.getElementById('avatarPicker');
+        const avatars = PlayerManager.getAvatars();
+
+        picker.innerHTML = avatars.map(avatar => `
+          <div class="avatar-option ${avatar.id === newPilotAvatar ? 'selected' : ''}" data-avatar="${avatar.id}">
+            <img src="${PlayerManager.getAvatarPath(avatar.id)}" alt="${avatar.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👤</text></svg>'">
+          </div>
+        `).join('');
+      }
+
+      // ─────────────────────────────────────────────────────────────────────────
+      // MODAL CONTROLS
+      // ─────────────────────────────────────────────────────────────────────────
+
+      function openCreateModal() {
+        const modal = document.getElementById('createModal');
+        modal.classList.add('open');
+        
+        // Reset form
+        document.getElementById('newPilotName').value = '';
+        document.getElementById('newCallsign').value = PlayerManager.generateCallsign();
+        newPilotAvatar = 'ghost';
+        renderAvatarPicker();
+        
+        document.getElementById('newPilotName').focus();
+      }
+
+      function closeCreateModal() {
+        document.getElementById('createModal').classList.remove('open');
+      }
+
+      function createPilot() {
+        const name = document.getElementById('newPilotName').value.trim().toUpperCase() || 'PILOT';
+        const callsign = document.getElementById('newCallsign').value.trim().toUpperCase() || PlayerManager.generateCallsign();
+
+        const profile = PlayerManager.create({
+          name,
+          callsign,
+          avatar: newPilotAvatar
+        });
+
+        if (profile) {
+          PlayerManager.setActive(profile.id);
+          closeCreateModal();
+          renderPilotGrid();
+        } else {
+          alert('Maximum pilots reached. Delete a pilot to create a new one.');
+        }
+      }
+
+      // ─────────────────────────────────────────────────────────────────────────
+      // EVENT HANDLERS
+      // ─────────────────────────────────────────────────────────────────────────
+
+      function init() {
+        renderPilotGrid();
+        renderAvatarPicker();
+
+        // Pilot slot clicks
+        document.getElementById('pilotGrid').addEventListener('click', (e) => {
+          const slot = e.target.closest('.pilot-slot');
+          if (!slot) return;
+
+          const id = slot.dataset.id;
+          
+          if (id) {
+            // Select existing pilot
+            PlayerManager.setActive(id);
+            renderPilotGrid();
+          } else {
+            // Create new pilot
+            openCreateModal();
+          }
+        });
+
+        // Launch button
+        document.getElementById('launchBtn').addEventListener('click', () => {
+          const active = PlayerManager.getActive();
+          if (active) {
+            window.location.href = 'space-capital.html';
+          }
+        });
+
+        // Modal controls
+        document.getElementById('cancelCreate').addEventListener('click', closeCreateModal);
+        document.getElementById('confirmCreate').addEventListener('click', createPilot);
+        
+        document.getElementById('createModal').addEventListener('click', (e) => {
+          if (e.target.classList.contains('modal-overlay')) {
+            closeCreateModal();
+          }
+        });
+
+        // Random callsign button
+        document.getElementById('randomCallsign').addEventListener('click', () => {
+          document.getElementById('newCallsign').value = PlayerManager.generateCallsign();
+        });
+
+        // Avatar picker
+        document.getElementById('avatarPicker').addEventListener('click', (e) => {
+          const option = e.target.closest('.avatar-option');
+          if (!option) return;
+
+          newPilotAvatar = option.dataset.avatar;
+          document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+          option.classList.add('selected');
+        });
+
+        // Enter key in form
+        document.getElementById('newPilotName').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') createPilot();
+        });
+        document.getElementById('newCallsign').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') createPilot();
+        });
+
+        // ESC to close modal
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeCreateModal();
+        });
+
+        // Listen for profile changes
+        PlayerManager.onChange((event, data) => {
+          renderPilotGrid();
+        });
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

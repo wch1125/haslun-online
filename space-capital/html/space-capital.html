@@ -247,6 +247,39 @@
       box-shadow: 0 0 10px var(--yellow);
     }
 
+    /* Pilot Button */
+    .pilot-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.75rem !important;
+      border: 1px solid var(--cyan) !important;
+      background: rgba(0, 255, 255, 0.1) !important;
+    }
+
+    .pilot-btn:hover {
+      background: rgba(0, 255, 255, 0.2) !important;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .pilot-avatar-mini {
+      width: 24px;
+      height: 24px;
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #111;
+    }
+
+    .pilot-avatar-mini img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+
     .status-dot.offline {
       background: var(--red-alert);
       box-shadow: 0 0 10px var(--red-alert);
@@ -1171,6 +1204,11 @@
         </div>
       </div>
       <div class="header-status">
+        <button id="pilotBtn" class="moduleViewer__trigger pilot-btn" title="Switch Pilot">
+          <span class="pilot-avatar-mini" id="pilotAvatarMini">👤</span>
+          <span id="pilotCallsign">GUEST</span>
+        </button>
+        <button id="openPositionsBtn" class="moduleViewer__trigger">📊 POSITIONS</button>
         <button id="openModulesBtn" class="moduleViewer__trigger">🧰 MODULES</button>
         <div class="status-item">
           <span class="status-dot online" id="system-status"></span>
@@ -1608,14 +1646,23 @@
       const grid = document.getElementById('fleet-grid');
       grid.innerHTML = '';
       
+      // Filter to only show tickers that have ship profiles configured
+      const configuredPositions = positions.filter(pos => TICKER_CONFIG[pos.ticker]);
+      
       // Store positions for the animator to access
       window._fleetPositions = {};
-      positions.forEach(pos => {
+      configuredPositions.forEach(pos => {
         window._fleetPositions[pos.ticker] = pos;
         grid.appendChild(renderShipCard(pos));
       });
 
-      document.getElementById('ship-count').textContent = positions.length;
+      document.getElementById('ship-count').textContent = configuredPositions.length;
+      
+      // Show notice if some positions were filtered out
+      const filteredCount = positions.length - configuredPositions.length;
+      if (filteredCount > 0) {
+        console.log(`[SpaceCapital] ${filteredCount} tickers hidden (no ship profile configured)`);
+      }
       
       // Hydrate animated sprites and behavior controllers after DOM update
       function hydrateSprites() {
@@ -1662,12 +1709,24 @@
             }
 
             // Calculate derived stats
-            const cost = pos.entry_cost * pos.contracts * 100;
-            const value = pos.current_price * pos.contracts * 100;
-            const pnlPct = cost > 0 ? ((value - cost) / cost * 100) : pos.chgPct;
+            // Check PositionManager first for imported P&L data
+            let pnlPct;
+            let hull;
+            const pmStats = window.PositionManager?.getBehaviorStats(ticker);
+            
+            if (pmStats && pmStats.totalPL !== 0) {
+              // Use PositionManager data (from CSV import or manual entry)
+              pnlPct = pmStats.pnlPercent;
+              hull = pmStats.hull;
+            } else {
+              // Fall back to calculated P&L from telemetry
+              const cost = pos.entry_cost * pos.contracts * 100;
+              const value = pos.current_price * pos.contracts * 100;
+              pnlPct = cost > 0 ? ((value - cost) / cost * 100) : pos.chgPct;
+              hull = Math.max(0, Math.min(100, 100 - ((pos.visual?.damage ?? 0) * 100)));
+            }
             
             // Map telemetry to behavior inputs
-            const hull = Math.max(0, Math.min(100, 100 - ((pos.visual?.damage ?? 0) * 100)));
             const fuel = Math.max(0, Math.min(100, (pos.activity ?? 0.5) * 100));
             const vol = pos.volatility ?? 0.02;
 
@@ -1709,6 +1768,69 @@
       }
       
       requestAnimationFrame(hydrateSprites);
+    }
+
+    // Global function to update behavior states (called when positions change)
+    function updateShipBehaviors() {
+      if (!window.ShipBehavior) return;
+      
+      document.querySelectorAll('.ship-sprite-img').forEach((img) => {
+        const ticker = img.dataset.ticker;
+        const pos = window._fleetPositions?.[ticker];
+        if (!pos) return;
+
+        // Check PositionManager for imported P&L data
+        let pnlPct;
+        let hull;
+        const pmStats = window.PositionManager?.getBehaviorStats(ticker);
+        
+        if (pmStats && pmStats.totalPL !== 0) {
+          pnlPct = pmStats.pnlPercent;
+          hull = pmStats.hull;
+        } else {
+          const cost = pos.entry_cost * pos.contracts * 100;
+          const value = pos.current_price * pos.contracts * 100;
+          pnlPct = cost > 0 ? ((value - cost) / cost * 100) : pos.chgPct;
+          hull = Math.max(0, Math.min(100, 100 - ((pos.visual?.damage ?? 0) * 100)));
+        }
+        
+        const fuel = Math.max(0, Math.min(100, (pos.activity ?? 0.5) * 100));
+        const vol = pos.volatility ?? 0.02;
+
+        // Update behavior controller
+        if (img._behaviorController) {
+          img._behaviorController.updateStats({
+            pnlPercent: pnlPct,
+            volatility: vol,
+            hull,
+            fuel
+          });
+        }
+
+        // Update behavior badges
+        const card = img.closest('.ship-card');
+        if (card) {
+          const thrustBadge = card.querySelector('[data-badge="thrust"]');
+          const stabilityBadge = card.querySelector('[data-badge="stability"]');
+          const hullBadge = card.querySelector('[data-badge="hull"]');
+
+          if (thrustBadge) {
+            const state = pnlPct >= 5 ? 'THRUST++' : pnlPct > 0 ? 'THRUST+' : pnlPct > -5 ? 'DRIFT' : 'FAIL';
+            thrustBadge.textContent = state;
+            thrustBadge.dataset.state = state;
+          }
+          if (stabilityBadge) {
+            const state = vol >= 0.08 ? 'EXTREME' : vol >= 0.05 ? 'HIGH' : vol >= 0.03 ? 'ELEV' : 'STABLE';
+            stabilityBadge.textContent = state;
+            stabilityBadge.dataset.state = state;
+          }
+          if (hullBadge) {
+            const state = hull >= 80 ? 'HULL OK' : hull >= 50 ? 'STRESS' : hull >= 25 ? 'CRIT' : 'HULL!';
+            hullBadge.textContent = state;
+            hullBadge.dataset.state = state;
+          }
+        }
+      });
     }
 
     function renderThemes(positions) {
@@ -1993,6 +2115,47 @@
         }
       });
 
+      // Position Manager button
+      document.getElementById('openPositionsBtn')?.addEventListener('click', () => {
+        if (window.PositionManagerUI) {
+          PositionManagerUI.open();
+        }
+      });
+
+      // Pilot button - go to pilot select
+      document.getElementById('pilotBtn')?.addEventListener('click', () => {
+        window.location.href = 'pilot-select.html';
+      });
+
+      // Update pilot display in header
+      function updatePilotDisplay() {
+        if (!window.PlayerManager) return;
+        
+        const pilot = PlayerManager.getActive();
+        if (pilot) {
+          document.getElementById('pilotCallsign').textContent = pilot.callsign;
+          const avatarContainer = document.getElementById('pilotAvatarMini');
+          const avatarPath = PlayerManager.getAvatarPath(pilot.avatar);
+          avatarContainer.innerHTML = `<img src="${avatarPath}" alt="${pilot.name}">`;
+        }
+      }
+      updatePilotDisplay();
+
+      // Listen for profile changes
+      window.PlayerManager?.onChange((event, data) => {
+        if (event === 'switched') {
+          console.log('[SpaceCapital] Profile switched, reloading positions...');
+          PositionManager.switchProfile();
+          updatePilotDisplay();
+        }
+      });
+
+      // Re-hydrate sprites when position data changes
+      window.PositionManager?.onChange(() => {
+        console.log('[SpaceCapital] Position data changed, updating behaviors...');
+        updateShipBehaviors();
+      });
+
       // Set up polling for updates
       setInterval(async () => {
         const freshData = await loadData();
@@ -2022,6 +2185,13 @@
 
   <!-- Ship Behavior Engine - State machine for reactive sprites -->
   <script src="../js/ships/ship-behavior.js"></script>
+
+  <!-- Player Manager - Pilot profiles -->
+  <script src="../js/data/player-manager.js"></script>
+
+  <!-- Position Manager - P&L and cost basis data -->
+  <script src="../js/data/position-manager.js"></script>
+  <script src="../js/ui/position-manager-ui.js"></script>
 
   <!-- Ship Animator - Telemetry-driven sprite animations -->
   <script src="../js/ui/ship-animator.js"></script>
