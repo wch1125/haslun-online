@@ -169,7 +169,10 @@
       // Update nameplate
       const tickerEl = document.getElementById('hangar-ship-ticker');
       const classEl = document.getElementById('hangar-ship-class');
-      if (tickerEl) tickerEl.textContent = ticker;
+      if (tickerEl) {
+        tickerEl.textContent = ticker;
+        tickerEl.setAttribute('data-ticker', ticker);
+      }
       if (classEl) classEl.textContent = shipClass;
       
       // Update stats

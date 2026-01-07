@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="css/hotline-hud.css">
   <link rel="stylesheet" href="css/hotline-atmosphere.css">
   <link rel="stylesheet" href="css/hotline-hud-clean.css">
+  <link rel="stylesheet" href="css/hud-glitch-fix.css">
 <script src="js/space-scene.js"></script>
 </head>
 <body>
@@ -2307,7 +2308,7 @@
     <div class="hangar-rpg">
       
       <!-- LEFT SIDEBAR: Stats & Equipment -->
-      <div class="hangar-sidebar">
+      <div class="hangar-sidebar left">
         
         <!-- Core Stats -->
         <div class="stat-block">
@@ -2407,7 +2408,7 @@
         </div>
         
         <div class="ship-nameplate">
-          <div class="ship-nameplate-ticker" id="hangar-ship-ticker">RKLB</div>
+          <div class="ship-nameplate-ticker" id="hangar-ship-ticker" data-ticker="RKLB">RKLB</div>
           <div class="ship-nameplate-class" id="hangar-ship-class">FLAGSHIP CLASS</div>
         </div>
         
@@ -2417,7 +2418,7 @@
       </div>
       
       <!-- RIGHT SIDEBAR: Colors & Cosmetics -->
-      <div class="hangar-sidebar">
+      <div class="hangar-sidebar right">
         
         <!-- Color Customization -->
         <div class="stat-block">
