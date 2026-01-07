@@ -3,6 +3,14 @@
    =========================================================================
    Transforms the dashboard into an immersive retro-futuristic experience.
    Focused on atmosphere, not obstruction.
+   
+   NOTE: These effects are now SEMANTIC - they respond to market state:
+   - Bullish: CLEAN, no distortion
+   - Bearish: Subtle scanlines + noise
+   - Volatile: Jittering effects
+   - Critical: Heavy distortion
+   
+   See ui-overhaul.css for semantic state classes.
    ========================================================================= */
 
 /* -------------------------------------------------------------------------
@@ -17,6 +25,7 @@
   --phosphor-violet: #b388ff;
   
   /* CRT characteristics — tuned for readability */
+  /* Base values - adjusted by semantic state in ui-overhaul.css */
   --scanline-opacity: 0.06;
   --bloom-intensity: 1.15;
   --noise-opacity: 0.015;

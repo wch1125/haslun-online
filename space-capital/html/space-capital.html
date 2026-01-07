@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Shared theme variables -->
   <link rel="stylesheet" href="../css/theme.css">
+  <!-- UI Overhaul - Pixel discipline, semantic CRT, visual tiers -->
+  <link rel="stylesheet" href="../css/ui-overhaul.css">
   <!-- Ship behavior states (thrust, volatility, hull effects) -->
   <link rel="stylesheet" href="../css/ship-states.css">
   <!-- Module viewer overlay -->
@@ -995,23 +997,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* Yearly indicator - emphasized as the "journey summary" */
-    .mood-indicator.yearly {
-      padding-left: 0.35rem;
-      border-left: 1px solid var(--border-dim);
-      margin-left: 0.1rem;
-    }
-
-    .mood-indicator.yearly .mood-dot {
-      width: 12px;
-      height: 12px;
-    }
-
-    .mood-indicator.yearly .mood-label {
-      font-weight: bold;
-      color: var(--cyan);
-    }
-
     /* Veteran Badge */
     .veteran-badge {
       position: absolute;
@@ -1036,236 +1021,6 @@
       background: rgba(255, 41, 117, 0.15);
       border-color: var(--magenta);
       color: var(--magenta);
-    }
-
-    /* Multiple badges container */
-    .badge-cluster {
-      position: absolute;
-      top: 0.4rem;
-      right: 0.4rem;
-      display: flex;
-      gap: 0.25rem;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      max-width: 60%;
-    }
-
-    .badge-cluster .veteran-badge {
-      position: static;
-      font-size: 0.5rem;
-      padding: 0.1rem 0.25rem;
-    }
-
-    /* Centurion badge for +100% yearly */
-    .veteran-badge.centurion {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
-      border-color: #ffa500;
-      color: #ffa500;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Gold shimmer effect for centurion */
-    .veteran-badge.centurion::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        45deg,
-        transparent 30%,
-        rgba(255, 215, 0, 0.3) 50%,
-        transparent 70%
-      );
-      animation: centurionShimmer 3s ease-in-out infinite;
-    }
-
-    @keyframes centurionShimmer {
-      0% { transform: translateX(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) rotate(45deg); }
-    }
-
-    /* Badge hover effects */
-    .badge-cluster .veteran-badge {
-      position: static;
-      font-size: 0.5rem;
-      padding: 0.1rem 0.25rem;
-      transition: all 0.2s ease;
-      cursor: help;
-    }
-
-    .badge-cluster .veteran-badge:hover {
-      transform: scale(1.1);
-      z-index: 10;
-    }
-
-    .badge-cluster .veteran-badge.apex:hover {
-      box-shadow: 0 0 12px var(--cyan);
-    }
-
-    .badge-cluster .veteran-badge.centurion:hover {
-      box-shadow: 0 0 12px #ffa500;
-    }
-
-    .badge-cluster .veteran-badge.survivor:hover {
-      box-shadow: 0 0 12px var(--magenta);
-    }
-
-    /* ═══════════════════════════════════════════════════════════════════════
-       HISTORICAL STATE-BASED SHIP VISUAL EFFECTS
-       Ships visually change based on their 52-week position
-       ═══════════════════════════════════════════════════════════════════════ */
-
-    /* APEX STATE: Near all-time high (>90% of 52w range) */
-    .ship-card.apex-state {
-      box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.3),
-        0 0 40px rgba(0, 255, 255, 0.15),
-        inset 0 0 15px rgba(0, 255, 255, 0.1);
-      border-color: var(--cyan) !important;
-    }
-
-    .ship-card.apex-state .ship-sprite-wrap {
-      filter: brightness(1.2) saturate(1.1);
-    }
-
-    .ship-card.apex-state .engine-glow {
-      animation: apexPulse 2s ease-in-out infinite;
-    }
-
-    /* Glory crown effect for apex ships */
-    .ship-card.apex-state::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        var(--cyan) 20%, 
-        #fff 50%, 
-        var(--cyan) 80%, 
-        transparent 100%
-      );
-      animation: apexGlory 2s ease-in-out infinite;
-    }
-
-    @keyframes apexPulse {
-      0%, 100% { opacity: 0.8; transform: scaleY(1); }
-      50% { opacity: 1; transform: scaleY(1.15); }
-    }
-
-    @keyframes apexGlory {
-      0%, 100% { opacity: 0.6; filter: blur(1px); }
-      50% { opacity: 1; filter: blur(0px); }
-    }
-
-    /* DISTRESS STATE: Near 52-week low (<15% of range) */
-    .ship-card.distress-state {
-      box-shadow: 
-        0 0 15px rgba(255, 41, 117, 0.3),
-        inset 0 0 20px rgba(255, 0, 0, 0.1);
-      border-color: var(--red-alert) !important;
-    }
-
-    .ship-card.distress-state .ship-sprite-wrap {
-      filter: brightness(0.8) saturate(0.9);
-      animation: distressFlicker 0.5s steps(2) infinite;
-    }
-
-    .ship-card.distress-state .engine-glow {
-      opacity: 0.3 !important;
-      animation: engineSputter 1s ease-in-out infinite;
-    }
-
-    /* Distress warning symbol */
-    .ship-card.distress-state::after {
-      content: '⚠';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2rem;
-      color: var(--red-alert);
-      opacity: 0;
-      animation: distressWarning 2s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    /* Static noise overlay for distressed ships */
-    .ship-card.distress-state::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(255, 0, 64, 0.03) 2px,
-        rgba(255, 0, 64, 0.03) 4px
-      );
-      animation: staticNoise 0.1s steps(3) infinite;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    @keyframes staticNoise {
-      0% { transform: translateY(0); }
-      33% { transform: translateY(-2px); }
-      66% { transform: translateY(1px); }
-      100% { transform: translateY(0); }
-    }
-
-    @keyframes distressFlicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.85; }
-    }
-
-    @keyframes engineSputter {
-      0%, 100% { transform: scaleY(1); }
-      25% { transform: scaleY(0.6); }
-      75% { transform: scaleY(0.8); }
-    }
-
-    @keyframes distressWarning {
-      0%, 80%, 100% { opacity: 0; }
-      40% { opacity: 0.6; }
-    }
-
-    /* WARNING STATE: Moderately low (<30% of range) */
-    .ship-card.warning-state {
-      box-shadow: 
-        0 0 10px rgba(255, 179, 71, 0.2),
-        inset 0 0 10px rgba(255, 179, 71, 0.05);
-    }
-
-    .ship-card.warning-state .ship-sprite-wrap {
-      filter: brightness(0.95) saturate(0.95);
-    }
-
-    /* Damage overlay that responds to --damage-opacity */
-    .ship-card .damage-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(255, 0, 0, 0.03) 10px,
-        rgba(255, 0, 0, 0.03) 20px
-      );
-      opacity: var(--damage-opacity, 0);
-      pointer-events: none;
-      mix-blend-mode: multiply;
     }
 
     /* Strike Range Indicator */
@@ -1598,15 +1353,8 @@
   <div class="vhs-noise"></div>
   <div class="crt-vignette"></div>
 
-  <!-- Loading Screen -->
-  <div class="loading-screen" id="loading-screen">
-    <div class="loading-title">SPACE CAPITAL</div>
-    <div class="loading-subtitle">Fleet Command System</div>
-    <div class="loading-bar-container">
-      <div class="loading-bar" id="loading-bar"></div>
-    </div>
-    <div class="loading-status" id="loading-status">INITIALIZING SYSTEMS...</div>
-  </div>
+  <!-- Loading handled by TelemetryLockIn module -->
+  <!-- Lock-in screen is created dynamically by js/ui/telemetry-lockin.js -->
 
   <!-- Main App -->
   <div class="app">
@@ -1932,7 +1680,7 @@
       const history = position.history;
       if (!history) return '';
 
-      const { high_52w, low_52w, return_1d, return_1w, return_1m, return_3m, return_6m, return_1y, daily_count } = history;
+      const { high_52w, low_52w, return_1d, return_1w, return_1m, return_3m, return_1y, daily_count } = history;
       const currentPrice = position.stock_price;
 
       // Calculate position in 52-week range (0-100%)
@@ -1940,80 +1688,36 @@
       const rangePosition = range > 0 ? ((currentPrice - low_52w) / range) * 100 : 50;
       const clampedPosition = Math.max(0, Math.min(100, rangePosition));
 
-      // ═══════════════════════════════════════════════════════════════════════
-      // MULTIPLE BADGE SYSTEM
-      // Ships can earn multiple achievements based on their history
-      // ═══════════════════════════════════════════════════════════════════════
-      const badges = [];
-      
-      // APEX: At or near all-time high (95%+ of 52w range)
+      // Determine veteran status
+      let veteranBadge = '';
       if (clampedPosition >= 95) {
-        badges.push({ class: 'apex', label: '👑 APEX', title: 'Trading near 52-week high' });
+        veteranBadge = '<div class="veteran-badge apex">APEX</div>';
+      } else if (return_1y <= -40) {
+        veteranBadge = '<div class="veteran-badge survivor">SURVIVOR</div>';
+      } else if (daily_count >= 500) {
+        veteranBadge = '<div class="veteran-badge">VETERAN</div>';
       }
-      
-      // CENTURION: +100% yearly return (doubled in value)
-      if ((return_1y || 0) >= 100) {
-        badges.push({ class: 'centurion', label: '⚔️ CENTURION', title: `+${return_1y.toFixed(0)}% yearly return` });
-      }
-      
-      // SURVIVOR: Weathered a major drawdown (-40% or worse yearly)
-      if ((return_1y || 0) <= -40) {
-        badges.push({ class: 'survivor', label: '💀 SURVIVOR', title: `Survived ${return_1y.toFixed(0)}% yearly drawdown` });
-      }
-      
-      // VETERAN: Long trading history (500+ days of data)
-      if ((daily_count || 0) >= 500) {
-        badges.push({ class: '', label: '🎖️ VETERAN', title: `${daily_count} days of trading data` });
-      }
-      
-      // ROCKET: Strong recent momentum (+50% in 3 months)
-      if ((return_3m || 0) >= 50) {
-        badges.push({ class: 'centurion', label: '🚀 ROCKET', title: `+${return_3m.toFixed(0)}% in 3 months` });
-      }
-
-      // Build badge HTML (max 3 shown to avoid clutter)
-      const badgeHtml = badges.length > 0 ? `
-        <div class="badge-cluster">
-          ${badges.slice(0, 3).map(b => 
-            `<div class="veteran-badge ${b.class}" title="${b.title}">${b.label}</div>`
-          ).join('')}
-        </div>
-      ` : '';
-
-      // Get 6M return (with fallback)
-      const r6m = return_6m ?? return_3m ?? 0;
 
       return `
-        ${badgeHtml}
+        ${veteranBadge}
         
-        <!-- Damage overlay for distressed ships -->
-        <div class="damage-overlay"></div>
-        
-        <!-- Historical Mood Ring - Complete 6-timeframe journey view -->
+        <!-- Historical Mood Ring -->
         <div class="journey-mood" title="Performance over time">
           <div class="mood-indicator">
-            <div class="mood-dot ${getMoodClass(return_1d || 0)}" title="1D: ${(return_1d || 0) >= 0 ? '+' : ''}${(return_1d || 0).toFixed(1)}%"></div>
+            <div class="mood-dot ${getMoodClass(return_1d)}" title="1D: ${return_1d >= 0 ? '+' : ''}${return_1d.toFixed(1)}%"></div>
             <span class="mood-label">1D</span>
           </div>
           <div class="mood-indicator">
-            <div class="mood-dot ${getMoodClass(return_1w || 0)}" title="1W: ${(return_1w || 0) >= 0 ? '+' : ''}${(return_1w || 0).toFixed(1)}%"></div>
+            <div class="mood-dot ${getMoodClass(return_1w)}" title="1W: ${return_1w >= 0 ? '+' : ''}${return_1w.toFixed(1)}%"></div>
             <span class="mood-label">1W</span>
           </div>
           <div class="mood-indicator">
-            <div class="mood-dot ${getMoodClass(return_1m || 0)}" title="1M: ${(return_1m || 0) >= 0 ? '+' : ''}${(return_1m || 0).toFixed(1)}%"></div>
+            <div class="mood-dot ${getMoodClass(return_1m)}" title="1M: ${return_1m >= 0 ? '+' : ''}${return_1m.toFixed(1)}%"></div>
             <span class="mood-label">1M</span>
           </div>
           <div class="mood-indicator">
-            <div class="mood-dot ${getMoodClass(return_3m || 0)}" title="3M: ${(return_3m || 0) >= 0 ? '+' : ''}${(return_3m || 0).toFixed(1)}%"></div>
+            <div class="mood-dot ${getMoodClass(return_3m)}" title="3M: ${return_3m >= 0 ? '+' : ''}${return_3m.toFixed(1)}%"></div>
             <span class="mood-label">3M</span>
-          </div>
-          <div class="mood-indicator">
-            <div class="mood-dot ${getMoodClass(r6m)}" title="6M: ${r6m >= 0 ? '+' : ''}${r6m.toFixed(1)}%"></div>
-            <span class="mood-label">6M</span>
-          </div>
-          <div class="mood-indicator yearly">
-            <div class="mood-dot ${getMoodClass(return_1y || 0)}" title="1Y: ${(return_1y || 0) >= 0 ? '+' : ''}${(return_1y || 0).toFixed(1)}%"></div>
-            <span class="mood-label">1Y</span>
           </div>
         </div>
 
@@ -2057,28 +1761,7 @@
       const strikePos = hasStrikes ? calculateStrikePosition(position.stock_price, position.long_strike) : 50;
       const shortStrikePos = position.short_strike ? calculateStrikePosition(position.stock_price, position.short_strike) : null;
 
-      // ═══════════════════════════════════════════════════════════════════════
-      // HISTORICAL DATA → VISUAL BEHAVIOR INTEGRATION
-      // ═══════════════════════════════════════════════════════════════════════
-      const history = position.history || {};
-      const high_52w = history.high_52w || position.stock_price * 1.2;
-      const low_52w = history.low_52w || position.stock_price * 0.8;
-      const range52w = high_52w - low_52w;
-      const rangePosition = range52w > 0 ? ((position.stock_price - low_52w) / range52w) * 100 : 50;
-      const clampedRangePos = Math.max(0, Math.min(100, rangePosition));
-      
-      // Historical modifiers for visual behavior
-      const historyMods = {
-        // Near ATH (>90%) = glory state: brighter, stronger thrust
-        // Near 52w low (<15%) = distress state: dimmer, more damage
-        glowBoost: clampedRangePos > 90 ? 0.3 : (clampedRangePos < 15 ? -0.2 : 0),
-        thrustBoost: clampedRangePos > 90 ? 0.2 : (clampedRangePos < 15 ? -0.15 : 0),
-        damageBoost: clampedRangePos < 15 ? 0.25 : (clampedRangePos < 30 ? 0.1 : 0),
-        // Yearly performance affects base state
-        yearlyMod: (history.return_1y || 0) > 100 ? 0.15 : ((history.return_1y || 0) < -30 ? -0.1 : 0)
-      };
-
-      // Telemetry-driven visuals + historical modifiers
+      // Telemetry-driven visuals
       const visual = position.visual || { glow: 0.5, jitter: 0.1, thrust: 0.3, damage: 0 };
       const trend = position.trend ?? 0;
       const momentum = position.momentum ?? 0;
@@ -2086,15 +1769,9 @@
       const activity = position.activity ?? 0.5;
       const signalState = position.signalState || 'neutral';
 
-      // Apply historical modifiers to visual parameters
-      const glowIntensity = Math.max(0.2, Math.min(1, visual.glow + historyMods.glowBoost + historyMods.yearlyMod));
-      const thrustLength = 20 + ((visual.thrust + historyMods.thrustBoost) * 30);
-      const damageOpacity = Math.min(0.6, (visual.damage + historyMods.damageBoost) * 0.5);
-      
-      // Historical state class for CSS targeting
-      const historyState = clampedRangePos > 90 ? 'apex-state' : 
-                          clampedRangePos < 15 ? 'distress-state' : 
-                          clampedRangePos < 30 ? 'warning-state' : '';
+      const glowIntensity = Math.max(0.3, visual.glow);
+      const thrustLength = 20 + (visual.thrust * 30);
+      const damageOpacity = visual.damage * 0.5;
 
       const signalColors = {
         bull: 'var(--green-neon)',
@@ -2104,8 +1781,8 @@
       const signalColor = signalColors[signalState] || signalColors.neutral;
 
       const card = document.createElement('div');
-      card.className = `ship-card ${pnlClass} ${historyState}`.trim();
-      card.style.cssText = `--ship-glow: ${glowIntensity}; --ship-color: ${config.color}; --signal-color: ${signalColor}; --damage-opacity: ${damageOpacity};`;
+      card.className = `ship-card ${pnlClass}`;
+      card.style.cssText = `--ship-glow: ${glowIntensity}; --ship-color: ${config.color}; --signal-color: ${signalColor};`;
       
       if (volatility > 0.6) card.classList.add('high-volatility');
       
@@ -2635,16 +2312,16 @@
     // Embedded fallback data (works without any external files)
     const FALLBACK_DATA = {
       "positions": [
-        { "ticker": "RKLB", "structure": "Naked LEAP", "long_strike": 75, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 24.14, "current_price": 24.14, "delta": 0.68, "contracts": 1, "stock_price": 75.99, "entry_stock": 75.99, "trend": 0.6, "momentum": 0.4, "volatility": 0.5, "activity": 0.7, "signalState": "bull", "visual": { "glow": 0.7, "jitter": 0.1, "thrust": 0.5, "damage": 0 }, "history": { "high_52w": 77.46, "low_52w": 16.30, "return_1d": 2.16, "return_1w": -6.5, "return_1m": 74.66, "return_3m": 43.23, "return_6m": 102.72, "return_1y": 177.9, "daily_count": 1281 } },
-        { "ticker": "LUNR", "structure": "Naked LEAP", "long_strike": 17.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 6.69, "current_price": 6.69, "delta": 0.7, "contracts": 1, "stock_price": 17.88, "entry_stock": 17.88, "trend": 0.3, "momentum": 0.2, "volatility": 0.7, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.2, "thrust": 0.3, "damage": 0.1 }, "history": { "high_52w": 23.49, "low_52w": 6.62, "return_1d": 5.32, "return_1w": 2.03, "return_1m": 81.87, "return_3m": 54.79, "return_6m": 57.57, "return_1y": -6.48, "daily_count": 920 } },
-        { "ticker": "ASTS", "structure": "Bull Spread", "long_strike": 80, "short_strike": 120, "expiry": "2027-01-15", "entry_cost": 20.0, "current_price": 20.0, "delta": 0.42, "contracts": 1, "stock_price": 83.47, "entry_stock": 83.47, "trend": 0.5, "momentum": 0.3, "volatility": 0.6, "activity": 0.6, "signalState": "bull", "visual": { "glow": 0.6, "jitter": 0.15, "thrust": 0.4, "damage": 0 }, "history": { "high_52w": 96.58, "low_52w": 17.88, "return_1d": 15.08, "return_1w": 5.14, "return_1m": 45.6, "return_3m": 25.69, "return_6m": 82.89, "return_1y": 279.86, "daily_count": 267 } },
-        { "ticker": "ACHR", "structure": "Naked LEAP", "long_strike": 7.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 3.0, "current_price": 3.0, "delta": 0.72, "contracts": 1, "stock_price": 8.13, "entry_stock": 8.13, "trend": 0.7, "momentum": 0.5, "volatility": 0.4, "activity": 0.8, "signalState": "bull", "visual": { "glow": 0.8, "jitter": 0.1, "thrust": 0.6, "damage": 0 }, "history": { "high_52w": 13.48, "low_52w": 6.14, "return_1d": 4.64, "return_1w": -4.19, "return_1m": 3.33, "return_3m": -22.06, "return_6m": -22.1, "return_1y": -23.98, "daily_count": 801 } },
-        { "ticker": "JOBY", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.43, "contracts": 1, "stock_price": 14.36, "entry_stock": 14.36, "trend": 0.4, "momentum": 0.2, "volatility": 0.5, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.15, "thrust": 0.35, "damage": 0.05 }, "history": { "high_52w": 19.98, "low_52w": 5.34, "return_1d": 4.97, "return_1w": -3.33, "return_1m": 1.21, "return_3m": -18.98, "return_6m": 34.15, "return_1y": 63.18, "daily_count": 374 } },
-        { "ticker": "GME", "structure": "Bull Spread", "long_strike": 20, "short_strike": 35, "expiry": "2027-01-15", "entry_cost": 4.5, "current_price": 4.5, "delta": 0.6, "contracts": 1, "stock_price": 20.62, "entry_stock": 20.62, "trend": -0.1, "momentum": -0.2, "volatility": 0.9, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.3, "thrust": 0.2, "damage": 0.2 }, "history": { "high_52w": 34.87, "low_52w": 20.04, "return_1d": 2.85, "return_1w": -4.01, "return_1m": -9.8, "return_3m": -24.14, "return_6m": -12.89, "return_1y": -35.47, "daily_count": 265 } },
-        { "ticker": "BKSY", "structure": "Naked LEAP", "long_strike": 20, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 7.56, "current_price": 7.56, "delta": 0.7, "contracts": 1, "stock_price": 20.82, "entry_stock": 20.82, "trend": 0.3, "momentum": 0.1, "volatility": 0.5, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.45, "jitter": 0.12, "thrust": 0.25, "damage": 0.1 }, "history": { "high_52w": 31.58, "low_52w": 6.62, "return_1d": 10.14, "return_1w": -1.64, "return_1m": 22.3, "return_3m": -14.73, "return_6m": -2.93, "return_1y": 87.67, "daily_count": 267 } },
-        { "ticker": "RDW", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.55, "contracts": 1, "stock_price": 9.07, "entry_stock": 9.07, "trend": 0.2, "momentum": 0.1, "volatility": 0.4, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.1, "thrust": 0.2, "damage": 0.15 }, "history": { "high_52w": 25.88, "low_52w": 5.08, "return_1d": 19.99, "return_1w": 15.28, "return_1m": 71.05, "return_3m": -12.56, "return_6m": -43.01, "return_1y": -48.98, "daily_count": 266 } },
-        { "ticker": "PL", "structure": "Bull Spread", "long_strike": 4, "short_strike": 6, "expiry": "2027-01-15", "entry_cost": 0.65, "current_price": 0.65, "delta": 0.43, "contracts": 1, "stock_price": 20.4, "entry_stock": 20.4, "trend": -0.2, "momentum": -0.1, "volatility": 0.6, "activity": 0.2, "signalState": "bear", "visual": { "glow": 0.3, "jitter": 0.2, "thrust": 0.1, "damage": 0.3 }, "history": { "high_52w": 20.8, "low_52w": 2.95, "return_1d": 3.34, "return_1w": 0.23, "return_1m": 72.55, "return_3m": 36.7, "return_6m": 198.54, "return_1y": 382.35, "daily_count": 267 } },
-        { "ticker": "EVEX", "structure": "Bull Spread", "long_strike": 7.5, "short_strike": 12.5, "expiry": "2027-01-15", "entry_cost": 2.0, "current_price": 2.0, "delta": 0.45, "contracts": 1, "stock_price": 4.18, "entry_stock": 4.18, "trend": 0.1, "momentum": 0.0, "volatility": 0.5, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.35, "jitter": 0.15, "thrust": 0.15, "damage": 0.2 }, "history": { "high_52w": 7.5, "low_52w": 3.08, "return_1d": 3.11, "return_1w": -6.44, "return_1m": -9.75, "return_3m": -0.9, "return_6m": -44.47, "return_1y": -24.15, "daily_count": 380 } }
+        { "ticker": "RKLB", "structure": "Naked LEAP", "long_strike": 75, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 24.14, "current_price": 24.14, "delta": 0.68, "contracts": 1, "stock_price": 75.99, "entry_stock": 75.99, "trend": 0.6, "momentum": 0.4, "volatility": 0.5, "activity": 0.7, "signalState": "bull", "visual": { "glow": 0.7, "jitter": 0.1, "thrust": 0.5, "damage": 0 }, "history": { "high_52w": 77.46, "low_52w": 16.30, "return_1d": 2.16, "return_1w": -6.5, "return_1m": 74.66, "return_3m": 43.23, "return_1y": 177.9, "daily_count": 1281 } },
+        { "ticker": "LUNR", "structure": "Naked LEAP", "long_strike": 17.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 6.69, "current_price": 6.69, "delta": 0.7, "contracts": 1, "stock_price": 17.88, "entry_stock": 17.88, "trend": 0.3, "momentum": 0.2, "volatility": 0.7, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.2, "thrust": 0.3, "damage": 0.1 }, "history": { "high_52w": 23.49, "low_52w": 6.62, "return_1d": 5.32, "return_1w": 2.03, "return_1m": 81.87, "return_3m": 54.79, "return_1y": -6.48, "daily_count": 920 } },
+        { "ticker": "ASTS", "structure": "Bull Spread", "long_strike": 80, "short_strike": 120, "expiry": "2027-01-15", "entry_cost": 20.0, "current_price": 20.0, "delta": 0.42, "contracts": 1, "stock_price": 83.47, "entry_stock": 83.47, "trend": 0.5, "momentum": 0.3, "volatility": 0.6, "activity": 0.6, "signalState": "bull", "visual": { "glow": 0.6, "jitter": 0.15, "thrust": 0.4, "damage": 0 }, "history": { "high_52w": 96.58, "low_52w": 17.88, "return_1d": 15.08, "return_1w": 5.14, "return_1m": 45.6, "return_3m": 25.69, "return_1y": 279.86, "daily_count": 267 } },
+        { "ticker": "ACHR", "structure": "Naked LEAP", "long_strike": 7.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 3.0, "current_price": 3.0, "delta": 0.72, "contracts": 1, "stock_price": 8.13, "entry_stock": 8.13, "trend": 0.7, "momentum": 0.5, "volatility": 0.4, "activity": 0.8, "signalState": "bull", "visual": { "glow": 0.8, "jitter": 0.1, "thrust": 0.6, "damage": 0 }, "history": { "high_52w": 13.48, "low_52w": 6.14, "return_1d": 4.64, "return_1w": -4.19, "return_1m": 3.33, "return_3m": -22.06, "return_1y": -23.98, "daily_count": 801 } },
+        { "ticker": "JOBY", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.43, "contracts": 1, "stock_price": 14.36, "entry_stock": 14.36, "trend": 0.4, "momentum": 0.2, "volatility": 0.5, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.15, "thrust": 0.35, "damage": 0.05 }, "history": { "high_52w": 19.98, "low_52w": 5.34, "return_1d": 4.97, "return_1w": -3.33, "return_1m": 1.21, "return_3m": -18.98, "return_1y": 63.18, "daily_count": 374 } },
+        { "ticker": "GME", "structure": "Bull Spread", "long_strike": 20, "short_strike": 35, "expiry": "2027-01-15", "entry_cost": 4.5, "current_price": 4.5, "delta": 0.6, "contracts": 1, "stock_price": 20.62, "entry_stock": 20.62, "trend": -0.1, "momentum": -0.2, "volatility": 0.9, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.3, "thrust": 0.2, "damage": 0.2 }, "history": { "high_52w": 34.87, "low_52w": 20.04, "return_1d": 2.85, "return_1w": -4.01, "return_1m": -9.8, "return_3m": -24.14, "return_1y": -35.47, "daily_count": 265 } },
+        { "ticker": "BKSY", "structure": "Naked LEAP", "long_strike": 20, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 7.56, "current_price": 7.56, "delta": 0.7, "contracts": 1, "stock_price": 20.82, "entry_stock": 20.82, "trend": 0.3, "momentum": 0.1, "volatility": 0.5, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.45, "jitter": 0.12, "thrust": 0.25, "damage": 0.1 }, "history": { "high_52w": 31.58, "low_52w": 6.62, "return_1d": 10.14, "return_1w": -1.64, "return_1m": 22.3, "return_3m": -14.73, "return_1y": 87.67, "daily_count": 267 } },
+        { "ticker": "RDW", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.55, "contracts": 1, "stock_price": 9.07, "entry_stock": 9.07, "trend": 0.2, "momentum": 0.1, "volatility": 0.4, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.1, "thrust": 0.2, "damage": 0.15 }, "history": { "high_52w": 25.88, "low_52w": 5.08, "return_1d": 19.99, "return_1w": 15.28, "return_1m": 71.05, "return_3m": -12.56, "return_1y": -48.98, "daily_count": 266 } },
+        { "ticker": "PL", "structure": "Bull Spread", "long_strike": 4, "short_strike": 6, "expiry": "2027-01-15", "entry_cost": 0.65, "current_price": 0.65, "delta": 0.43, "contracts": 1, "stock_price": 20.4, "entry_stock": 20.4, "trend": -0.2, "momentum": -0.1, "volatility": 0.6, "activity": 0.2, "signalState": "bear", "visual": { "glow": 0.3, "jitter": 0.2, "thrust": 0.1, "damage": 0.3 }, "history": { "high_52w": 20.8, "low_52w": 2.95, "return_1d": 3.34, "return_1w": 0.23, "return_1m": 72.55, "return_3m": 36.7, "return_1y": 382.35, "daily_count": 267 } },
+        { "ticker": "EVEX", "structure": "Bull Spread", "long_strike": 7.5, "short_strike": 12.5, "expiry": "2027-01-15", "entry_cost": 2.0, "current_price": 2.0, "delta": 0.45, "contracts": 1, "stock_price": 4.18, "entry_stock": 4.18, "trend": 0.1, "momentum": 0.0, "volatility": 0.5, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.35, "jitter": 0.15, "thrust": 0.15, "damage": 0.2 }, "history": { "high_52w": 7.5, "low_52w": 3.08, "return_1d": 3.11, "return_1w": -6.44, "return_1m": -9.75, "return_3m": -0.9, "return_1y": -24.15, "daily_count": 380 } }
       ],
       "catalysts": [
         { "date": "2026-02-15", "ticker": "LUNR", "event": "IM-2 Lunar Mission", "impact": "HIGH", "status": "UPCOMING" },
@@ -2661,38 +2338,47 @@
     // =========================================================================
 
     async function init() {
-      const loadingBar = document.getElementById('loading-bar');
-      const loadingStatus = document.getElementById('loading-status');
-      const loadingScreen = document.getElementById('loading-screen');
-
-      // Simulate boot sequence
-      const stages = [
-        { progress: 20, status: 'LOADING FLEET MANIFEST...' },
-        { progress: 40, status: 'INITIALIZING TELEMETRY...' },
-        { progress: 60, status: 'SYNCING MARKET DATA...' },
-        { progress: 80, status: 'CALIBRATING SENSORS...' },
-        { progress: 100, status: 'SYSTEMS READY' }
-      ];
-
-      for (const stage of stages) {
-        loadingBar.style.width = stage.progress + '%';
-        loadingStatus.textContent = stage.status;
-        await new Promise(r => setTimeout(r, 400));
+      // Use new Telemetry Lock-In transition if available
+      if (window.TelemetryLockIn) {
+        await TelemetryLockIn.run({
+          onDataReady: async () => {
+            // Load and render data during lock-in
+            const data = await loadData();
+            renderFleet(data.positions);
+            renderThemes(data.positions);
+            renderCatalysts(data.catalysts);
+            renderStats(data);
+            
+            // Apply semantic state based on overall portfolio
+            if (window.VisualTiers) {
+              const avgTrend = data.positions.reduce((sum, p) => sum + (p.trend || 0), 0) / data.positions.length;
+              const avgVolatility = data.positions.reduce((sum, p) => sum + (p.volatility || 0), 0) / data.positions.length;
+              const tiers = VisualTiers.telemetryToTiers({
+                trend: avgTrend,
+                momentum: avgTrend,
+                volatility: avgVolatility,
+                activity: 0.5
+              });
+              const state = VisualTiers.getSemanticState(tiers);
+              VisualTiers.applySemanticState(state);
+            }
+          },
+          telemetryData: {
+            signal: 'LOCKED',
+            status: 'FLEET READY'
+          }
+        });
+      } else {
+        // Fallback: just load data directly
+        const data = await loadData();
+        renderFleet(data.positions);
+        renderThemes(data.positions);
+        renderCatalysts(data.catalysts);
+        renderStats(data);
       }
-
-      // Load and render data
-      const data = await loadData();
-      renderFleet(data.positions);
-      renderThemes(data.positions);
-      renderCatalysts(data.catalysts);
-      renderStats(data);
 
       // Focus ticker from URL parameter (e.g., ?ticker=RKLB from derivatives)
       focusTickerFromUrl();
-
-      // Hide loading screen
-      await new Promise(r => setTimeout(r, 500));
-      loadingScreen.classList.add('hidden');
 
       // Ship card click → open ship telemetry page
       document.getElementById('fleet-grid').addEventListener('click', (e) => {
@@ -2786,6 +2472,10 @@
       <iframe id="moduleViewerFrame" class="moduleViewer__frame" title="Module content"></iframe>
     </div>
   </div>
+
+  <!-- UI Overhaul Modules -->
+  <script src="../js/ui/visual-tiers.js"></script>
+  <script src="../js/ui/telemetry-lockin.js"></script>
 
   <!-- Ship Behavior Engine - State machine for reactive sprites -->
   <script src="../js/ships/ship-behavior.js"></script>

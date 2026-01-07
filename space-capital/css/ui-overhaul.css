@@ -1,0 +1,857 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SPACE CAPITAL UI OVERHAUL
+   ═══════════════════════════════════════════════════════════════════════════
+   Implements ChatGPT UI Audit recommendations:
+   1. Telemetry Lock-In transition (replaces WARP)
+   2. Pixel discipline - hard edges, step-based easing
+   3. Semantic CRT effects - only for error/bearish states
+   4. Panel-driven navigation
+   5. Visual tier system for telemetry
+   6. Strict palette separation
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. PALETTE SEPARATION - UI vs Ship Colors
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* UI PALETTE - Neutral industrial */
+  --ui-bg-deep: #08080C;
+  --ui-bg-panel: #0E0E14;
+  --ui-bg-surface: #14141C;
+  --ui-bg-elevated: #1A1A24;
+  
+  --ui-border-harsh: #FF2975;
+  --ui-border-active: rgba(255, 41, 117, 0.6);
+  --ui-border-panel: #2A2A36;
+  --ui-border-dim: #1E1E28;
+  
+  --ui-text-bright: #F0F0F0;
+  --ui-text-normal: #CCCCDD;
+  --ui-text-dim: #666677;
+  --ui-text-ghost: #444455;
+  
+  /* UI accents - muted versions, never borrowed from ships */
+  --ui-accent-primary: #FF2975;
+  --ui-accent-data: #00CCCC;
+  --ui-accent-warning: #FFAA00;
+  --ui-accent-success: #22DD66;
+  --ui-accent-danger: #FF3355;
+  
+  /* STEP-BASED TIMING */
+  --timing-snap: steps(1);
+  --timing-step-4: steps(4);
+  --timing-step-8: steps(8);
+  
+  /* PIXEL DISCIPLINE */
+  --stroke-thin: 1px;
+  --stroke-medium: 2px;
+  --stroke-thick: 3px;
+  --corner-sharp: 0px;
+  --corner-minimal: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. PIXEL DISCIPLINE - Hard edges, no blur
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Override soft shadows/glows with hard pixel equivalents */
+.pixel-discipline {
+  /* Dithered shadow fallback using border-image or multiple box-shadows */
+  box-shadow: 
+    2px 2px 0 0 rgba(0,0,0,0.4),
+    4px 4px 0 0 rgba(0,0,0,0.2);
+  border-radius: var(--corner-sharp);
+}
+
+/* Hard pixel outlines instead of soft glows */
+.hard-outline {
+  outline: var(--stroke-thin) solid var(--ui-border-harsh);
+  outline-offset: var(--stroke-thin);
+}
+
+/* Step-based animations - no easing, arcade feel */
+@keyframes step-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes step-pulse-4 {
+  0%, 24% { opacity: 1; }
+  25%, 49% { opacity: 0.7; }
+  50%, 74% { opacity: 0.4; }
+  75%, 100% { opacity: 0.7; }
+}
+
+@keyframes step-scan {
+  0% { transform: translateY(0%); }
+  25% { transform: translateY(25%); }
+  50% { transform: translateY(50%); }
+  75% { transform: translateY(75%); }
+  100% { transform: translateY(100%); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. TELEMETRY LOCK-IN TRANSITION
+   ═══════════════════════════════════════════════════════════════════════════
+   Replaces WARP with data configuration feel:
+   - Ship freezes in silhouette
+   - Telemetry layers snap on
+   - Hard cut to main experience
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lockin-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--ui-bg-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.lockin-screen.complete {
+  animation: lockin-exit 200ms var(--timing-step-4) forwards;
+}
+
+@keyframes lockin-exit {
+  0% { opacity: 1; clip-path: inset(0 0 0 0); }
+  25% { clip-path: inset(0 0 0 50%); }
+  50% { clip-path: inset(0 0 0 75%); }
+  75% { clip-path: inset(0 0 0 90%); }
+  100% { opacity: 0; clip-path: inset(0 0 0 100%); visibility: hidden; }
+}
+
+/* Ship silhouette container */
+.lockin-ship {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lockin-ship-silhouette {
+  width: 120px;
+  height: 120px;
+  background: var(--ui-text-ghost);
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,10 90,90 50,75 10,90" fill="white"/></svg>');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,10 90,90 50,75 10,90" fill="white"/></svg>');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  animation: silhouette-idle 800ms var(--timing-step-4) infinite;
+}
+
+@keyframes silhouette-idle {
+  0%, 50% { transform: translateY(0); }
+  25% { transform: translateY(-2px); }
+  75% { transform: translateY(2px); }
+}
+
+/* Telemetry layers that snap on */
+.lockin-layer {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lockin-layer.active {
+  opacity: 1;
+  animation: layer-snap 100ms var(--timing-snap);
+}
+
+@keyframes layer-snap {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Layer: Engine glow */
+.lockin-layer-engine {
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 40px;
+  background: var(--ui-accent-warning);
+  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+  box-shadow: 0 0 0 2px var(--ui-accent-warning);
+}
+
+/* Layer: Shield outline */
+.lockin-layer-shield {
+  inset: 10%;
+  border: var(--stroke-medium) solid var(--ui-accent-data);
+  border-radius: 50%;
+}
+
+/* Layer: Targeting brackets */
+.lockin-layer-targeting {
+  inset: 0;
+}
+
+.lockin-layer-targeting::before,
+.lockin-layer-targeting::after,
+.lockin-layer-targeting .corner-bl,
+.lockin-layer-targeting .corner-br {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--ui-accent-primary);
+  border-style: solid;
+}
+
+.lockin-layer-targeting::before {
+  top: 0; left: 0;
+  border-width: var(--stroke-medium) 0 0 var(--stroke-medium);
+}
+
+.lockin-layer-targeting::after {
+  top: 0; right: 0;
+  border-width: var(--stroke-medium) var(--stroke-medium) 0 0;
+}
+
+.lockin-layer-targeting .corner-bl {
+  bottom: 0; left: 0;
+  border-width: 0 0 var(--stroke-medium) var(--stroke-medium);
+}
+
+.lockin-layer-targeting .corner-br {
+  bottom: 0; right: 0;
+  border-width: 0 var(--stroke-medium) var(--stroke-medium) 0;
+}
+
+/* Telemetry readout panels */
+.lockin-telemetry {
+  position: absolute;
+  background: var(--ui-bg-panel);
+  border: var(--stroke-thin) solid var(--ui-border-panel);
+  padding: 0.5rem 0.75rem;
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem;
+  color: var(--ui-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.lockin-telemetry.active {
+  opacity: 1;
+  transform: translateX(0);
+  animation: telem-snap 100ms var(--timing-snap);
+}
+
+.lockin-telemetry-left {
+  left: -140px;
+  top: 30%;
+}
+
+.lockin-telemetry-right {
+  right: -140px;
+  top: 40%;
+}
+
+.lockin-telemetry-value {
+  color: var(--ui-accent-data);
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+/* Status text */
+.lockin-status {
+  margin-top: 2rem;
+  font-family: 'VT323', monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.2em;
+  color: var(--ui-text-ghost);
+  text-transform: uppercase;
+}
+
+.lockin-status.active {
+  color: var(--ui-text-dim);
+  animation: step-blink 400ms var(--timing-snap) infinite;
+}
+
+/* Progress indicator - segmented bar */
+.lockin-progress {
+  display: flex;
+  gap: 4px;
+  margin-top: 1rem;
+}
+
+.lockin-progress-segment {
+  width: 40px;
+  height: 4px;
+  background: var(--ui-border-dim);
+  transition: background 0ms;
+}
+
+.lockin-progress-segment.filled {
+  background: var(--ui-accent-primary);
+  box-shadow: 0 0 0 1px var(--ui-accent-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. SEMANTIC CRT/GLITCH EFFECTS
+   ═══════════════════════════════════════════════════════════════════════════
+   CRT effects ONLY appear for:
+   - Error states
+   - Bearish/unstable regimes
+   - Critical warnings
+   
+   Bullish states = clean, bright, no distortion
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Default: NO CRT effects */
+.scanlines,
+.vhs-noise,
+.crt-vignette {
+  opacity: 0;
+  transition: opacity 200ms var(--timing-step-4);
+}
+
+/* Enable CRT for semantic states */
+body.regime-bearish .scanlines,
+body.regime-bearish .vhs-noise {
+  opacity: 0.4;
+}
+
+body.regime-volatile .scanlines {
+  opacity: 0.3;
+  animation: scanline-jitter 200ms var(--timing-step-8) infinite;
+}
+
+body.state-error .vhs-noise,
+body.state-error .scanlines {
+  opacity: 0.6;
+}
+
+body.state-critical .vhs-noise {
+  opacity: 0.8;
+  animation: noise-critical 100ms var(--timing-step-4) infinite;
+}
+
+@keyframes scanline-jitter {
+  0%, 50% { transform: translateY(0); }
+  25% { transform: translateY(-1px); }
+  75% { transform: translateY(1px); }
+}
+
+@keyframes noise-critical {
+  0%, 50% { opacity: 0.8; }
+  25%, 75% { opacity: 0.5; }
+}
+
+/* Vignette only for warnings/errors */
+body.state-warning .crt-vignette {
+  opacity: 0.3;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(255, 170, 0, 0.1) 100%
+  );
+}
+
+body.state-error .crt-vignette,
+body.state-critical .crt-vignette {
+  opacity: 0.5;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 30%,
+    rgba(255, 51, 85, 0.15) 100%
+  );
+}
+
+/* Bullish states: CLEAN - actively suppress effects */
+body.regime-bullish .scanlines,
+body.regime-bullish .vhs-noise,
+body.regime-bullish .crt-vignette {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+body.regime-bullish {
+  /* Slightly brighter background for bullish */
+  --ui-bg-deep: #0A0A10;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. PANEL-DRIVEN NAVIGATION
+   ═══════════════════════════════════════════════════════════════════════════
+   Navigation feels like changing ship modes, not page navigation:
+   - Opacity snaps
+   - Horizontal wipes
+   - Vertical data stack reveals
+   - No scroll-based reveals
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Navigation container */
+.nav-panel {
+  display: flex;
+  gap: 2px;
+  background: var(--ui-bg-deep);
+  border: var(--stroke-thin) solid var(--ui-border-panel);
+  padding: 2px;
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  background: var(--ui-bg-panel);
+  border: var(--stroke-thin) solid transparent;
+  color: var(--ui-text-dim);
+  font-family: 'VT323', monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: none;
+  position: relative;
+}
+
+.nav-btn:hover {
+  background: var(--ui-bg-surface);
+  color: var(--ui-text-normal);
+}
+
+.nav-btn.active {
+  background: var(--ui-bg-elevated);
+  border-color: var(--ui-accent-primary);
+  color: var(--ui-accent-primary);
+}
+
+/* Active indicator - hard line, no glow */
+.nav-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--stroke-medium);
+  background: var(--ui-accent-primary);
+}
+
+/* Panel content transitions */
+.panel-content {
+  opacity: 0;
+  transform: translateX(-20px);
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.panel-content.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  animation: panel-snap-in 150ms var(--timing-step-4);
+}
+
+.panel-content.exiting {
+  animation: panel-snap-out 100ms var(--timing-step-4) forwards;
+}
+
+@keyframes panel-snap-in {
+  0% { opacity: 0; clip-path: inset(0 100% 0 0); }
+  33% { opacity: 0.5; clip-path: inset(0 66% 0 0); }
+  66% { opacity: 0.8; clip-path: inset(0 33% 0 0); }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+@keyframes panel-snap-out {
+  0% { opacity: 1; clip-path: inset(0 0 0 0); }
+  33% { opacity: 0.8; clip-path: inset(0 0 0 33%); }
+  66% { opacity: 0.5; clip-path: inset(0 0 0 66%); }
+  100% { opacity: 0; clip-path: inset(0 0 0 100%); }
+}
+
+/* Vertical data stack reveal */
+.data-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.data-stack-item {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.data-stack.revealed .data-stack-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.data-stack.revealed .data-stack-item:nth-child(1) { animation: stack-reveal 100ms 0ms var(--timing-snap) forwards; }
+.data-stack.revealed .data-stack-item:nth-child(2) { animation: stack-reveal 100ms 50ms var(--timing-snap) forwards; }
+.data-stack.revealed .data-stack-item:nth-child(3) { animation: stack-reveal 100ms 100ms var(--timing-snap) forwards; }
+.data-stack.revealed .data-stack-item:nth-child(4) { animation: stack-reveal 100ms 150ms var(--timing-snap) forwards; }
+.data-stack.revealed .data-stack-item:nth-child(5) { animation: stack-reveal 100ms 200ms var(--timing-snap) forwards; }
+
+@keyframes stack-reveal {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. VISUAL TIER SYSTEM
+   ═══════════════════════════════════════════════════════════════════════════
+   Replace charts with animated indicators and tier labels
+   Telemetry should be FELT, not read
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tier badge */
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--ui-bg-panel);
+  border: var(--stroke-thin) solid var(--ui-border-panel);
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tier-badge-label {
+  color: var(--ui-text-ghost);
+}
+
+.tier-badge-value {
+  color: var(--ui-text-bright);
+  font-weight: bold;
+}
+
+/* Tier levels with Roman numerals */
+.tier-badge[data-tier="I"] .tier-badge-value { color: var(--ui-text-dim); }
+.tier-badge[data-tier="II"] .tier-badge-value { color: var(--ui-text-dim); }
+.tier-badge[data-tier="III"] .tier-badge-value { color: var(--ui-text-normal); }
+.tier-badge[data-tier="IV"] .tier-badge-value { color: var(--ui-accent-data); }
+.tier-badge[data-tier="V"] .tier-badge-value { color: var(--ui-accent-data); }
+.tier-badge[data-tier="VI"] .tier-badge-value { color: var(--ui-accent-warning); }
+.tier-badge[data-tier="VII"] .tier-badge-value { color: var(--ui-accent-warning); }
+.tier-badge[data-tier="VIII"] .tier-badge-value { color: var(--ui-accent-primary); }
+.tier-badge[data-tier="IX"] .tier-badge-value { color: var(--ui-accent-primary); }
+.tier-badge[data-tier="X"] .tier-badge-value { color: var(--ui-accent-danger); }
+
+/* Animated tier indicator */
+.tier-indicator {
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  align-items: flex-end;
+}
+
+.tier-bar {
+  width: 4px;
+  background: var(--ui-border-dim);
+  transition: none;
+}
+
+.tier-bar.filled {
+  background: currentColor;
+}
+
+.tier-indicator[data-tier="I"] { color: var(--ui-text-dim); }
+.tier-indicator[data-tier="II"] { color: var(--ui-text-dim); }
+.tier-indicator[data-tier="III"] { color: var(--ui-text-normal); }
+.tier-indicator[data-tier="IV"] { color: var(--ui-accent-data); }
+.tier-indicator[data-tier="V"] { color: var(--ui-accent-data); }
+.tier-indicator[data-tier="VI"] { color: var(--ui-accent-warning); }
+.tier-indicator[data-tier="VII"] { color: var(--ui-accent-warning); }
+.tier-indicator[data-tier="VIII"] { color: var(--ui-accent-primary); }
+.tier-indicator[data-tier="IX"] { color: var(--ui-accent-primary); }
+.tier-indicator[data-tier="X"] { color: var(--ui-accent-danger); }
+
+/* Stepped bar heights */
+.tier-bar:nth-child(1) { height: 20%; }
+.tier-bar:nth-child(2) { height: 30%; }
+.tier-bar:nth-child(3) { height: 40%; }
+.tier-bar:nth-child(4) { height: 50%; }
+.tier-bar:nth-child(5) { height: 60%; }
+.tier-bar:nth-child(6) { height: 70%; }
+.tier-bar:nth-child(7) { height: 80%; }
+.tier-bar:nth-child(8) { height: 90%; }
+.tier-bar:nth-child(9) { height: 95%; }
+.tier-bar:nth-child(10) { height: 100%; }
+
+/* Pulsing for critical tiers */
+.tier-indicator[data-tier="IX"] .tier-bar.filled,
+.tier-indicator[data-tier="X"] .tier-bar.filled {
+  animation: tier-pulse 300ms var(--timing-step-4) infinite;
+}
+
+@keyframes tier-pulse {
+  0%, 50% { opacity: 1; }
+  25%, 75% { opacity: 0.6; }
+}
+
+/* Status readout - single line with tier */
+.status-readout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--ui-bg-panel);
+  border: var(--stroke-thin) solid var(--ui-border-panel);
+}
+
+.status-readout-label {
+  font-family: 'VT323', monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ui-text-ghost);
+  min-width: 60px;
+}
+
+.status-readout-tier {
+  font-family: 'VT323', monospace;
+  font-size: 1rem;
+  font-weight: bold;
+  min-width: 40px;
+}
+
+/* Telemetry grid - tiers instead of charts */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.telemetry-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0.5rem;
+  background: var(--ui-bg-panel);
+  border: var(--stroke-thin) solid var(--ui-border-dim);
+}
+
+.telemetry-cell-label {
+  font-family: 'VT323', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ui-text-ghost);
+}
+
+.telemetry-cell-value {
+  font-family: 'VT323', monospace;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. SHIP SELECT PIXEL DISCIPLINE
+   ═══════════════════════════════════════════════════════════════════════════
+   Override ship-select.css soft effects with hard pixel styling
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Override soft glows with hard outlines */
+.ship-select-card {
+  border-radius: var(--corner-sharp) !important;
+  box-shadow: 
+    2px 2px 0 0 rgba(0,0,0,0.5),
+    4px 4px 0 0 rgba(0,0,0,0.3) !important;
+  transition: none !important;
+}
+
+.ship-select-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    3px 3px 0 0 rgba(0,0,0,0.5),
+    6px 6px 0 0 rgba(0,0,0,0.3),
+    0 0 0 var(--stroke-medium) var(--ui-accent-primary) !important;
+}
+
+/* Remove soft card glow pulse */
+.ship-card-glow {
+  display: none !important;
+}
+
+/* Hard pixel sprite shadow */
+.ship-card-sprite {
+  filter: none !important;
+  /* Pixel-perfect shadow using box-shadow on a wrapper */
+}
+
+.ship-card-sprite-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  box-shadow: 
+    2px 2px 0 0 rgba(51, 255, 153, 0.3),
+    -2px -2px 0 0 rgba(0, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+/* Step-based card entrance */
+.ship-select-card {
+  animation: card-enter-stepped 400ms var(--timing-step-8) backwards !important;
+}
+
+@keyframes card-enter-stepped {
+  0% { opacity: 0; transform: translateY(16px); }
+  12.5% { opacity: 0.125; transform: translateY(14px); }
+  25% { opacity: 0.25; transform: translateY(12px); }
+  37.5% { opacity: 0.375; transform: translateY(10px); }
+  50% { opacity: 0.5; transform: translateY(8px); }
+  62.5% { opacity: 0.625; transform: translateY(6px); }
+  75% { opacity: 0.75; transform: translateY(4px); }
+  87.5% { opacity: 0.875; transform: translateY(2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Stat bars - hard segmented look */
+.ship-stat-bar {
+  background: var(--ui-bg-deep) !important;
+  border: var(--stroke-thin) solid var(--ui-border-dim) !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+.ship-stat-fill {
+  border-radius: 0 !important;
+  /* Dithered edge effect */
+  background-image: linear-gradient(
+    90deg,
+    currentColor 0%,
+    currentColor 90%,
+    transparent 90%,
+    transparent 100%
+  ) !important;
+  background-size: 4px 100% !important;
+}
+
+/* Title - remove smooth pulse */
+.ship-select-title {
+  animation: none !important;
+  text-shadow: 
+    2px 2px 0 rgba(0,0,0,0.8),
+    0 0 0 2px var(--ui-accent-primary) !important;
+}
+
+/* Button - hard edges */
+.ship-select-btn {
+  border-radius: 0 !important;
+  box-shadow: 
+    2px 2px 0 0 rgba(0,0,0,0.5) !important;
+  transition: none !important;
+}
+
+.ship-select-btn:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 
+    3px 3px 0 0 rgba(0,0,0,0.5) !important;
+}
+
+.ship-select-btn:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow: 
+    1px 1px 0 0 rgba(0,0,0,0.5) !important;
+}
+
+/* Remove btn glow sweep */
+.ship-select-btn .btn-glow {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. TARGETING CORNERS (ODST-style)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.targeting-frame {
+  position: relative;
+}
+
+.targeting-frame::before,
+.targeting-frame::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--ui-accent-primary);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.targeting-frame::before {
+  top: 0;
+  left: 0;
+  border-width: var(--stroke-medium) 0 0 var(--stroke-medium);
+}
+
+.targeting-frame::after {
+  top: 0;
+  right: 0;
+  border-width: var(--stroke-medium) var(--stroke-medium) 0 0;
+}
+
+/* Additional corners via pseudo-elements on children or extra divs */
+.targeting-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--ui-accent-primary);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.targeting-corner.bl {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 var(--stroke-medium) var(--stroke-medium);
+}
+
+.targeting-corner.br {
+  bottom: 0;
+  right: 0;
+  border-width: 0 var(--stroke-medium) var(--stroke-medium) 0;
+}
+
+/* Animated targeting corners */
+.targeting-frame.scanning::before,
+.targeting-frame.scanning::after,
+.targeting-frame.scanning .targeting-corner {
+  animation: corner-scan 600ms var(--timing-step-8) infinite;
+}
+
+@keyframes corner-scan {
+  0%, 100% { border-color: var(--ui-accent-primary); }
+  50% { border-color: var(--ui-accent-data); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. REDUCED MOTION SUPPORT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .scanlines,
+  .vhs-noise,
+  .crt-vignette {
+    display: none !important;
+  }
+  
+  .lockin-screen.complete {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
