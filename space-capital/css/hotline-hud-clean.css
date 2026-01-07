@@ -1,0 +1,519 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOTLINE HUD CLEANUP — v2
+   
+   Fixes:
+   - Remove all dashed borders (they look unfinished)
+   - Cleaner sidebar panels with consistent hierarchy
+   - Better color swatch presentation
+   - Unified equipment slot styling
+   - Improved visual rhythm
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. GLOBAL BORDER CLEANUP — No more dashes
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+* {
+  border-style: solid !important;
+}
+
+/* Kill any remaining dashed/dotted borders */
+[style*="dashed"],
+[style*="dotted"] {
+  border-style: solid !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. RIGHT SIDEBAR PANELS — Clean, unified cards
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hangar-sidebar.right .stat-block,
+.hangar-sidebar.right .panel,
+.hangar-sidebar.right [class*="block"],
+.hull-colors-panel,
+.accent-colors-panel,
+.arena-record-panel,
+.quick-actions-panel {
+  background: rgba(10, 0, 8, 0.85) !important;
+  border: 1px solid rgba(255, 0, 102, 0.25) !important;
+  border-left: 3px solid #ff0066 !important;
+  border-radius: 0 !important;
+  padding: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Panel headers - consistent styling */
+.hangar-sidebar.right .stat-block-header,
+.hangar-sidebar.right .panel-header,
+.hangar-sidebar.right h3,
+.hangar-sidebar.right h4 {
+  font-family: 'VT323', monospace !important;
+  font-size: 12px !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  color: #ff0066 !important;
+  margin: 0 0 10px 0 !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid rgba(255, 0, 102, 0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Panel header icons */
+.hangar-sidebar.right .stat-block-icon,
+.hangar-sidebar.right .panel-icon {
+  font-size: 14px !important;
+  color: #ff0066 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. COLOR SWATCHES — Clean grid, no jank
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.color-grid,
+.hull-colors-grid,
+.accent-colors-grid,
+[class*="color-grid"] {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(32px, 1fr)) !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+.color-swatch,
+.hull-color-btn,
+.accent-color-btn,
+[class*="color-btn"],
+[class*="color-option"] {
+  width: 32px !important;
+  height: 32px !important;
+  border: 2px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.1s steps(2) !important;
+  position: relative !important;
+  /* Remove janky animations */
+  animation: none !important;
+}
+
+.color-swatch:hover,
+.hull-color-btn:hover,
+.accent-color-btn:hover,
+[class*="color-btn"]:hover {
+  border-color: #ff0066 !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 0 12px rgba(255, 0, 102, 0.5) !important;
+  z-index: 2 !important;
+}
+
+.color-swatch.active,
+.color-swatch.selected,
+.hull-color-btn.active,
+.accent-color-btn.active,
+[class*="color-btn"].active {
+  border-color: #ff0066 !important;
+  box-shadow: 
+    0 0 0 2px #0a0008,
+    0 0 0 4px #ff0066,
+    0 0 15px rgba(255, 0, 102, 0.4) !important;
+  transform: scale(1.05) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. EQUIPMENT GRID — Industrial hardpoints, not empty boxes
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.equipment-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 8px !important;
+}
+
+.equipment-slot {
+  background: rgba(15, 5, 12, 0.9) !important;
+  border: 1px solid rgba(255, 0, 102, 0.2) !important;
+  border-radius: 0 !important;
+  padding: 12px 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  min-height: 70px !important;
+  position: relative !important;
+  transition: all 0.15s steps(3) !important;
+}
+
+/* Remove the corner bracket pseudo-elements */
+.equipment-slot::before,
+.equipment-slot::after {
+  display: none !important;
+}
+
+/* Slot icon */
+.equipment-slot-icon,
+.equipment-slot .icon {
+  font-size: 18px !important;
+  color: rgba(255, 0, 102, 0.4) !important;
+  transition: color 0.15s !important;
+}
+
+/* Slot label */
+.equipment-slot-label,
+.equipment-slot .label {
+  font-family: 'VT323', monospace !important;
+  font-size: 10px !important;
+  letter-spacing: 0.1em !important;
+  color: rgba(255, 200, 220, 0.5) !important;
+  text-transform: uppercase !important;
+}
+
+/* Hover state */
+.equipment-slot:hover {
+  border-color: rgba(255, 0, 102, 0.5) !important;
+  background: rgba(255, 0, 102, 0.08) !important;
+}
+
+.equipment-slot:hover .equipment-slot-icon,
+.equipment-slot:hover .icon {
+  color: #ff0066 !important;
+}
+
+/* Filled/equipped state */
+.equipment-slot.filled,
+.equipment-slot.equipped,
+.equipment-slot[data-equipped="true"] {
+  border-color: rgba(170, 255, 0, 0.4) !important;
+  background: 
+    radial-gradient(ellipse at center, rgba(170, 255, 0, 0.1), transparent 70%),
+    rgba(15, 5, 12, 0.9) !important;
+}
+
+.equipment-slot.filled .equipment-slot-icon,
+.equipment-slot.equipped .icon {
+  color: #aaff00 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. ARENA RECORD — Clean stats display
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.arena-record,
+.arena-stats,
+[class*="arena-record"] {
+  display: flex !important;
+  justify-content: space-around !important;
+  gap: 16px !important;
+  padding: 8px 0 !important;
+}
+
+.arena-stat,
+.record-stat {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.arena-stat-value,
+.record-value {
+  font-family: 'VT323', monospace !important;
+  font-size: 24px !important;
+  color: #aaff00 !important;
+  text-shadow: 0 0 10px rgba(170, 255, 0, 0.4) !important;
+}
+
+.arena-stat-label,
+.record-label {
+  font-family: 'VT323', monospace !important;
+  font-size: 10px !important;
+  letter-spacing: 0.15em !important;
+  color: rgba(255, 200, 220, 0.5) !important;
+  text-transform: uppercase !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. QUICK ACTIONS — Dangerous buttons
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.quick-actions,
+.action-buttons,
+[class*="quick-actions"] {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.quick-action-btn,
+.action-btn,
+.hangar-action-btn {
+  font-family: 'VT323', monospace !important;
+  font-size: 14px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  padding: 12px 16px !important;
+  border: 2px solid !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.1s steps(2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+/* Enter Arena - Primary danger */
+.enter-arena-btn,
+.arena-btn,
+button[class*="arena"],
+.quick-action-btn.primary {
+  background: linear-gradient(180deg, rgba(255, 122, 0, 0.25), rgba(255, 0, 102, 0.15)) !important;
+  border-color: #ff7a00 !important;
+  color: #ff7a00 !important;
+  text-shadow: 0 0 10px rgba(255, 122, 0, 0.5) !important;
+}
+
+.enter-arena-btn:hover,
+.arena-btn:hover,
+button[class*="arena"]:hover,
+.quick-action-btn.primary:hover {
+  background: #ff7a00 !important;
+  color: #0a0008 !important;
+  box-shadow: 0 0 25px rgba(255, 122, 0, 0.5) !important;
+  text-shadow: none !important;
+}
+
+/* Paint Bay - Secondary */
+.paint-bay-btn,
+button[class*="paint"],
+.quick-action-btn.secondary {
+  background: linear-gradient(180deg, rgba(170, 255, 0, 0.15), rgba(170, 255, 0, 0.05)) !important;
+  border-color: #aaff00 !important;
+  color: #aaff00 !important;
+  text-shadow: 0 0 10px rgba(170, 255, 0, 0.5) !important;
+}
+
+.paint-bay-btn:hover,
+button[class*="paint"]:hover,
+.quick-action-btn.secondary:hover {
+  background: #aaff00 !important;
+  color: #0a0008 !important;
+  box-shadow: 0 0 25px rgba(170, 255, 0, 0.5) !important;
+  text-shadow: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. LEFT SIDEBAR — Telemetry panels (these are good, minor tweaks)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hangar-sidebar.left .stat-block {
+  background: rgba(10, 0, 8, 0.85) !important;
+  border: 1px solid rgba(255, 0, 102, 0.25) !important;
+  border-left: 3px solid #ff0066 !important;
+  border-radius: 0 !important;
+}
+
+/* Telemetry bars - cleaner */
+.stat-bar-wrap,
+.telemetry-bar-wrap {
+  height: 8px !important;
+  background: rgba(10, 0, 8, 0.8) !important;
+  border: 1px solid rgba(255, 0, 102, 0.2) !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Remove redline stripes for cleaner look */
+.stat-bar-wrap::after {
+  display: none !important;
+}
+
+.stat-bar,
+.stat-fill,
+.telemetry-bar {
+  height: 100% !important;
+  border-radius: 0 !important;
+  transition: width 0.3s steps(8) !important;
+}
+
+/* Regime bias button */
+.regime-toggle,
+.regime-btn,
+button[class*="regime"] {
+  background: rgba(255, 122, 0, 0.15) !important;
+  border: 2px solid #ff7a00 !important;
+  color: #ff7a00 !important;
+  font-family: 'VT323', monospace !important;
+  font-size: 14px !important;
+  letter-spacing: 0.1em !important;
+  padding: 8px 20px !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+}
+
+.regime-toggle:hover,
+.regime-btn:hover,
+button[class*="regime"]:hover {
+  background: #ff7a00 !important;
+  color: #0a0008 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. SHIP SELECTOR GRID — Clean thumbnails
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ship-selector-grid,
+.ship-thumbnails {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)) !important;
+  gap: 6px !important;
+  padding: 8px !important;
+  background: rgba(10, 0, 8, 0.5) !important;
+  border: 1px solid rgba(255, 0, 102, 0.15) !important;
+}
+
+.ship-selector-btn,
+.ship-thumbnail {
+  width: 48px !important;
+  height: 48px !important;
+  padding: 4px !important;
+  background: rgba(15, 5, 12, 0.9) !important;
+  border: 2px solid rgba(255, 0, 102, 0.2) !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.1s steps(2) !important;
+}
+
+.ship-selector-btn:hover,
+.ship-thumbnail:hover {
+  border-color: #ff0066 !important;
+  transform: scale(1.08) !important;
+  box-shadow: 0 0 15px rgba(255, 0, 102, 0.4) !important;
+}
+
+.ship-selector-btn.active,
+.ship-thumbnail.active {
+  border-color: #ff0066 !important;
+  background: rgba(255, 0, 102, 0.15) !important;
+  box-shadow: 
+    0 0 0 1px #cc0055,
+    0 0 20px rgba(255, 0, 102, 0.3) !important;
+}
+
+.ship-selector-btn img,
+.ship-thumbnail img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+}
+
+/* Remove corner notches on ship buttons */
+.ship-selector-btn::before,
+.ship-thumbnail::before {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. SHIP SHOWCASE — Cleaner containment ring
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ship-showcase-ring {
+  border: 2px solid rgba(255, 0, 102, 0.3) !important;
+  box-shadow: 
+    0 0 60px rgba(255, 0, 102, 0.15),
+    inset 0 0 80px rgba(255, 0, 102, 0.05) !important;
+}
+
+/* Remove the busy warning text and bracket decorations */
+.ship-showcase-ring::before,
+.ship-showcase::after {
+  display: none !important;
+}
+
+/* Keep inner pulse but make it subtle */
+.ship-showcase-ring::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: -15px !important;
+  border: 1px solid rgba(255, 0, 102, 0.15) !important;
+  border-radius: 50% !important;
+  animation: subtle-ring-pulse 3s ease-in-out infinite !important;
+  pointer-events: none !important;
+}
+
+@keyframes subtle-ring-pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 0.3; 
+  }
+  50% { 
+    transform: scale(1.03); 
+    opacity: 0.5; 
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10. GENERAL CLEANUP — Remove visual noise
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Remove any dashed showcase rings */
+.ship-showcase-ring::before {
+  border-style: solid !important;
+}
+
+/* Clean up any stray decorations */
+.corner-bracket,
+.corner-cut,
+[class*="corner-"] {
+  display: none !important;
+}
+
+/* Consistent panel spacing */
+.hangar-sidebar .stat-block + .stat-block,
+.hangar-sidebar .panel + .panel {
+  margin-top: 12px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11. RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1200px) {
+  .color-grid,
+  .hull-colors-grid,
+  .accent-colors-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+  
+  .color-swatch,
+  .hull-color-btn,
+  .accent-color-btn {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hangar-sidebar.right .stat-block,
+  .hangar-sidebar.left .stat-block {
+    padding: 10px !important;
+  }
+  
+  .equipment-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .equipment-slot {
+    min-height: 60px !important;
+    padding: 10px 6px !important;
+  }
+  
+  .quick-action-btn,
+  .action-btn {
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+  }
+}
