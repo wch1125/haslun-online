@@ -866,6 +866,161 @@
       text-shadow: 0 0 5px var(--cyan);
     }
 
+    /* ═══════════════════════════════════════════════════════════════════════
+       SHIP JOURNEY VISUALIZATION - Historical data display
+       ═══════════════════════════════════════════════════════════════════════ */
+
+    /* 52-Week Range Indicator */
+    .journey-range {
+      margin-top: 0.5rem;
+      padding: 0.4rem 0.5rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dim);
+    }
+
+    .journey-range-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .journey-range-label {
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .journey-range-pct {
+      font-size: 0.6rem;
+      color: var(--cyan);
+      font-weight: bold;
+    }
+
+    .journey-range-bar {
+      position: relative;
+      height: 6px;
+      background: linear-gradient(90deg, 
+        var(--red-alert) 0%, 
+        var(--yellow) 25%,
+        var(--text-dim) 50%, 
+        var(--cyan) 75%,
+        var(--green-neon) 100%
+      );
+      border-radius: 3px;
+      overflow: visible;
+    }
+
+    .journey-range-marker {
+      position: absolute;
+      top: -3px;
+      width: 3px;
+      height: 12px;
+      background: #fff;
+      border-radius: 1px;
+      transform: translateX(-50%);
+      box-shadow: 0 0 6px #fff, 0 0 10px var(--cyan);
+    }
+
+    .journey-range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.2rem;
+    }
+
+    .journey-range-value {
+      font-size: 0.5rem;
+      color: var(--text-dim);
+    }
+
+    /* Historical Mood Ring - Return indicators */
+    .journey-mood {
+      display: flex;
+      justify-content: center;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+      padding: 0.3rem 0;
+    }
+
+    .mood-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+    }
+
+    .mood-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .mood-dot.positive {
+      background: var(--green-neon);
+      box-shadow: 0 0 6px var(--green-neon);
+    }
+
+    .mood-dot.negative {
+      background: var(--red-alert);
+      box-shadow: 0 0 6px var(--red-alert);
+    }
+
+    .mood-dot.neutral {
+      background: var(--text-dim);
+    }
+
+    .mood-dot.strong-positive {
+      background: var(--green-neon);
+      box-shadow: 0 0 10px var(--green-neon), 0 0 20px var(--green-neon);
+      animation: moodPulse 2s ease-in-out infinite;
+    }
+
+    .mood-dot.strong-negative {
+      background: var(--red-alert);
+      box-shadow: 0 0 10px var(--red-alert), 0 0 20px var(--red-alert);
+      animation: moodPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes moodPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .mood-label {
+      font-size: 0.45rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* Veteran Badge */
+    .veteran-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-size: 0.6rem;
+      padding: 0.15rem 0.3rem;
+      background: rgba(255, 215, 0, 0.15);
+      border: 1px solid rgba(255, 215, 0, 0.5);
+      color: #ffd700;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    .veteran-badge.apex {
+      background: rgba(0, 255, 255, 0.15);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .veteran-badge.survivor {
+      background: rgba(255, 41, 117, 0.15);
+      border-color: var(--magenta);
+      color: var(--magenta);
+    }
+
     /* Strike Range Indicator */
     .strike-range {
       display: flex;
@@ -1516,6 +1671,78 @@
     // RENDERING
     // =========================================================================
 
+    // Helper to get mood class based on return percentage
+    function getMoodClass(returnPct) {
+      if (returnPct >= 20) return 'strong-positive';
+      if (returnPct >= 5) return 'positive';
+      if (returnPct <= -20) return 'strong-negative';
+      if (returnPct <= -5) return 'negative';
+      return 'neutral';
+    }
+
+    // Render the journey visualization (52w range + mood ring)
+    function renderJourneyVisualization(position) {
+      const history = position.history;
+      if (!history) return '';
+
+      const { high_52w, low_52w, return_1d, return_1w, return_1m, return_3m, return_1y, daily_count } = history;
+      const currentPrice = position.stock_price;
+
+      // Calculate position in 52-week range (0-100%)
+      const range = high_52w - low_52w;
+      const rangePosition = range > 0 ? ((currentPrice - low_52w) / range) * 100 : 50;
+      const clampedPosition = Math.max(0, Math.min(100, rangePosition));
+
+      // Determine veteran status
+      let veteranBadge = '';
+      if (clampedPosition >= 95) {
+        veteranBadge = '<div class="veteran-badge apex">APEX</div>';
+      } else if (return_1y <= -40) {
+        veteranBadge = '<div class="veteran-badge survivor">SURVIVOR</div>';
+      } else if (daily_count >= 500) {
+        veteranBadge = '<div class="veteran-badge">VETERAN</div>';
+      }
+
+      return `
+        ${veteranBadge}
+        
+        <!-- Historical Mood Ring -->
+        <div class="journey-mood" title="Performance over time">
+          <div class="mood-indicator">
+            <div class="mood-dot ${getMoodClass(return_1d)}" title="1D: ${return_1d >= 0 ? '+' : ''}${return_1d.toFixed(1)}%"></div>
+            <span class="mood-label">1D</span>
+          </div>
+          <div class="mood-indicator">
+            <div class="mood-dot ${getMoodClass(return_1w)}" title="1W: ${return_1w >= 0 ? '+' : ''}${return_1w.toFixed(1)}%"></div>
+            <span class="mood-label">1W</span>
+          </div>
+          <div class="mood-indicator">
+            <div class="mood-dot ${getMoodClass(return_1m)}" title="1M: ${return_1m >= 0 ? '+' : ''}${return_1m.toFixed(1)}%"></div>
+            <span class="mood-label">1M</span>
+          </div>
+          <div class="mood-indicator">
+            <div class="mood-dot ${getMoodClass(return_3m)}" title="3M: ${return_3m >= 0 ? '+' : ''}${return_3m.toFixed(1)}%"></div>
+            <span class="mood-label">3M</span>
+          </div>
+        </div>
+
+        <!-- 52-Week Range Indicator -->
+        <div class="journey-range" title="Position in 52-week range">
+          <div class="journey-range-header">
+            <span class="journey-range-label">52W RANGE</span>
+            <span class="journey-range-pct">${clampedPosition.toFixed(0)}%</span>
+          </div>
+          <div class="journey-range-bar">
+            <div class="journey-range-marker" style="left: ${clampedPosition}%;"></div>
+          </div>
+          <div class="journey-range-labels">
+            <span class="journey-range-value">$${low_52w.toFixed(2)}</span>
+            <span class="journey-range-value">$${high_52w.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    }
+
     function renderShipCard(position) {
       const config = TICKER_CONFIG[position.ticker] || DEFAULT_CONFIG;
       
@@ -1626,6 +1853,8 @@
             </div>
           </div>
         </div>
+
+        ${renderJourneyVisualization(position)}
 
         ${hasStrikes ? `
         <div class="strike-range">
@@ -1969,8 +2198,24 @@
       fleet: '../data/telemetry/fleet.json',
       positions: '../data/options_summaries/positions.json',
       catalysts: '../data/options_summaries/catalysts.json',
-      manifest: '../data/telemetry/manifest.json'
+      manifest: '../data/telemetry/manifest.json',
+      stats: '../data/stats.json'
     };
+
+    // Load historical stats data (52w range, returns over time)
+    async function loadStats() {
+      try {
+        const response = await fetch(DATA_PATHS.stats);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✓ Loaded historical stats:', Object.keys(data.stats || {}).length, 'tickers');
+          return data.stats || {};
+        }
+      } catch (e) {
+        console.log('Stats file not found, historical data unavailable');
+      }
+      return {};
+    }
 
     // Load telemetry-enriched fleet data
     async function loadFleetTelemetry() {
@@ -2004,9 +2249,10 @@
 
     // Main data loader - fleet.json is primary, positions optional
     async function loadData() {
-      const [fleet, positions] = await Promise.all([
+      const [fleet, positions, stats] = await Promise.all([
         loadFleetTelemetry(),
-        loadPositions()
+        loadPositions(),
+        loadStats()
       ]);
 
       // If we have fleet telemetry, use it as the base
@@ -2016,9 +2262,11 @@
           positions.positions.forEach(p => { positionMap[p.ticker] = p; });
         }
 
-        // Merge fleet telemetry with any position data
+        // Merge fleet telemetry with any position data AND historical stats
         const enrichedShips = fleet.ships.map(ship => {
           const pos = positionMap[ship.ticker] || {};
+          const hist = stats[ship.ticker] || {};
+          
           return {
             ticker: ship.ticker,
             // Telemetry data
@@ -2038,7 +2286,19 @@
             entry_cost: pos.entry_cost || 0,
             current_price: pos.current_price || ship.price,
             delta: pos.delta || ship.trend,
-            contracts: pos.contracts || 0
+            contracts: pos.contracts || 0,
+            // Historical stats (for journey visualization)
+            history: {
+              high_52w: hist.high_52w || ship.price * 1.2,
+              low_52w: hist.low_52w || ship.price * 0.8,
+              return_1d: hist.return_1d || ship.chgPct || 0,
+              return_1w: hist.return_1w || 0,
+              return_1m: hist.return_1m || 0,
+              return_3m: hist.return_3m || 0,
+              return_6m: hist.return_6m || 0,
+              return_1y: hist.return_1y || 0,
+              daily_count: hist.daily_count || 0
+            }
           };
         });
 
@@ -2057,16 +2317,16 @@
     // Embedded fallback data (works without any external files)
     const FALLBACK_DATA = {
       "positions": [
-        { "ticker": "RKLB", "structure": "Naked LEAP", "long_strike": 75, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 24.14, "current_price": 24.14, "delta": 0.68, "contracts": 1, "stock_price": 75.99, "entry_stock": 75.99, "trend": 0.6, "momentum": 0.4, "volatility": 0.5, "activity": 0.7, "signalState": "bull", "visual": { "glow": 0.7, "jitter": 0.1, "thrust": 0.5, "damage": 0 } },
-        { "ticker": "LUNR", "structure": "Naked LEAP", "long_strike": 17.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 6.69, "current_price": 6.69, "delta": 0.7, "contracts": 1, "stock_price": 17.88, "entry_stock": 17.88, "trend": 0.3, "momentum": 0.2, "volatility": 0.7, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.2, "thrust": 0.3, "damage": 0.1 } },
-        { "ticker": "ASTS", "structure": "Bull Spread", "long_strike": 80, "short_strike": 120, "expiry": "2027-01-15", "entry_cost": 20.0, "current_price": 20.0, "delta": 0.42, "contracts": 1, "stock_price": 83.47, "entry_stock": 83.47, "trend": 0.5, "momentum": 0.3, "volatility": 0.6, "activity": 0.6, "signalState": "bull", "visual": { "glow": 0.6, "jitter": 0.15, "thrust": 0.4, "damage": 0 } },
-        { "ticker": "ACHR", "structure": "Naked LEAP", "long_strike": 7.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 3.0, "current_price": 3.0, "delta": 0.72, "contracts": 1, "stock_price": 8.13, "entry_stock": 8.13, "trend": 0.7, "momentum": 0.5, "volatility": 0.4, "activity": 0.8, "signalState": "bull", "visual": { "glow": 0.8, "jitter": 0.1, "thrust": 0.6, "damage": 0 } },
-        { "ticker": "JOBY", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.43, "contracts": 1, "stock_price": 14.36, "entry_stock": 14.36, "trend": 0.4, "momentum": 0.2, "volatility": 0.5, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.15, "thrust": 0.35, "damage": 0.05 } },
-        { "ticker": "GME", "structure": "Bull Spread", "long_strike": 20, "short_strike": 35, "expiry": "2027-01-15", "entry_cost": 4.5, "current_price": 4.5, "delta": 0.6, "contracts": 1, "stock_price": 20.62, "entry_stock": 20.62, "trend": -0.1, "momentum": -0.2, "volatility": 0.9, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.3, "thrust": 0.2, "damage": 0.2 } },
-        { "ticker": "BKSY", "structure": "Naked LEAP", "long_strike": 20, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 7.56, "current_price": 7.56, "delta": 0.7, "contracts": 1, "stock_price": 20.82, "entry_stock": 20.82, "trend": 0.3, "momentum": 0.1, "volatility": 0.5, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.45, "jitter": 0.12, "thrust": 0.25, "damage": 0.1 } },
-        { "ticker": "RDW", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.55, "contracts": 1, "stock_price": 15.0, "entry_stock": 15.0, "trend": 0.2, "momentum": 0.1, "volatility": 0.4, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.1, "thrust": 0.2, "damage": 0.15 } },
-        { "ticker": "PL", "structure": "Bull Spread", "long_strike": 4, "short_strike": 6, "expiry": "2027-01-15", "entry_cost": 0.65, "current_price": 0.65, "delta": 0.43, "contracts": 1, "stock_price": 4.0, "entry_stock": 4.0, "trend": -0.2, "momentum": -0.1, "volatility": 0.6, "activity": 0.2, "signalState": "bear", "visual": { "glow": 0.3, "jitter": 0.2, "thrust": 0.1, "damage": 0.3 } },
-        { "ticker": "EVEX", "structure": "Bull Spread", "long_strike": 7.5, "short_strike": 12.5, "expiry": "2027-01-15", "entry_cost": 2.0, "current_price": 2.0, "delta": 0.45, "contracts": 1, "stock_price": 8.0, "entry_stock": 8.0, "trend": 0.1, "momentum": 0.0, "volatility": 0.5, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.35, "jitter": 0.15, "thrust": 0.15, "damage": 0.2 } }
+        { "ticker": "RKLB", "structure": "Naked LEAP", "long_strike": 75, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 24.14, "current_price": 24.14, "delta": 0.68, "contracts": 1, "stock_price": 75.99, "entry_stock": 75.99, "trend": 0.6, "momentum": 0.4, "volatility": 0.5, "activity": 0.7, "signalState": "bull", "visual": { "glow": 0.7, "jitter": 0.1, "thrust": 0.5, "damage": 0 }, "history": { "high_52w": 77.46, "low_52w": 16.30, "return_1d": 2.16, "return_1w": -6.5, "return_1m": 74.66, "return_3m": 43.23, "return_1y": 177.9, "daily_count": 1281 } },
+        { "ticker": "LUNR", "structure": "Naked LEAP", "long_strike": 17.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 6.69, "current_price": 6.69, "delta": 0.7, "contracts": 1, "stock_price": 17.88, "entry_stock": 17.88, "trend": 0.3, "momentum": 0.2, "volatility": 0.7, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.2, "thrust": 0.3, "damage": 0.1 }, "history": { "high_52w": 23.49, "low_52w": 6.62, "return_1d": 5.32, "return_1w": 2.03, "return_1m": 81.87, "return_3m": 54.79, "return_1y": -6.48, "daily_count": 920 } },
+        { "ticker": "ASTS", "structure": "Bull Spread", "long_strike": 80, "short_strike": 120, "expiry": "2027-01-15", "entry_cost": 20.0, "current_price": 20.0, "delta": 0.42, "contracts": 1, "stock_price": 83.47, "entry_stock": 83.47, "trend": 0.5, "momentum": 0.3, "volatility": 0.6, "activity": 0.6, "signalState": "bull", "visual": { "glow": 0.6, "jitter": 0.15, "thrust": 0.4, "damage": 0 }, "history": { "high_52w": 96.58, "low_52w": 17.88, "return_1d": 15.08, "return_1w": 5.14, "return_1m": 45.6, "return_3m": 25.69, "return_1y": 279.86, "daily_count": 267 } },
+        { "ticker": "ACHR", "structure": "Naked LEAP", "long_strike": 7.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 3.0, "current_price": 3.0, "delta": 0.72, "contracts": 1, "stock_price": 8.13, "entry_stock": 8.13, "trend": 0.7, "momentum": 0.5, "volatility": 0.4, "activity": 0.8, "signalState": "bull", "visual": { "glow": 0.8, "jitter": 0.1, "thrust": 0.6, "damage": 0 }, "history": { "high_52w": 13.48, "low_52w": 6.14, "return_1d": 4.64, "return_1w": -4.19, "return_1m": 3.33, "return_3m": -22.06, "return_1y": -23.98, "daily_count": 801 } },
+        { "ticker": "JOBY", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.43, "contracts": 1, "stock_price": 14.36, "entry_stock": 14.36, "trend": 0.4, "momentum": 0.2, "volatility": 0.5, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.15, "thrust": 0.35, "damage": 0.05 }, "history": { "high_52w": 19.98, "low_52w": 5.34, "return_1d": 4.97, "return_1w": -3.33, "return_1m": 1.21, "return_3m": -18.98, "return_1y": 63.18, "daily_count": 374 } },
+        { "ticker": "GME", "structure": "Bull Spread", "long_strike": 20, "short_strike": 35, "expiry": "2027-01-15", "entry_cost": 4.5, "current_price": 4.5, "delta": 0.6, "contracts": 1, "stock_price": 20.62, "entry_stock": 20.62, "trend": -0.1, "momentum": -0.2, "volatility": 0.9, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.3, "thrust": 0.2, "damage": 0.2 }, "history": { "high_52w": 34.87, "low_52w": 20.04, "return_1d": 2.85, "return_1w": -4.01, "return_1m": -9.8, "return_3m": -24.14, "return_1y": -35.47, "daily_count": 265 } },
+        { "ticker": "BKSY", "structure": "Naked LEAP", "long_strike": 20, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 7.56, "current_price": 7.56, "delta": 0.7, "contracts": 1, "stock_price": 20.82, "entry_stock": 20.82, "trend": 0.3, "momentum": 0.1, "volatility": 0.5, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.45, "jitter": 0.12, "thrust": 0.25, "damage": 0.1 }, "history": { "high_52w": 31.58, "low_52w": 6.62, "return_1d": 10.14, "return_1w": -1.64, "return_1m": 22.3, "return_3m": -14.73, "return_1y": 87.67, "daily_count": 267 } },
+        { "ticker": "RDW", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.55, "contracts": 1, "stock_price": 9.07, "entry_stock": 9.07, "trend": 0.2, "momentum": 0.1, "volatility": 0.4, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.1, "thrust": 0.2, "damage": 0.15 }, "history": { "high_52w": 25.88, "low_52w": 5.08, "return_1d": 19.99, "return_1w": 15.28, "return_1m": 71.05, "return_3m": -12.56, "return_1y": -48.98, "daily_count": 266 } },
+        { "ticker": "PL", "structure": "Bull Spread", "long_strike": 4, "short_strike": 6, "expiry": "2027-01-15", "entry_cost": 0.65, "current_price": 0.65, "delta": 0.43, "contracts": 1, "stock_price": 20.4, "entry_stock": 20.4, "trend": -0.2, "momentum": -0.1, "volatility": 0.6, "activity": 0.2, "signalState": "bear", "visual": { "glow": 0.3, "jitter": 0.2, "thrust": 0.1, "damage": 0.3 }, "history": { "high_52w": 20.8, "low_52w": 2.95, "return_1d": 3.34, "return_1w": 0.23, "return_1m": 72.55, "return_3m": 36.7, "return_1y": 382.35, "daily_count": 267 } },
+        { "ticker": "EVEX", "structure": "Bull Spread", "long_strike": 7.5, "short_strike": 12.5, "expiry": "2027-01-15", "entry_cost": 2.0, "current_price": 2.0, "delta": 0.45, "contracts": 1, "stock_price": 4.18, "entry_stock": 4.18, "trend": 0.1, "momentum": 0.0, "volatility": 0.5, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.35, "jitter": 0.15, "thrust": 0.15, "damage": 0.2 }, "history": { "high_52w": 7.5, "low_52w": 3.08, "return_1d": 3.11, "return_1w": -6.44, "return_1m": -9.75, "return_3m": -0.9, "return_1y": -24.15, "daily_count": 380 } }
       ],
       "catalysts": [
         { "date": "2026-02-15", "ticker": "LUNR", "event": "IM-2 Lunar Mission", "impact": "HIGH", "status": "UPCOMING" },
