@@ -285,7 +285,7 @@ window.PixelIcons = (function() {
   
   // Default colors
   const COLORS = {
-    phosphor: '#33ff99',
+    phosphor: '#ff0066',
     amber: '#ffaa33',
     red: '#ff4444',
     cyan: '#47d4ff',

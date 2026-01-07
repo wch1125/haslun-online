@@ -108,7 +108,7 @@ window.LiveryRenderer = (function() {
     const data = imageData.data;
 
     // Get primary and secondary colors from color map
-    const primary = hexToRgb(colorMap.hull || colorMap.primary || '#33ff99');
+    const primary = hexToRgb(colorMap.hull || colorMap.primary || '#ff0066');
     const secondary = hexToRgb(colorMap.trim || colorMap.secondary || '#00cc77');
     const highlight = hexToRgb(colorMap.engines || colorMap.highlight || '#66ffcc');
 
@@ -229,7 +229,7 @@ window.LiveryRenderer = (function() {
     const livery = LiverySystem.getLiveryForTicker(ticker);
     if (!livery) return null;
 
-    return livery.palette.baseColors[0] || '#33ff99';
+    return livery.palette.baseColors[0] || '#ff0066';
   }
 
   /**

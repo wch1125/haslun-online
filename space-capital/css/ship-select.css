@@ -1,24 +1,25 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SHIP SELECT :: Mario Kart-style ship selection screen
-   Retro CRT aesthetic with data-driven stat visualization
+   SHIP SELECT :: Battle selection screen
+   Hotline Miami arcade cabinet aesthetic
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   VARIABLES
+   VARIABLES — Hotline Miami palette
    ───────────────────────────────────────────────────────────────────────────── */
 
 .ship-select-screen {
-  --ss-bg: #0a0c0f;
-  --ss-panel: rgba(15, 25, 20, 0.95);
-  --ss-border: rgba(51, 255, 153, 0.3);
-  --ss-glow: rgba(51, 255, 153, 0.6);
-  --ss-text: rgba(200, 255, 220, 0.95);
-  --ss-text-dim: rgba(150, 200, 170, 0.7);
-  --ss-accent: #33ff99;
-  --ss-amber: #ffb347;
-  --ss-cyan: #4ecdc4;
-  --ss-red: #ff6b6b;
-  --ss-card-bg: linear-gradient(145deg, rgba(20, 35, 25, 0.98), rgba(10, 20, 15, 0.98));
+  --ss-bg: #0a0008;
+  --ss-panel: rgba(30, 5, 25, 0.95);
+  --ss-border: rgba(255, 0, 102, 0.4);
+  --ss-glow: rgba(255, 0, 102, 0.6);
+  --ss-text: rgba(255, 240, 248, 0.95);
+  --ss-text-dim: rgba(200, 150, 180, 0.7);
+  --ss-accent: #ff0066;
+  --ss-amber: #ff7a00;
+  --ss-cyan: #00ffcc;
+  --ss-red: #ff0066;
+  --ss-lime: #aaff00;
+  --ss-card-bg: linear-gradient(145deg, rgba(40, 10, 35, 0.98), rgba(20, 0, 15, 0.98));
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -29,7 +30,7 @@
   min-height: calc(var(--vh, 1vh) * 100);
   background: var(--ss-bg);
   padding: 1.5rem;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'VT323', monospace;
   color: var(--ss-text);
   position: relative;
   overflow-x: hidden;
@@ -44,8 +45,8 @@
       0deg,
       transparent,
       transparent 2px,
-      rgba(0, 0, 0, 0.15) 2px,
-      rgba(0, 0, 0, 0.15) 4px
+      rgba(255, 0, 102, 0.02) 2px,
+      rgba(255, 0, 102, 0.02) 4px
     );
   pointer-events: none;
   z-index: 1000;
@@ -70,7 +71,7 @@
   text-shadow: 
     0 0 10px var(--ss-glow),
     0 0 20px var(--ss-glow),
-    0 0 40px rgba(51, 255, 153, 0.3);
+    0 0 40px rgba(255, 0, 102, 0.3);
   letter-spacing: 0.15em;
   display: flex;
   align-items: center;
@@ -160,15 +161,16 @@
 
 .ship-select-card {
   background: var(--ss-card-bg);
-  border: 1px solid var(--ss-border);
-  border-radius: 8px;
+  border: 2px solid var(--ss-border);
+  border-radius: 0;
   padding: 1rem;
   position: relative;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.1s steps(2);
   overflow: hidden;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 0 20px rgba(255, 0, 102, 0.15);
 }
 
 .ship-select-card::before {
@@ -177,9 +179,9 @@
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(51, 255, 153, 0.05) 0%,
+    rgba(255, 0, 102, 0.05) 0%,
     transparent 50%,
-    rgba(51, 255, 153, 0.02) 100%
+    rgba(255, 0, 102, 0.02) 100%
   );
   pointer-events: none;
 }
@@ -194,7 +196,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(51, 255, 153, 0.1),
+    rgba(255, 0, 102, 0.1),
     transparent
   );
   transition: left 0.5s ease;
@@ -206,8 +208,8 @@
   transform: translateY(-4px);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(51, 255, 153, 0.2),
-    inset 0 0 20px rgba(51, 255, 153, 0.05);
+    0 0 20px rgba(255, 0, 102, 0.2),
+    inset 0 0 20px rgba(255, 0, 102, 0.05);
 }
 
 .ship-select-card:hover::after {
@@ -240,7 +242,7 @@
   gap: 0.75rem;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(51, 255, 153, 0.15);
+  border-bottom: 1px solid rgba(255, 0, 102, 0.15);
 }
 
 .ship-card-tier {
@@ -323,7 +325,7 @@
   inset: -20px;
   background: radial-gradient(
     circle at center,
-    rgba(51, 255, 153, 0.15) 0%,
+    rgba(255, 0, 102, 0.15) 0%,
     transparent 70%
   );
   pointer-events: none;
@@ -417,7 +419,7 @@
   flex: 1;
   height: 12px;
   background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(51, 255, 153, 0.2);
+  border: 1px solid rgba(255, 0, 102, 0.2);
   border-radius: 2px;
   position: relative;
   overflow: hidden;
@@ -538,7 +540,7 @@ body.reduced-motion .ship-stat-bar::before {
 .ship-card-footer {
   text-align: center;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(51, 255, 153, 0.1);
+  border-top: 1px solid rgba(255, 0, 102, 0.1);
   margin-bottom: 0.75rem;
 }
 
@@ -679,7 +681,7 @@ body.reduced-motion .ship-stat-bar::before {
   background: var(--ss-bg);
   border: 1px solid var(--ss-border);
   border-radius: 8px;
-  box-shadow: 0 0 60px rgba(51, 255, 153, 0.2);
+  box-shadow: 0 0 60px rgba(255, 0, 102, 0.2);
 }
 
 .ship-select-modal-close {
@@ -734,7 +736,7 @@ body.reduced-motion .ship-stat-bar::before {
 
 .compact-ship-card:hover {
   border-color: var(--ss-accent);
-  background: rgba(51, 255, 153, 0.05);
+  background: rgba(255, 0, 102, 0.05);
 }
 
 .compact-tier {

@@ -320,7 +320,7 @@ window.ShipBrief = (function() {
       designation: 'UNK-XXX',
       sector: 'UNKNOWN',
       sprite: DEFAULT_SPRITE,
-      color: '#33ff99',
+      color: '#ff0066',
       role: 'UTILITY',
       hasPosition: false,
       value: 0,
@@ -561,7 +561,7 @@ window.ShipBrief = (function() {
     if (summary && effects) {
       // Level badge
       levelEl.textContent = 'LVL ' + summary.level;
-      levelEl.style.color = summary.level >= 5 ? '#ffd700' : summary.level >= 3 ? '#47d4ff' : '#33ff99';
+      levelEl.style.color = summary.level >= 5 ? '#ffd700' : summary.level >= 3 ? '#47d4ff' : '#ff0066';
       
       // XP bar
       const xpProgress = Math.min(100, summary.progress * 100);
@@ -595,7 +595,7 @@ window.ShipBrief = (function() {
     } else {
       // No progression data
       levelEl.textContent = 'LVL 1';
-      levelEl.style.color = '#33ff99';
+      levelEl.style.color = '#ff0066';
       xpBarEl.style.width = '0%';
       xpTextEl.textContent = '0 / 100 XP';
       

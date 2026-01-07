@@ -3,11 +3,8 @@
  * FLEET COMMAND — Active Vessel Manifest UI
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Implements the Fleet Command panel design with:
- * - Ship cards with stats bars (Hull, Cargo, Fuel)
- * - CRT-framed ship display
- * - Price and P&L per vessel
- * - Operational status badges
+ * Hotline Miami arcade cabinet aesthetic
+ * Dangerous, aggressive, illegal spin pit vibes
  * 
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -17,10 +14,11 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 .fleet-command {
-  background: linear-gradient(180deg, #0d1218 0%, #080c10 100%);
-  border: 1px solid rgba(51, 255, 153, 0.2);
-  border-radius: 4px;
+  background: linear-gradient(180deg, #1a0018 0%, #0a0008 100%);
+  border: 2px solid rgba(255, 0, 102, 0.4);
+  border-radius: 0;
   overflow: hidden;
+  box-shadow: 0 0 30px rgba(255, 0, 102, 0.15);
 }
 
 .fleet-command-header {
@@ -28,12 +26,12 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  background: linear-gradient(90deg, rgba(51, 255, 153, 0.08) 0%, transparent 100%);
-  border-bottom: 1px solid rgba(51, 255, 153, 0.15);
+  background: linear-gradient(90deg, rgba(255, 0, 102, 0.12) 0%, transparent 100%);
+  border-bottom: 2px solid rgba(255, 0, 102, 0.3);
 }
 
 .fleet-command-icon {
-  color: #33ff99;
+  color: #ff0066;
   font-size: 0.9rem;
 }
 
@@ -42,19 +40,21 @@
 }
 
 .fleet-command-title {
-  color: #33ff99;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
+  color: #ff0066;
+  font-size: 1.1rem;
+  font-weight: 400;
+  font-family: 'VT323', monospace;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  text-shadow: 0 0 15px rgba(51, 255, 153, 0.4);
+  text-shadow: 0 0 15px rgba(255, 0, 102, 0.5);
   margin: 0;
 }
 
 .fleet-command-subtitle {
-  color: #6a7a8a;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
+  color: #9a7088;
+  font-size: 0.7rem;
+  font-family: 'VT323', monospace;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-top: 0.15rem;
 }
@@ -79,26 +79,26 @@
   grid-template-columns: 90px 1fr;
   gap: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(13, 18, 24, 0.9) 0%, rgba(8, 12, 16, 0.95) 100%);
-  border: 1px solid rgba(51, 255, 153, 0.15);
-  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(30, 5, 25, 0.9) 0%, rgba(15, 0, 12, 0.95) 100%);
+  border: 2px solid rgba(255, 0, 102, 0.3);
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.1s steps(2);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
 .vessel-card:hover {
-  border-color: rgba(51, 255, 153, 0.4);
-  background: linear-gradient(135deg, rgba(51, 255, 153, 0.05) 0%, rgba(13, 18, 24, 0.95) 100%);
+  border-color: rgba(255, 0, 102, 0.6);
+  background: linear-gradient(135deg, rgba(255, 0, 102, 0.08) 0%, rgba(30, 5, 25, 0.95) 100%);
   box-shadow: 
-    0 0 20px rgba(51, 255, 153, 0.1),
-    inset 0 0 30px rgba(51, 255, 153, 0.02);
+    0 0 25px rgba(255, 0, 102, 0.2),
+    inset 0 0 30px rgba(255, 0, 102, 0.05);
 }
 
 .vessel-card.active {
-  border-color: rgba(51, 255, 153, 0.5);
-  box-shadow: 0 0 25px rgba(51, 255, 153, 0.15);
+  border-color: rgba(255, 0, 102, 0.7);
+  box-shadow: 0 0 30px rgba(255, 0, 102, 0.25);
 }
 
 /* Corner brackets on vessel card */
@@ -108,22 +108,22 @@
   position: absolute;
   width: 12px;
   height: 12px;
-  border-color: #33ff99;
+  border-color: #ff0066;
   border-style: solid;
-  opacity: 0.4;
-  transition: opacity 0.2s;
+  opacity: 0.5;
+  transition: opacity 0.1s steps(2);
 }
 
 .vessel-card::before {
   top: 4px;
   left: 4px;
-  border-width: 1px 0 0 1px;
+  border-width: 2px 0 0 2px;
 }
 
 .vessel-card::after {
   bottom: 4px;
   right: 4px;
-  border-width: 0 1px 1px 0;
+  border-width: 0 2px 2px 0;
 }
 
 .vessel-card:hover::before,
@@ -142,8 +142,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(51, 255, 153, 0.03) 100%);
-  border: 1px solid rgba(51, 255, 153, 0.2);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(255, 0, 102, 0.03) 100%);
+  border: 1px solid rgba(255, 0, 102, 0.2);
   border-radius: 4px;
 }
 
@@ -152,7 +152,7 @@
   position: absolute;
   width: 8px;
   height: 8px;
-  border-color: #33ff99;
+  border-color: #ff0066;
   border-style: solid;
   opacity: 0.5;
 }
@@ -176,7 +176,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: #0d1218;
-  border: 1px solid rgba(51, 255, 153, 0.3);
+  border: 1px solid rgba(255, 0, 102, 0.3);
   padding: 0.15rem 0.5rem;
   font-size: 0.55rem;
   color: #47d4ff;
@@ -226,8 +226,8 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.25rem 0.6rem;
-  background: rgba(51, 255, 153, 0.15);
-  border: 1px solid rgba(51, 255, 153, 0.3);
+  background: rgba(255, 0, 102, 0.15);
+  border: 1px solid rgba(255, 0, 102, 0.3);
   border-radius: 2px;
   font-size: 0.6rem;
   font-weight: 600;
@@ -236,9 +236,9 @@
 }
 
 .vessel-status.operational {
-  color: #33ff99;
-  background: rgba(51, 255, 153, 0.1);
-  border-color: rgba(51, 255, 153, 0.3);
+  color: #ff0066;
+  background: rgba(255, 0, 102, 0.1);
+  border-color: rgba(255, 0, 102, 0.3);
 }
 
 .vessel-status.standby {
@@ -341,7 +341,7 @@
   align-items: flex-end;
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(51, 255, 153, 0.1);
+  border-top: 1px solid rgba(255, 0, 102, 0.1);
 }
 
 .vessel-price {
@@ -363,8 +363,8 @@
 }
 
 .vessel-pnl-value.positive {
-  color: #33ff99;
-  text-shadow: 0 0 10px rgba(51, 255, 153, 0.4);
+  color: #ff0066;
+  text-shadow: 0 0 10px rgba(255, 0, 102, 0.4);
 }
 
 .vessel-pnl-value.negative {
@@ -384,7 +384,7 @@
 .ship-brief-crt-frame {
   position: relative;
   background: linear-gradient(145deg, #0a0d10 0%, #0d1218 50%, #080a0d 100%);
-  border: 2px solid rgba(51, 255, 153, 0.4);
+  border: 2px solid rgba(255, 0, 102, 0.4);
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1rem;
@@ -398,7 +398,7 @@
   border-radius: 10px;
   background: transparent;
   box-shadow: 
-    0 0 30px rgba(51, 255, 153, 0.15),
+    0 0 30px rgba(255, 0, 102, 0.15),
     inset 0 0 60px rgba(0, 0, 0, 0.5);
   pointer-events: none;
 }
@@ -414,7 +414,7 @@
   border-radius: 6px 6px 0 0;
   background: linear-gradient(
     180deg,
-    rgba(51, 255, 153, 0.03) 0%,
+    rgba(255, 0, 102, 0.03) 0%,
     transparent 100%
   );
   pointer-events: none;
@@ -429,7 +429,7 @@
   background: linear-gradient(
     to bottom,
     transparent,
-    rgba(51, 255, 153, 0.1),
+    rgba(255, 0, 102, 0.1),
     transparent
   );
   pointer-events: none;
@@ -461,7 +461,7 @@
   image-rendering: pixelated;
   filter: 
     drop-shadow(0 0 15px rgba(71, 212, 255, 0.6))
-    drop-shadow(0 0 30px rgba(51, 255, 153, 0.3));
+    drop-shadow(0 0 30px rgba(255, 0, 102, 0.3));
   animation: ship-hover 3s ease-in-out infinite;
 }
 
@@ -475,7 +475,7 @@
   position: absolute;
   width: 25px;
   height: 25px;
-  border-color: #33ff99;
+  border-color: #ff0066;
   border-style: solid;
   opacity: 0.6;
 }
@@ -494,11 +494,11 @@
 .ship-brief-name {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #33ff99;
+  color: #ff0066;
   letter-spacing: 0.1em;
   text-shadow: 
-    0 0 15px rgba(51, 255, 153, 0.5),
-    0 0 30px rgba(51, 255, 153, 0.3);
+    0 0 15px rgba(255, 0, 102, 0.5),
+    0 0 30px rgba(255, 0, 102, 0.3);
 }
 
 .ship-brief-tagline {
@@ -519,7 +519,7 @@
   gap: 1.5rem;
   padding: 1.25rem;
   background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(51, 255, 153, 0.1);
+  border: 1px solid rgba(255, 0, 102, 0.1);
   border-radius: 4px;
 }
 
@@ -539,12 +539,12 @@
 }
 
 .ship-brief-class-badge {
-  background: rgba(51, 255, 153, 0.15);
-  border: 1px solid rgba(51, 255, 153, 0.4);
+  background: rgba(255, 0, 102, 0.15);
+  border: 1px solid rgba(255, 0, 102, 0.4);
   padding: 0.3rem 0.75rem;
   font-size: 0.65rem;
   font-weight: 600;
-  color: #33ff99;
+  color: #ff0066;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -595,8 +595,8 @@
 
 .ship-brief-system-fill {
   height: 100%;
-  background: linear-gradient(90deg, #33ff99, #47d4ff);
-  box-shadow: 0 0 6px rgba(51, 255, 153, 0.5);
+  background: linear-gradient(90deg, #ff0066, #47d4ff);
+  box-shadow: 0 0 6px rgba(255, 0, 102, 0.5);
 }
 
 /* Pilot Progression */
@@ -648,8 +648,8 @@
 
 .ship-brief-skill {
   padding: 0.2rem 0.4rem;
-  background: rgba(51, 255, 153, 0.08);
-  border: 1px solid rgba(51, 255, 153, 0.2);
+  background: rgba(255, 0, 102, 0.08);
+  border: 1px solid rgba(255, 0, 102, 0.2);
   font-size: 0.55rem;
   color: #6a7a8a;
   letter-spacing: 0.05em;
@@ -657,9 +657,9 @@
 }
 
 .ship-brief-skill.active {
-  background: rgba(51, 255, 153, 0.15);
-  border-color: rgba(51, 255, 153, 0.4);
-  color: #33ff99;
+  background: rgba(255, 0, 102, 0.15);
+  border-color: rgba(255, 0, 102, 0.4);
+  color: #ff0066;
 }
 
 /* Operations Data */
@@ -728,7 +728,7 @@
   gap: 0.5rem;
   padding: 0.85rem 1.25rem;
   background: transparent;
-  border: 1px solid rgba(51, 255, 153, 0.3);
+  border: 1px solid rgba(255, 0, 102, 0.3);
   border-radius: 2px;
   color: #c8d4e0;
   font-family: inherit;
@@ -741,20 +741,20 @@
 }
 
 .ship-brief-btn:hover {
-  background: rgba(51, 255, 153, 0.1);
-  border-color: rgba(51, 255, 153, 0.5);
-  color: #33ff99;
+  background: rgba(255, 0, 102, 0.1);
+  border-color: rgba(255, 0, 102, 0.5);
+  color: #ff0066;
 }
 
 .ship-brief-btn.primary {
-  background: linear-gradient(180deg, rgba(51, 255, 153, 0.2) 0%, rgba(51, 255, 153, 0.1) 100%);
-  border-color: rgba(51, 255, 153, 0.5);
-  color: #33ff99;
+  background: linear-gradient(180deg, rgba(255, 0, 102, 0.2) 0%, rgba(255, 0, 102, 0.1) 100%);
+  border-color: rgba(255, 0, 102, 0.5);
+  color: #ff0066;
 }
 
 .ship-brief-btn.primary:hover {
-  background: linear-gradient(180deg, rgba(51, 255, 153, 0.3) 0%, rgba(51, 255, 153, 0.15) 100%);
-  box-shadow: 0 0 20px rgba(51, 255, 153, 0.2);
+  background: linear-gradient(180deg, rgba(255, 0, 102, 0.3) 0%, rgba(255, 0, 102, 0.15) 100%);
+  box-shadow: 0 0 20px rgba(255, 0, 102, 0.2);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -763,7 +763,7 @@
 
 .portfolio-status {
   background: linear-gradient(180deg, #0d1218 0%, #080c10 100%);
-  border: 1px solid rgba(51, 255, 153, 0.2);
+  border: 1px solid rgba(255, 0, 102, 0.2);
   border-radius: 4px;
   padding: 1rem;
 }
@@ -785,7 +785,7 @@
 .portfolio-stat {
   padding: 0.75rem;
   background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(51, 255, 153, 0.1);
+  border: 1px solid rgba(255, 0, 102, 0.1);
 }
 
 .portfolio-stat-label {
@@ -803,8 +803,8 @@
 }
 
 .portfolio-stat-value.positive {
-  color: #33ff99;
-  text-shadow: 0 0 15px rgba(51, 255, 153, 0.5);
+  color: #ff0066;
+  text-shadow: 0 0 15px rgba(255, 0, 102, 0.5);
 }
 
 .portfolio-stat-value.neutral {

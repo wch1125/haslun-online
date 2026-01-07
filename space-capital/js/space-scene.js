@@ -72,7 +72,7 @@ const SpaceScene = (() => {
   
   // Colors
   const starColors = ['#ffffff', '#aaccff', '#ffeecc', '#aaffaa'];
-  const debrisColors = ['#33ff99', '#ffb347', '#6688aa'];
+  const debrisColors = ['#ff0066', '#ffb347', '#6688aa'];
 
   function resize() {
     canvas.width = window.innerWidth * dpr;

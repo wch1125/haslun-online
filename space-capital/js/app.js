@@ -229,7 +229,7 @@
         wrap.style.setProperty('--x', x + '%');
 
         // Glow color by ticker (fallback)
-        const glow = (window.tickerColors && tickerColors[ticker]) ? tickerColors[ticker] : '#33ff99';
+        const glow = (window.tickerColors && tickerColors[ticker]) ? tickerColors[ticker] : '#ff0066';
         wrap.style.setProperty('--shipGlow', glow);
 
         // Sparkline color reflects momentum (green up, red down)
@@ -363,11 +363,11 @@
     
     // Legacy color/theme maps (fallback when ShipRegistry not ready)
     const _legacyColors = {
-      'RKLB': '#33ff99', 'LUNR': '#47d4ff', 'ASTS': '#ffb347', 'ACHR': '#ff6b9d',
-      'JOBY': '#b388ff', 'GME': '#ff6b6b', 'BKSY': '#47d4ff', 'RDW': '#33ff99',
+      'RKLB': '#ff0066', 'LUNR': '#47d4ff', 'ASTS': '#ffb347', 'ACHR': '#ff6b9d',
+      'JOBY': '#b388ff', 'GME': '#ff6b6b', 'BKSY': '#47d4ff', 'RDW': '#ff0066',
       'PL': '#b388ff', 'EVEX': '#ff6b9d', 'MP': '#ffb347', 'KTOS': '#47d4ff',
-      'IRDM': '#33ff99', 'HON': '#b388ff', 'ATI': '#ffb347', 'CACI': '#47d4ff', 'LOAR': '#ff6b9d',
-      'COHR': '#47d4ff', 'GE': '#ff6b6b', 'LHX': '#33ff99', 'RTX': '#ff6b6b'
+      'IRDM': '#ff0066', 'HON': '#b388ff', 'ATI': '#ffb347', 'CACI': '#47d4ff', 'LOAR': '#ff6b9d',
+      'COHR': '#47d4ff', 'GE': '#ff6b6b', 'LHX': '#ff0066', 'RTX': '#ff6b6b'
     };
     
     const _legacyThemes = {
@@ -386,7 +386,7 @@
           const color = window.ShipRegistry.getColor(prop);
           if (color) return color;
         }
-        return target[prop] || '#33ff99';
+        return target[prop] || '#ff0066';
       }
     });
     
@@ -408,7 +408,7 @@
       // Fallback: construct minimal ship object from legacy data
       return {
         ticker: ticker,
-        color: _legacyColors[ticker] || '#33ff99',
+        color: _legacyColors[ticker] || '#ff0066',
         sector: _legacyThemes[ticker] || 'UNKNOWN',
         tier: 'B',
         role: 'ESCORT',
@@ -427,7 +427,7 @@
     // Doubled EMA ribbon for pronounced effect (12 bands)
     const RIBBON_PERIODS = [5, 8, 10, 13, 16, 21, 26, 34, 42, 55, 70, 89];
     const RIBBON_COLORS = [
-      '#33ff99', // phosphor green (fast)
+      '#ff0066', // phosphor green (fast)
       '#2de8a0', // mint
       '#47d4ff', // cyan
       '#5ac8ff', // light cyan
@@ -496,17 +496,17 @@
         
         // Terrain gradient from bottom (deep) to ribbon area (high altitude)
         const terrainGrad = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-        terrainGrad.addColorStop(0, 'rgba(51, 255, 153, 0.08)');
+        terrainGrad.addColorStop(0, 'rgba(255, 0, 102, 0.08)');
         terrainGrad.addColorStop(0.2, 'rgba(71, 212, 255, 0.05)');
         terrainGrad.addColorStop(0.4, 'rgba(179, 136, 255, 0.03)');
-        terrainGrad.addColorStop(0.7, 'rgba(51, 255, 153, 0.02)');
+        terrainGrad.addColorStop(0.7, 'rgba(255, 0, 102, 0.02)');
         terrainGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
         
         ctx.fillStyle = terrainGrad;
         ctx.fillRect(chartArea.left, chartArea.top, w, h);
         
         // Subtle horizontal contour lines (like topographic map)
-        ctx.strokeStyle = 'rgba(51, 255, 153, 0.03)';
+        ctx.strokeStyle = 'rgba(255, 0, 102, 0.03)';
         ctx.lineWidth = 1;
         const contourSpacing = 40;
         for (let y = chartArea.bottom; y > chartArea.top; y -= contourSpacing) {
@@ -585,9 +585,9 @@
           chartArea.left + w/2, chartArea.top + h/2, 0,
           chartArea.left + w/2, chartArea.top + h/2, Math.max(w, h) * 0.7
         );
-        gradient.addColorStop(0, 'rgba(51, 255, 153, 0.06)');
-        gradient.addColorStop(0.5, 'rgba(51, 255, 153, 0.03)');
-        gradient.addColorStop(1, 'rgba(51, 255, 153, 0)');
+        gradient.addColorStop(0, 'rgba(255, 0, 102, 0.06)');
+        gradient.addColorStop(0.5, 'rgba(255, 0, 102, 0.03)');
+        gradient.addColorStop(1, 'rgba(255, 0, 102, 0)');
         
         ctx.globalCompositeOperation = 'screen';
         ctx.globalAlpha = 0.5 + Math.sin(now * 0.8) * 0.15;
@@ -604,11 +604,11 @@
         ctx.globalAlpha = 0.15;
         
         const sweepGrad = ctx.createLinearGradient(0, sweepY - 30, 0, sweepY + 30);
-        sweepGrad.addColorStop(0, 'rgba(51, 255, 153, 0)');
-        sweepGrad.addColorStop(0.4, 'rgba(51, 255, 153, 0.4)');
+        sweepGrad.addColorStop(0, 'rgba(255, 0, 102, 0)');
+        sweepGrad.addColorStop(0.4, 'rgba(255, 0, 102, 0.4)');
         sweepGrad.addColorStop(0.5, 'rgba(71, 212, 255, 0.6)');
-        sweepGrad.addColorStop(0.6, 'rgba(51, 255, 153, 0.4)');
-        sweepGrad.addColorStop(1, 'rgba(51, 255, 153, 0)');
+        sweepGrad.addColorStop(0.6, 'rgba(255, 0, 102, 0.4)');
+        sweepGrad.addColorStop(1, 'rgba(255, 0, 102, 0)');
         
         ctx.fillStyle = sweepGrad;
         ctx.fillRect(chartArea.left, sweepY - 30, w, 60);
@@ -846,7 +846,7 @@
         const sweepY = bandTop + (sweepPhase * bandH);
         ctx.globalCompositeOperation = 'screen';
         ctx.globalAlpha = 0.18 * intensity;
-        ctx.fillStyle = '#33ff99';
+        ctx.fillStyle = '#ff0066';
         ctx.fillRect(chartArea.left, sweepY, w, 2);
         
         // Secondary sweep (slower)
@@ -970,7 +970,7 @@
         ctx.save();
         
         // Glow effect behind ship
-        ctx.shadowColor = tickerColors[currentTicker] || '#33ff99';
+        ctx.shadowColor = tickerColors[currentTicker] || '#ff0066';
         ctx.shadowBlur = 12;
         ctx.globalAlpha = 0.85;
         
@@ -1330,7 +1330,7 @@
      * @param {number} x - Center X position
      * @param {number} y - Center Y position  
      * @param {number} scale - Pixel scale (1 = 1px per cell)
-     * @param {string} baseColor - Base color in hex (e.g., '#33ff99')
+     * @param {string} baseColor - Base color in hex (e.g., '#ff0066')
      * @param {object} opts - Options: { glow: boolean, glowBlur: number }
      */
     function drawPixelShipOnCanvas(ctx, patternKey, x, y, scale, baseColor, opts = {}) {
@@ -1867,7 +1867,7 @@
         const stats = statsData[t] || {};
         const change = stats.return_1d || 0;
         const theme = tickerThemes[t] || '';
-        const color = tickerColors[t] || '#33ff99';
+        const color = tickerColors[t] || '#ff0066';
         return '<div class="watchlist-item ' + (t === currentTicker ? 'active' : '') + '" data-ticker="' + t + '" onclick="selectTicker(\'' + t + '\'); if(window.innerWidth <= 768) toggleMobileDrawer();">' +
           '<div class="watchlist-info"><div class="watchlist-ticker" style="color: ' + color + '">' + t + '</div>' +
           '<div class="watchlist-meta">' + theme + '</div></div>' +
@@ -2057,7 +2057,7 @@
     function updateTickerDisplay() {
       const stats = statsData[currentTicker] || {};
       const change = stats.return_1d || 0;
-      const color = tickerColors[currentTicker] || '#33ff99';
+      const color = tickerColors[currentTicker] || '#ff0066';
       const tickerEl = document.getElementById('chart-ticker');
       tickerEl.textContent = currentTicker;
       tickerEl.style.color = color;
@@ -2363,7 +2363,7 @@
       
       const labels = source.map(d => new Date(d.t));
       const closes = source.map(d => d.c);
-      const color = tickerColors[currentTicker] || '#33ff99';
+      const color = tickerColors[currentTicker] || '#ff0066';
       
       // Store closes for Context Bay access
       window.currentSeriesCloses = closes;
@@ -2472,9 +2472,9 @@
             },
             tooltip: { 
               backgroundColor: 'rgba(10, 12, 15, 0.92)', 
-              titleColor: '#33ff99', 
+              titleColor: '#ff0066', 
               bodyColor: '#e8f4f0', 
-              borderColor: '#33ff99', 
+              borderColor: '#ff0066', 
               borderWidth: 1,
               padding: 8,
               titleFont: { family: "'IBM Plex Mono', monospace", size: 11 }, 
@@ -2500,14 +2500,14 @@
           scales: {
             x: { 
               type: 'time', 
-              grid: { color: 'rgba(51, 255, 153, 0.05)' }, 
+              grid: { color: 'rgba(255, 0, 102, 0.05)' }, 
               ticks: { color: '#3a4a44', font: { family: "'IBM Plex Mono', monospace", size: 10 }, maxTicksLimit: 8 } 
             },
             y: { 
               position: 'right', 
               min: minPrice - yPadding,
               max: maxPrice + yPadding,
-              grid: { color: 'rgba(51, 255, 153, 0.05)' }, 
+              grid: { color: 'rgba(255, 0, 102, 0.05)' }, 
               ticks: { color: '#5a7068', font: { family: "'IBM Plex Mono', monospace", size: 10 }, callback: v => '$' + v.toFixed(2) } 
             }
           }
@@ -2519,11 +2519,11 @@
       const macdData = source.map(d => d.macd), signalData = source.map(d => d.signal), histData = source.map(d => d.hist);
       macdChart = new Chart(document.getElementById('macd-chart'), {
         type: 'bar', data: { labels, datasets: [
-          { label: 'Histogram', data: histData, type: 'bar', order: 2, backgroundColor: histData.map(v => v >= 0 ? 'rgba(51, 255, 153, 0.5)' : 'rgba(255, 107, 107, 0.5)'), borderColor: histData.map(v => v >= 0 ? '#33ff99' : '#ff6b6b'), borderWidth: 1 },
+          { label: 'Histogram', data: histData, type: 'bar', order: 2, backgroundColor: histData.map(v => v >= 0 ? 'rgba(255, 0, 102, 0.5)' : 'rgba(255, 107, 107, 0.5)'), borderColor: histData.map(v => v >= 0 ? '#ff0066' : '#ff6b6b'), borderWidth: 1 },
           { label: 'MACD', data: macdData, type: 'line', order: 1, borderColor: '#47d4ff', borderWidth: 1.5, fill: false, tension: 0.1, pointRadius: 0 },
           { label: 'Signal', data: signalData, type: 'line', order: 0, borderColor: '#ffb347', borderWidth: 1.5, fill: false, tension: 0.1, pointRadius: 0 }
         ]},
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { type: 'time', display: false }, y: { position: 'right', grid: { color: 'rgba(51, 255, 153, 0.05)' }, ticks: { color: '#5a7068', font: { family: "'IBM Plex Mono', monospace", size: 9 } } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { type: 'time', display: false }, y: { position: 'right', grid: { color: 'rgba(255, 0, 102, 0.05)' }, ticks: { color: '#5a7068', font: { family: "'IBM Plex Mono', monospace", size: 9 } } } } }
       });
       
       // Update telemetry side console
@@ -2761,7 +2761,7 @@
       );
       nebulaGrad.addColorStop(0, 'rgba(71, 212, 255, 0.04)');
       nebulaGrad.addColorStop(0.3, 'rgba(179, 136, 255, 0.025)');
-      nebulaGrad.addColorStop(0.6, 'rgba(51, 255, 153, 0.015)');
+      nebulaGrad.addColorStop(0.6, 'rgba(255, 0, 102, 0.015)');
       nebulaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = nebulaGrad;
       ctx.fillRect(0, 0, rect.width, rect.height);
@@ -2775,7 +2775,7 @@
         const starSize = k % 5 === 0 ? 2 : 1;
         const twinkle = 0.5 + 0.5 * Math.sin(t * 3 + k);
         ctx.globalAlpha = 0.03 + twinkle * 0.04;
-        ctx.fillStyle = k % 4 === 0 ? '#47d4ff' : k % 3 === 0 ? '#b388ff' : '#33ff99';
+        ctx.fillStyle = k % 4 === 0 ? '#47d4ff' : k % 3 === 0 ? '#b388ff' : '#ff0066';
         ctx.beginPath();
         ctx.arc(sx, sy, starSize, 0, Math.PI * 2);
         ctx.fill();
@@ -2788,7 +2788,7 @@
       // Outer corona
       const coronaGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * 2.5 * starPulse);
       coronaGrad.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
-      coronaGrad.addColorStop(0.1, 'rgba(51, 255, 153, 0.25)');
+      coronaGrad.addColorStop(0.1, 'rgba(255, 0, 102, 0.25)');
       coronaGrad.addColorStop(0.25, 'rgba(71, 212, 255, 0.15)');
       coronaGrad.addColorStop(0.5, 'rgba(179, 136, 255, 0.06)');
       coronaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
@@ -2800,7 +2800,7 @@
       // Inner star glow
       const starGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * 0.8 * starPulse);
       starGlow.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-      starGlow.addColorStop(0.3, 'rgba(51, 255, 153, 0.6)');
+      starGlow.addColorStop(0.3, 'rgba(255, 0, 102, 0.6)');
       starGlow.addColorStop(0.7, 'rgba(71, 212, 255, 0.2)');
       starGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = starGlow;
@@ -2822,7 +2822,7 @@
       for (let ring = 0; ring < 3; ring++) {
         const ringR = baseR + (maxR - baseR) * (ring / 2);
         const ringAlpha = 0.04 + (ring === 0 ? 0.04 : 0);
-        ctx.strokeStyle = `rgba(51, 255, 153, ${ringAlpha})`;
+        ctx.strokeStyle = `rgba(255, 0, 102, ${ringAlpha})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.ellipse(cx, cy, ringR, ringR * ecc, 0, 0, Math.PI * 2);
@@ -2831,7 +2831,7 @@
       ctx.setLineDash([]);
       
       // Active orbit ring (brighter)
-      ctx.strokeStyle = `rgba(51, 255, 153, ${0.12 + thrust * 0.15})`;
+      ctx.strokeStyle = `rgba(255, 0, 102, ${0.12 + thrust * 0.15})`;
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
@@ -2857,7 +2857,7 @@
         const yj = cy + Math.sin(aj) * (rj * eccJ);
         
         const age = j / (N - 1);
-        const trailColor = hjN > 0 ? '51, 255, 153' : '255, 107, 107';
+        const trailColor = hjN > 0 ? '255, 0, 102' : '255, 107, 107';
         ctx.fillStyle = `rgba(${trailColor}, ${0.02 + age * 0.12})`;
         ctx.beginPath();
         ctx.arc(xj, yj, 1.5 + age * 1.5, 0, Math.PI * 2);
@@ -2870,7 +2870,7 @@
       
       // Atmospheric glow
       const atmosGrad = ctx.createRadialGradient(px, py, 0, px, py, 20 + thrust * 15);
-      const planetColor = thrust > 0.5 ? 'rgba(51, 255, 153' : 'rgba(71, 212, 255';
+      const planetColor = thrust > 0.5 ? 'rgba(255, 0, 102' : 'rgba(71, 212, 255';
       atmosGrad.addColorStop(0, planetColor + ', 0.9)');
       atmosGrad.addColorStop(0.4, planetColor + ', 0.4)');
       atmosGrad.addColorStop(0.7, planetColor + ', 0.15)');
@@ -2882,8 +2882,8 @@
       
       // Planet core
       ctx.shadowBlur = 20;
-      ctx.shadowColor = thrust > 0.5 ? 'rgba(51, 255, 153, 0.9)' : 'rgba(71, 212, 255, 0.8)';
-      ctx.fillStyle = thrust > 0.5 ? '#33ff99' : '#47d4ff';
+      ctx.shadowColor = thrust > 0.5 ? 'rgba(255, 0, 102, 0.9)' : 'rgba(71, 212, 255, 0.8)';
+      ctx.fillStyle = thrust > 0.5 ? '#ff0066' : '#47d4ff';
       ctx.beginPath();
       ctx.arc(px, py, 6 + thrust * 4, 0, Math.PI * 2);
       ctx.fill();
@@ -2898,7 +2898,7 @@
           px - Math.cos(angle) * flareLen, 
           py - Math.sin(angle) * flareLen * ecc
         );
-        const flareColor = dir > 0 ? '51, 255, 153' : '255, 107, 107';
+        const flareColor = dir > 0 ? '255, 0, 102' : '255, 107, 107';
         flareGrad.addColorStop(0, `rgba(${flareColor}, 0.8)`);
         flareGrad.addColorStop(0.5, `rgba(${flareColor}, 0.3)`);
         flareGrad.addColorStop(1, `rgba(${flareColor}, 0)`);
@@ -2945,7 +2945,7 @@
       ctx.font = "9px 'IBM Plex Mono', monospace";
       ctx.textAlign = 'center';
       const momentum = h >= 0 ? '▲ THRUST' : '▼ DRAG';
-      const momentumColor = h >= 0 ? 'rgba(51, 255, 153, 0.6)' : 'rgba(255, 107, 107, 0.6)';
+      const momentumColor = h >= 0 ? 'rgba(255, 0, 102, 0.6)' : 'rgba(255, 107, 107, 0.6)';
       ctx.fillStyle = momentumColor;
       ctx.fillText(momentum, cx, rect.height - 8);
       
@@ -2955,7 +2955,7 @@
       const divNorm = orbitClamp(divergence / maxDiv, 0, 1);
       if (divNorm > 0.4) {
         ctx.globalAlpha = (divNorm - 0.4) * 0.5;
-        ctx.strokeStyle = m > s ? 'rgba(51, 255, 153, 0.7)' : 'rgba(255, 107, 107, 0.7)';
+        ctx.strokeStyle = m > s ? 'rgba(255, 0, 102, 0.7)' : 'rgba(255, 107, 107, 0.7)';
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(cx, cy, planetR + 14, angle - 0.35, angle + 0.35);
@@ -3331,7 +3331,7 @@
       
       const latest = source[source.length - 1];
       const first = source[0];
-      const color = tickerColors[currentTicker] || '#33ff99';
+      const color = tickerColors[currentTicker] || '#ff0066';
       const profile = TICKER_PROFILES[currentTicker] || {};
       const shipInfo = SHIP_NAMES[currentTicker] || { name: currentTicker, designation: 'UNK-XXX' };
       
@@ -3538,7 +3538,7 @@
       const sector = tickerThemes[ticker] || 'UNKNOWN';
       const meta = mapTickerToPixelShip(ticker, sector, pnlPercent);
       const lore = PIXEL_SHIP_LORE[meta.pattern] || PIXEL_SHIP_LORE.drone;
-      const color = tickerColors[ticker] || '#33ff99';
+      const color = tickerColors[ticker] || '#ff0066';
       
       // Use PNG sprite (custom or fallback)
       const spritePath = SHIP_SPRITES[ticker] || DEFAULT_SHIP_SPRITE;
@@ -3879,7 +3879,7 @@
         const change = stats.return_1d || 0;
         const changeClass = change >= 0 ? 'positive' : 'negative';
         const isActive = ticker === currentTicker;
-        const color = tickerColors[ticker] || '#33ff99';
+        const color = tickerColors[ticker] || '#ff0066';
         
         return '<div class="carousel-ticker ' + (isActive ? 'active' : '') + '" data-ticker="' + ticker + '" onclick="selectTickerFromCarousel(\'' + ticker + '\')" style="--ticker-color: ' + color + '">' +
           '<div class="carousel-ticker-symbol" style="color: ' + color + '">' + ticker + '</div>' +
@@ -4018,7 +4018,7 @@
           const value = pos.shares * pos.current_price;
           const pnl = (pos.current_price - pos.entry_price) * pos.shares;
           const pnlPct = ((pos.current_price - pos.entry_price) / pos.entry_price * 100);
-          const color = tickerColors[pos.ticker] || '#33ff99';
+          const color = tickerColors[pos.ticker] || '#ff0066';
           const hasDossier = TICKER_PROFILES[pos.ticker] ? true : false;
           const dossierBtn = hasDossier ? '<button class="dossier-btn" onclick="openTickerDossier(\'' + pos.ticker + '\')">◉</button>' : '';
           return '<tr class="position-row" data-ticker="' + pos.ticker + '">' +
@@ -4093,7 +4093,7 @@
         
         // Glow effect
         if (options.glow) {
-          ctx.shadowColor = options.glowColor || tickerColors[ticker] || '#33ff99';
+          ctx.shadowColor = options.glowColor || tickerColors[ticker] || '#ff0066';
           ctx.shadowBlur = options.glowBlur || 10;
         }
         
@@ -4117,13 +4117,13 @@
         
         const tickers = Object.keys(SHIP_SPRITES);
         grid.innerHTML = tickers.map(ticker => {
-          const color = tickerColors[ticker] || '#33ff99';
+          const color = tickerColors[ticker] || '#ff0066';
           const isSelected = ticker === this.selectedPlayerShip;
           
           // Step 8: Get ship level for display
           const summary = window.Progression?.getShipSummary(ticker);
           const level = summary?.level || 1;
-          const levelColor = level >= 5 ? '#ffd700' : level >= 3 ? '#47d4ff' : '#33ff99';
+          const levelColor = level >= 5 ? '#ffd700' : level >= 3 ? '#47d4ff' : '#ff0066';
           
           return `
             <div class="ship-select-item ${isSelected ? 'selected' : ''}" 
@@ -4170,7 +4170,7 @@
         ctx.fillRect(0, 0, 280, 160);
         
         // Stars
-        ctx.fillStyle = 'rgba(51, 255, 153, 0.3)';
+        ctx.fillStyle = 'rgba(255, 0, 102, 0.3)';
         for (let i = 0; i < 30; i++) {
           ctx.fillRect(Math.random() * 280, Math.random() * 160, 1, 1);
         }
@@ -4187,8 +4187,8 @@
         this.drawOnCanvas(ctx, this.selectedPlayerShip, 140, 130, 0.7, { glow: true, glowBlur: 6 });
         
         // Draw some bullets
-        ctx.fillStyle = '#33ff99';
-        ctx.shadowColor = '#33ff99';
+        ctx.fillStyle = '#ff0066';
+        ctx.shadowColor = '#ff0066';
         ctx.shadowBlur = 4;
         ctx.fillRect(138, 100, 4, 10);
         ctx.fillRect(138, 70, 4, 10);
@@ -4205,13 +4205,13 @@
         ctx.fillRect(0, 0, 280, 160);
         
         // Stars
-        ctx.fillStyle = 'rgba(51, 255, 153, 0.2)';
+        ctx.fillStyle = 'rgba(255, 0, 102, 0.2)';
         for (let i = 0; i < 20; i++) {
           ctx.fillRect(Math.random() * 280, Math.random() * 100, 1, 1);
         }
         
         // Draw terrain
-        ctx.strokeStyle = '#33ff99';
+        ctx.strokeStyle = '#ff0066';
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(0, 140);
@@ -4363,7 +4363,7 @@
         const value = pos.shares * pos.current_price;
         const pnl = (pos.current_price - pos.entry_price) * pos.shares;
         const pnlPct = ((pos.current_price - pos.entry_price) / pos.entry_price * 100);
-        const color = tickerColors[pos.ticker] || '#33ff99';
+        const color = tickerColors[pos.ticker] || '#ff0066';
         const profile = TICKER_PROFILES[pos.ticker] || {};
         const shipInfo = SHIP_NAMES[pos.ticker] || { name: pos.ticker, designation: 'UNK-XXX' };
         const sector = tickerThemes[pos.ticker] || 'UNKNOWN';
@@ -4685,7 +4685,7 @@
       document.getElementById('options-tbody').innerHTML = DEMO_OPTIONS.map(pos => {
         const pnl = (pos.current - pos.entry) * pos.contracts * 100;
         const pnlPct = ((pos.current - pos.entry) / pos.entry * 100);
-        const color = tickerColors[pos.ticker] || '#33ff99';
+        const color = tickerColors[pos.ticker] || '#ff0066';
         const hasDossier = TICKER_PROFILES[pos.ticker] ? true : false;
         const dossierBtn = hasDossier ? '<button class="dossier-btn" onclick="openTickerDossier(\'' + pos.ticker + '\')">◉</button>' : '';
         const shipSrc = SHIP_SPRITES[pos.ticker] || DEFAULT_SHIP_SPRITE;
@@ -4707,7 +4707,7 @@
       if (!chartSizes || !chartPnl) return;
       if (!DEMO_OPTIONS || !DEMO_OPTIONS.length) return;
       
-      const positions = DEMO_OPTIONS.map(pos => ({ ticker: pos.ticker, value: pos.current * pos.contracts * 100, color: tickerColors[pos.ticker] || '#33ff99' })).sort((a, b) => b.value - a.value);
+      const positions = DEMO_OPTIONS.map(pos => ({ ticker: pos.ticker, value: pos.current * pos.contracts * 100, color: tickerColors[pos.ticker] || '#ff0066' })).sort((a, b) => b.value - a.value);
       const maxValue = Math.max(...positions.map(p => p.value));
       const totalValue = positions.reduce((s, x) => s + x.value, 0);
       chartSizes.innerHTML = '<div class="bar-chart">' + positions.map(p =>
@@ -4716,7 +4716,7 @@
         '<span class="bar-value">$' + p.value.toLocaleString() + '</span></div>'
       ).join('') + '</div>';
       
-      const pnlData = DEMO_OPTIONS.map(pos => ({ ticker: pos.ticker, pnl: (pos.current - pos.entry) * pos.contracts * 100, pct: ((pos.current - pos.entry) / pos.entry * 100), color: tickerColors[pos.ticker] || '#33ff99' })).sort((a, b) => b.pnl - a.pnl);
+      const pnlData = DEMO_OPTIONS.map(pos => ({ ticker: pos.ticker, pnl: (pos.current - pos.entry) * pos.contracts * 100, pct: ((pos.current - pos.entry) / pos.entry * 100), color: tickerColors[pos.ticker] || '#ff0066' })).sort((a, b) => b.pnl - a.pnl);
       const maxPnl = Math.max(...pnlData.map(p => Math.abs(p.pnl)));
       let winners = 0, losers = 0, totalPnl = 0;
       pnlData.forEach(p => { if (p.pnl >= 0) winners++; else losers++; totalPnl += p.pnl; });
@@ -4971,7 +4971,7 @@
       // Flash the panel header to show update
       const header = document.querySelector('.panel-header');
       if (header) {
-        header.style.background = 'rgba(51, 255, 153, 0.1)';
+        header.style.background = 'rgba(255, 0, 102, 0.1)';
         setTimeout(() => {
           header.style.background = '';
         }, 150);
@@ -5039,7 +5039,7 @@
       ];
       
       const THEMES = {
-        Terminal: { '--phosphor': '#33ff99', '--amber': '#ffb347' },
+        Terminal: { '--phosphor': '#ff0066', '--amber': '#ffb347' },
         Arcade:   { '--phosphor': '#7cff00', '--amber': '#ffd93d' },
         NeonNoir: { '--phosphor': '#7afcff', '--amber': '#ff6fd8' }
       };
@@ -5504,7 +5504,7 @@
           }
           
           currentVesselTicker = ticker;
-          const color = tickerColors[ticker] || '#33ff99';
+          const color = tickerColors[ticker] || '#ff0066';
           const profile = TICKER_PROFILES[ticker] || {};
           const shipInfo = SHIP_NAMES[ticker] || { name: ticker, designation: 'UNK-XXX' };
           const sector = tickerThemes[ticker] || 'UNKNOWN';
@@ -6644,7 +6644,7 @@
         `;
       }
       
-      const missionIcon = activeMission.icon ? PixelIcons.replaceEmojis(activeMission.icon) : PixelIcons.toSvg('rocket', '#33ff99', 14);
+      const missionIcon = activeMission.icon ? PixelIcons.replaceEmojis(activeMission.icon) : PixelIcons.toSvg('rocket', '#ff0066', 14);
       
       contextContainer.innerHTML = `
         <div class="mission-context-card">
@@ -7647,7 +7647,7 @@
         
         // Shield effect
         if (upgrades.shield?.id) {
-          ctx.strokeStyle = `rgba(51, 255, 153, ${0.3 + upgrades.shield.val * 0.3})`;
+          ctx.strokeStyle = `rgba(255, 0, 102, ${0.3 + upgrades.shield.val * 0.3})`;
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.ellipse(cx, cy, 70, 60, 0, 0, Math.PI * 2);

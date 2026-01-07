@@ -16,7 +16,7 @@ const MissionSystem = (function() {
   'use strict';
   
   // Pixel icon helper - uses PixelIcons if available, else returns text fallback
-  function pxIcon(name, color = '#33ff99', size = 12) {
+  function pxIcon(name, color = '#ff0066', size = 12) {
     if (window.PixelIcons) {
       return window.PixelIcons.toSvg(name, color, size);
     }
@@ -372,7 +372,7 @@ const MissionSystem = (function() {
     HARVEST: {
       id: 'HARVEST',
       name: 'HARVEST OPERATION',
-      get icon() { return pxIcon('target', '#33ff99', 14); },
+      get icon() { return pxIcon('target', '#ff0066', 14); },
       concept: 'Teaches range/mean reversion / premium intuition',
       description: 'Extract value from stable zones. Low volatility and clear boundaries maximize yield.',
       teaches: 'How to profit from range-bound conditions by selling premium.',
@@ -884,7 +884,7 @@ const MissionSystem = (function() {
       tMs: Date.now(),
       barIndex: startBarIndex,
       kind: 'EVENT',
-      msg: pxIcon('rocket', '#33ff99', 12) + ` Mission launched from ${mission.ticker} @ $${rows[startBarIndex].close.toFixed(2)}`
+      msg: pxIcon('rocket', '#ff0066', 12) + ` Mission launched from ${mission.ticker} @ $${rows[startBarIndex].close.toFixed(2)}`
     });
     
     // Warn if mission window was shortened due to limited data
@@ -1207,7 +1207,7 @@ const MissionSystem = (function() {
       const prevAbove = prevBar.close > prevBar.kernelRegression;
       if (currAbove !== prevAbove) {
         const direction = currAbove ? 'above' : 'below';
-        triggers.push({ kind: 'EVENT', msg: pxIcon('target', '#33ff99', 12) + ` Course correction: price crossed ${direction} trend line` });
+        triggers.push({ kind: 'EVENT', msg: pxIcon('target', '#ff0066', 12) + ` Course correction: price crossed ${direction} trend line` });
       }
     }
     

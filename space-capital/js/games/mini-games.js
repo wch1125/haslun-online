@@ -342,7 +342,7 @@
       const boostBar = document.getElementById('run-boost-bar');
       if (boostBar) {
         boostBar.style.width = `${this.boostFuel}%`;
-        boostBar.style.background = this.boosting ? '#ffb347' : '#33ff99';
+        boostBar.style.background = this.boosting ? '#ffb347' : '#ff0066';
       }
       
       // Update hull bar visual
@@ -354,7 +354,7 @@
         } else if (this.hull < 60) {
           hullBar.style.background = '#ffb347';
         } else {
-          hullBar.style.background = '#33ff99';
+          hullBar.style.background = '#ff0066';
         }
       }
     },
@@ -620,14 +620,14 @@
       
       // Flash overlay
       if (this.flashIntensity > 0.05) {
-        ctx.fillStyle = `rgba(51, 255, 153, ${this.flashIntensity * 0.3})`;
+        ctx.fillStyle = `rgba(255, 0, 102, ${this.flashIntensity * 0.3})`;
         ctx.fillRect(0, 0, w, h);
       }
       
       // Speed lines at edges
       if (this.speed > this.baseSpeed * 1.5) {
         const lineIntensity = (this.speed - this.baseSpeed) / (this.maxSpeed - this.baseSpeed);
-        ctx.strokeStyle = `rgba(51, 255, 153, ${lineIntensity * 0.4})`;
+        ctx.strokeStyle = `rgba(255, 0, 102, ${lineIntensity * 0.4})`;
         ctx.lineWidth = 2;
         
         for (let i = 0; i < 8; i++) {
@@ -663,7 +663,7 @@
         
         if (screenX > 0 && screenX < w && screenY > 0 && screenY < h) {
           const alpha = Math.min(1, scale * 0.5);
-          ctx.fillStyle = `rgba(51, 255, 153, ${alpha})`;
+          ctx.fillStyle = `rgba(255, 0, 102, ${alpha})`;
           ctx.fillRect(screenX, screenY, size, size);
         }
       });
@@ -783,7 +783,7 @@
           
           if (screenY > 0 && screenY < h) {
             const alpha = Math.max(0.1, 0.5 / z);
-            ctx.fillStyle = `rgba(51, 255, 153, ${alpha})`;
+            ctx.fillStyle = `rgba(255, 0, 102, ${alpha})`;
             ctx.fillRect(
               screenX - streamWidth / 2,
               screenY - 2,
@@ -837,7 +837,7 @@
       const playerScreenY = h * 0.82;
       
       // Ship color based on selected ticker
-      const shipColor = (window.tickerColors && window.tickerColors[this.selectedShip]) || '#33ff99';
+      const shipColor = (window.tickerColors && window.tickerColors[this.selectedShip]) || '#ff0066';
       
       ctx.save();
       ctx.translate(playerScreenX, playerScreenY);

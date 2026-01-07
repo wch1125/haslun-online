@@ -68,14 +68,14 @@ window.SPACE_CAPITAL.CONSTANTS = {
   // ═══════════════════════════════════════════════════════════════════
   COLORS: {
     // Primary phosphor colors
-    PHOSPHOR_GREEN: '#33ff99',
+    PHOSPHOR_GREEN: '#ff0066',
     PHOSPHOR_AMBER: '#ffb347',
     PHOSPHOR_CYAN: '#47d4ff',
     PHOSPHOR_MAGENTA: '#ff4fd8',
     PHOSPHOR_VIOLET: '#b388ff',
     
     // Status colors
-    POSITIVE: '#33ff99',
+    POSITIVE: '#ff0066',
     NEGATIVE: '#ff6b6b',
     NEUTRAL: '#888888',
     WARNING: '#ffb347',

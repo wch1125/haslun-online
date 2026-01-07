@@ -79,7 +79,7 @@ window.FlightScene = (function() {
   
   // Ship type visual configs
   const SHIP_STYLES = {
-    normal: { color: '#33ff99', glowColor: 'rgba(51, 255, 153, 0.6)', size: 1.0 },
+    normal: { color: '#ff0066', glowColor: 'rgba(255, 0, 102, 0.6)', size: 1.0 },
     elite: { color: '#ffd700', glowColor: 'rgba(255, 215, 0, 0.7)', size: 1.2 },
     mission: { color: '#00d4ff', glowColor: 'rgba(0, 212, 255, 0.7)', size: 1.1 },
     support: { color: '#ffaa33', glowColor: 'rgba(255, 170, 51, 0.5)', size: 0.9 },
@@ -667,7 +667,7 @@ window.FlightScene = (function() {
       
       // Title
       ctx.font = '600 24px "IBM Plex Mono", monospace';
-      ctx.fillStyle = 'rgba(51, 255, 153, 0.9)';
+      ctx.fillStyle = 'rgba(255, 0, 102, 0.9)';
       ctx.textAlign = 'center';
       ctx.fillText('SPACE CAPITAL', this.width / 2, 50);
       
@@ -702,7 +702,7 @@ window.FlightScene = (function() {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.fillRect(barX, barY, barWidth, barHeight);
       
-      ctx.fillStyle = 'rgba(51, 255, 153, 0.8)';
+      ctx.fillStyle = 'rgba(255, 0, 102, 0.8)';
       ctx.fillRect(barX, barY, barWidth * progress, barHeight);
     }
     

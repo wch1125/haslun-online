@@ -149,7 +149,7 @@ window.LiverySystem = (function() {
       // Palette data (from Paint Bay)
       palette: {
         model: options.palette?.model || 'dual-glaze',
-        baseColors: options.palette?.baseColors || ['#33ff99', '#00cc77', '#0a3333'],
+        baseColors: options.palette?.baseColors || ['#ff0066', '#00cc77', '#0a3333'],
         generated: options.palette?.generated || generatePaletteRoles(options.palette?.baseColors)
       },
 
@@ -185,7 +185,7 @@ window.LiverySystem = (function() {
    */
   function generatePaletteRoles(baseColors, ticker) {
     if (!baseColors || baseColors.length < 2) {
-      baseColors = ['#33ff99', '#00cc77', '#0a3333'];
+      baseColors = ['#ff0066', '#00cc77', '#0a3333'];
     }
 
     let primary = baseColors[0];
@@ -490,7 +490,7 @@ window.LiverySystem = (function() {
     // Resolve role names to hex colors
     const colorMap = {};
     for (const [zone, role] of Object.entries(application)) {
-      colorMap[zone] = paletteMap[role] || paletteMap.primary || '#33ff99';
+      colorMap[zone] = paletteMap[role] || paletteMap.primary || '#ff0066';
     }
 
     return {
@@ -587,9 +587,9 @@ window.LiverySystem = (function() {
         author: 'system',
         palette: {
           model: 'dual-glaze',
-          baseColors: ['#33ff99', '#00cc77', '#0a3333'],
+          baseColors: ['#ff0066', '#00cc77', '#0a3333'],
           generated: [
-            { role: 'primary', hex: '#33ff99' },
+            { role: 'primary', hex: '#ff0066' },
             { role: 'secondary', hex: '#00cc77' },
             { role: 'glaze', hex: '#22dd99' },
             { role: 'highlight', hex: '#66ffcc' },

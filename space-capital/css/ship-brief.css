@@ -3,12 +3,8 @@
  * SHIP BRIEF — Unified Ship Dialog Component Styles
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Dedicated stylesheet for the Ship Brief dialog component.
- * This file can be removed without affecting other pages.
- * 
- * Dependencies:
- *   - CSS variables from styles.css (--phosphor, --amber, --bg-panel, etc.)
- *   - Font families from styles.css (--font-mono, --font-display)
+ * Hotline Miami arcade cabinet aesthetic
+ * Dangerous, aggressive, underground vibes
  * 
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -22,7 +18,7 @@
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.15s steps(3), visibility 0.15s steps(3);
 }
 
 .ship-brief-dialog.visible {
@@ -37,8 +33,8 @@
 .ship-brief-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(4px);
+  background: rgba(10, 0, 8, 0.92);
+  backdrop-filter: blur(6px);
 }
 
 .ship-brief-container {
@@ -48,23 +44,23 @@
   max-height: 90vh;
   overflow: hidden;
   background: 
-    linear-gradient(135deg, rgba(51, 255, 153, 0.03) 0%, transparent 50%),
-    linear-gradient(225deg, rgba(255, 179, 71, 0.02) 0%, transparent 50%),
-    var(--bg-panel);
-  border: 1px solid rgba(51, 255, 153, 0.3);
-  border-radius: 4px;
+    linear-gradient(135deg, rgba(255, 0, 102, 0.06) 0%, transparent 50%),
+    linear-gradient(225deg, rgba(255, 122, 0, 0.03) 0%, transparent 50%),
+    linear-gradient(180deg, #1a0018 0%, #0a0008 100%);
+  border: 3px solid var(--hot, #ff0066);
+  border-radius: 0;
   box-shadow: 
-    0 0 60px rgba(0, 0, 0, 0.8),
-    0 0 30px rgba(51, 255, 153, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 0 80px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(255, 0, 102, 0.25),
+    inset 0 0 50px rgba(255, 0, 102, 0.08);
 }
 
 .ship-brief-container::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--ship-color, var(--phosphor)), transparent);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--ship-color, var(--hot, #ff0066)), transparent);
 }
 
 /* Boot Animation */
@@ -125,7 +121,7 @@
 }
 
 .ship-brief-close:hover {
-  background: rgba(51, 255, 153, 0.1);
+  background: rgba(255, 0, 102, 0.1);
   border-color: var(--phosphor);
   color: var(--phosphor);
 }
@@ -166,12 +162,12 @@
   justify-content: center;
   /* CRT Frame styling */
   background: linear-gradient(145deg, #080a0d 0%, #0d1218 50%, #080a0d 100%);
-  border: 2px solid rgba(51, 255, 153, 0.5);
+  border: 2px solid rgba(255, 0, 102, 0.5);
   border-radius: 8px;
   box-shadow: 
-    0 0 30px rgba(51, 255, 153, 0.15),
+    0 0 30px rgba(255, 0, 102, 0.15),
     inset 0 0 40px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(51, 255, 153, 0.1);
+    inset 0 1px 0 rgba(255, 0, 102, 0.1);
 }
 
 /* CRT screen curvature reflection */
@@ -185,7 +181,7 @@
   border-radius: 6px 6px 0 0;
   background: linear-gradient(
     180deg,
-    rgba(51, 255, 153, 0.04) 0%,
+    rgba(255, 0, 102, 0.04) 0%,
     transparent 100%
   );
   pointer-events: none;
@@ -198,7 +194,7 @@
   position: absolute;
   inset: 3px;
   border-radius: 6px;
-  border: 1px solid rgba(51, 255, 153, 0.15);
+  border: 1px solid rgba(255, 0, 102, 0.15);
   pointer-events: none;
 }
 
@@ -248,7 +244,7 @@
   image-rendering: pixelated;
   filter: 
     drop-shadow(0 0 15px rgba(71, 212, 255, 0.5))
-    drop-shadow(0 0 30px rgba(51, 255, 153, 0.3));
+    drop-shadow(0 0 30px rgba(255, 0, 102, 0.3));
   animation: ship-brief-hover 4s ease-in-out infinite;
   z-index: 2;
 }
@@ -270,8 +266,8 @@
   color: var(--phosphor);
   letter-spacing: 0.1em;
   text-shadow: 
-    0 0 15px rgba(51, 255, 153, 0.5),
-    0 0 30px rgba(51, 255, 153, 0.3);
+    0 0 15px rgba(255, 0, 102, 0.5),
+    0 0 30px rgba(255, 0, 102, 0.3);
 }
 
 .ship-brief-title-tagline {
@@ -293,8 +289,8 @@
   color: var(--ship-color, var(--phosphor));
   border: 1px solid var(--ship-color, var(--phosphor));
   border-radius: 2px;
-  background: rgba(51, 255, 153, 0.1);
-  box-shadow: 0 0 10px rgba(51, 255, 153, 0.2);
+  background: rgba(255, 0, 102, 0.1);
+  box-shadow: 0 0 10px rgba(255, 0, 102, 0.2);
 }
 
 /* Authority Line */
@@ -515,14 +511,14 @@
 }
 
 .ship-brief-action.primary {
-  background: rgba(51, 255, 153, 0.1);
+  background: rgba(255, 0, 102, 0.1);
   border-color: var(--phosphor);
   color: var(--phosphor);
 }
 
 .ship-brief-action.primary:hover {
-  background: rgba(51, 255, 153, 0.2);
-  box-shadow: 0 0 20px rgba(51, 255, 153, 0.2);
+  background: rgba(255, 0, 102, 0.2);
+  box-shadow: 0 0 20px rgba(255, 0, 102, 0.2);
 }
 
 .ship-brief-action-icon {
@@ -604,12 +600,12 @@ body.ship-brief-open {
   font-family: var(--font-mono, 'IBM Plex Mono', monospace);
   font-size: 0.8rem;
   font-weight: 600;
-  color: #33ff99;
-  background: rgba(51, 255, 153, 0.1);
-  border: 1px solid rgba(51, 255, 153, 0.3);
+  color: #ff0066;
+  background: rgba(255, 0, 102, 0.1);
+  border: 1px solid rgba(255, 0, 102, 0.3);
   padding: 0.25rem 0.5rem;
   border-radius: 3px;
-  text-shadow: 0 0 8px rgba(51, 255, 153, 0.5);
+  text-shadow: 0 0 8px rgba(255, 0, 102, 0.5);
   min-width: 52px;
   text-align: center;
 }
@@ -624,8 +620,8 @@ body.ship-brief-open {
 
 .ship-brief-xp-fill {
   height: 100%;
-  background: linear-gradient(90deg, #33ff99, #47d4ff);
-  box-shadow: 0 0 8px rgba(51, 255, 153, 0.5);
+  background: linear-gradient(90deg, #ff0066, #47d4ff);
+  box-shadow: 0 0 8px rgba(255, 0, 102, 0.5);
   transition: width 0.4s ease;
   width: 0%;
 }
@@ -711,8 +707,8 @@ body.ship-brief-open {
 }
 
 .ship-brief-mood .mood-indicator.mood-confident {
-  background: #33ff99;
-  box-shadow: 0 0 8px rgba(51, 255, 153, 0.5);
+  background: #ff0066;
+  box-shadow: 0 0 8px rgba(255, 0, 102, 0.5);
 }
 
 .ship-brief-mood .mood-indicator.mood-optimistic {
@@ -782,7 +778,7 @@ body.ship-brief-open {
 }
 
 .trait-row:hover {
-  background: rgba(51, 255, 153, 0.05);
+  background: rgba(255, 0, 102, 0.05);
 }
 
 .trait-label {

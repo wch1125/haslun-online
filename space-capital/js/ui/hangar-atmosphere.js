@@ -69,17 +69,17 @@ window.HangarAtmosphere = (function() {
     opacity: 0.3
   };
 
-  // Colors
+  // Colors - Hotline Miami palette
   const COLORS = {
-    starDim: 'rgba(100, 150, 180, 0.3)',
-    starBright: 'rgba(180, 220, 255, 0.8)',
-    ringBase: '#33ff99',
-    ringGlow: 'rgba(51, 255, 153, 0.4)',
-    radarSweep: 'rgba(51, 255, 153, 0.15)',
-    dustMote: 'rgba(100, 200, 180, 0.3)',
-    dataFragment: 'rgba(0, 255, 200, 0.5)',
-    volatileRing: '#ff6644',
-    stableRing: '#33ff99',
+    starDim: 'rgba(150, 80, 120, 0.3)',
+    starBright: 'rgba(255, 180, 220, 0.8)',
+    ringBase: '#ff0066',
+    ringGlow: 'rgba(255, 0, 102, 0.4)',
+    radarSweep: 'rgba(255, 0, 102, 0.15)',
+    dustMote: 'rgba(255, 100, 150, 0.3)',
+    dataFragment: 'rgba(255, 51, 153, 0.5)',
+    volatileRing: '#ff7a00',
+    stableRing: '#ff0066',
     warningRing: '#ffaa00'
   };
 
@@ -355,10 +355,10 @@ window.HangarAtmosphere = (function() {
     
     // Sweep gradient
     const sweepGrad = ctx.createConicGradient(radar.angle - Math.PI/2, 0, 0);
-    sweepGrad.addColorStop(0, 'rgba(51, 255, 153, 0)');
-    sweepGrad.addColorStop(0.1, `rgba(51, 255, 153, ${radar.opacity * currentShip.signal})`);
-    sweepGrad.addColorStop(0.15, 'rgba(51, 255, 153, 0)');
-    sweepGrad.addColorStop(1, 'rgba(51, 255, 153, 0)');
+    sweepGrad.addColorStop(0, 'rgba(255, 0, 102, 0)');
+    sweepGrad.addColorStop(0.1, `rgba(255, 0, 102, ${radar.opacity * currentShip.signal})`);
+    sweepGrad.addColorStop(0.15, 'rgba(255, 0, 102, 0)');
+    sweepGrad.addColorStop(1, 'rgba(255, 0, 102, 0)');
     
     ctx.beginPath();
     ctx.arc(0, 0, radius, 0, Math.PI * 2);
@@ -464,8 +464,8 @@ window.HangarAtmosphere = (function() {
     // Central ambient glow
     const glowGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, ring.baseRadius * 0.8);
     const glowStrength = 0.05 + currentShip.signal * 0.1;
-    glowGrad.addColorStop(0, `rgba(51, 255, 153, ${glowStrength})`);
-    glowGrad.addColorStop(1, 'rgba(51, 255, 153, 0)');
+    glowGrad.addColorStop(0, `rgba(255, 0, 102, ${glowStrength})`);
+    glowGrad.addColorStop(1, 'rgba(255, 0, 102, 0)');
     
     ctx.fillStyle = glowGrad;
     ctx.fillRect(0, 0, w, h);

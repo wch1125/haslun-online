@@ -146,8 +146,8 @@
     
     // Current livery state
     livery: {
-      hull: '#33ff99',
-      accent: '#33ff99'
+      hull: '#ff0066',
+      accent: '#ff0066'
     },
     
     updateShipDisplay() {

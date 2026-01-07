@@ -679,7 +679,7 @@ window.SpaceRun = (function() {
     ctx.rotate(tilt);
     
     // Ship body
-    ctx.fillStyle = '#33ff99';
+    ctx.fillStyle = '#ff0066';
     ctx.beginPath();
     ctx.moveTo(0, -shipH);
     ctx.lineTo(-shipW/2, shipH/2);
@@ -719,7 +719,7 @@ window.SpaceRun = (function() {
     // Position badge (top left)
     ctx.fillStyle = '#000000cc';
     ctx.fillRect(10, 10, 90, 70);
-    ctx.strokeStyle = '#33ff99';
+    ctx.strokeStyle = '#ff0066';
     ctx.lineWidth = 2;
     ctx.strokeRect(10, 10, 90, 70);
     
@@ -733,18 +733,18 @@ window.SpaceRun = (function() {
     ctx.fillText('/' + CONFIG.totalRacers, 55, 55);
     
     // Lap counter
-    ctx.fillStyle = '#33ff99';
+    ctx.fillStyle = '#ff0066';
     ctx.font = '14px "IBM Plex Mono", monospace';
     ctx.fillText(`LAP ${Math.min(player.lap, CONFIG.laps)}/${CONFIG.laps}`, 20, 72);
     
     // Speed (top right)
     ctx.fillStyle = '#000000cc';
     ctx.fillRect(CONFIG.width - 150, 10, 140, 60);
-    ctx.strokeStyle = '#33ff99';
+    ctx.strokeStyle = '#ff0066';
     ctx.strokeRect(CONFIG.width - 150, 10, 140, 60);
     
     const speed = Math.floor(player.speed / 100);
-    ctx.fillStyle = '#33ff99';
+    ctx.fillStyle = '#ff0066';
     ctx.font = 'bold 28px "Orbitron", sans-serif';
     ctx.textAlign = 'right';
     ctx.fillText(speed.toString(), CONFIG.width - 50, 45);
@@ -795,7 +795,7 @@ window.SpaceRun = (function() {
       ctx.fillStyle = '#000000aa';
       ctx.fillRect(0, 0, CONFIG.width, CONFIG.height);
       
-      ctx.fillStyle = count > 0 ? '#ffffff' : '#33ff99';
+      ctx.fillStyle = count > 0 ? '#ffffff' : '#ff0066';
       ctx.font = 'bold 120px "Orbitron", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(count > 0 ? count.toString() : 'GO!', CONFIG.width / 2, CONFIG.height / 2 + 40);
@@ -806,7 +806,7 @@ window.SpaceRun = (function() {
       ctx.fillStyle = '#000000cc';
       ctx.fillRect(0, 0, CONFIG.width, CONFIG.height);
       
-      ctx.fillStyle = '#33ff99';
+      ctx.fillStyle = '#ff0066';
       ctx.font = 'bold 48px "Orbitron", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('RACE COMPLETE', CONFIG.width / 2, CONFIG.height / 2 - 40);
@@ -819,7 +819,7 @@ window.SpaceRun = (function() {
       ctx.font = '24px "IBM Plex Mono", monospace';
       ctx.fillText(`Total Time: ${formatTime(raceTime)}`, CONFIG.width / 2, CONFIG.height / 2 + 90);
       
-      ctx.fillStyle = '#33ff99';
+      ctx.fillStyle = '#ff0066';
       ctx.font = '18px "IBM Plex Mono", monospace';
       ctx.fillText('Press SPACE to race again', CONFIG.width / 2, CONFIG.height / 2 + 140);
       ctx.textAlign = 'left';
@@ -829,7 +829,7 @@ window.SpaceRun = (function() {
       ctx.fillStyle = '#000000cc';
       ctx.fillRect(0, 0, CONFIG.width, CONFIG.height);
       
-      ctx.fillStyle = '#33ff99';
+      ctx.fillStyle = '#ff0066';
       ctx.font = 'bold 48px "Orbitron", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('PARALLAX RUN', CONFIG.width / 2, CONFIG.height / 2 - 60);
@@ -843,7 +843,7 @@ window.SpaceRun = (function() {
       ctx.fillText('↑/↓ Accelerate/Brake · ←/→ Steer', CONFIG.width / 2, CONFIG.height / 2 + 50);
       ctx.fillText('SHIFT = Boost', CONFIG.width / 2, CONFIG.height / 2 + 80);
       
-      ctx.fillStyle = '#33ff99';
+      ctx.fillStyle = '#ff0066';
       ctx.fillText('Press SPACE to start', CONFIG.width / 2, CONFIG.height / 2 + 130);
       ctx.textAlign = 'left';
     }

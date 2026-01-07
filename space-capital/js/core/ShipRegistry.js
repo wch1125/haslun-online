@@ -94,7 +94,7 @@
       const codename = identity.codename || ticker;
       const sector = identity.sector || 'UNKNOWN';
       const basePattern = identity.pixelShipPattern || 'drone';
-      const color = identity.color || '#33ff99';
+      const color = identity.color || '#ff0066';
       const threatLevel = identity.threatLevel || 'MODERATE';
       const hasOptions = identity.hasOptions || false;
       const hasAnimatedSprite = identity.hasAnimatedSprite !== false;
@@ -355,7 +355,7 @@
      * @returns {string}
      */
     getColor(ticker) {
-      return this.get(ticker)?.color || '#33ff99';
+      return this.get(ticker)?.color || '#ff0066';
     },
 
     /**

@@ -96,7 +96,7 @@ async function drawPart(ctx, partId, tier, baseWidth, baseHeight, options = {}) 
   
   // Apply glow effect for engines, shields, etc.
   if (glow > 0) {
-    ctx.shadowColor = options.glowColor || '#33ff99';
+    ctx.shadowColor = options.glowColor || '#ff0066';
     ctx.shadowBlur = glow * 15;
     ctx.globalAlpha = 0.5 + glow * 0.5;
   }
@@ -184,7 +184,7 @@ function drawProceduralPart(ctx, partId, tier, baseWidth, baseHeight) {
     ctx.lineTo(anchor.x, anchor.y);
     ctx.stroke();
     
-    ctx.fillStyle = '#33ff99';
+    ctx.fillStyle = '#ff0066';
     ctx.beginPath();
     ctx.arc(anchor.x, anchor.y, 2, 0, Math.PI * 2);
     ctx.fill();
@@ -201,9 +201,9 @@ function drawProceduralPart(ctx, partId, tier, baseWidth, baseHeight) {
       baseWidth / 2, baseHeight / 2, 0,
       baseWidth / 2, baseHeight / 2, baseWidth * 0.6
     );
-    gradient.addColorStop(0, 'rgba(51, 255, 153, 0)');
-    gradient.addColorStop(0.7, 'rgba(51, 255, 153, 0.1)');
-    gradient.addColorStop(1, 'rgba(51, 255, 153, 0.3)');
+    gradient.addColorStop(0, 'rgba(255, 0, 102, 0)');
+    gradient.addColorStop(0.7, 'rgba(255, 0, 102, 0.1)');
+    gradient.addColorStop(1, 'rgba(255, 0, 102, 0.3)');
     
     ctx.fillStyle = gradient;
     ctx.beginPath();
@@ -248,8 +248,8 @@ function drawStatusOverlay(ctx, status, config, baseWidth, baseHeight) {
       baseWidth / 2, baseHeight, 0,
       baseWidth / 2, baseHeight, baseHeight
     );
-    gradient.addColorStop(0, 'rgba(51, 255, 153, 0.4)');
-    gradient.addColorStop(1, 'rgba(51, 255, 153, 0)');
+    gradient.addColorStop(0, 'rgba(255, 0, 102, 0.4)');
+    gradient.addColorStop(1, 'rgba(255, 0, 102, 0)');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, baseWidth, baseHeight);
   } else if (status === 'alert') {

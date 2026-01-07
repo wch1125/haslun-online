@@ -204,7 +204,7 @@
     // Tier color coding
     const tierColors = {
       'S': '#ffaa33',
-      'A': '#33ff99',
+      'A': '#ff0066',
       'B': '#4ecdc4',
       'C': '#888',
       '?': '#ff6b6b'
@@ -372,7 +372,7 @@
     
     const tierColors = {
       'S': '#ffaa33',
-      'A': '#33ff99', 
+      'A': '#ff0066', 
       'B': '#4ecdc4',
       'C': '#888',
       '?': '#ff6b6b'
