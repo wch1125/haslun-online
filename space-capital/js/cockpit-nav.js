@@ -86,7 +86,14 @@
           fleetStatusPanel.classList.add('active');
           fleetStatusPanel.style.display = 'block';
         }
-        this.updateFleetStatus();
+        // Initialize observatory if not already done
+        if (window.ObservatoryController && !window.ObservatoryController.isInitialized) {
+          window.ObservatoryController.init('observatory-container');
+        } else if (window.ObservatoryController?.observatory) {
+          // Resume if paused
+          window.ObservatoryController.observatory.start();
+          window.ObservatoryController.resize();
+        }
       } else if (panel === 'news') {
         const newsPanel = document.getElementById('news-panel');
         if (newsPanel) {
@@ -394,63 +401,22 @@
     },
     
     // -------------------------------------------------------------------------
-    // FLEET STATUS - Observatory View
+    // FLEET STATUS - Orbital Observatory
     // -------------------------------------------------------------------------
     initFleetStatus() {
-      // Fleet status will be populated when panel is opened
-      console.log('[CockpitNav] Fleet Status panel initialized');
+      console.log('[CockpitNav] Initializing Orbital Observatory...');
+      
+      // Initialize the observatory when first accessed
+      setTimeout(() => {
+        if (window.ObservatoryController && !window.ObservatoryController.isInitialized) {
+          window.ObservatoryController.init('observatory-container');
+        }
+      }, 100);
     },
     
     updateFleetStatus() {
-      // Calculate fleet-wide telemetry metrics
-      const ships = this.ships;
-      let totalHealth = 0;
-      let totalMomentum = 0;
-      let positionsHtml = '';
-      
-      ships.forEach(ticker => {
-        const telem = window.Telemetry?.get(ticker) || {};
-        const rsi = telem.rsi || 50;
-        const momentum = telem.momentum || 0;
-        
-        // Health based on RSI normalization
-        const health = 100 - Math.abs(rsi - 50) * 2;
-        totalHealth += health;
-        totalMomentum += momentum;
-        
-        // Position status
-        const status = momentum > 0 ? 'positive' : momentum < 0 ? 'negative' : 'neutral';
-        positionsHtml += `
-          <div class="position-row ${status}">
-            <span class="position-ticker">${ticker}</span>
-            <span class="position-momentum">${momentum >= 0 ? '+' : ''}${(momentum * 100).toFixed(1)}%</span>
-          </div>
-        `;
-      });
-      
-      const avgHealth = totalHealth / ships.length;
-      const avgMomentum = (totalMomentum / ships.length) * 100;
-      
-      // Update UI
-      const healthEl = document.getElementById('fleet-health-pct');
-      const healthBar = document.getElementById('fleet-health-bar');
-      const momentumEl = document.getElementById('fleet-momentum');
-      const riskEl = document.getElementById('fleet-risk');
-      const positionsEl = document.getElementById('fleet-positions-list');
-      const countEl = document.getElementById('fleet-position-count');
-      
-      if (healthEl) healthEl.textContent = `${avgHealth.toFixed(0)}%`;
-      if (healthBar) healthBar.style.width = `${avgHealth}%`;
-      if (momentumEl) {
-        momentumEl.textContent = `${avgMomentum >= 0 ? '+' : ''}${avgMomentum.toFixed(1)}%`;
-        momentumEl.className = `status-metric-large ${avgMomentum >= 0 ? 'positive' : 'negative'}`;
-      }
-      if (riskEl) {
-        const riskLevel = avgHealth > 70 ? 'LOW' : avgHealth > 40 ? 'MODERATE' : 'HIGH';
-        riskEl.textContent = riskLevel;
-      }
-      if (positionsEl) positionsEl.innerHTML = positionsHtml;
-      if (countEl) countEl.textContent = `${ships.length} ships`;
+      // Observatory handles its own updates via ObservatoryController
+      // This method kept for compatibility
     },
     
     // -------------------------------------------------------------------------

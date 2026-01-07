@@ -30,6 +30,8 @@
   <link rel="stylesheet" href="css/hotline-atmosphere.css">
   <link rel="stylesheet" href="css/hotline-hud-clean.css">
   <link rel="stylesheet" href="css/hud-glitch-fix.css">
+  <!-- Orbital Observatory -->
+  <link rel="stylesheet" href="css/observatory.css">
 
   <link rel="stylesheet" href="css/mobile-cleanup.css">
 <script src="js/space-scene.js"></script>
@@ -2277,68 +2279,10 @@
     </div>
   </div>
   
-  <!-- FLEET STATUS PANEL - Observatory View -->
+  <!-- FLEET STATUS PANEL - Orbital Observatory -->
   <div class="cockpit-panel" id="fleet-status-panel">
-    <div class="fleet-status-panel">
-      <div class="fleet-status-header">
-        <h1 class="fleet-status-title">FLEET STATUS</h1>
-        <p class="fleet-status-subtitle">REAL-TIME TELEMETRY OVERVIEW</p>
-      </div>
-      
-      <div class="fleet-status-grid">
-        <!-- Fleet Health Summary -->
-        <div class="status-card">
-          <div class="status-card-header">
-            <span class="status-icon">◈</span>
-            <span class="status-card-title">FLEET HEALTH</span>
-          </div>
-          <div class="status-metric-large">
-            <span id="fleet-health-pct">87%</span>
-            <span class="metric-label">OVERALL STABILITY</span>
-          </div>
-          <div class="status-bar-wrap">
-            <div class="status-bar positive" id="fleet-health-bar" style="width: 87%"></div>
-          </div>
-        </div>
-        
-        <!-- Momentum Aggregate -->
-        <div class="status-card">
-          <div class="status-card-header">
-            <span class="status-icon">▲</span>
-            <span class="status-card-title">FLEET MOMENTUM</span>
-          </div>
-          <div class="status-metric-large positive">
-            <span id="fleet-momentum">+2.4%</span>
-            <span class="metric-label">AVG VELOCITY</span>
-          </div>
-        </div>
-        
-        <!-- Risk Exposure -->
-        <div class="status-card">
-          <div class="status-card-header">
-            <span class="status-icon">⚠</span>
-            <span class="status-card-title">RISK EXPOSURE</span>
-          </div>
-          <div class="status-metric-large warning">
-            <span id="fleet-risk">MODERATE</span>
-            <span class="metric-label">VOLATILITY INDEX</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="fleet-positions-summary">
-        <div class="positions-header">
-          <span>ACTIVE POSITIONS</span>
-          <span class="positions-count" id="fleet-position-count">6 ships</span>
-        </div>
-        <div class="positions-list" id="fleet-positions-list">
-          <!-- Populated dynamically -->
-        </div>
-      </div>
-      
-      <p style="margin-top: 24px; font-size: 11px; color: rgba(255,255,255,0.4); text-align: center;">
-        Telemetry refreshes every market tick
-      </p>
+    <div class="observatory-container" id="observatory-container">
+      <!-- Observatory canvas and HUD will be injected by ObservatoryController -->
     </div>
   </div>
   
@@ -2416,6 +2360,10 @@
   
   <!-- Hangar Atmosphere (animated background, ring effects) -->
   <script src="js/ui/hangar-atmosphere.js"></script>
+  
+  <!-- Orbital Observatory (Solar System Visualization) -->
+  <script src="js/observatory/orbital-sim.js"></script>
+  <script src="js/observatory/observatory-bridge.js"></script>
   
   <!-- Cockpit Navigation Controller -->
   <script src="js/cockpit-nav.js"></script>
