@@ -456,6 +456,8 @@
 
   <!-- Ship Behavior Engine -->
   <script src="../js/ships/ship-behavior.js"></script>
+  <!-- Chart Utilities - Robust data processing -->
+  <script src="../js/data/chart-utils.js"></script>
   <!-- Player & Position Managers -->
   <script src="../js/data/player-manager.js"></script>
   <script src="../js/data/position-manager.js"></script>
@@ -839,17 +841,93 @@
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // PRICE CHART
+    // PRICE CHART - Using ChartUtils for robust rendering
     // ─────────────────────────────────────────────────────────────────────────
 
     async function initChart() {
       const ctx = document.getElementById('priceChart').getContext('2d');
       const config = TICKER_CONFIG[currentTicker];
 
-      // Try to load historical data
-      let chartData = await loadChartData('1M');
+      // Load and process chart data using ChartUtils
+      let rawData = await loadRawChartData('1M');
+      
+      // Diagnose data for issues (dev debugging)
+      if (window.ChartUtils) {
+        const diagnosis = ChartUtils.diagnoseData(rawData);
+        if (!diagnosis.valid) {
+          console.warn('[Chart] Data issues detected:', diagnosis.issues);
+        }
+      }
 
-      priceChart = new Chart(ctx, {
+      // Prepare data with deduplication, sorting, and downsampling
+      const chartData = window.ChartUtils 
+        ? ChartUtils.prepareChartData(rawData, { targetPoints: 150 })
+        : fallbackPrepareData(rawData);
+
+      // Create chart with optimal config
+      const chartConfig = window.ChartUtils
+        ? ChartUtils.createChartConfig(chartData, { color: config.color, label: currentTicker })
+        : createFallbackConfig(chartData, config);
+
+      priceChart = new Chart(ctx, chartConfig);
+    }
+
+    async function loadRawChartData(range) {
+      // Try to load from timeseries
+      try {
+        const res = await fetch(`../data/timeseries/${currentTicker.toLowerCase()}.json`);
+        if (res.ok) {
+          const data = await res.json();
+          // Filter by range
+          const now = new Date();
+          const ranges = {
+            '1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': 9999
+          };
+          const days = ranges[range] || 30;
+          const cutoff = new Date(now - days * 24 * 60 * 60 * 1000);
+          
+          // Return raw data with consistent format
+          const rawArray = data.prices || data;
+          return rawArray
+            .filter(p => new Date(p.date) >= cutoff)
+            .map(p => ({
+              date: p.date,
+              close: p.close || p.price,
+              time: new Date(p.date).getTime()
+            }));
+        }
+      } catch (e) {
+        console.warn('[Chart] Failed to load timeseries:', e);
+      }
+
+      // Generate mock data
+      return generateMockChartData(range);
+    }
+
+    // Fallback data preparation if ChartUtils not loaded
+    function fallbackPrepareData(rawData) {
+      const seen = new Set();
+      const cleaned = rawData.filter(d => {
+        if (seen.has(d.date)) return false;
+        seen.add(d.date);
+        return true;
+      });
+      
+      cleaned.sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      return {
+        labels: cleaned.map(p => new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+        prices: cleaned.map(p => p.close),
+        domain: {
+          min: Math.min(...cleaned.map(p => p.close)) * 0.95,
+          max: Math.max(...cleaned.map(p => p.close)) * 1.05
+        }
+      };
+    }
+
+    // Fallback chart config
+    function createFallbackConfig(chartData, config) {
+      return {
         type: 'line',
         data: {
           labels: chartData.labels,
@@ -861,7 +939,8 @@
             fill: true,
             tension: 0.1,
             pointRadius: 0,
-            borderWidth: 2
+            borderWidth: 2,
+            spanGaps: true
           }]
         },
         options: {
@@ -872,9 +951,7 @@
             mode: 'index'
           },
           plugins: {
-            legend: {
-              display: false
-            },
+            legend: { display: false },
             tooltip: {
               backgroundColor: '#12121A',
               borderColor: config.color,
@@ -889,6 +966,8 @@
               ticks: { color: '#888899', font: { family: 'VT323' } }
             },
             y: {
+              min: chartData.domain.min,
+              max: chartData.domain.max,
               grid: { color: '#333344' },
               ticks: { 
                 color: '#888899', 
@@ -898,55 +977,30 @@
             }
           }
         }
-      });
-    }
-
-    async function loadChartData(range) {
-      // Try to load from timeseries
-      try {
-        const res = await fetch(`../data/timeseries/${currentTicker.toLowerCase()}.json`);
-        if (res.ok) {
-          const data = await res.json();
-          // Filter by range
-          const now = new Date();
-          const ranges = {
-            '1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': 9999
-          };
-          const days = ranges[range] || 30;
-          const cutoff = new Date(now - days * 24 * 60 * 60 * 1000);
-          
-          const filtered = (data.prices || data).filter(p => new Date(p.date) >= cutoff);
-          return {
-            labels: filtered.map(p => p.date),
-            prices: filtered.map(p => p.close || p.price)
-          };
-        }
-      } catch (e) {
-        console.warn('[Chart] Failed to load timeseries:', e);
-      }
-
-      // Generate mock data
-      return generateMockChartData(range);
+      };
     }
 
     function generateMockChartData(range) {
       const days = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': 500 }[range] || 30;
       const basePrice = telemetryData.current_price || 30;
-      const labels = [];
-      const prices = [];
+      const data = [];
 
       for (let i = days; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
         
         // Random walk with drift
         const noise = (Math.random() - 0.5) * basePrice * 0.05;
         const trend = (days - i) / days * basePrice * 0.1 * (Math.random() > 0.5 ? 1 : -1);
-        prices.push(Math.max(1, basePrice + noise + trend));
+        
+        data.push({
+          date: date.toISOString().split('T')[0],
+          close: Math.max(1, basePrice + noise + trend),
+          time: date.getTime()
+        });
       }
 
-      return { labels, prices };
+      return data;
     }
 
     function setupChartControls() {
@@ -956,10 +1010,20 @@
           btn.classList.add('active');
           
           const range = btn.dataset.range;
-          const chartData = await loadChartData(range);
+          const rawData = await loadRawChartData(range);
           
-          priceChart.data.labels = chartData.labels;
+          // Process with ChartUtils
+          const chartData = window.ChartUtils 
+            ? ChartUtils.prepareChartData(rawData, { targetPoints: 150 })
+            : fallbackPrepareData(rawData);
+          
+          // Update chart
+          priceChart.data.labels = chartData.labels.map(l => 
+            window.ChartUtils ? ChartUtils.formatDate(l) : l
+          );
           priceChart.data.datasets[0].data = chartData.prices;
+          priceChart.options.scales.y.min = chartData.domain.min;
+          priceChart.options.scales.y.max = chartData.domain.max;
           priceChart.update();
         });
       });
