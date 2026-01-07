@@ -1,5 +1,5 @@
 // =========================================================================
-// SHIP DATA — All ship-related data objects for PARALLAX
+// SHIP DATA — All ship-related data objects for HASLUN-BOT
 // Extracted from app.js for modularity
 // =========================================================================
 
@@ -40,7 +40,7 @@
     hud: "DESCENT TRAJECTORY LOCKED",
     lore: "Landers don't win wars. They bring people home."
   },
-  "#ship-shadow": {
+  "#ship-parallax": {
     hud: "BLACK CHANNEL AUTHENTICATED",
     lore: "Officially, this class does not exist. If you can see it — it chose to let you."
   },
@@ -312,25 +312,25 @@ const SHIP_NAMES = {
 // SHIP SPRITES — PNG sprite paths for each ticker
 // =========================================================================
 const SHIP_SPRITES = {
-  ACHR: 'assets/ships/static/ACHR-eVTOL-ship.png',
-  ASTS: 'assets/ships/static/ASTS-Communications-Relay-Ship.png',
-  BKSY: 'assets/ships/static/BKSY-recon-ship.png',
-  COHR: 'assets/ships/static/COHR-Glass-Reflector-ship.png',
-  EVEX: 'assets/ships/static/EVEX-Transport-Ship.png',
-  GE: 'assets/ships/static/GE-Stealth-Bomber-ship.png',
-  GME: 'assets/ships/static/GME-moonshot-ship.png',
-  JOBY: 'assets/ships/static/JOBY-eVTOL-light-class-ship.png',
-  KTOS: 'assets/ships/static/KTOS-Fighter-Ship.png',
-  LHX: 'assets/ships/static/LHX-Drone-ship.png',
-  LUNR: 'assets/ships/static/LUNR-lander-ship.png',
-  PL: 'assets/ships/static/PL-scout-ship.png',
-  RDW: 'assets/ships/static/RDW-Hauler-ship.png',
-  RKLB: 'assets/ships/static/RKLB-flagship-ship.png',
-  RTX: 'assets/ships/static/RTX-Officer-Class-Ship.png'
+  ACHR: 'assets/ships/ACHR-eVTOL-ship.png',
+  ASTS: 'assets/ships/ASTS-Communications-Relay-Ship.png',
+  BKSY: 'assets/ships/BKSY-recon-ship.png',
+  COHR: 'assets/ships/COHR-Glass-Reflector-ship.png',
+  EVEX: 'assets/ships/EVEX-Transport-Ship.png',
+  GE: 'assets/ships/GE-Stealth-Bomber-ship.png',
+  GME: 'assets/ships/GME-moonshot-ship.png',
+  JOBY: 'assets/ships/JOBY-eVTOL-light-class-ship.png',
+  KTOS: 'assets/ships/KTOS-Fighter-Ship.png',
+  LHX: 'assets/ships/LHX-Drone-ship.png',
+  LUNR: 'assets/ships/LUNR-lander-ship.png',
+  PL: 'assets/ships/PL-scout-ship.png',
+  RDW: 'assets/ships/RDW-Hauler-ship.png',
+  RKLB: 'assets/ships/RKLB-flagship-ship.png',
+  RTX: 'assets/ships/RTX-Officer-Class-Ship.png'
 };
 
 // Default fallback sprite for tickers without custom ships
-const DEFAULT_SHIP_SPRITE = 'assets/ships/static/Unclaimed-Drone-ship.png';
+const DEFAULT_SHIP_SPRITE = 'assets/ships/Unclaimed-Drone-ship.png';
 
 // =========================================================================
   // Expose globally for use by other modules

@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HASLUN-BOT // Mission Command</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0e14;
+      --bg-card: #0d1218;
+      --bg-card-hover: #111820;
+      --phosphor: #33ff99;
+      --phosphor-dim: rgba(51, 255, 153, 0.3);
+      --amber: #ffaa33;
+      --amber-dim: rgba(255, 170, 51, 0.3);
+      --red: #ff4444;
+      --red-dim: rgba(255, 68, 68, 0.3);
+      --cyan: #00d4ff;
+      --text: #c8d4e0;
+      --text-dim: #6a7a8a;
+      --border: rgba(51, 255, 153, 0.15);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
+    .container { max-width: 1600px; margin: 0 auto; padding: 1.5rem; }
+    
+    /* Header */
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+    }
+    .header-title h1 { font-size: 1.5rem; color: var(--phosphor); text-shadow: 0 0 20px var(--phosphor-dim); letter-spacing: 2px; }
+    .header-title .subtitle { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+    .back-btn { 
+      font-family: inherit; font-size: 0.85rem; background: transparent;
+      color: var(--phosphor); border: 1px solid var(--border); padding: 0.5rem 1rem;
+      cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .back-btn:hover { background: var(--bg-card-hover); border-color: var(--phosphor); }
+    
+    /* Controls */
+    .controls { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .control-group { display: flex; align-items: center; gap: 0.5rem; }
+    .control-group label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+    
+    select, button {
+      font-family: inherit; font-size: 0.85rem; background: var(--bg-card);
+      color: var(--phosphor); border: 1px solid var(--border); padding: 0.5rem 1rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    select:hover, button:hover { background: var(--bg-card-hover); border-color: var(--phosphor); }
+    button { text-transform: uppercase; letter-spacing: 1px; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.danger { color: var(--red); border-color: var(--red-dim); }
+    button.danger:hover { background: var(--red-dim); }
+    button.small { padding: 0.3rem 0.6rem; font-size: 0.7rem; }
+    
+    /* Status bar */
+    .status-bar {
+      background: var(--bg-card); border: 1px solid var(--border);
+      padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 0.8rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .status-bar .status { color: var(--text-dim); }
+    .status-bar .status.ready { color: var(--phosphor); }
+    .status-bar .status.loading { color: var(--amber); }
+    .status-bar .status.error { color: var(--red); }
+    .status-bar .meta { color: var(--text-dim); font-size: 0.7rem; }
+    
+    /* Main layout */
+    .main-layout { display: grid; grid-template-columns: 320px 1fr 380px; gap: 1.5rem; }
+    @media (max-width: 1200px) { .main-layout { grid-template-columns: 1fr; } }
+    
+    /* Panels */
+    .panel { background: var(--bg-card); border: 1px solid var(--border); }
+    .panel-header { padding: 1rem; border-bottom: 1px solid var(--border); }
+    .panel-label { color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem; }
+    .panel-title { color: var(--phosphor); font-size: 1rem; font-weight: 600; }
+    .panel-body { padding: 1rem; }
+    
+    /* Stats */
+    .stat-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .stat-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .stat-name { font-size: 0.85rem; color: var(--text); text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .stat-value.high { color: var(--phosphor); }
+    .stat-value.medium { color: var(--amber); }
+    .stat-value.low { color: var(--red); }
+    .stat-bar { height: 4px; background: rgba(255,255,255,0.1); margin-bottom: 0.5rem; overflow: hidden; }
+    .stat-bar-fill { height: 100%; transition: width 0.5s ease; }
+    .stat-bar-fill.high { background: var(--phosphor); box-shadow: 0 0 10px var(--phosphor); }
+    .stat-bar-fill.medium { background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+    .stat-bar-fill.low { background: var(--red); box-shadow: 0 0 10px var(--red); }
+    .stat-why { font-size: 0.7rem; color: var(--text-dim); line-height: 1.4; }
+    .latest-bar { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); }
+    .latest-bar strong { color: var(--text); }
+    
+    /* Mission cards */
+    .missions-grid { display: grid; gap: 1rem; }
+    .mission-card {
+      background: var(--bg-dark); border: 1px solid var(--border);
+      padding: 1rem; transition: all 0.2s;
+    }
+    .mission-card:hover { border-color: var(--phosphor); box-shadow: 0 0 20px var(--phosphor-dim); }
+    .mission-card.recommended { border-color: var(--phosphor); }
+    .mission-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .mission-card-title { display: flex; align-items: center; gap: 0.5rem; }
+    .mission-icon { font-size: 1.5rem; }
+    .mission-name { font-size: 0.9rem; color: var(--phosphor); font-weight: 600; }
+    .mission-meta { text-align: right; }
+    .difficulty-stars { color: var(--amber); font-size: 0.9rem; letter-spacing: 2px; }
+    .suitability { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.25rem; }
+    .suitability.high { color: var(--phosphor); }
+    .mission-concept { font-size: 0.75rem; color: var(--amber); margin-bottom: 0.5rem; font-style: italic; }
+    .mission-betting { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+    .mission-betting strong { color: var(--cyan); }
+    .mission-why-now { font-size: 0.75rem; color: var(--phosphor); padding: 0.5rem; background: rgba(51,255,153,0.05); border-left: 2px solid var(--phosphor); margin-bottom: 0.75rem; }
+    .mission-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .launch-btn { background: var(--phosphor); color: var(--bg-dark); font-weight: 600; }
+    .launch-btn:hover { background: #2de088; }
+    .launch-btn:disabled { background: var(--text-dim); }
+    
+    /* Active missions panel */
+    .active-missions-list { max-height: 400px; overflow-y: auto; }
+    .active-mission-item {
+      background: var(--bg-dark); border: 1px solid var(--border);
+      padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s;
+    }
+    .active-mission-item:hover { border-color: var(--amber); }
+    .active-mission-item.selected { border-color: var(--phosphor); background: rgba(51,255,153,0.05); }
+    .active-mission-item.complete { border-color: var(--cyan); }
+    .active-mission-item.damaged { border-color: var(--red); }
+    .ami-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .ami-ticker { font-weight: 600; color: var(--phosphor); }
+    .ami-type { font-size: 0.7rem; color: var(--text-dim); }
+    .ami-progress { height: 4px; background: rgba(255,255,255,0.1); margin-bottom: 0.5rem; }
+    .ami-progress-fill { height: 100%; background: var(--amber); transition: width 0.3s; }
+    .ami-progress-fill.complete { background: var(--phosphor); }
+    .ami-time { font-size: 0.7rem; color: var(--text-dim); }
+    .ami-grade { font-size: 1.2rem; font-weight: 700; }
+    .ami-grade.S { color: #ffd700; }
+    .ami-grade.A { color: var(--phosphor); }
+    .ami-grade.B { color: var(--cyan); }
+    .ami-grade.C { color: var(--amber); }
+    .ami-grade.D { color: var(--red); }
+    
+    /* Mission detail panel */
+    .mission-detail { display: none; }
+    .mission-detail.visible { display: block; }
+    .detail-section { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .detail-section:last-child { border-bottom: none; }
+    .detail-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; }
+    .detail-value { font-size: 0.9rem; color: var(--text); }
+    .detail-value.big { font-size: 1.5rem; font-weight: 700; }
+    
+    /* Progress display */
+    .progress-container { margin: 1rem 0; }
+    .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--phosphor)); transition: width 0.3s; }
+    .progress-text { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-dim); }
+    
+    /* Log feed */
+    .log-feed { max-height: 200px; overflow-y: auto; font-size: 0.75rem; }
+    .log-entry { padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 0.5rem; }
+    .log-entry:last-child { border-bottom: none; }
+    .log-kind { font-weight: 600; min-width: 50px; }
+    .log-kind.INFO { color: var(--cyan); }
+    .log-kind.WARN { color: var(--amber); }
+    .log-kind.EVENT { color: var(--phosphor); }
+    .log-msg { color: var(--text); flex: 1; }
+    
+    /* Outcome display */
+    .outcome-box { background: rgba(51,255,153,0.05); border: 1px solid var(--phosphor); padding: 1rem; }
+    .outcome-grade { font-size: 3rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+    .outcome-score { text-align: center; font-size: 1rem; color: var(--text-dim); margin-bottom: 1rem; }
+    .outcome-explanation { font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem; }
+    .outcome-list { font-size: 0.8rem; }
+    .outcome-list h4 { color: var(--phosphor); margin-bottom: 0.5rem; font-size: 0.75rem; text-transform: uppercase; }
+    .outcome-list.hurt h4 { color: var(--red); }
+    .outcome-list ul { list-style: none; padding-left: 0; }
+    .outcome-list li { padding: 0.25rem 0; padding-left: 1rem; position: relative; }
+    .outcome-list li::before { content: '›'; position: absolute; left: 0; color: var(--text-dim); }
+    
+    /* Sim controls */
+    .sim-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+    
+    /* Disclaimer */
+    .disclaimer {
+      background: rgba(255,170,51,0.1); border: 1px solid var(--amber);
+      padding: 0.75rem; margin-top: 1rem; font-size: 0.75rem; color: var(--amber); text-align: center;
+    }
+    
+    /* Empty states */
+    .empty-state { text-align: center; padding: 2rem; color: var(--text-dim); font-size: 0.85rem; }
+    
+    /* Loading */
+    .loading { text-align: center; padding: 2rem; color: var(--text-dim); }
+    
+    /* Footer */
+    .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-dim); font-size: 0.7rem; }
+    .footer a { color: var(--phosphor); text-decoration: none; }
+    
+    /* Ticker badge */
+    .ticker-badge { display: inline-block; background: var(--amber); color: var(--bg-dark); font-size: 0.6rem; padding: 0.1rem 0.4rem; margin-left: 0.5rem; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-title">
+        <h1>⚔️ MISSION COMMAND</h1>
+        <div class="subtitle">Derivatives Training Sandbox</div>
+      </div>
+      <button class="back-btn" onclick="returnToDashboard()">← Dashboard</button>
+    </header>
+    
+    <!-- Controls -->
+    <div class="controls">
+      <div class="control-group">
+        <label>Sector:</label>
+        <select id="ticker-select"><option value="">Loading...</option></select>
+      </div>
+      <button id="compute-btn" disabled>Analyze Sector</button>
+      <div class="control-group">
+        <label>Sim Speed:</label>
+        <select id="speed-select">
+          <option value="1x">1x (1 bar / 4s)</option>
+          <option value="5x">5x (1 bar / 0.8s)</option>
+          <option value="20x">20x (5 bars / s)</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status" id="status-text">Initializing...</span>
+      <span class="meta" id="status-meta"></span>
+    </div>
+    
+    <!-- Main layout -->
+    <div class="main-layout">
+      <!-- Left: Environment Stats -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-label">// Sector Analysis</div>
+          <div class="panel-title">Environment Stats</div>
+        </div>
+        <div class="panel-body" id="env-stats">
+          <div class="empty-state">Select a sector to begin</div>
+        </div>
+      </div>
+      
+      <!-- Center: Mission Cards -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-label">// Available Operations</div>
+          <div class="panel-title">Mission Recommendations</div>
+        </div>
+        <div class="panel-body">
+          <div class="missions-grid" id="missions-grid">
+            <div class="empty-state">Awaiting sector analysis</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right: Active Missions + Detail -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-label">// Fleet Operations</div>
+          <div class="panel-title">Active Missions</div>
+        </div>
+        <div class="panel-body">
+          <div class="active-missions-list" id="active-missions-list">
+            <div class="empty-state">No active missions</div>
+          </div>
+          
+          <!-- Mission Detail (hidden by default) -->
+          <div class="mission-detail" id="mission-detail">
+            <div class="detail-section">
+              <div class="detail-label">Mission</div>
+              <div class="detail-value" id="detail-name"></div>
+              <div class="detail-value" style="font-size:0.8rem;color:var(--text-dim)" id="detail-ticker"></div>
+            </div>
+            
+            <div class="detail-section">
+              <div class="detail-label">Progress</div>
+              <div class="progress-container">
+                <div class="progress-bar"><div class="progress-fill" id="detail-progress-fill"></div></div>
+                <div class="progress-text">
+                  <span id="detail-bars-elapsed">0 bars</span>
+                  <span id="detail-time-remaining">--</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <div class="detail-label">Mission Log</div>
+              <div class="log-feed" id="detail-logs"></div>
+            </div>
+            
+            <!-- Outcome (shown when complete) -->
+            <div class="outcome-box" id="detail-outcome" style="display:none;">
+              <div class="outcome-grade" id="outcome-grade"></div>
+              <div class="outcome-score" id="outcome-score"></div>
+              <div class="outcome-explanation" id="outcome-explanation"></div>
+              <div class="outcome-list" id="outcome-helped"></div>
+              <div class="outcome-list hurt" id="outcome-hurt"></div>
+            </div>
+            
+            <div class="sim-controls" id="detail-controls">
+              <button class="small" onclick="UI.fastForward(10)">+10 Bars</button>
+              <button class="small" onclick="UI.completeNow()">Complete Now</button>
+              <button class="small danger" onclick="UI.abortMission()">Abort</button>
+              <button class="small danger" onclick="UI.deleteMission()">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      ⚠️ TRAINING SIMULATION — Not investment advice. No real orders. Educational purposes only.
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      HASLUN-BOT Mission System v2 // Step 2 Play Loop<br>
+      <a href="#" onclick="localStorage.removeItem('HASLUN_MISSIONS_V1');location.reload();">Clear All Missions</a> |
+      <a href="#" onclick="IndicatorLoader.clearCache();location.reload();">Clear Data Cache</a>
+    </div>
+  </div>
+  
+  <!-- Scripts -->
+  <script src="js/data/indicator-loader.js"></script>
+  <script src="js/mission-system.js"></script>
+  <script>
+    // ═══════════════════════════════════════════════════════════════════
+    // MISSION COMMAND UI (Step 2)
+    // ═══════════════════════════════════════════════════════════════════
+    
+    const UI = {
+      // DOM refs
+      tickerSelect: null,
+      computeBtn: null,
+      speedSelect: null,
+      statusText: null,
+      statusMeta: null,
+      envStats: null,
+      missionsGrid: null,
+      activeMissionsList: null,
+      missionDetail: null,
+      
+      // State
+      currentTicker: null,
+      currentEnv: null,
+      currentTickerData: null,
+      selectedMissionId: null,
+      updateInterval: null,
+      
+      init() {
+        this.tickerSelect = document.getElementById('ticker-select');
+        this.computeBtn = document.getElementById('compute-btn');
+        this.speedSelect = document.getElementById('speed-select');
+        this.statusText = document.getElementById('status-text');
+        this.statusMeta = document.getElementById('status-meta');
+        this.envStats = document.getElementById('env-stats');
+        this.missionsGrid = document.getElementById('missions-grid');
+        this.activeMissionsList = document.getElementById('active-missions-list');
+        this.missionDetail = document.getElementById('mission-detail');
+        
+        this.tickerSelect.addEventListener('change', () => this.onTickerChange());
+        this.computeBtn.addEventListener('click', () => this.computeEnvironment());
+        
+        // Read ticker from URL params (Step 2.2)
+        const params = new URLSearchParams(window.location.search);
+        this.preselectedTicker = params.get('ticker')?.toUpperCase() || null;
+        
+        this.loadTickers();
+        this.renderActiveMissions();
+        
+        // Start update loop
+        this.updateInterval = setInterval(() => this.updateLoop(), 500);
+      },
+      
+      setStatus(text, type = 'ready') {
+        this.statusText.textContent = text;
+        this.statusText.className = 'status ' + type;
+      },
+      
+      setMeta(text) {
+        this.statusMeta.textContent = text;
+      },
+      
+      async loadTickers() {
+        this.setStatus('Loading manifest...', 'loading');
+        try {
+          const tickers = await IndicatorLoader.getAvailableTickers();
+          const meta = await IndicatorLoader.getMetadata();
+          
+          this.tickerSelect.innerHTML = '<option value="">Select sector...</option>';
+          for (const t of tickers) {
+            const opt = document.createElement('option');
+            opt.value = t.ticker;
+            
+            // Check if active mission exists
+            const activeMission = MissionSystem.getActiveMissionForTicker(t.ticker);
+            opt.textContent = activeMission 
+              ? `${t.ticker} — ${t.name} [ACTIVE]`
+              : `${t.ticker} — ${t.name}`;
+            
+            this.tickerSelect.appendChild(opt);
+          }
+          
+          this.computeBtn.disabled = true;
+          this.setStatus('Ready', 'ready');
+          this.setMeta(`${tickers.length} sectors • Updated: ${meta.lastUpdated}`);
+          
+          // Auto-select ticker from URL params (Step 2.2)
+          if (this.preselectedTicker) {
+            const tickerExists = tickers.some(t => t.ticker === this.preselectedTicker);
+            if (tickerExists) {
+              this.tickerSelect.value = this.preselectedTicker;
+              this.onTickerChange();
+              // Auto-analyze after short delay
+              setTimeout(() => this.computeEnvironment(), 200);
+            }
+            this.preselectedTicker = null; // Clear so it doesn't trigger again
+          }
+        } catch (err) {
+          this.setStatus('Failed: ' + err.message, 'error');
+        }
+      },
+      
+      onTickerChange() {
+        const ticker = this.tickerSelect.value;
+        this.computeBtn.disabled = !ticker;
+        this.currentTicker = ticker;
+        if (ticker) this.setStatus(`Selected: ${ticker}`, 'ready');
+      },
+      
+      async computeEnvironment() {
+        if (!this.currentTicker) return;
+        
+        this.setStatus(`Analyzing ${this.currentTicker}...`, 'loading');
+        this.computeBtn.disabled = true;
+        
+        try {
+          // Load full ticker data (needed for missions)
+          this.currentTickerData = await IndicatorLoader.loadTicker(this.currentTicker);
+          
+          // Compute environment
+          const env = await MissionSystem.computeEnvironment(this.currentTicker);
+          this.currentEnv = env;
+          
+          // Generate recommendations
+          const recommendations = MissionSystem.generateRecommendations(env);
+          
+          this.renderEnvironment(env);
+          this.renderMissionCards(recommendations);
+          
+          this.setStatus(`Analysis complete: ${this.currentTicker}`, 'ready');
+          this.setMeta(`${env.barsUsed} bars • Latest: ${new Date(env.latestBar.time).toLocaleString()}`);
+        } catch (err) {
+          this.setStatus('Error: ' + err.message, 'error');
+          this.envStats.innerHTML = `<div class="empty-state" style="color:var(--red)">${err.message}</div>`;
+        }
+        
+        this.computeBtn.disabled = false;
+      },
+      
+      renderEnvironment(env) {
+        const stats = [
+          { key: 'hull', name: 'Hull', icon: '🛡️' },
+          { key: 'firepower', name: 'Firepower', icon: '⚡' },
+          { key: 'sensors', name: 'Sensors', icon: '📡' },
+          { key: 'fuel', name: 'Fuel', icon: '⛽' },
+          { key: 'threat', name: 'Threat', icon: '⚠️', inverted: true }
+        ];
+        
+        let html = '';
+        for (const stat of stats) {
+          const value = env[stat.key];
+          const why = env.why[stat.key];
+          let colorClass = stat.inverted
+            ? (value >= 60 ? 'low' : value >= 35 ? 'medium' : 'high')
+            : (value >= 60 ? 'high' : value >= 35 ? 'medium' : 'low');
+          
+          html += `
+            <div class="stat-item">
+              <div class="stat-header">
+                <span class="stat-name">${stat.icon} ${stat.name}</span>
+                <span class="stat-value ${colorClass}">${value}</span>
+              </div>
+              <div class="stat-bar"><div class="stat-bar-fill ${colorClass}" style="width:${value}%"></div></div>
+              <div class="stat-why">${why}</div>
+            </div>`;
+        }
+        
+        html += `
+          <div class="latest-bar">
+            <strong>${env.ticker}</strong> @ $${env.latestBar.close.toFixed(2)}<br>
+            Volume: ${env.latestBar.volume?.toLocaleString() || 'N/A'}
+          </div>`;
+        
+        this.envStats.innerHTML = html;
+      },
+      
+      renderMissionCards(recommendations) {
+        const activeMission = this.currentTicker 
+          ? MissionSystem.getActiveMissionForTicker(this.currentTicker)
+          : null;
+        
+        let html = '';
+        for (const m of recommendations) {
+          const stars = '★'.repeat(m.difficulty) + '☆'.repeat(3 - m.difficulty);
+          const suitClass = m.suitability >= 55 ? 'high' : '';
+          const cardClass = m.recommended ? 'recommended' : '';
+          const canLaunch = !activeMission && this.currentTickerData;
+          
+          html += `
+            <div class="mission-card ${cardClass}">
+              <div class="mission-card-header">
+                <div class="mission-card-title">
+                  <span class="mission-icon">${m.icon}</span>
+                  <span class="mission-name">${m.name}</span>
+                </div>
+                <div class="mission-meta">
+                  <div class="difficulty-stars">${stars}</div>
+                  <div class="suitability ${suitClass}">${m.suitability}% fit</div>
+                </div>
+              </div>
+              <div class="mission-concept">${m.concept}</div>
+              <div class="mission-betting"><strong>Betting on:</strong> ${m.bettingOn}</div>
+              <div class="mission-why-now">${m.whyNow}</div>
+              <div class="mission-actions">
+                <button class="launch-btn" ${canLaunch ? '' : 'disabled'} onclick="UI.launchMission('${m.type}', ${m.difficulty})">
+                  ${activeMission ? 'Mission Active' : 'Launch Mission'}
+                </button>
+                <select class="duration-select" id="duration-${m.type}" style="font-size:0.75rem;padding:0.3rem;">
+                  ${m.durationBands.map(d => `<option value="${d}" ${d === m.defaultDuration ? 'selected' : ''}>${d}</option>`).join('')}
+                </select>
+              </div>
+            </div>`;
+        }
+        
+        this.missionsGrid.innerHTML = html;
+      },
+      
+      async launchMission(type, difficulty) {
+        if (!this.currentTicker || !this.currentTickerData || !this.currentEnv) {
+          alert('Please analyze a sector first');
+          return;
+        }
+        
+        // Check for existing active mission
+        if (MissionSystem.getActiveMissionForTicker(this.currentTicker)) {
+          alert('This sector already has an active mission');
+          return;
+        }
+        
+        const durationKey = document.getElementById(`duration-${type}`)?.value || '1D';
+        const simSpeed = this.speedSelect.value;
+        
+        // Create mission
+        const mission = MissionSystem.createMission(this.currentTicker, type, {
+          difficulty,
+          durationKey,
+          simSpeed,
+          env: this.currentEnv
+        });
+        
+        // Save to storage
+        const missions = MissionSystem.loadMissions();
+        missions.push(mission);
+        MissionSystem.saveMissions(missions);
+        
+        // Launch it
+        MissionSystem.launchMission(mission.id, this.currentTickerData);
+        
+        this.setStatus(`Mission launched: ${mission.typeName}`, 'ready');
+        this.renderActiveMissions();
+        this.selectMission(mission.id);
+        
+        // Refresh ticker dropdown to show [ACTIVE] badge
+        this.loadTickers();
+        
+        // Re-render mission cards to disable launch buttons
+        const recommendations = MissionSystem.generateRecommendations(this.currentEnv);
+        this.renderMissionCards(recommendations);
+      },
+      
+      renderActiveMissions() {
+        const missions = MissionSystem.loadMissions();
+        
+        if (missions.length === 0) {
+          this.activeMissionsList.innerHTML = '<div class="empty-state">No missions yet</div>';
+          return;
+        }
+        
+        // Sort: active first, then by creation time
+        missions.sort((a, b) => {
+          if (a.status === 'ACTIVE' && b.status !== 'ACTIVE') return -1;
+          if (b.status === 'ACTIVE' && a.status !== 'ACTIVE') return 1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        
+        let html = '';
+        for (const m of missions) {
+          const progress = MissionSystem.getMissionProgress(m);
+          const isSelected = m.id === this.selectedMissionId;
+          const statusClass = m.status === 'COMPLETE' ? 'complete' : m.status === 'DAMAGED' ? 'damaged' : '';
+          
+          html += `
+            <div class="active-mission-item ${statusClass} ${isSelected ? 'selected' : ''}" onclick="UI.selectMission('${m.id}')">
+              <div class="ami-header">
+                <span class="ami-ticker">${m.icon} ${m.ticker}</span>
+                ${m.outcome ? `<span class="ami-grade ${m.outcome.grade}">${m.outcome.grade}</span>` : ''}
+              </div>
+              <div class="ami-type">${m.typeName} • ${m.difficulty}★</div>
+              <div class="ami-progress">
+                <div class="ami-progress-fill ${progress.progress >= 1 ? 'complete' : ''}" style="width:${progress.progress * 100}%"></div>
+              </div>
+              <div class="ami-time">${m.status === 'ACTIVE' ? progress.timeRemaining : m.status}</div>
+            </div>`;
+        }
+        
+        this.activeMissionsList.innerHTML = html;
+      },
+      
+      async selectMission(missionId) {
+        this.selectedMissionId = missionId;
+        const mission = MissionSystem.getMission(missionId);
+        
+        if (!mission) {
+          this.missionDetail.classList.remove('visible');
+          return;
+        }
+        
+        // Load ticker data if needed for log generation
+        if (!this.currentTickerData || this.currentTickerData.ticker !== mission.ticker) {
+          try {
+            this.currentTickerData = await IndicatorLoader.loadTicker(mission.ticker);
+          } catch (e) {
+            console.error('Failed to load ticker data:', e);
+          }
+        }
+        
+        this.missionDetail.classList.add('visible');
+        this.renderMissionDetail(mission);
+        this.renderActiveMissions(); // Update selection highlight
+      },
+      
+      renderMissionDetail(mission) {
+        document.getElementById('detail-name').textContent = `${mission.icon} ${mission.typeName}`;
+        document.getElementById('detail-ticker').textContent = `${mission.ticker} • ${mission.difficulty}★ • ${mission.duration.label}`;
+        
+        const progress = MissionSystem.getMissionProgress(mission);
+        document.getElementById('detail-progress-fill').style.width = `${progress.progress * 100}%`;
+        document.getElementById('detail-bars-elapsed').textContent = `${progress.barsElapsed} / ${mission.duration.targetBars} bars`;
+        document.getElementById('detail-time-remaining').textContent = progress.timeRemaining;
+        
+        // Render logs
+        const logsHtml = mission.logs.map(log => `
+          <div class="log-entry">
+            <span class="log-kind ${log.kind}">${log.kind}</span>
+            <span class="log-msg">${log.msg}</span>
+          </div>
+        `).join('');
+        document.getElementById('detail-logs').innerHTML = logsHtml || '<div style="color:var(--text-dim)">No events yet</div>';
+        
+        // Show/hide outcome
+        const outcomeBox = document.getElementById('detail-outcome');
+        const controlsBox = document.getElementById('detail-controls');
+        
+        if (mission.outcome) {
+          outcomeBox.style.display = 'block';
+          document.getElementById('outcome-grade').textContent = mission.outcome.grade;
+          document.getElementById('outcome-grade').className = `outcome-grade ${mission.outcome.grade}`;
+          document.getElementById('outcome-score').textContent = `Score: ${mission.outcome.score}/100`;
+          document.getElementById('outcome-explanation').textContent = mission.outcome.explanation;
+          
+          document.getElementById('outcome-helped').innerHTML = mission.outcome.whatHelped.length
+            ? `<h4>What Helped</h4><ul>${mission.outcome.whatHelped.map(w => `<li>${w}</li>`).join('')}</ul>`
+            : '';
+          document.getElementById('outcome-hurt').innerHTML = mission.outcome.whatHurt.length
+            ? `<h4>What Hurt</h4><ul>${mission.outcome.whatHurt.map(w => `<li>${w}</li>`).join('')}</ul>`
+            : '';
+          
+          // Hide active controls for completed missions
+          controlsBox.innerHTML = `<button class="small danger" onclick="UI.deleteMission()">Delete Mission</button>`;
+        } else {
+          outcomeBox.style.display = 'none';
+          controlsBox.innerHTML = `
+            <button class="small" onclick="UI.fastForward(10)">+10 Bars</button>
+            <button class="small" onclick="UI.completeNow()">Complete Now</button>
+            <button class="small danger" onclick="UI.abortMission()">Abort</button>
+          `;
+        }
+      },
+      
+      async updateLoop() {
+        const activeMissions = MissionSystem.getActiveMissions();
+        
+        for (const mission of activeMissions) {
+          // Load ticker data if needed
+          let tickerData = this.currentTickerData;
+          if (!tickerData || tickerData.ticker !== mission.ticker) {
+            try {
+              tickerData = await IndicatorLoader.loadTicker(mission.ticker);
+            } catch (e) {
+              continue;
+            }
+          }
+          
+          // Generate logs for elapsed bars
+          const newLogs = MissionSystem.generateLogsForMission(mission, tickerData);
+          
+          // Check if mission should complete
+          const progress = MissionSystem.getMissionProgress(mission);
+          if (progress.progress >= 1 && mission.status === 'ACTIVE') {
+            MissionSystem.resolveMission(mission.id, tickerData);
+            this.loadTickers(); // Refresh dropdown
+          }
+          
+          // Save if logs were added
+          if (newLogs.length > 0) {
+            const missions = MissionSystem.loadMissions();
+            const idx = missions.findIndex(m => m.id === mission.id);
+            if (idx >= 0) {
+              missions[idx] = mission;
+              MissionSystem.saveMissions(missions);
+            }
+          }
+        }
+        
+        // Re-render
+        this.renderActiveMissions();
+        if (this.selectedMissionId) {
+          const m = MissionSystem.getMission(this.selectedMissionId);
+          if (m) this.renderMissionDetail(m);
+        }
+      },
+      
+      async fastForward(bars) {
+        if (!this.selectedMissionId) return;
+        MissionSystem.fastForwardMission(this.selectedMissionId, bars);
+        await this.updateLoop();
+      },
+      
+      async completeNow() {
+        if (!this.selectedMissionId) return;
+        MissionSystem.completeMissionNow(this.selectedMissionId);
+        await this.updateLoop();
+      },
+      
+      abortMission() {
+        if (!this.selectedMissionId) return;
+        if (!confirm('Abort this mission? It will be marked as DAMAGED.')) return;
+        MissionSystem.abortMission(this.selectedMissionId);
+        this.renderActiveMissions();
+        this.loadTickers();
+        
+        const m = MissionSystem.getMission(this.selectedMissionId);
+        if (m) this.renderMissionDetail(m);
+        
+        // Refresh mission cards
+        if (this.currentEnv) {
+          const recommendations = MissionSystem.generateRecommendations(this.currentEnv);
+          this.renderMissionCards(recommendations);
+        }
+      },
+      
+      deleteMission() {
+        if (!this.selectedMissionId) return;
+        if (!confirm('Delete this mission permanently?')) return;
+        MissionSystem.deleteMission(this.selectedMissionId);
+        this.selectedMissionId = null;
+        this.missionDetail.classList.remove('visible');
+        this.renderActiveMissions();
+        this.loadTickers();
+        
+        // Refresh mission cards
+        if (this.currentEnv) {
+          const recommendations = MissionSystem.generateRecommendations(this.currentEnv);
+          this.renderMissionCards(recommendations);
+        }
+      }
+    };
+    
+    /**
+     * Return to main dashboard, optionally preserving ticker context (Step 2.2)
+     */
+    function returnToDashboard() {
+      let url = 'index.html';
+      // Optionally pass current ticker back (uncomment if index.html reads URL params)
+      // if (UI.currentTicker) {
+      //   url += `?ticker=${encodeURIComponent(UI.currentTicker)}`;
+      // }
+      window.location.href = url;
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => UI.init());
+  </script>
+</body>
+</html>

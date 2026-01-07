@@ -1,0 +1,36 @@
+{
+  "timeframe": "45m",
+  "source": "TradingView export",
+  "description": "45-minute candle data with technical indicators for mission system",
+  "columns": {
+    "price": ["time", "open", "high", "low", "close"],
+    "bands": ["A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3", "B4", "B5", "C1", "C2", "C3", "C4", "C5", "D1", "D2", "D3", "D4", "D5", "E1", "E2", "E3", "E4", "E5", "F1", "F2", "F3", "F4", "F5"],
+    "movingAverages": ["G100", "G150", "G200"],
+    "kernel": ["Kernel Regression Estimate"],
+    "signals": ["Buy", "Sell"],
+    "signalsIgnored": ["StopBuy", "StopSell"],
+    "volume": ["Volume", "Volume MA"],
+    "macd": ["MACD", "Signal Line", "Histogram"],
+    "custom": ["Cross", "Main Line", "Gobble Line"]
+  },
+  "tickers": [
+    { "ticker": "ACHR", "file": "ACHR_45m.csv", "name": "Archer Aviation" },
+    { "ticker": "ASTS", "file": "ASTS_45m.csv", "name": "AST SpaceMobile" },
+    { "ticker": "BKSY", "file": "BKSY_45m.csv", "name": "BlackSky Technology" },
+    { "ticker": "COHR", "file": "COHR_45m.csv", "name": "Coherent Corp" },
+    { "ticker": "EVEX", "file": "EVEX_45m.csv", "name": "Eve Holding" },
+    { "ticker": "GE", "file": "GE_45m.csv", "name": "GE Aerospace" },
+    { "ticker": "GME", "file": "GME_45m.csv", "name": "GameStop" },
+    { "ticker": "JOBY", "file": "JOBY_45m.csv", "name": "Joby Aviation" },
+    { "ticker": "KTOS", "file": "KTOS_45m.csv", "name": "Kratos Defense" },
+    { "ticker": "LHX", "file": "LHX_45m.csv", "name": "L3Harris Technologies" },
+    { "ticker": "LUNR", "file": "LUNR_45m.csv", "name": "Intuitive Machines" },
+    { "ticker": "PL", "file": "PL_45m.csv", "name": "Planet Labs" },
+    { "ticker": "RDW", "file": "RDW_45m.csv", "name": "Redwire" },
+    { "ticker": "RKLB", "file": "RKLB_45m.csv", "name": "Rocket Lab USA" },
+    { "ticker": "RTX", "file": "RTX_45m.csv", "name": "RTX Corporation" },
+    { "ticker": "XAR", "file": "XAR_45m.csv", "name": "SPDR S&P Aerospace & Defense ETF" }
+  ],
+  "lastUpdated": "2026-01-05",
+  "notes": "StopBuy and StopSell columns are empty - do not use. Add more CSVs by dropping renamed files here and updating this manifest."
+}

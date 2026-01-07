@@ -1,5 +1,5 @@
 /**
- * PARALLAX Indicator Loader
+ * HASLUN-BOT Indicator Loader
  * Loads and parses TradingView 45m CSV exports for the mission system
  * 
  * CSV Structure (51 columns):
@@ -68,19 +68,15 @@ const IndicatorLoader = (function() {
   }
   
   /**
-   * Get list of available tickers (ACTIVE + BENCHMARK for main dropdown)
+   * Get list of available tickers
    */
   async function getAvailableTickers() {
     const m = await loadManifest();
-    // Step 3.1: Include ACTIVE and BENCHMARK, but mark them
-    return m.tickers
-      .filter(t => t.status === 'ACTIVE' || t.status === 'BENCHMARK' || !t.status)
-      .map(t => ({
-        ticker: t.ticker,
-        name: t.name || t.ticker,
-        file: t.file,
-        status: t.status || 'ACTIVE'
-      }));
+    return m.tickers.map(t => ({
+      ticker: t.ticker,
+      name: t.name || t.ticker,
+      file: t.file
+    }));
   }
   
   /**
@@ -262,7 +258,6 @@ const IndicatorLoader = (function() {
       source: m.source,
       lastUpdated: m.lastUpdated,
       tickerCount: m.tickers.length,
-      tickers: m.tickers,  // Step 3: Include full ticker list with status
       notes: m.notes
     };
   }

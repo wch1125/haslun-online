@@ -1,5 +1,5 @@
 // =========================================================================
-// PARALLAX AUDIO SYSTEM
+// HASLUN-BOT AUDIO SYSTEM
 // 90s Anime Mech Sound Effects + Epic Background Music
 // Inspired by Gundam, Evangelion, Macross soundtracks
 // Extracted from app.js for modularity
