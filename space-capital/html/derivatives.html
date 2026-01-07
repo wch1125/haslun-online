@@ -863,11 +863,11 @@
   </style>
 </head>
 <body>
-  <!-- Navigation (matches index.html) -->
+  <!-- Navigation -->
   <nav class="page-nav">
-    <a href="index.html#chart" class="nav-link">TELEMETRY</a>
-    <a href="index.html#positions" class="nav-link active">OPERATIONS</a>
-    <a href="index.html#arcade" class="nav-link">TRAINING</a>
+    <a href="space-capital.html" class="nav-link">FLEET</a>
+    <a href="ship-select.html" class="nav-link">HANGAR</a>
+    <a href="derivatives.html" class="nav-link active">DERIVATIVES</a>
   </nav>
   
   <!-- Breadcrumb -->
@@ -1900,11 +1900,23 @@
     };
     
     /**
-     * Return to main dashboard, optionally preserving ticker context (Step 2.2)
+     * Navigate to Fleet Command, optionally focusing a specific ticker
+     * @param {string} [ticker] - Optional ticker to focus on arrival
+     */
+    function goFleet(ticker) {
+      const url = ticker 
+        ? `space-capital.html?ticker=${encodeURIComponent(ticker)}` 
+        : 'space-capital.html';
+      window.location.href = url;
+    }
+    
+    /**
+     * Return to main dashboard
      */
     function returnToDashboard() {
-      let url = 'index.html#positions';
-      window.location.href = url;
+      // If we have a current ticker loaded, pass it to Fleet
+      const currentTicker = UI.currentTicker;
+      goFleet(currentTicker);
     }
     
     /**
@@ -1922,7 +1934,7 @@
         
         try {
           // Load stats data
-          const response = await fetch('data/stats.json');
+          const response = await fetch('../data/stats.json');
           this.data = await response.json();
           this.render();
           

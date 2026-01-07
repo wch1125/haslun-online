@@ -426,6 +426,18 @@
       box-shadow: 0 0 20px rgba(255, 0, 64, 0.3), inset 0 0 30px rgba(255, 0, 64, 0.05);
     }
 
+    /* Focused state - when navigating from another page with ?ticker= */
+    .ship-card.focused {
+      outline: 3px solid var(--cyan);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.1);
+      animation: focusPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes focusPulse {
+      0%, 100% { transform: translateY(0); box-shadow: 0 0 30px rgba(0, 255, 255, 0.5); }
+      50% { transform: translateY(-4px); box-shadow: 0 0 50px rgba(0, 255, 255, 0.8); }
+    }
+
     /* Ship Header */
     .ship-header {
       display: flex;
@@ -792,10 +804,11 @@
 
     .telem-bar-label {
       font-size: 0.5rem;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
       color: var(--text-muted);
-      width: 24px;
+      width: 52px;
       text-align: right;
+      flex-shrink: 0;
     }
 
     .telem-bar {
@@ -1208,6 +1221,8 @@
           <span class="pilot-avatar-mini" id="pilotAvatarMini">👤</span>
           <span id="pilotCallsign">GUEST</span>
         </button>
+        <button id="openHangarBtn" class="moduleViewer__trigger">🛠 HANGAR</button>
+        <button id="openDerivativesBtn" class="moduleViewer__trigger">📟 DERIVATIVES</button>
         <button id="openPositionsBtn" class="moduleViewer__trigger">📊 POSITIONS</button>
         <button id="openModulesBtn" class="moduleViewer__trigger">🧰 MODULES</button>
         <div class="status-item">
@@ -1591,21 +1606,21 @@
 
         <div class="telemetry-bars">
           <div class="telem-bar-row">
-            <span class="telem-bar-label">TRD</span>
+            <span class="telem-bar-label">TREND</span>
             <div class="telem-bar">
               <div class="telem-bar-fill trend" style="width: ${50 + trend * 50}%; background: ${trend > 0 ? 'var(--green-neon)' : 'var(--red-alert)'};"></div>
               <div class="telem-bar-center"></div>
             </div>
           </div>
           <div class="telem-bar-row">
-            <span class="telem-bar-label">MOM</span>
+            <span class="telem-bar-label">MOMENTUM</span>
             <div class="telem-bar">
               <div class="telem-bar-fill momentum" style="width: ${50 + momentum * 50}%; background: ${momentum > 0 ? 'var(--cyan)' : 'var(--orange)'};"></div>
               <div class="telem-bar-center"></div>
             </div>
           </div>
           <div class="telem-bar-row">
-            <span class="telem-bar-label">VOL</span>
+            <span class="telem-bar-label">VOLATILITY</span>
             <div class="telem-bar">
               <div class="telem-bar-fill volatility" style="width: ${volatility * 100}%; background: var(--yellow);"></div>
             </div>
@@ -1916,6 +1931,36 @@
     }
 
     // =========================================================================
+    // TICKER FOCUS - Accept ?ticker=RKLB from other pages
+    // =========================================================================
+    
+    function focusTickerFromUrl() {
+      const ticker = new URLSearchParams(window.location.search).get('ticker');
+      if (!ticker) return;
+
+      // Find the ship card with this ticker
+      const img = document.querySelector(`.ship-sprite-img[data-ticker="${ticker.toUpperCase()}"]`);
+      const card = img?.closest('.ship-card');
+      if (!card) {
+        console.log('[SpaceCapital] Ticker from URL not found in fleet:', ticker);
+        return;
+      }
+
+      // Add focused class and scroll into view
+      card.classList.add('focused');
+      setTimeout(() => {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+
+      // Remove focus after animation
+      setTimeout(() => {
+        card.classList.remove('focused');
+      }, 5000);
+
+      console.log('[SpaceCapital] Focused on ticker from URL:', ticker);
+    }
+
+    // =========================================================================
     // DATA LOADING - Supports multiple sources
     // =========================================================================
     
@@ -2064,11 +2109,14 @@
       renderCatalysts(data.catalysts);
       renderStats(data);
 
+      // Focus ticker from URL parameter (e.g., ?ticker=RKLB from derivatives)
+      focusTickerFromUrl();
+
       // Hide loading screen
       await new Promise(r => setTimeout(r, 500));
       loadingScreen.classList.add('hidden');
 
-      // Ship card click → open behavior demo with context
+      // Ship card click → open ship telemetry page
       document.getElementById('fleet-grid').addEventListener('click', (e) => {
         const card = e.target.closest('.ship-card');
         if (!card) return;
@@ -2077,42 +2125,10 @@
         if (!img) return;
         
         const ticker = img.dataset.ticker;
-        const pos = window._fleetPositions?.[ticker];
-        if (!pos) return;
+        if (!ticker) return;
 
-        // Calculate stats for the behavior demo
-        const cost = pos.entry_cost * pos.contracts * 100;
-        const value = pos.current_price * pos.contracts * 100;
-        const pnlPct = cost > 0 ? ((value - cost) / cost * 100) : pos.chgPct;
-        const hull = Math.max(0, Math.min(100, 100 - ((pos.visual?.damage ?? 0) * 100)));
-        const fuel = Math.max(0, Math.min(100, (pos.activity ?? 0.5) * 100));
-        const vol = pos.volatility ?? 0.02;
-
-        // Open module viewer with behavior demo
-        if (window.ModuleViewer) {
-          ModuleViewer.open('behavior-demo');
-          
-          // Wait for iframe to load, then send ship data
-          const frame = document.getElementById('moduleViewerFrame');
-          const sendData = () => {
-            if (frame.contentWindow) {
-              frame.contentWindow.postMessage({
-                type: 'SHIP_BEHAVIOR_SET',
-                ticker,
-                stats: {
-                  pnlPercent: pnlPct,
-                  volatility: vol,
-                  hull,
-                  fuel
-                }
-              }, '*');
-            }
-          };
-          
-          // Send after a delay to ensure iframe is loaded
-          frame.addEventListener('load', sendData, { once: true });
-          setTimeout(sendData, 500); // Fallback
-        }
+        // Navigate to ship telemetry page with this ticker
+        window.location.href = `ship-telemetry.html?ship=${encodeURIComponent(ticker)}`;
       });
 
       // Position Manager button
@@ -2125,6 +2141,16 @@
       // Pilot button - go to pilot select
       document.getElementById('pilotBtn')?.addEventListener('click', () => {
         window.location.href = 'pilot-select.html';
+      });
+
+      // Hangar button - go to ship select
+      document.getElementById('openHangarBtn')?.addEventListener('click', () => {
+        window.location.href = 'ship-select.html';
+      });
+
+      // Derivatives button - go to derivatives console
+      document.getElementById('openDerivativesBtn')?.addEventListener('click', () => {
+        window.location.href = 'derivatives.html';
       });
 
       // Update pilot display in header

@@ -190,13 +190,13 @@
   
   <!-- Navigation -->
   <nav class="hangar-nav">
-    <div class="hangar-nav-logo">PARALLAX</div>
+    <div class="hangar-nav-logo">SPACE CAPITAL</div>
     <div class="hangar-nav-links">
+      <a href="space-capital.html" class="hangar-nav-link">
+        <span>📊</span> FLEET
+      </a>
       <a href="ship-select.html" class="hangar-nav-link active">
         <span>🚀</span> HANGAR
-      </a>
-      <a href="index.html" class="hangar-nav-link">
-        <span>📊</span> COMMAND
       </a>
       <a href="derivatives.html" class="hangar-nav-link">
         <span>🎯</span> MISSIONS
@@ -340,11 +340,11 @@
           }, 50);
           
           setTimeout(() => {
-            window.location.href = `index.html?ship=${ticker}`;
+            window.location.href = `ship-telemetry.html?ship=${ticker}`;
           }, 1500);
         } else {
           // Fallback: just redirect
-          window.location.href = `index.html?ship=${ticker}`;
+          window.location.href = `ship-telemetry.html?ship=${ticker}`;
         }
       }
       
@@ -382,7 +382,7 @@
           container.innerHTML = `
             <div style="text-align:center;padding:4rem;color:#ff6b6b;">
               <p>Ship Select module failed to load.</p>
-              <a href="index.html" style="color:#33ff99;">Return to Command</a>
+              <a href="space-capital.html" style="color:#33ff99;">Return to Command</a>
             </div>
           `;
         }
