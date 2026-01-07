@@ -85,15 +85,24 @@
         if (fleetStatusPanel) {
           fleetStatusPanel.classList.add('active');
           fleetStatusPanel.style.display = 'block';
+          
+          // Force a reflow to ensure the panel has dimensions before Observatory init
+          fleetStatusPanel.offsetHeight;
         }
-        // Initialize observatory if not already done
-        if (window.ObservatoryController && !window.ObservatoryController.isInitialized) {
-          window.ObservatoryController.init('observatory-container');
-        } else if (window.ObservatoryController?.observatory) {
-          // Resume if paused
-          window.ObservatoryController.observatory.start();
-          window.ObservatoryController.resize();
-        }
+        // Initialize observatory with proper timing
+        requestAnimationFrame(() => {
+          if (window.ObservatoryController && !window.ObservatoryController.isInitialized) {
+            window.ObservatoryController.init('observatory-container');
+          } else if (window.ObservatoryController?.observatory) {
+            // Resume and resize if already initialized
+            window.ObservatoryController.observatory.start();
+            // Double-call resize to handle any layout shifts
+            window.ObservatoryController.resize();
+            requestAnimationFrame(() => {
+              window.ObservatoryController.resize();
+            });
+          }
+        });
       } else if (panel === 'news') {
         const newsPanel = document.getElementById('news-panel');
         if (newsPanel) {

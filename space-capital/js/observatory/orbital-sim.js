@@ -1096,9 +1096,21 @@
     }
     
     resize() {
-      const rect = this.canvas.parentElement.getBoundingClientRect();
-      this.canvas.width = rect.width;
-      this.canvas.height = rect.height;
+      const parent = this.canvas.parentElement;
+      if (!parent) return;
+      
+      const rect = parent.getBoundingClientRect();
+      
+      // Use parent dimensions, fallback to window size if dimensions are invalid
+      let width = rect.width;
+      let height = rect.height;
+      
+      // If dimensions are too small, use fallback sizes
+      if (width < 100) width = Math.min(window.innerWidth, 1200);
+      if (height < 100) height = Math.min(window.innerHeight - 140, 600);
+      
+      this.canvas.width = width;
+      this.canvas.height = height;
     }
   }
   

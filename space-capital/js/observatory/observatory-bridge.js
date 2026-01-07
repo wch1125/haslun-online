@@ -91,6 +91,12 @@
     
     resize() {
       if (this.observatory) {
+        // Ensure container is visible and has dimensions
+        const container = this.container;
+        if (container) {
+          // Force layout recalculation
+          container.offsetHeight;
+        }
         this.observatory.resize();
       }
     },

@@ -12,6 +12,35 @@
   overflow: hidden;
 }
 
+/* Fix: Explicit sizing when inside cockpit panel */
+#fleet-status-panel .observatory-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  min-height: unset; /* Let the parent define the height */
+}
+
+/* Ensure fleet-status-panel has proper layout */
+#fleet-status-panel {
+  position: relative !important;
+}
+
+/* When cockpit-active, fleet-status-panel should fill available space */
+body.cockpit-active #fleet-status-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+body.cockpit-active #fleet-status-panel .observatory-container {
+  flex: 1;
+  position: relative;
+  min-height: 400px;
+}
+
 .observatory-canvas {
   position: absolute;
   top: 0;
