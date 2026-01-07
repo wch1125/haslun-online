@@ -314,19 +314,38 @@
           <div class="legend-title">LEGEND</div>
           <div class="legend-item">
             <div class="legend-icon sun"></div>
-            <span>Portfolio Sun</span>
+            <span>Your Portfolio</span>
           </div>
           <div class="legend-item">
             <div class="legend-icon benchmark"></div>
-            <span>Benchmark</span>
+            <span>Benchmark Zone</span>
           </div>
           <div class="legend-item">
             <div class="legend-icon fleet"></div>
             <span>Fleet (Position)</span>
           </div>
+          <div class="legend-glyphs">
+            <div class="glyph-item">
+              <span class="glyph-icon up">▲</span>
+              <span>Up</span>
+            </div>
+            <div class="glyph-item">
+              <span class="glyph-icon neutral">■</span>
+              <span>Flat</span>
+            </div>
+            <div class="glyph-item">
+              <span class="glyph-icon down">▼</span>
+              <span>Down</span>
+            </div>
+          </div>
           <div class="legend-divider"></div>
           <div class="legend-item" id="obs-data-source">
             <span style="font-size: 9px; opacity: 0.6;">Loading data...</span>
+          </div>
+          <div class="legend-item" style="margin-top: 8px;">
+            <button class="guide-btn" id="obs-show-guide" style="font-size: 10px; padding: 4px 8px; border-width: 1px;">
+              ? Help
+            </button>
           </div>
         </div>
         
@@ -337,8 +356,172 @@
       this.container.appendChild(hud);
       this.bindHUDEvents();
       
+      // Create guided overlay
+      this.createGuide();
+      
       // Update data source indicator
       this.updateDataSourceIndicator();
+      
+      // Show guide on first visit
+      this.checkFirstVisit();
+    },
+    
+    createGuide() {
+      const guide = document.createElement('div');
+      guide.className = 'observatory-guide';
+      guide.id = 'observatory-guide';
+      guide.innerHTML = `
+        <div class="guide-content">
+          <!-- Step 1: Sun -->
+          <div class="guide-step" data-step="1">
+            <div class="guide-icon sun">☀</div>
+            <div class="guide-title">Your Portfolio</div>
+            <div class="guide-text">
+              The sun at the center represents your entire portfolio. 
+              Its brightness shows overall health, and turbulence indicates market volatility.
+              The colored ring segments show different health metrics.
+            </div>
+          </div>
+          
+          <!-- Step 2: Benchmarks -->
+          <div class="guide-step" data-step="2">
+            <div class="guide-icon planet">◉</div>
+            <div class="guide-title">Benchmark Zones</div>
+            <div class="guide-text">
+              Planets represent market benchmarks like SPY, XAR, and QQQ.
+              They define "zones" where your positions operate.
+              Each zone represents a different market sector or style.
+            </div>
+          </div>
+          
+          <!-- Step 3: Fleets -->
+          <div class="guide-step" data-step="3">
+            <div class="guide-icon fleet">▲</div>
+            <div class="guide-title">Your Positions</div>
+            <div class="guide-text">
+              Each fleet represents one of your holdings. 
+              More ships = larger position size.
+              The formation shape reflects volatility: tight rings are calm, scattered swarms are stressed.
+            </div>
+          </div>
+          
+          <!-- Step 4: State Glyphs -->
+          <div class="guide-step" data-step="4">
+            <div class="guide-icon motion">⬡</div>
+            <div class="guide-title">Reading the Glyphs</div>
+            <div class="guide-text">
+              Each fleet has a status glyph above it:<br>
+              <span style="color: #33ff99">▲ Green = Trending up</span><br>
+              <span style="color: #ffb347">■ Amber = Consolidating</span><br>
+              <span style="color: #ff3366">▼ Red = Trending down</span><br>
+              The border color shows risk level.
+            </div>
+          </div>
+          
+          <!-- Step 5: Interaction -->
+          <div class="guide-step" data-step="5">
+            <div class="guide-icon fleet">✦</div>
+            <div class="guide-title">Interact & Explore</div>
+            <div class="guide-text">
+              <b>Click</b> any object to see details.<br>
+              <b>Double-click</b> to focus camera.<br>
+              <b>Drag</b> to pan around.<br>
+              <b>Scroll</b> to zoom in/out.<br>
+              Press <b>T</b> to switch timeframes.
+            </div>
+          </div>
+          
+          <div class="guide-progress">
+            <div class="guide-dot" data-step="1"></div>
+            <div class="guide-dot" data-step="2"></div>
+            <div class="guide-dot" data-step="3"></div>
+            <div class="guide-dot" data-step="4"></div>
+            <div class="guide-dot" data-step="5"></div>
+          </div>
+          
+          <div class="guide-buttons">
+            <button class="guide-btn skip" id="guide-skip">Skip</button>
+            <button class="guide-btn" id="guide-next">Next →</button>
+          </div>
+        </div>
+      `;
+      
+      this.container.appendChild(guide);
+      this.bindGuideEvents();
+    },
+    
+    bindGuideEvents() {
+      this.guideStep = 1;
+      
+      document.getElementById('guide-next')?.addEventListener('click', () => {
+        this.nextGuideStep();
+      });
+      
+      document.getElementById('guide-skip')?.addEventListener('click', () => {
+        this.closeGuide();
+      });
+      
+      document.getElementById('obs-show-guide')?.addEventListener('click', () => {
+        this.showGuide();
+      });
+    },
+    
+    showGuide() {
+      const guide = document.getElementById('observatory-guide');
+      if (guide) {
+        this.guideStep = 1;
+        this.updateGuideStep();
+        guide.classList.add('visible');
+      }
+    },
+    
+    closeGuide() {
+      const guide = document.getElementById('observatory-guide');
+      if (guide) {
+        guide.classList.remove('visible');
+        localStorage.setItem('observatory-guide-seen', 'true');
+      }
+    },
+    
+    nextGuideStep() {
+      const totalSteps = 5;
+      if (this.guideStep >= totalSteps) {
+        this.closeGuide();
+      } else {
+        this.guideStep++;
+        this.updateGuideStep();
+      }
+    },
+    
+    updateGuideStep() {
+      // Update step visibility
+      document.querySelectorAll('.guide-step').forEach(step => {
+        step.classList.remove('active');
+        if (parseInt(step.dataset.step) === this.guideStep) {
+          step.classList.add('active');
+        }
+      });
+      
+      // Update dots
+      document.querySelectorAll('.guide-dot').forEach(dot => {
+        const step = parseInt(dot.dataset.step);
+        dot.classList.remove('active', 'completed');
+        if (step === this.guideStep) dot.classList.add('active');
+        else if (step < this.guideStep) dot.classList.add('completed');
+      });
+      
+      // Update button text
+      const nextBtn = document.getElementById('guide-next');
+      if (nextBtn) {
+        nextBtn.textContent = this.guideStep >= 5 ? 'Done ✓' : 'Next →';
+      }
+    },
+    
+    checkFirstVisit() {
+      if (!localStorage.getItem('observatory-guide-seen')) {
+        // Show guide after a short delay
+        setTimeout(() => this.showGuide(), 1000);
+      }
     },
     
     updateDataSourceIndicator() {
@@ -467,42 +650,68 @@
     buildSelectionContent(body) {
       if (body.type === 'sun') {
         const sun = body;
+        const health = sun.brightness.cur;
+        const turb = sun.turbulence.cur;
+        const temp = sun.temperature.cur;
+        
+        // Semantic assessment
+        let overallStatus = 'Stable';
+        let statusClass = '';
+        if (health > 0.7 && turb < 0.4) {
+          overallStatus = 'Healthy';
+          statusClass = 'positive';
+        } else if (health < 0.5 || turb > 0.6) {
+          overallStatus = 'Under Stress';
+          statusClass = 'negative';
+        }
+        
         return `
-          <div class="selection-metric">
-            <span class="metric-label">Brightness</span>
-            <span class="metric-value">${(sun.brightness.cur * 100).toFixed(0)}%</span>
+          <div class="selection-summary">
+            <div class="summary-status ${statusClass}">${overallStatus}</div>
+            <div class="summary-text">
+              ${health > 0.6 ? 'Portfolio is performing well' : 'Portfolio needs attention'}. 
+              ${turb > 0.5 ? 'High market volatility detected.' : 'Market conditions are calm.'}
+            </div>
           </div>
           <div class="selection-metric">
-            <span class="metric-label">Turbulence</span>
-            <span class="metric-value">${(sun.turbulence.cur * 100).toFixed(0)}%</span>
+            <span class="metric-label">Overall Health</span>
+            <span class="metric-value">${(health * 100).toFixed(0)}%</span>
           </div>
           <div class="selection-metric">
-            <span class="metric-label">Temperature</span>
-            <span class="metric-value ${sun.temperature.cur > 0.5 ? 'positive' : 'negative'}">
-              ${sun.temperature.cur > 0.5 ? 'BULLISH' : 'BEARISH'}
+            <span class="metric-label">Market Regime</span>
+            <span class="metric-value ${temp > 0.5 ? 'positive' : 'negative'}">
+              ${temp > 0.5 ? 'BULLISH' : 'BEARISH'}
             </span>
+          </div>
+          <div class="selection-metric">
+            <span class="metric-label">Volatility</span>
+            <div class="metric-bar"><div class="metric-bar-fill" style="width: ${turb * 100}%; background: ${turb > 0.5 ? '#ffb347' : '#33ff99'}"></div></div>
           </div>
         `;
       }
       
       if (body.type === 'benchmark') {
         const benchmark = body;
+        const glow = benchmark.glow?.cur || 0;
+        
         return `
-          <div class="selection-metric">
-            <span class="metric-label">Orbit Radius</span>
-            <span class="metric-value">${benchmark.orbitRadius.toFixed(0)} AU</span>
+          <div class="selection-summary">
+            <div class="summary-status">${benchmark.roleLabel}</div>
+            <div class="summary-text">
+              This benchmark defines a market zone. Fleets near this planet track ${benchmark.symbol}'s performance.
+            </div>
           </div>
           <div class="selection-metric">
-            <span class="metric-label">Angular Velocity</span>
-            <span class="metric-value">${(benchmark.omega.cur * 100).toFixed(1)}°/s</span>
+            <span class="metric-label">Sector</span>
+            <span class="metric-value">${benchmark.roleLabel}</span>
           </div>
           <div class="selection-metric">
-            <span class="metric-label">Eccentricity</span>
-            <span class="metric-value">${benchmark.eccentricity.cur.toFixed(3)}</span>
+            <span class="metric-label">Activity</span>
+            <div class="metric-bar"><div class="metric-bar-fill" style="width: ${glow * 100}%"></div></div>
           </div>
           <div class="selection-metric">
-            <span class="metric-label">Glow</span>
-            <div class="metric-bar"><div class="metric-bar-fill" style="width: ${benchmark.glow.cur * 100}%"></div></div>
+            <span class="metric-label">Fleets in Zone</span>
+            <span class="metric-value">${benchmark.fleets?.length || 0}</span>
           </div>
         `;
       }
@@ -511,37 +720,73 @@
         const fleet = body;
         const telem = fleet.telemetry || {};
         
-        const momentum = telem.momentum || 0;
-        const dayChange = telem.dayChange || 0;
+        const dayChange = (telem.chgPct || telem.dayChange || 0);
+        const price = telem.price || 0;
+        
+        // Semantic descriptions
+        const trendDesc = {
+          'favorable': 'Positive trend',
+          'neutral': 'Consolidating',
+          'adverse': 'Negative trend'
+        }[fleet.trendState] || 'Unknown';
+        
+        const riskDesc = {
+          'controlled': 'Low risk',
+          'watch': 'Elevated risk',
+          'stressed': 'High stress'
+        }[fleet.riskState] || 'Unknown';
+        
+        // Formation explanation
+        const formationDesc = {
+          'ring': 'Stable patrol formation',
+          'arrow': 'Aggressive momentum formation',
+          'swarm': 'Scattered (high volatility)',
+          'line': 'Defensive alignment'
+        }[fleet.formationType] || fleet.formationType;
+        
+        // Overall assessment
+        let overallStatus = 'Stable';
+        let statusClass = '';
+        if (fleet.trendState === 'favorable' && fleet.riskState === 'controlled') {
+          overallStatus = 'Healthy';
+          statusClass = 'positive';
+        } else if (fleet.riskState === 'stressed' || fleet.trendState === 'adverse') {
+          overallStatus = 'Needs Attention';
+          statusClass = 'negative';
+        }
         
         return `
+          <div class="selection-summary">
+            <div class="summary-status ${statusClass}">${overallStatus}</div>
+            <div class="summary-text">
+              ${trendDesc} vs ${fleet.benchmark?.symbol || 'benchmark'}. 
+              ${riskDesc}. 
+              ${formationDesc}.
+            </div>
+          </div>
+          <div class="selection-metric">
+            <span class="metric-label">Price</span>
+            <span class="metric-value">$${price.toFixed(2)}</span>
+          </div>
           <div class="selection-metric">
             <span class="metric-label">Day Change</span>
             <span class="metric-value ${dayChange >= 0 ? 'positive' : 'negative'}">
-              ${dayChange >= 0 ? '+' : ''}${(dayChange * 100).toFixed(2)}%
+              ${dayChange >= 0 ? '+' : ''}${dayChange.toFixed(2)}%
             </span>
           </div>
           <div class="selection-metric">
-            <span class="metric-label">Momentum</span>
-            <span class="metric-value ${momentum >= 0 ? 'positive' : 'negative'}">
-              ${momentum >= 0 ? '+' : ''}${(momentum * 100).toFixed(1)}%
+            <span class="metric-label">Trend</span>
+            <span class="metric-value ${fleet.trendState === 'favorable' ? 'positive' : fleet.trendState === 'adverse' ? 'negative' : ''}">
+              ${trendDesc}
             </span>
           </div>
           <div class="selection-metric">
-            <span class="metric-label">Orbit Radius</span>
-            <span class="metric-value">${fleet.orbitRadius.cur.toFixed(0)}</span>
+            <span class="metric-label">Ships</span>
+            <span class="metric-value">${fleet.shipCount} vessels</span>
           </div>
           <div class="selection-metric">
-            <span class="metric-label">Velocity</span>
-            <span class="metric-value">${(fleet.omega.cur * 100).toFixed(1)}°/s</span>
-          </div>
-          <div class="selection-metric">
-            <span class="metric-label">IV Rank</span>
-            <span class="metric-value">${((telem.ivRank || 0) * 100).toFixed(0)}%</span>
-          </div>
-          <div class="selection-metric">
-            <span class="metric-label">Stress</span>
-            <div class="metric-bar"><div class="metric-bar-fill" style="width: ${fleet.stress.cur * 100}%; background: ${fleet.stress.cur > 0.5 ? '#ff3366' : '#00ffff'}"></div></div>
+            <span class="metric-label">Stress Level</span>
+            <div class="metric-bar"><div class="metric-bar-fill" style="width: ${fleet.stress.cur * 100}%; background: ${fleet.stress.cur > 0.5 ? '#ff3366' : fleet.stress.cur > 0.3 ? '#ffb347' : '#33ff99'}"></div></div>
           </div>
         `;
       }
