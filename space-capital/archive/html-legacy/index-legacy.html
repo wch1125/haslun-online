@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a0c0f">
   <title>SPACE CAPITAL \\ COMMAND INTERFACE</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%230a0c0f' width='100' height='100'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%2333ff99' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='25' fill='none' stroke='%2333ff99' stroke-width='1' opacity='0.5'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%23ffb347'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Chart.js loaded lazily when DATA tab is accessed -->
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/crt-effects.css">
@@ -23,17 +23,10 @@
   <link rel="stylesheet" href="css/paint-bay.css">
   <!-- Ship Behavior States (reactive animations) -->
   <link rel="stylesheet" href="css/ship-states.css">
-
+  <!-- Bey Arena (Beyblade-style ship battles) -->
+  <link rel="stylesheet" href="css/bey-arena.css">
   <!-- Cockpit HUD (New 3-panel navigation) -->
   <link rel="stylesheet" href="css/cockpit-hud.css">
-  <link rel="stylesheet" href="css/hotline-hud.css">
-  <link rel="stylesheet" href="css/hotline-atmosphere.css">
-  <link rel="stylesheet" href="css/hotline-hud-clean.css">
-  <link rel="stylesheet" href="css/hud-glitch-fix.css">
-  <!-- Orbital Observatory -->
-  <link rel="stylesheet" href="css/observatory.css">
-
-  <link rel="stylesheet" href="css/mobile-cleanup.css">
 <script src="js/space-scene.js"></script>
 </head>
 <body>
@@ -421,8 +414,8 @@
         </g>
       </symbol>
 
-      <!-- BLACK OPS — NIGHT SHADOW (stealth) -->
-      <symbol id="ship-shadow" viewBox="0 0 120 80">
+      <!-- BLACK OPS — NIGHT PARALLAX (stealth) -->
+      <symbol id="ship-parallax" viewBox="0 0 120 80">
         <g class="ship-primary" style="stroke-dasharray:3 4;">
           <polygon points="60,14 96,40 60,66 24,40"/>
         </g>
@@ -485,9 +478,10 @@
           </div>
         </div>
         <nav class="nav-tabs" role="tablist" aria-label="Main navigation">
-          <button class="nav-tab active" data-group="hangar" data-tab="hangar" onclick="switchTab('hangar')" role="tab" aria-selected="true" aria-controls="hangar-panel">▣ HANGAR</button>
+          <button class="nav-tab active" data-group="hangar" data-tab="hangar" onclick="switchTab('hangar')" role="tab" aria-selected="true" aria-controls="hangar-panel">🚀 HANGAR</button>
           <button class="nav-tab" data-group="command" data-tab="positions" onclick="switchTab('positions')" role="tab" aria-selected="false" aria-controls="positions-panel">COMMAND</button>
           <button class="nav-tab" data-group="garage" data-tab="garage" onclick="switchTab('garage')" role="tab" aria-selected="false" aria-controls="garage-panel">GARAGE</button>
+          <button class="nav-tab" data-group="arcade" data-tab="arcade" onclick="switchTab('arcade')" role="tab" aria-selected="false" aria-controls="arcade-panel">ARCADE</button>
           <button class="nav-tab" data-group="data" data-tab="chart" onclick="switchTab('chart')" role="tab" aria-selected="false" aria-controls="chart-panel">DATA</button>
         </nav>
       </div>
@@ -543,6 +537,12 @@
           <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('positions');">› Holdings</button>
           <button class="push-btn primary" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); launchMissionCommand();">› Missions</button>
           <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('catalysts');">› Events</button>
+        </div>
+        <div class="sidebar-section" style="padding-bottom: 0.5rem;">
+          <div class="sidebar-title">◇ Training</div>
+        </div>
+        <div style="padding: 0 0.5rem 0.5rem;">
+          <button class="push-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="toggleMobileDrawer(); switchTab('arcade');">› Arcade</button>
         </div>
         <div class="sidebar-section" style="padding-bottom: 0.5rem;">
           <div class="sidebar-title">⚙ Garage</div>
@@ -1393,6 +1393,110 @@
           </div>
         </div>
         
+        <!-- ARCADE PANEL -->
+        <div class="tab-panel fleet-scene-container" id="arcade-panel">
+          <!-- Step 5.1: Fleet background canvas -->
+          <canvas class="fleet-bg-canvas" id="arcade-bg-canvas"></canvas>
+          
+          <div class="arcade-lobby fleet-ui-layer">
+            <div class="arcade-lobby-header">
+              <div class="arcade-lobby-title">
+                <span class="arcade-icon">◈</span>
+                <div>
+                  <h2>SPACE CAPITAL ARCADE</h2>
+                  <span class="arcade-subtitle">VECTOR RACING SIMULATION</span>
+                </div>
+              </div>
+              <div class="arcade-stats-bar">
+                <div class="arcade-stat"><span class="label">BEST DISTANCE</span><span class="value" id="arcade-high-score">0 km</span></div>
+                <div class="arcade-stat"><span class="label">RUNS</span><span class="value" id="arcade-games-played">0</span></div>
+              </div>
+            </div>
+            
+            <!-- SPACE RUN - Unified Arcade Experience -->
+            <div class="parallax-run-launcher">
+              <div class="run-hero-card" onclick="window.ParallaxRun && ParallaxRun.start()">
+                <div class="run-hero-preview">
+                  <canvas id="run-preview-canvas" width="400" height="200"></canvas>
+                  <div class="run-hero-overlay">
+                    <span class="run-play-icon">▶</span>
+                    <span class="run-play-text">INITIATE RUN</span>
+                  </div>
+                </div>
+                <div class="run-hero-info">
+                  <div class="run-hero-title">SPACE RUN</div>
+                  <div class="run-hero-subtitle">High-Speed Market Corridor</div>
+                  <div class="run-hero-desc">
+                    Thread through the volatility field. Dodge debris, ride momentum streams, 
+                    and push your ship to the limit. The market is the track — speed is survival.
+                  </div>
+                  <div class="run-hero-controls">
+                    <span class="control-hint"><kbd>←</kbd> <kbd>→</kbd> DODGE</span>
+                    <span class="control-hint"><kbd>SPACE</kbd> BOOST</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="run-stats-panel">
+                <div class="run-stat-block">
+                  <span class="run-stat-label">LAST RUN</span>
+                  <span class="run-stat-value" id="run-last-distance">— km</span>
+                </div>
+                <div class="run-stat-block highlight">
+                  <span class="run-stat-label">BEST RUN</span>
+                  <span class="run-stat-value" id="run-best-distance">0 km</span>
+                </div>
+                <div class="run-stat-block">
+                  <span class="run-stat-label">ACTIVE SHIP</span>
+                  <span class="run-stat-value" id="run-active-ship">RKLB</span>
+                </div>
+                <div class="run-stat-block">
+                  <span class="run-stat-label">SQUADRON</span>
+                  <div class="run-squadron-bar" id="run-squadron-strength">
+                    <span class="squadron-fill"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- BEY ARENA - Telemetry Spin Battle -->
+            <div class="bey-arena-launcher" style="margin-top: 24px;">
+              <div class="run-hero-card" id="bey-arena-launch" style="cursor: pointer;">
+                <div class="run-hero-preview" style="background: radial-gradient(circle at 50% 40%, rgba(28,32,44,0.95), rgba(8,10,14,0.98)); display: flex; align-items: center; justify-content: center;">
+                  <div class="run-hero-overlay">
+                    <span class="run-play-icon" style="font-size: 2.2rem;">⟳</span>
+                    <span class="run-play-text">LAUNCH ARENA</span>
+                  </div>
+                </div>
+                <div class="run-hero-info">
+                  <div class="run-hero-title">BEY ARENA</div>
+                  <div class="run-hero-subtitle">Telemetry Spin Battle</div>
+                  <div class="run-hero-desc">
+                    Ships become spinners. Market behavior becomes physics. Watch your fleet collide 
+                    in an anime-style arena where telemetry drives the action. Ring-outs, burst finishes, 
+                    and momentum clashes — all derived from real trading data.
+                  </div>
+                  <div class="run-hero-controls">
+                    <span class="control-hint">TELEMETRY → PHYSICS</span>
+                    <span class="control-hint">CHAOS GUARANTEED</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Ship Selection for Games -->
+            <div class="arcade-ship-select">
+              <div class="ship-select-header">
+                <span class="ship-select-title">▲ SELECT YOUR SHIP</span>
+                <span class="ship-select-hint">Your vessel determines your handling characteristics</span>
+              </div>
+              <div class="ship-select-grid" id="arcade-ship-grid">
+                <!-- Ships will be populated dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <!-- GARAGE PANEL - Refit Bay (Ship Livery Customization) -->
         <div class="tab-panel" id="garage-panel">
           <div id="paint-bay-container"></div>
@@ -1575,7 +1679,7 @@
       </aside>
     </main>
     
-    <div class="watermark"><span title="Play money. Real feelings.">SIMULATION MODE</span><span class="space-capital-mark">SPACE CAPITAL</span></div>
+    <div class="watermark"><span title="Play money. Real feelings.">SIMULATION MODE</span><span class="parallax-mark">PARALLAX</span></div>
     
     <div class="status-strip">
       <div class="status-item" title="Everything is fine, which is statistically suspicious."><span class="dot green"></span><span class="value">SYSTEM NOMINAL</span></div>
@@ -1636,12 +1740,16 @@
     <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
       <div class="mobile-nav-items">
         <button class="mobile-nav-item active" data-tab="hangar" data-group="hangar" onclick="switchTabMobile('hangar')">
-          <span class="nav-icon">▣</span>
+          <span class="nav-icon">🚀</span>
           <span>Hangar</span>
         </button>
         <button class="mobile-nav-item" data-tab="positions" data-group="command" onclick="switchTabMobile('positions')">
           <span class="nav-icon">▲</span>
           <span>Command</span>
+        </button>
+        <button class="mobile-nav-item" data-tab="arcade" data-group="arcade" onclick="switchTabMobile('arcade')">
+          <span class="nav-icon">◇</span>
+          <span>Arcade</span>
         </button>
         <button class="mobile-nav-item" data-tab="chart" data-group="data" onclick="switchTabMobile('chart')">
           <span class="nav-icon">◈</span>
@@ -1707,6 +1815,26 @@
       </div>
     </div>
     
+    <!-- ARCADE HUD – mini mission list -->
+    <div id="arcade-hud" class="arcade-hud hidden">
+      <div class="hud-title">[ARCADE MODE]</div>
+      <ul id="mission-list"></ul>
+      <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem;">
+        <button class="arcade-launch-btn" onclick="window.BeyArena && BeyArena.open('RKLB', 'ACHR')" style="border-color: #ff6b35; color: #ff6b35;">
+          › BEY ARENA
+        </button>
+        <button class="arcade-launch-btn" onclick="window.SignalInvaders && SignalInvaders.start()">
+          › SIGNAL INVADERS
+        </button>
+        <button class="arcade-launch-btn" onclick="window.LandingGame && LandingGame.start()">
+          › TERRAIN LANDER
+        </button>
+        <button class="arcade-launch-btn" onclick="window.AdminConsole && AdminConsole.open()" style="border-color: var(--amber); color: var(--amber);">
+          › ADMIN CONSOLE
+        </button>
+      </div>
+    </div>
+    
     <!-- Tiny uplink terminal -->
     <div id="terminal-log" class="terminal-log"></div>
     
@@ -1751,6 +1879,102 @@
       </div>
     </div>
     
+    <!-- CHART LANDING GAME -->
+    <!-- PARALLAX RUN GAME OVERLAY -->
+    <div id="parallax-run-overlay" class="parallax-run-overlay hidden">
+      <div class="run-game-backdrop"></div>
+      <div class="run-game-container">
+        <button class="run-close-btn" id="parallax-run-close-btn">✕ ESC</button>
+        
+        <div class="run-game-header">
+          <div class="run-game-title">[PARALLAX RUN]</div>
+          <div class="run-game-stats">
+            <div class="run-stat">
+              <span class="stat-label">DISTANCE</span>
+              <span class="stat-value" id="run-distance">0</span>
+              <span class="stat-unit">km</span>
+            </div>
+            <div class="run-stat">
+              <span class="stat-label">SPEED</span>
+              <span class="stat-value" id="run-speed">0</span>
+            </div>
+            <div class="run-stat multiplier">
+              <span class="stat-label">MULT</span>
+              <span class="stat-value" id="run-multiplier">×1.0</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="run-hud-bars">
+          <div class="run-bar-container hull-bar">
+            <span class="bar-label">HULL</span>
+            <div class="bar-track">
+              <div class="bar-fill" id="run-hull-bar" style="width: 100%"></div>
+            </div>
+            <span class="bar-value" id="run-hull">100</span>
+          </div>
+          <div class="run-bar-container boost-bar">
+            <span class="bar-label">BOOST</span>
+            <div class="bar-track">
+              <div class="bar-fill" id="run-boost-bar" style="width: 100%"></div>
+            </div>
+            <span class="bar-value" id="run-boost">100</span>
+          </div>
+        </div>
+        
+        <canvas id="parallax-run-canvas" width="700" height="450"></canvas>
+        
+        <div class="run-controls-hint">
+          <span>← → DODGE</span>
+          <span>SPACE / ↑ BOOST</span>
+          <span>ESC EXIT</span>
+        </div>
+        
+        <div class="run-touch-controls">
+          <button class="run-touch-btn" id="run-touch-left">◀</button>
+          <button class="run-touch-btn boost" id="run-touch-boost">▲ BOOST</button>
+          <button class="run-touch-btn" id="run-touch-right">▶</button>
+        </div>
+        
+        <div class="run-message" id="run-message" style="display: none;"></div>
+      </div>
+    </div>
+    
+    <!-- BEY ARENA OVERLAY -->
+    <div id="bey-arena-overlay" class="bey-arena-overlay">
+      <div class="bey-arena-shell">
+        <div class="bey-arena-topbar">
+          <div>
+            <div class="bey-arena-title">BEY ARENA</div>
+            <div class="bey-arena-sub">TELEMETRY SPIN BATTLE</div>
+          </div>
+          <button class="bey-arena-close" id="bey-arena-close">✕ ESC</button>
+        </div>
+        
+        <div class="bey-arena-stage">
+          <div class="bey-panel left">
+            <h3>PILOT 1</h3>
+            <pre class="bey-readout" id="bey-left-readout">—</pre>
+          </div>
+          
+          <div class="bey-canvas-wrap">
+            <canvas id="bey-arena-canvas" width="520" height="520"></canvas>
+            <div class="bey-banner" id="bey-arena-banner">AWAITING LAUNCH</div>
+            <div class="bey-controls">
+              <button class="bey-btn primary" id="bey-arena-rematch">⟳ REMATCH</button>
+              <button class="bey-btn" id="bey-arena-swap">⇄ SWAP</button>
+            </div>
+            <div class="bey-scanlines"></div>
+          </div>
+          
+          <div class="bey-panel right">
+            <h3>PILOT 2</h3>
+            <pre class="bey-readout" id="bey-right-readout">—</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- ABOUT / STORY OVERLAY -->
     <div id="about-overlay" class="about-overlay hidden">
       <div class="about-backdrop"></div>
@@ -1765,7 +1989,7 @@
         <div class="about-body">
           <p>
             PARALLAX is a <strong>command and telemetry interface</strong> for a fictional research fund.
-            It's part data room, part observatory, and part mood board for how we think about risk,
+            It's part data room, part arcade cabinet, and part mood board for how we think about risk,
             storytelling, and markets.
           </p>
           <p>
@@ -2053,20 +2277,20 @@
 
   <!-- ═══════════════════════════════════════════════════════════════════════════
        COCKPIT HUD - Persistent Navigation
-       Three pillars: HANGAR | FLEET STATUS | NEWS
+       Three pillars: HANGAR | BATTLE ARENA | NEWS
        ═══════════════════════════════════════════════════════════════════════════ -->
   
   <div class="cockpit-hud">
     <button class="hud-btn active" data-panel="hangar">
-      <span class="hud-btn-icon">▣</span>
+      <span class="hud-btn-icon">🔧</span>
       <span class="hud-btn-label">HANGAR</span>
     </button>
-    <button class="hud-btn" data-panel="fleet-status">
-      <span class="hud-btn-icon">◈</span>
-      <span class="hud-btn-label">FLEET STATUS</span>
+    <button class="hud-btn battle-btn" data-panel="battle">
+      <span class="hud-btn-icon">⚔️</span>
+      <span class="hud-btn-label">BATTLE ARENA</span>
     </button>
     <button class="hud-btn" data-panel="news">
-      <span class="hud-btn-icon">◎</span>
+      <span class="hud-btn-icon">📡</span>
       <span class="hud-btn-label">NEWS</span>
     </button>
   </div>
@@ -2076,16 +2300,16 @@
        ═══════════════════════════════════════════════════════════════════════════ -->
   
   <!-- HANGAR PANEL - RPG Character Screen -->
-  <div class="cockpit-panel active" id="hangar-panel-new">
+  <div class="cockpit-panel active" id="hangar-panel-new" style="display: none;">
     <div class="hangar-rpg">
       
       <!-- LEFT SIDEBAR: Stats & Equipment -->
-      <div class="hangar-sidebar left">
+      <div class="hangar-sidebar">
         
         <!-- Core Stats -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon icon-telemetry"></span>
+            <span class="stat-block-icon">📊</span>
             <span class="stat-block-title">TELEMETRY STATS</span>
           </div>
           
@@ -2123,7 +2347,7 @@
         <!-- Regime Badge -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon icon-regime"></span>
+            <span class="stat-block-icon">🎯</span>
             <span class="stat-block-title">REGIME BIAS</span>
           </div>
           <div style="text-align: center; padding: 8px 0;">
@@ -2144,24 +2368,24 @@
         <!-- Equipment Slots (Future) -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon icon-equipment"></span>
+            <span class="stat-block-icon">⚙️</span>
             <span class="stat-block-title">EQUIPMENT</span>
           </div>
           <div class="equipment-grid">
             <div class="equipment-slot">
-              <span class="equipment-slot-icon icon-shield"></span>
+              <span class="equipment-slot-icon">🛡️</span>
               <span>SHIELD</span>
             </div>
             <div class="equipment-slot">
-              <span class="equipment-slot-icon icon-engine"></span>
+              <span class="equipment-slot-icon">🔋</span>
               <span>ENGINE</span>
             </div>
             <div class="equipment-slot">
-              <span class="equipment-slot-icon icon-scanner"></span>
+              <span class="equipment-slot-icon">📡</span>
               <span>SCANNER</span>
             </div>
             <div class="equipment-slot">
-              <span class="equipment-slot-icon icon-livery"></span>
+              <span class="equipment-slot-icon">🎨</span>
               <span>LIVERY</span>
             </div>
           </div>
@@ -2180,7 +2404,7 @@
         </div>
         
         <div class="ship-nameplate">
-          <div class="ship-nameplate-ticker" id="hangar-ship-ticker" data-ticker="RKLB">RKLB</div>
+          <div class="ship-nameplate-ticker" id="hangar-ship-ticker">RKLB</div>
           <div class="ship-nameplate-class" id="hangar-ship-class">FLAGSHIP CLASS</div>
         </div>
         
@@ -2190,12 +2414,12 @@
       </div>
       
       <!-- RIGHT SIDEBAR: Colors & Cosmetics -->
-      <div class="hangar-sidebar right">
+      <div class="hangar-sidebar">
         
         <!-- Color Customization -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon icon-hull"></span>
+            <span class="stat-block-icon">🎨</span>
             <span class="stat-block-title">HULL COLORS</span>
           </div>
           <div class="color-picker-row">
@@ -2213,7 +2437,7 @@
         <!-- Accent Color -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon icon-accent"></span>
+            <span class="stat-block-icon">✨</span>
             <span class="stat-block-title">ACCENT COLOR</span>
           </div>
           <div class="color-picker-row">
@@ -2225,16 +2449,34 @@
           </div>
         </div>
         
+        <!-- Battle Stats Preview -->
+        <div class="stat-block">
+          <div class="stat-block-header">
+            <span class="stat-block-icon">⚔️</span>
+            <span class="stat-block-title">ARENA RECORD</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center;">
+            <div>
+              <div style="font-family: 'Orbitron', system-ui; font-size: 24px; color: #33ff99;">0</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.1em;">WINS</div>
+            </div>
+            <div>
+              <div style="font-family: 'Orbitron', system-ui; font-size: 24px; color: #ff6b35;">0</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.1em;">LOSSES</div>
+            </div>
+          </div>
+        </div>
+        
         <!-- Quick Actions -->
         <div class="stat-block">
           <div class="stat-block-header">
-            <span class="stat-block-icon icon-actions"></span>
+            <span class="stat-block-icon">⚡</span>
             <span class="stat-block-title">QUICK ACTIONS</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button onclick="CockpitNav.switchPanel('fleet-status')" style="
+            <button onclick="CockpitNav.switchPanel('battle')" style="
               padding: 12px;
-              background: linear-gradient(180deg, #00c8ff 0%, #0099cc 100%);
+              background: linear-gradient(180deg, #ff6b35 0%, #e55a2b 100%);
               border: none;
               border-radius: 8px;
               font-family: 'Orbitron', system-ui;
@@ -2242,7 +2484,18 @@
               letter-spacing: 0.1em;
               color: white;
               cursor: pointer;
-            ">◈ FLEET STATUS</button>
+            ">⚔️ ENTER ARENA</button>
+            <button onclick="switchTab('garage')" style="
+              padding: 12px;
+              background: rgba(51, 255, 153, 0.15);
+              border: 1px solid rgba(51, 255, 153, 0.3);
+              border-radius: 8px;
+              font-family: 'Orbitron', system-ui;
+              font-size: 11px;
+              letter-spacing: 0.1em;
+              color: #33ff99;
+              cursor: pointer;
+            ">🎨 PAINT BAY</button>
           </div>
         </div>
         
@@ -2250,18 +2503,58 @@
     </div>
   </div>
   
-  <!-- FLEET STATUS PANEL - Orbital Observatory -->
-  <div class="cockpit-panel" id="fleet-status-panel">
-    <div class="observatory-container" id="observatory-container">
-      <!-- Observatory canvas and HUD will be injected by ObservatoryController -->
+  <!-- BATTLE ARENA PANEL -->
+  <div class="cockpit-panel" id="battle-panel" style="display: none;">
+    <div class="battle-arena-panel">
+      <div class="battle-ready-screen">
+        <h1 class="battle-title">BATTLE ARENA</h1>
+        <p class="battle-subtitle">TELEMETRY-DRIVEN SPIN COMBAT</p>
+        
+        <div class="battle-matchup">
+          <div class="battle-ship-card">
+            <img src="assets/ships/static/RKLB-flagship-ship.png" alt="Player Ship" id="battle-player-sprite">
+            <span class="ticker" id="battle-player-ticker">RKLB</span>
+            <span style="font-size: 10px; color: rgba(255,255,255,0.5);">YOUR SHIP</span>
+          </div>
+          
+          <span class="battle-vs">VS</span>
+          
+          <div class="battle-ship-card">
+            <img src="assets/ships/static/ACHR-eVTOL-ship.png" alt="Opponent Ship" id="battle-opponent-sprite">
+            <span class="ticker" id="battle-opponent-ticker">ACHR</span>
+            <span style="font-size: 10px; color: rgba(255,255,255,0.5);">OPPONENT</span>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 20px;">
+          <button id="battle-random-btn" style="
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+          ">🎲 RANDOMIZE</button>
+        </div>
+        
+        <button id="battle-start-btn" class="battle-start-btn">
+          ▶ START BATTLE
+        </button>
+        
+        <p style="margin-top: 24px; font-size: 11px; color: rgba(255,255,255,0.4);">
+          Press <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">B</kbd> to quick-launch
+        </p>
+      </div>
     </div>
   </div>
   
   <!-- NEWS PANEL -->
-  <div class="cockpit-panel" id="news-panel">
+  <div class="cockpit-panel" id="news-panel" style="display: none;">
     <div class="news-panel">
       <div class="news-header">
-        <h2 class="news-title">◎ FLEET TRANSMISSIONS</h2>
+        <h2 class="news-title">📡 FLEET TRANSMISSIONS</h2>
         <span style="font-size: 11px; color: rgba(255,255,255,0.4);">Live market events & fleet lore</span>
       </div>
       
@@ -2282,7 +2575,6 @@
   <script src="js/core/constants.js"></script>
   <script src="js/core/bus.js"></script>
   <script src="js/core/store.js"></script>
-  <script src="js/core/ShipRegistry.js"></script>
   <script src="js/state/upgrades.js"></script>
   <script src="js/state/progression.js"></script>
   <script src="js/state/liveries.js"></script>
@@ -2295,12 +2587,14 @@
   <script src="js/data/pixel-icons.js"></script>
   <script src="js/data/ship-data.js"></script>
   <script src="js/data/telemetry.js"></script>
-  <script src="js/data/telemetry-enrichment.js"></script>
   <script src="js/data/ship-animator.js"></script>
   <script src="js/data/holo-ships.js"></script>
   
   <!-- Audio system -->
   <script src="js/audio/audio-system.js"></script>
+  
+  <!-- Mini-games -->
+  <script src="js/games/mini-games.js"></script>
   
   <!-- Step 4: Mission Bridge (read-only adapter for dashboard) -->
   <script src="js/mission-bridge.js"></script>
@@ -2326,16 +2620,11 @@
   <!-- Paint Bay (ship color customization) -->
   <script src="js/ui/paint-bay.js"></script>
   
-  <!-- Ship Idle Animation (hero ship life) -->
-  <script src="js/ui/ship-idle.js"></script>
+  <!-- SPACE RUN Racing Game -->
+  <script src="js/games/parallax-run.js"></script>
   
-  <!-- Hangar Atmosphere (animated background, ring effects) -->
-  <script src="js/ui/hangar-atmosphere.js"></script>
-  
-  <!-- Orbital Observatory (Solar System Visualization) -->
-  <script src="js/observatory/orbital-sim.js"></script>
-  <script src="js/observatory/telemetry-loader.js"></script>
-  <script src="js/observatory/observatory-bridge.js"></script>
+  <!-- BEY ARENA Spin Battle Game -->
+  <script src="js/games/bey-arena.js"></script>
   
   <!-- Cockpit Navigation Controller -->
   <script src="js/cockpit-nav.js"></script>
@@ -2346,134 +2635,5 @@
   
   <!-- Main application -->
   <script src="js/app.js"></script>
-  
-  <!-- Hull Color & Theme Functionality -->
-  <script>
-  (function() {
-    'use strict';
-    
-    // Color to hue mapping for CSS hue-rotate filter
-    const COLOR_HUE_MAP = {
-      '#33ff99': 0,      // Green (default) - no rotation needed
-      '#00d4ff': 180,    // Cyan
-      '#ff6b35': 330,    // Orange
-      '#8a2be2': 270,    // Purple
-      '#ffd700': 45,     // Gold
-      '#ff1493': 300,    // Hot Pink
-      '#ffffff': 0,      // White (special case)
-      '#1a1a2e': 0       // Dark (special case)
-    };
-    
-    function rgbToHex(rgb) {
-      if (rgb.startsWith('#')) return rgb.toLowerCase();
-      const match = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-      if (!match) return rgb;
-      const r = parseInt(match[1]).toString(16).padStart(2, '0');
-      const g = parseInt(match[2]).toString(16).padStart(2, '0');
-      const b = parseInt(match[3]).toString(16).padStart(2, '0');
-      return `#${r}${g}${b}`;
-    }
-    
-    function initHullColors() {
-      const statBlocks = document.querySelectorAll('.hangar-sidebar .stat-block');
-      let hullBlock = null;
-      let accentBlock = null;
-      
-      statBlocks.forEach(block => {
-        const title = block.querySelector('.stat-block-title');
-        if (title) {
-          if (title.textContent.includes('HULL')) hullBlock = block;
-          if (title.textContent.includes('ACCENT')) accentBlock = block;
-        }
-      });
-      
-      if (hullBlock) {
-        hullBlock.querySelectorAll('.color-swatch').forEach(swatch => {
-          swatch.addEventListener('click', function() {
-            const color = this.style.backgroundColor || window.getComputedStyle(this).backgroundColor;
-            const hexColor = rgbToHex(color);
-            
-            // Update ship showcase ring glow
-            const showcase = document.querySelector('.ship-showcase');
-            if (showcase) {
-              showcase.style.setProperty('--ship-glow-color', hexColor);
-            }
-            
-            // Apply hue-rotate to ship sprite for actual color change
-            const sprite = document.querySelector('.ship-showcase-sprite');
-            if (sprite) {
-              const hueRotate = COLOR_HUE_MAP[hexColor] || 0;
-              
-              // Special handling for white/dark
-              if (hexColor === '#ffffff') {
-                sprite.style.filter = `brightness(1.5) saturate(0.3) drop-shadow(0 0 30px ${hexColor})`;
-              } else if (hexColor === '#1a1a2e') {
-                sprite.style.filter = `brightness(0.6) saturate(0.5) drop-shadow(0 0 20px rgba(100,100,120,0.5))`;
-              } else {
-                sprite.style.filter = `hue-rotate(${hueRotate}deg) drop-shadow(0 0 30px ${hexColor})`;
-              }
-            }
-            
-            // Update ring colors
-            const ring = document.querySelector('.ship-showcase-ring');
-            if (ring) {
-              ring.style.borderColor = hexColor.replace(')', ', 0.3)').replace('rgb', 'rgba').replace('#', '');
-              ring.style.borderColor = `${hexColor}33`;
-              ring.style.boxShadow = `0 0 30px ${hexColor}22, inset 0 0 30px ${hexColor}11`;
-            }
-            
-            // Update active state
-            hullBlock.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-            this.classList.add('active');
-          });
-        });
-      }
-      
-      if (accentBlock) {
-        accentBlock.querySelectorAll('.color-swatch').forEach(swatch => {
-          swatch.addEventListener('click', function() {
-            accentBlock.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-            this.classList.add('active');
-          });
-        });
-      }
-    }
-    
-    // Theme toggle - Press 'T' to toggle Hotline Miami theme
-    function initThemeToggle() {
-      // Check localStorage for saved preference
-      const savedTheme = localStorage.getItem('space-capital-theme');
-      if (savedTheme === 'hotline') {
-        document.body.classList.add('theme-hotline');
-      }
-      
-      document.addEventListener('keydown', function(e) {
-        // Press 'T' (not in input) to toggle theme
-        if (e.key === 't' || e.key === 'T') {
-          if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-          
-          document.body.classList.toggle('theme-hotline');
-          const isHotline = document.body.classList.contains('theme-hotline');
-          localStorage.setItem('space-capital-theme', isHotline ? 'hotline' : 'default');
-          
-          // Visual feedback
-          console.log(`Theme: ${isHotline ? 'HOTLINE MIAMI' : 'SPACE CAPITAL'}`);
-        }
-      });
-    }
-    
-    // Initialize
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        initHullColors();
-        initThemeToggle();
-      });
-    } else {
-      initHullColors();
-      initThemeToggle();
-    }
-    setTimeout(initHullColors, 500);
-  })();
-  </script>
 </body>
 </html>

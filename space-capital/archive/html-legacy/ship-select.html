@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0c0f">
+  <title>PARALLAX \\ HANGAR BAY</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%230a0c0f' width='100' height='100'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%2333ff99' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='25' fill='none' stroke='%2333ff99' stroke-width='1' opacity='0.5'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%23ffb347'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Core styles -->
+  <link rel="stylesheet" href="css/crt-effects.css">
+  <link rel="stylesheet" href="css/ship-select.css">
+  
+  <style>
+    /* Page-specific overrides */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #0a0c0f;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Loading state */
+    .loading-state {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0a0c0f;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    
+    .loading-state.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(51, 255, 153, 0.2);
+      border-top-color: #33ff99;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      margin-top: 1rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      color: rgba(51, 255, 153, 0.7);
+      letter-spacing: 0.1em;
+    }
+    
+    /* Navigation header */
+    .hangar-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      background: rgba(10, 12, 15, 0.95);
+      border-bottom: 1px solid rgba(51, 255, 153, 0.2);
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+    }
+    
+    .hangar-nav-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #33ff99;
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .hangar-nav-logo::before {
+      content: '◈';
+      font-size: 1.2em;
+    }
+    
+    .hangar-nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .hangar-nav-link {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(200, 255, 220, 0.7);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    
+    .hangar-nav-link:hover {
+      color: #33ff99;
+    }
+    
+    .hangar-nav-link.active {
+      color: #ffb347;
+    }
+    
+    /* Main content area */
+    #ship-select-container {
+      padding-top: 50px;
+    }
+    
+    /* Sound toggle */
+    .sound-toggle {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      background: rgba(10, 12, 15, 0.9);
+      border: 1px solid rgba(51, 255, 153, 0.3);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.2s ease;
+    }
+    
+    .sound-toggle:hover {
+      border-color: #33ff99;
+      box-shadow: 0 0 15px rgba(51, 255, 153, 0.3);
+    }
+    
+    .sound-toggle.muted {
+      opacity: 0.5;
+    }
+    
+    /* CRT scanlines overlay */
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+    }
+  </style>
+</head>
+<body>
+  <!-- CRT Scanlines -->
+  <div class="scanlines" aria-hidden="true"></div>
+  
+  <!-- Loading State -->
+  <div class="loading-state" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">INITIALIZING HANGAR SYSTEMS...</div>
+  </div>
+  
+  <!-- Navigation -->
+  <nav class="hangar-nav">
+    <div class="hangar-nav-logo">PARALLAX</div>
+    <div class="hangar-nav-links">
+      <a href="ship-select.html" class="hangar-nav-link active">
+        <span>🚀</span> HANGAR
+      </a>
+      <a href="index.html" class="hangar-nav-link">
+        <span>📊</span> COMMAND
+      </a>
+      <a href="derivatives.html" class="hangar-nav-link">
+        <span>🎯</span> MISSIONS
+      </a>
+    </div>
+  </nav>
+  
+  <!-- Main Container -->
+  <div id="ship-select-container"></div>
+  
+  <!-- Sound Toggle -->
+  <button class="sound-toggle" id="sound-toggle" title="Toggle Sound">
+    🔊
+  </button>
+
+  <!-- Data modules -->
+  <script src="js/data/ship-data.js"></script>
+  <script src="js/data/ticker-profiles.js"></script>
+  <script src="js/ui/ship-select.js"></script>
+  
+  <!-- Audio System (optional) -->
+  <script src="js/audio/audio-system.js"></script>
+  
+  <script>
+    // =========================================================================
+    // HANGAR BAY :: Ship Selection Entry Point
+    // =========================================================================
+    
+    (function() {
+      'use strict';
+      
+      let statsData = {};
+      let audioEnabled = false;
+      let audioCtx = null;
+      
+      // ─────────────────────────────────────────────────────────────────────
+      // LOAD STATS DATA
+      // ─────────────────────────────────────────────────────────────────────
+      
+      async function loadStatsData() {
+        try {
+          const response = await fetch('data/stats.json');
+          const data = await response.json();
+          return data.stats || {};
+        } catch (e) {
+          console.warn('Failed to load stats:', e);
+          return {};
+        }
+      }
+      
+      // ─────────────────────────────────────────────────────────────────────
+      // AUDIO
+      // ─────────────────────────────────────────────────────────────────────
+      
+      function initAudio() {
+        if (audioCtx) return;
+        
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+          console.warn('Web Audio not supported');
+        }
+      }
+      
+      function playSelectSound() {
+        if (!audioEnabled || !audioCtx) return;
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
+        
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+        
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.2);
+      }
+      
+      function playConfirmSound() {
+        if (!audioEnabled || !audioCtx) return;
+        
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
+          
+          gain.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.08);
+          gain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + i * 0.08 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.3);
+          
+          osc.start(audioCtx.currentTime + i * 0.08);
+          osc.stop(audioCtx.currentTime + i * 0.08 + 0.3);
+        });
+      }
+      
+      // ─────────────────────────────────────────────────────────────────────
+      // SHIP SELECTION HANDLER
+      // ─────────────────────────────────────────────────────────────────────
+      
+      function handleShipSelect(ticker, shipData) {
+        playConfirmSound();
+        
+        // Store selection in localStorage
+        localStorage.setItem('parallax_selected_ship', ticker);
+        localStorage.setItem('parallax_selected_ship_data', JSON.stringify(shipData));
+        
+        // Visual feedback
+        const card = document.querySelector(`.ship-select-card[data-ticker="${ticker}"]`);
+        if (card) {
+          card.classList.add('launching');
+          
+          // Create launch animation overlay
+          const overlay = document.createElement('div');
+          overlay.className = 'launch-overlay';
+          overlay.innerHTML = `
+            <div class="launch-content">
+              <div class="launch-ship">${ticker}</div>
+              <div class="launch-text">LAUNCHING...</div>
+              <div class="launch-bar"><div class="launch-bar-fill"></div></div>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+          
+          // Animate and redirect
+          setTimeout(() => {
+            overlay.classList.add('active');
+          }, 50);
+          
+          setTimeout(() => {
+            window.location.href = `index.html?ship=${ticker}`;
+          }, 1500);
+        } else {
+          // Fallback: just redirect
+          window.location.href = `index.html?ship=${ticker}`;
+        }
+      }
+      
+      // ─────────────────────────────────────────────────────────────────────
+      // INIT
+      // ─────────────────────────────────────────────────────────────────────
+      
+      async function init() {
+        // Load data
+        statsData = await loadStatsData();
+        
+        // Make stats data globally available
+        window.statsData = statsData;
+        
+        // Hide loading
+        const loading = document.getElementById('loading');
+        loading.classList.add('hidden');
+        
+        // Render ship selection
+        const container = document.getElementById('ship-select-container');
+        
+        if (window.ShipSelect) {
+          ShipSelect.renderShipSelectScreen(container, statsData, {
+            onSelect: handleShipSelect,
+            selectedTicker: localStorage.getItem('parallax_selected_ship')
+          });
+          
+          // Add click sounds to cards
+          container.querySelectorAll('.ship-select-card').forEach(card => {
+            card.addEventListener('click', () => {
+              playSelectSound();
+            });
+          });
+        } else {
+          container.innerHTML = `
+            <div style="text-align:center;padding:4rem;color:#ff6b6b;">
+              <p>Ship Select module failed to load.</p>
+              <a href="index.html" style="color:#33ff99;">Return to Command</a>
+            </div>
+          `;
+        }
+        
+        // Sound toggle
+        const soundToggle = document.getElementById('sound-toggle');
+        soundToggle.addEventListener('click', () => {
+          initAudio();
+          audioEnabled = !audioEnabled;
+          soundToggle.textContent = audioEnabled ? '🔊' : '🔇';
+          soundToggle.classList.toggle('muted', !audioEnabled);
+          
+          if (audioEnabled) {
+            playSelectSound();
+          }
+        });
+      }
+      
+      // Start
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+      
+    })();
+  </script>
+  
+  <!-- Launch overlay styles -->
+  <style>
+    .ship-select-card.launching {
+      animation: cardLaunch 1s ease-out forwards;
+    }
+    
+    @keyframes cardLaunch {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(0.8) translateY(-50px); opacity: 0; }
+    }
+    
+    .launch-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 12, 15, 0);
+      z-index: 10000;
+      transition: background 0.5s ease;
+    }
+    
+    .launch-overlay.active {
+      background: rgba(10, 12, 15, 0.98);
+    }
+    
+    .launch-content {
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.5s ease;
+    }
+    
+    .launch-overlay.active .launch-content {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    .launch-ship {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: #33ff99;
+      text-shadow: 0 0 30px rgba(51, 255, 153, 0.8);
+      margin-bottom: 1rem;
+    }
+    
+    .launch-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1rem;
+      color: rgba(200, 255, 220, 0.8);
+      letter-spacing: 0.3em;
+      margin-bottom: 1.5rem;
+      animation: blink 0.5s ease-in-out infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .launch-bar {
+      width: 200px;
+      height: 4px;
+      background: rgba(51, 255, 153, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    
+    .launch-bar-fill {
+      height: 100%;
+      width: 0;
+      background: #33ff99;
+      border-radius: 2px;
+      animation: launchFill 1.2s ease-out forwards;
+    }
+    
+    @keyframes launchFill {
+      0% { width: 0; }
+      100% { width: 100%; }
+    }
+  </style>
+</body>
+</html>

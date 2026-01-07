@@ -52,8 +52,8 @@
       maxShips: 12,
       shipSize: 12,
       formationRadius: 45,
-      patrolRadius: 30,   // How much fleets drift within their zone
-      patrolSpeed: 0.12   // Slow patrol, not frantic orbiting
+      patrolRadius: 12,    // Reduced: gentle drift, not active patrol
+      patrolSpeed: 0.04    // Slower: barely perceptible motion
     },
     
     // State glyph colors
@@ -98,35 +98,74 @@
   const SpriteCache = {
     sprites: {},
     loading: {},
+    defaultSprite: null,
+    
+    init() {
+      // Preload default sprite
+      if (!this.defaultSprite && window.DEFAULT_SHIP_SPRITE) {
+        this.defaultSprite = new Image();
+        this.defaultSprite.src = window.DEFAULT_SHIP_SPRITE;
+      }
+    },
     
     get(symbol) {
       if (this.sprites[symbol]) return this.sprites[symbol];
       if (this.loading[symbol]) return null;
       
+      // Initialize default if needed
+      this.init();
+      
       // Try to load sprite
       this.loading[symbol] = true;
       const img = new Image();
+      
+      // Use SHIP_SPRITES map if available (most reliable)
+      const shipSpritePath = window.SHIP_SPRITES?.[symbol];
+      
       img.onload = () => {
         this.sprites[symbol] = img;
         console.log(`[SpriteCache] Loaded sprite for ${symbol}`);
       };
+      
       img.onerror = () => {
-        // Fallback: try static folder
+        // Fallback: try static folder with various naming conventions
         const staticImg = new Image();
         staticImg.onload = () => {
           this.sprites[symbol] = staticImg;
+          console.log(`[SpriteCache] Loaded static sprite for ${symbol}`);
+        };
+        staticImg.onerror = () => {
+          // Final fallback: use default ship sprite
+          if (this.defaultSprite && this.defaultSprite.complete) {
+            this.sprites[symbol] = this.defaultSprite;
+            console.log(`[SpriteCache] Using default sprite for ${symbol}`);
+          }
         };
         staticImg.src = `assets/ships/static/${symbol}-ship.png`;
       };
       
-      // Try animated base first
-      img.src = `assets/ships/animated/${symbol}/${symbol}_base.png`;
+      // Use explicit map first, then try animated base
+      if (shipSpritePath) {
+        img.src = shipSpritePath;
+      } else {
+        img.src = `assets/ships/animated/${symbol}/${symbol}_base.png`;
+      }
       return null;
     },
     
     getAny(symbol) {
-      // Return sprite or null (for fallback rendering)
-      return this.sprites[symbol] || null;
+      // Trigger load if not cached, then return what we have
+      if (!this.sprites[symbol] && !this.loading[symbol]) {
+        this.get(symbol);
+      }
+      // Return sprite, or default sprite if available
+      return this.sprites[symbol] || (this.defaultSprite?.complete ? this.defaultSprite : null);
+    },
+    
+    // Preload sprites for all known tickers
+    preload(symbols) {
+      this.init();
+      symbols.forEach(symbol => this.get(symbol));
     }
   };
   
@@ -477,7 +516,7 @@
         ctx.stroke();
       }
       
-      // Try to render sprite, fallback to vector ship
+      // Try to render sprite, fallback to minimal placeholder
       const sprite = SpriteCache.getAny(this.fleetSymbol);
       
       ctx.save();
@@ -495,22 +534,12 @@
         ctx.drawImage(sprite, -w/2, -h/2, w, h);
         ctx.globalAlpha = 1;
       } else {
-        // Fallback vector ship (proper arrow shape)
-        const saturation = 70 - (1 - this.health) * 30;
-        const lightness = 60 - (1 - this.health) * 20;
-        
+        // Minimal placeholder while sprite loads (small glowing dot)
+        const dotSize = screenSize * 0.4;
         ctx.beginPath();
-        ctx.moveTo(screenSize, 0);
-        ctx.lineTo(-screenSize * 0.5, -screenSize * 0.6);
-        ctx.lineTo(-screenSize * 0.3, 0);
-        ctx.lineTo(-screenSize * 0.5, screenSize * 0.6);
-        ctx.closePath();
-        
-        ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.9)`;
+        ctx.arc(0, 0, dotSize, 0, TAU);
+        ctx.fillStyle = `hsla(${hue}, 70%, 60%, 0.7)`;
         ctx.fill();
-        ctx.strokeStyle = `hsla(${hue}, ${saturation}%, ${lightness + 20}%, 1)`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
       }
       
       ctx.restore();
@@ -640,30 +669,30 @@
       this.glow.update(dt);
       this.cohesion.update(dt);
       
-      // Slow patrol within zone
+      // Very subtle drift within zone (barely noticeable)
       this.patrolPhase += dt * CONFIG.fleet.patrolSpeed;
-      const patrolDist = CONFIG.fleet.patrolRadius * (1 + this.volatility.cur * 0.5);
+      const patrolDist = CONFIG.fleet.patrolRadius * (1 + this.volatility.cur * 0.3);
       this.patrolOffset.x = Math.sin(this.patrolPhase) * patrolDist;
       this.patrolOffset.y = Math.cos(this.patrolPhase * 0.7) * patrolDist * 0.6;
       
-      // Update position
+      // Base position near benchmark
       this.x = this.benchmark.x + this.patrolOffset.x;
       this.y = this.benchmark.y + this.patrolOffset.y;
       
-      // Spread fleets apart
+      // Spread fleets apart (fixed angles, no motion)
       const fleetIndex = this.benchmark.fleets.indexOf(this);
       if (fleetIndex >= 0 && this.benchmark.fleets.length > 1) {
-        const spreadAngle = (fleetIndex / this.benchmark.fleets.length) * TAU;
-        const spreadDist = 55 + fleetIndex * 25;
-        this.x += Math.cos(spreadAngle + this.patrolPhase * 0.05) * spreadDist;
-        this.y += Math.sin(spreadAngle + this.patrolPhase * 0.05) * spreadDist;
+        const spreadAngle = (fleetIndex / this.benchmark.fleets.length) * TAU + Math.PI * 0.25;
+        const spreadDist = 50 + fleetIndex * 20;
+        this.x += Math.cos(spreadAngle) * spreadDist;
+        this.y += Math.sin(spreadAngle) * spreadDist;
       }
       
       // Update formation
       this.updateFormation();
       
       // Update ships
-      const jitterAmount = this.volatility.cur;
+      const jitterAmount = this.volatility.cur * 0.6; // Reduced jitter
       const thrustAmount = Math.abs(this.momentum.cur);
       this.ships.forEach(ship => {
         ship.health = 1 - this.stress.cur;
@@ -1120,6 +1149,7 @@
   
   window.OrbitalObservatory = OrbitalObservatory;
   window.OrbitalConfig = CONFIG;
+  window.OrbitalSpriteCache = SpriteCache;
   
   console.log('[OrbitalObservatory v2] Loaded - Zones + Formations + State Glyphs + Sprites');
   

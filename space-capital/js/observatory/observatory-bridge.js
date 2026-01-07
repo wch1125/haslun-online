@@ -106,12 +106,27 @@
     // ─────────────────────────────────────────────────────────────────────────
     
     initializeFleets() {
+      // Wait for telemetry to be ready
+      if (!window.TelemetryData?.isLoaded && !window.TICKER_PROFILES) {
+        console.log('[ObservatoryController] Waiting for telemetry data...');
+        return;
+      }
+      
       // Get tickers from real telemetry data
       const tickers = this.getPortfolioTickers();
       
-      // Clear existing fleets
-      this.observatory.fleets = [];
+      // Preload sprites for all tickers
+      if (window.OrbitalSpriteCache) {
+        window.OrbitalSpriteCache.preload(tickers);
+      }
       
+      // Clear existing fleets from observatory and benchmarks
+      this.observatory.fleets = [];
+      this.observatory.benchmarks.forEach(b => {
+        b.fleets = [];
+      });
+      
+      // Add fleets
       tickers.forEach(symbol => {
         const benchmark = this.observatory.getBenchmarkForTicker(symbol);
         this.observatory.addFleet(symbol, benchmark);
