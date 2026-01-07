@@ -1630,10 +1630,21 @@ ${bar(energy, COLORS.toxicCyan)}
     // Draw individual ship telemetry panel
     drawTelemetryPanel(ctx, ship, centerX, centerY, scanProgress, isLeft) {
       const time = performance.now() * 0.001;
-      const panelWidth = 180;
-      const panelHeight = 280;
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      
+      // Responsive panel sizing based on canvas dimensions
+      const isMobile = w < 500 || h < 400;
+      const panelWidth = isMobile ? Math.min(140, w * 0.38) : 180;
+      const panelHeight = isMobile ? Math.min(220, h * 0.65) : 280;
       const x = centerX - panelWidth / 2;
       const y = centerY - panelHeight / 2;
+      
+      // Font sizes scale with panel
+      const titleFont = isMobile ? 16 : 20;
+      const labelFont = isMobile ? 8 : 10;
+      const spriteSize = isMobile ? 36 : 50;
+      const statHeight = isMobile ? 22 : 28;
       
       ctx.save();
       
@@ -1661,16 +1672,15 @@ ${bar(energy, COLORS.toxicCyan)}
       
       // Ticker name header
       ctx.fillStyle = ship.color;
-      ctx.font = 'bold 20px "Courier New", monospace';
+      ctx.font = `bold ${titleFont}px "Courier New", monospace`;
       ctx.textAlign = 'center';
       ctx.shadowColor = ship.color;
       ctx.shadowBlur = 10;
-      ctx.fillText(ship.ticker, centerX, y + 25);
+      ctx.fillText(ship.ticker, centerX, y + (isMobile ? 20 : 25));
       ctx.shadowBlur = 0;
       
       // Ship sprite or circle
-      const spriteY = y + 70;
-      const spriteSize = 50;
+      const spriteY = y + (isMobile ? 50 : 70);
       
       if (ship.spriteImg) {
         // Rotate to face opponent
@@ -1692,10 +1702,10 @@ ${bar(energy, COLORS.toxicCyan)}
       // Spinning ring around ship
       ctx.save();
       ctx.strokeStyle = ship.color;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = isMobile ? 1.5 : 2;
       ctx.globalAlpha = 0.5 + 0.3 * Math.sin(time * 5);
       ctx.beginPath();
-      ctx.arc(centerX, spriteY, spriteSize / 2 + 8, time * 2, time * 2 + Math.PI * 1.5);
+      ctx.arc(centerX, spriteY, spriteSize / 2 + (isMobile ? 5 : 8), time * 2, time * 2 + Math.PI * 1.5);
       ctx.stroke();
       ctx.restore();
       
@@ -1708,9 +1718,9 @@ ${bar(energy, COLORS.toxicCyan)}
         { label: 'SIGNAL', value: ship.telemetry.macdPersistence, color: COLORS.hotMagenta }
       ];
       
-      const statStartY = y + 115;
-      const statHeight = 28;
-      const barMaxWidth = panelWidth - 30;
+      const statStartY = y + (isMobile ? 85 : 115);
+      const barMaxWidth = panelWidth - (isMobile ? 20 : 30);
+      const barHeight = isMobile ? 6 : 8;
       
       stats.forEach((stat, i) => {
         const statY = statStartY + i * statHeight;
@@ -1725,13 +1735,13 @@ ${bar(energy, COLORS.toxicCyan)}
         
         // Label
         ctx.fillStyle = '#888';
-        ctx.font = '10px "Courier New", monospace';
+        ctx.font = `${labelFont}px "Courier New", monospace`;
         ctx.textAlign = 'left';
-        ctx.fillText(stat.label, x + 10, statY);
+        ctx.fillText(stat.label, x + (isMobile ? 6 : 10), statY);
         
         // Value bar background
         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fillRect(x + 10, statY + 4, barMaxWidth, 8);
+        ctx.fillRect(x + (isMobile ? 6 : 10), statY + 4, barMaxWidth, barHeight);
         
         // Value bar fill (animated)
         const fillWidth = barMaxWidth * stat.value * statProgress;
@@ -1739,23 +1749,23 @@ ${bar(energy, COLORS.toxicCyan)}
         barGrad.addColorStop(0, stat.color);
         barGrad.addColorStop(1, stat.color + '88');
         ctx.fillStyle = barGrad;
-        ctx.fillRect(x + 10, statY + 4, fillWidth, 8);
+        ctx.fillRect(x + (isMobile ? 6 : 10), statY + 4, fillWidth, barHeight);
         
         // Percentage text
         ctx.fillStyle = stat.color;
-        ctx.font = 'bold 10px "Courier New", monospace';
+        ctx.font = `bold ${labelFont}px "Courier New", monospace`;
         ctx.textAlign = 'right';
-        ctx.fillText(Math.round(stat.value * 100 * statProgress) + '%', x + panelWidth - 10, statY + 12);
+        ctx.fillText(Math.round(stat.value * 100 * statProgress) + '%', x + panelWidth - (isMobile ? 6 : 10), statY + (isMobile ? 10 : 12));
       });
       
       // Regime badge at bottom
       const regime = ship.telemetry.regimeBias?.toUpperCase() || 'RANGE';
-      const regimeY = y + panelHeight - 25;
+      const regimeY = y + panelHeight - (isMobile ? 18 : 25);
       
       ctx.globalAlpha = clamp01((scanProgress - 0.6) / 0.2);
       ctx.fillStyle = regime === 'TREND' ? COLORS.bullGreen : 
                       regime === 'CHAOTIC' ? COLORS.bearOrange : COLORS.toxicCyan;
-      ctx.font = 'bold 12px "Courier New", monospace';
+      ctx.font = `bold ${isMobile ? 10 : 12}px "Courier New", monospace`;
       ctx.textAlign = 'center';
       
       // Badge background

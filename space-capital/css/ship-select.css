@@ -26,7 +26,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 .ship-select-screen {
-  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
   background: var(--ss-bg);
   padding: 1.5rem;
   font-family: 'IBM Plex Mono', monospace;
@@ -167,6 +167,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   overflow: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ship-select-card::before {
@@ -471,6 +473,20 @@
 @keyframes stat-bar-shimmer {
   0% { left: -100%; }
   50%, 100% { left: 200%; }
+}
+
+/* Disable shimmer on reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ship-stat-bar::before {
+    animation: none;
+    display: none;
+  }
+}
+
+body.battery-mode .ship-stat-bar::before,
+body.reduced-motion .ship-stat-bar::before {
+  animation: none;
+  display: none;
 }
 
 .ship-stat-value {

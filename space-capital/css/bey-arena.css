@@ -124,12 +124,16 @@
   background: rgba(255, 0, 102, 0.15);
   color: var(--arena-hot-magenta);
   border-radius: 2px;
-  padding: 8px 12px;
+  padding: 10px 14px;
+  min-height: 44px;
+  min-width: 44px;
   cursor: pointer;
   font-family: 'VT323', monospace;
   font-size: 14px;
   letter-spacing: 0.1em;
   transition: all 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .bey-arena-close:hover {
@@ -365,13 +369,16 @@
   background: rgba(255, 0, 102, 0.1);
   color: var(--arena-hot-magenta);
   border-radius: 2px;
-  padding: 10px 16px;
+  padding: 12px 20px;
+  min-height: 44px;
   font-family: 'VT323', monospace;
   font-size: 14px;
   letter-spacing: 0.1em;
   cursor: pointer;
   transition: all 0.1s;
   text-transform: uppercase;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .bey-btn:hover {
@@ -475,10 +482,57 @@
   #bey-arena-canvas {
     width: 90vw;
     height: 50vh;
+    max-height: 400px;
   }
   
   .bey-readout {
     font-size: 11px;
+  }
+  
+  .bey-arena-header {
+    padding: 8px 12px;
+  }
+  
+  .bey-arena-banner {
+    font-size: 16px;
+  }
+  
+  .bey-arena-controls {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .bey-btn {
+    flex: 1 1 auto;
+    min-width: 100px;
+    text-align: center;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  #bey-arena-canvas {
+    width: 100vw;
+    height: 45vh;
+    max-height: 320px;
+  }
+  
+  .bey-panel {
+    padding: 6px 8px;
+  }
+  
+  .bey-readout {
+    font-size: 10px;
+  }
+  
+  .bey-arena-banner {
+    font-size: 14px;
+  }
+  
+  .bey-btn {
+    min-width: 80px;
+    padding: 8px 12px;
+    font-size: 10px;
   }
 }
 

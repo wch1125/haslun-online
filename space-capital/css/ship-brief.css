@@ -490,6 +490,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
+  min-height: 44px; /* Touch-friendly minimum */
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 600;
@@ -498,6 +499,8 @@
   border-radius: 2px;
   cursor: pointer;
   transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ship-brief-action.secondary {

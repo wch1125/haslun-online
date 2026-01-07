@@ -48,8 +48,19 @@ window.HangarAtmosphere = (function() {
     wobblePhase: 0,
     rotationAngle: 0,
     segments: 64,
-    glowIntensity: 0.5
+    glowIntensity: 0.5,
+    centerX: 0,
+    centerY: 0
   };
+
+  // Update ring size based on canvas
+  function updateRingSize() {
+    if (!canvas) return;
+    const minDim = Math.min(canvas.width, canvas.height);
+    ring.baseRadius = Math.max(60, Math.min(120, minDim * 0.35));
+    ring.centerX = canvas.width / 2;
+    ring.centerY = canvas.height / 2 - 20;
+  }
   
   // Radar sweep
   const radar = {
@@ -103,10 +114,13 @@ window.HangarAtmosphere = (function() {
     ctx = canvas.getContext('2d');
     resizeCanvas();
 
-    // Initialize particles
-    initStars(80);
-    initDustMotes(25);
-    initDataFragments(8);
+    // Detect mobile for performance scaling
+    const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
+    
+    // Initialize particles (reduced count on mobile)
+    initStars(isMobile ? 40 : 80);
+    initDustMotes(isMobile ? 12 : 25);
+    initDataFragments(isMobile ? 4 : 8);
 
     // Listen for resize
     window.addEventListener('resize', resizeCanvas);
@@ -121,9 +135,8 @@ window.HangarAtmosphere = (function() {
     canvas.width = rect.width;
     canvas.height = rect.height;
     
-    // Update ring center
-    ring.centerX = canvas.width / 2;
-    ring.centerY = canvas.height / 2 - 20; // Slightly above center
+    // Update ring size based on new canvas dimensions
+    updateRingSize();
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -172,7 +185,7 @@ window.HangarAtmosphere = (function() {
 
   function createDataFragment() {
     const angle = Math.random() * Math.PI * 2;
-    const dist = ring.baseRadius + 40 + Math.random() * 60;
+    const dist = ring.baseRadius + 40 + Math.random() * (ring.baseRadius * 0.5);
     return {
       angle,
       dist,
@@ -480,6 +493,14 @@ window.HangarAtmosphere = (function() {
 
   function start() {
     if (active) return;
+    
+    // Skip on battery mode or reduced motion
+    if (document.body.classList.contains('battery-mode') ||
+        document.body.classList.contains('reduced-motion') ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      console.log('[HangarAtmosphere] Skipped - reduced motion or battery mode');
+      return false;
+    }
     
     if (!canvas && !init()) {
       return false;

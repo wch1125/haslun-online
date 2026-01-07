@@ -66,6 +66,7 @@
     .fleet-ship-list {
       flex: 1;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding: 0.5rem;
     }
     
@@ -906,6 +907,8 @@
       cursor: pointer;
       transition: all 0.2s ease;
       text-align: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     
     .carousel-ship-card:hover,
@@ -1470,6 +1473,27 @@ body.no-scanlines::before {
     @keyframes stat-shimmer {
       0% { left: -100%; }
       50%, 100% { left: 200%; }
+    }
+    
+    /* Disable stat animations on reduced motion or battery mode */
+    @media (prefers-reduced-motion: reduce) {
+      .ship-stat-fill {
+        animation: none;
+      }
+      .ship-stat-fill::after {
+        animation: none;
+      }
+    }
+    
+    body.battery-mode .ship-stat-fill,
+    body.reduced-motion .ship-stat-fill {
+      animation: none;
+    }
+    
+    body.battery-mode .ship-stat-fill::after,
+    body.reduced-motion .ship-stat-fill::after {
+      animation: none;
+      display: none;
     }
     
     .ship-stat-fill.hull {
@@ -8433,6 +8457,23 @@ body.no-scanlines::before {
         -webkit-overflow-scrolling: touch;
         scroll-behavior: smooth;
       }
+      
+      /* Additional active states for touch feedback */
+      .fleet-ship-card:active,
+      .hangar-action-btn:active,
+      .hud-btn:active,
+      .carousel-ship-card:active {
+        transform: translateY(0) scale(0.98);
+        filter: brightness(1.15);
+      }
+      
+      /* Boost font sizes for readability on touch devices */
+      .fleet-card-ticker { font-size: 1rem; }
+      .fleet-card-name { font-size: 0.75rem; }
+      .fleet-status-badge { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
+      .fleet-ship-card { padding: 0.85rem; }
+      .sidebar-stat-value { font-size: 0.9rem; }
+      .dossier-stat-label { font-size: 0.65rem; }
     }
     
     /* Prevent zoom on input focus (iOS) */
