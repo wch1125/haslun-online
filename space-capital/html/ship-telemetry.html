@@ -847,12 +847,17 @@
     // PRICE CHART - Using ChartUtils for robust rendering
     // ─────────────────────────────────────────────────────────────────────────
 
+    let lastChartRange = '1M';  // Track last range to prevent redundant redraws
+    let lastChartTicker = null;
+
     async function initChart() {
       const ctx = document.getElementById('priceChart').getContext('2d');
       const config = TICKER_CONFIG[currentTicker];
 
       // Load and process chart data using ChartUtils
       let rawData = await loadRawChartData('1M');
+      lastChartRange = '1M';
+      lastChartTicker = currentTicker;
       
       // Diagnose data for issues (dev debugging)
       if (window.ChartUtils) {
@@ -862,14 +867,20 @@
         }
       }
 
-      // Prepare data with deduplication, sorting, and downsampling
+      // Prepare data with validation, deduplication, sorting, and downsampling
       const chartData = window.ChartUtils 
-        ? ChartUtils.prepareChartData(rawData, { targetPoints: 150 })
+        ? ChartUtils.prepareChartData(rawData, { targetPoints: 150, useIndexBasedX: true })
         : fallbackPrepareData(rawData);
+
+      // Bail if no valid data
+      if (!chartData.prices || chartData.prices.length === 0) {
+        console.error('[Chart] No valid data to render');
+        return;
+      }
 
       // Create chart with optimal config
       const chartConfig = window.ChartUtils
-        ? ChartUtils.createChartConfig(chartData, { color: config.color, label: currentTicker })
+        ? ChartUtils.createChartConfig(chartData, { color: config.color, label: currentTicker, fillOpacity: 0.1 })
         : createFallbackConfig(chartData, config);
 
       priceChart = new Chart(ctx, chartConfig);
@@ -895,9 +906,10 @@
             .filter(p => new Date(p.date) >= cutoff)
             .map(p => ({
               date: p.date,
-              close: p.close || p.price,
+              close: parseFloat(p.close || p.price),
               time: new Date(p.date).getTime()
-            }));
+            }))
+            .filter(p => isFinite(p.close)); // Remove invalid entries
         }
       } catch (e) {
         console.warn('[Chart] Failed to load timeseries:', e);
@@ -909,21 +921,35 @@
 
     // Fallback data preparation if ChartUtils not loaded
     function fallbackPrepareData(rawData) {
+      // Validate and clean
+      const cleaned = rawData
+        .filter(d => d && d.date && isFinite(parseFloat(d.close)))
+        .map(d => ({ ...d, close: parseFloat(d.close) }));
+      
+      // Deduplicate by date
       const seen = new Set();
-      const cleaned = rawData.filter(d => {
+      const deduped = cleaned.filter(d => {
         if (seen.has(d.date)) return false;
         seen.add(d.date);
         return true;
       });
       
-      cleaned.sort((a, b) => new Date(a.date) - new Date(b.date));
+      // Sort by date
+      deduped.sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      // Calculate safe domain
+      const prices = deduped.map(p => p.close);
+      const minP = Math.min(...prices);
+      const maxP = Math.max(...prices);
+      const pad = (maxP - minP) * 0.05 || 1;
       
       return {
-        labels: cleaned.map(p => new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
-        prices: cleaned.map(p => p.close),
+        labels: deduped.map(p => new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+        prices: prices,
+        dateLabels: deduped.map(p => p.date),
         domain: {
-          min: Math.min(...cleaned.map(p => p.close)) * 0.95,
-          max: Math.max(...cleaned.map(p => p.close)) * 1.05
+          min: minP - pad,
+          max: maxP + pad
         }
       };
     }
@@ -938,12 +964,12 @@
             label: currentTicker,
             data: chartData.prices,
             borderColor: config.color,
-            backgroundColor: config.color + '20',
-            fill: true,
+            backgroundColor: config.color + '1A', // 10% opacity
+            fill: 'origin',
             tension: 0.1,
             pointRadius: 0,
             borderWidth: 2,
-            spanGaps: true
+            spanGaps: false
           }]
         },
         options: {
@@ -960,13 +986,19 @@
               borderColor: config.color,
               borderWidth: 1,
               titleFont: { family: 'VT323' },
-              bodyFont: { family: 'VT323' }
+              bodyFont: { family: 'VT323' },
+              callbacks: {
+                label: (ctx) => {
+                  const val = ctx.parsed.y;
+                  return isFinite(val) ? `$${val.toFixed(2)}` : 'N/A';
+                }
+              }
             }
           },
           scales: {
             x: {
               grid: { color: '#333344' },
-              ticks: { color: '#888899', font: { family: 'VT323' } }
+              ticks: { color: '#888899', font: { family: 'VT323' }, maxTicksLimit: 8 }
             },
             y: {
               min: chartData.domain.min,
@@ -975,17 +1007,18 @@
               ticks: { 
                 color: '#888899', 
                 font: { family: 'VT323' },
-                callback: (value) => '$' + value.toFixed(2)
+                callback: (value) => isFinite(value) ? '$' + value.toFixed(2) : ''
               }
             }
-          }
+          },
+          animation: { duration: 300 }
         }
       };
     }
 
     function generateMockChartData(range) {
       const days = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': 500 }[range] || 30;
-      const basePrice = telemetryData.current_price || 30;
+      const basePrice = telemetryData.current_price || telemetryData.stock_price || 30;
       const data = [];
 
       for (let i = days; i >= 0; i--) {
@@ -1009,25 +1042,42 @@
     function setupChartControls() {
       document.querySelectorAll('.chart-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
+          const range = btn.dataset.range;
+          
+          // Guard: skip if same range and ticker
+          if (range === lastChartRange && currentTicker === lastChartTicker) {
+            console.log('[Chart] Skipping redundant redraw');
+            return;
+          }
+          
           document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           
-          const range = btn.dataset.range;
           const rawData = await loadRawChartData(range);
+          lastChartRange = range;
+          lastChartTicker = currentTicker;
           
           // Process with ChartUtils
           const chartData = window.ChartUtils 
-            ? ChartUtils.prepareChartData(rawData, { targetPoints: 150 })
+            ? ChartUtils.prepareChartData(rawData, { targetPoints: 150, useIndexBasedX: true })
             : fallbackPrepareData(rawData);
           
-          // Update chart
-          priceChart.data.labels = chartData.labels.map(l => 
-            window.ChartUtils ? ChartUtils.formatDate(l) : l
-          );
+          // Bail if no data
+          if (!chartData.prices || chartData.prices.length === 0) {
+            console.warn('[Chart] No data for range:', range);
+            return;
+          }
+          
+          // Update chart - use dateLabels for display
+          const displayLabels = chartData.dateLabels 
+            ? chartData.dateLabels.map(l => window.ChartUtils ? ChartUtils.formatDate(l) : new Date(l).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
+            : chartData.labels;
+          
+          priceChart.data.labels = displayLabels;
           priceChart.data.datasets[0].data = chartData.prices;
           priceChart.options.scales.y.min = chartData.domain.min;
           priceChart.options.scales.y.max = chartData.domain.max;
-          priceChart.update();
+          priceChart.update('none'); // Skip animation for faster update
         });
       });
     }

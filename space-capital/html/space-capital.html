@@ -871,6 +871,94 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
+       MACD MINI-CHART - Compact momentum indicator
+       ═══════════════════════════════════════════════════════════════════════ */
+    
+    .macd-mini-chart {
+      margin: 0.5rem 0;
+      padding: 0.35rem;
+      background: var(--bg-void);
+      border: 1px solid var(--border-dim);
+      position: relative;
+    }
+
+    .macd-mini-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .macd-mini-label {
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .macd-mini-signal {
+      font-size: 0.5rem;
+      letter-spacing: 0.05em;
+      padding: 0.1rem 0.25rem;
+      border: 1px solid;
+    }
+
+    .macd-mini-signal.bullish {
+      color: var(--green-neon);
+      border-color: var(--green-neon);
+    }
+
+    .macd-mini-signal.bearish {
+      color: var(--red-alert);
+      border-color: var(--red-alert);
+    }
+
+    .macd-mini-signal.neutral {
+      color: var(--text-muted);
+      border-color: var(--border-dim);
+    }
+
+    .macd-canvas-wrap {
+      height: 28px;
+      position: relative;
+    }
+
+    .macd-canvas-wrap canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .macd-zero-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: var(--border-dim);
+      pointer-events: none;
+    }
+
+    /* Crossover markers */
+    .macd-crossover {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .macd-crossover.bullish {
+      background: var(--green-neon);
+      box-shadow: 0 0 4px var(--green-neon);
+    }
+
+    .macd-crossover.bearish {
+      background: var(--red-alert);
+      box-shadow: 0 0 4px var(--red-alert);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
        SHIP JOURNEY VISUALIZATION - Historical data display
        ═══════════════════════════════════════════════════════════════════════ */
 
@@ -1850,6 +1938,18 @@
           </div>
         </div>
 
+        <!-- MACD Mini-Chart -->
+        <div class="macd-mini-chart" data-ticker="${position.ticker}">
+          <div class="macd-mini-header">
+            <span class="macd-mini-label">MACD</span>
+            <span class="macd-mini-signal neutral" data-macd-signal>--</span>
+          </div>
+          <div class="macd-canvas-wrap">
+            <div class="macd-zero-line"></div>
+            <canvas data-macd-canvas></canvas>
+          </div>
+        </div>
+
         ${renderJourneyVisualization(position)}
 
         ${hasStrikes ? `
@@ -2008,6 +2108,197 @@
       }
       
       requestAnimationFrame(hydrateSprites);
+      
+      // Render MACD mini-charts for each ship card
+      renderMACDMiniCharts();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // MACD MINI-CHARTS - Render momentum indicators on ship cards
+    // ═══════════════════════════════════════════════════════════════════════
+
+    const macdChartInstances = new Map(); // Store chart instances for cleanup
+
+    async function renderMACDMiniCharts() {
+      // Check if required dependencies are loaded
+      if (!window.Chart || !window.IndicatorLoader) {
+        console.log('[MACD] Waiting for dependencies...');
+        return setTimeout(renderMACDMiniCharts, 200);
+      }
+
+      const containers = document.querySelectorAll('.macd-mini-chart[data-ticker]');
+      
+      for (const container of containers) {
+        const ticker = container.dataset.ticker;
+        if (!ticker) continue;
+
+        try {
+          // Try to load indicator data
+          const data = await IndicatorLoader.getRecentBars(ticker, 24);
+          
+          if (data && data.length > 0) {
+            renderMACDChart(container, ticker, data);
+          } else {
+            // Show placeholder if no data
+            renderMACDPlaceholder(container, ticker);
+          }
+        } catch (err) {
+          console.warn(`[MACD] Failed to load data for ${ticker}:`, err.message);
+          renderMACDPlaceholder(container, ticker);
+        }
+      }
+    }
+
+    function renderMACDChart(container, ticker, data) {
+      const canvas = container.querySelector('[data-macd-canvas]');
+      const signalBadge = container.querySelector('[data-macd-signal]');
+      if (!canvas) return;
+
+      // Destroy previous chart instance if exists
+      if (macdChartInstances.has(ticker)) {
+        macdChartInstances.get(ticker).destroy();
+      }
+
+      // Extract MACD data
+      const macdData = data.map(d => ({
+        macd: d.macd,
+        signal: d.signalLine,
+        histogram: d.histogram
+      })).filter(d => d.macd != null && d.signal != null);
+
+      if (macdData.length < 3) {
+        renderMACDPlaceholder(container, ticker);
+        return;
+      }
+
+      // Detect crossovers for signal
+      const crossovers = window.ChartUtils 
+        ? ChartUtils.detectMACDCrossovers(macdData)
+        : detectSimpleCrossovers(macdData);
+
+      // Update signal badge based on latest crossover
+      const latestCrossover = crossovers.length > 0 ? crossovers[crossovers.length - 1] : null;
+      const lastMacd = macdData[macdData.length - 1];
+      
+      let signalState = 'neutral';
+      let signalText = '--';
+      
+      if (latestCrossover && latestCrossover.index >= macdData.length - 5) {
+        // Recent crossover (within last 5 bars)
+        signalState = latestCrossover.type;
+        signalText = latestCrossover.type === 'bullish' ? '▲ BULL' : '▼ BEAR';
+      } else if (lastMacd.macd > lastMacd.signal) {
+        signalState = 'bullish';
+        signalText = '+ POS';
+      } else {
+        signalState = 'bearish';
+        signalText = '- NEG';
+      }
+
+      if (signalBadge) {
+        signalBadge.textContent = signalText;
+        signalBadge.className = `macd-mini-signal ${signalState}`;
+      }
+
+      // Create chart configuration
+      const config = window.ChartUtils
+        ? ChartUtils.createMACDConfig(macdData, { height: 28, showHistogram: true })
+        : createSimpleMACDConfig(macdData);
+
+      // Create chart
+      const ctx = canvas.getContext('2d');
+      const chart = new Chart(ctx, config);
+      macdChartInstances.set(ticker, chart);
+    }
+
+    function renderMACDPlaceholder(container, ticker) {
+      const canvas = container.querySelector('[data-macd-canvas]');
+      const signalBadge = container.querySelector('[data-macd-signal]');
+      
+      if (signalBadge) {
+        signalBadge.textContent = 'N/A';
+        signalBadge.className = 'macd-mini-signal neutral';
+      }
+
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#333344';
+        ctx.font = '10px VT323';
+        ctx.textAlign = 'center';
+        ctx.fillText('NO DATA', canvas.width / 2, canvas.height / 2 + 3);
+      }
+    }
+
+    // Simple crossover detection fallback
+    function detectSimpleCrossovers(macdData) {
+      const crossovers = [];
+      for (let i = 1; i < macdData.length; i++) {
+        const prevDiff = macdData[i-1].macd - macdData[i-1].signal;
+        const currDiff = macdData[i].macd - macdData[i].signal;
+        
+        if (prevDiff <= 0 && currDiff > 0) {
+          crossovers.push({ index: i, type: 'bullish' });
+        } else if (prevDiff >= 0 && currDiff < 0) {
+          crossovers.push({ index: i, type: 'bearish' });
+        }
+      }
+      return crossovers;
+    }
+
+    // Simple MACD config fallback
+    function createSimpleMACDConfig(macdData) {
+      const macdLine = macdData.map(d => d.macd);
+      const signalLine = macdData.map(d => d.signal);
+      const histogram = macdData.map(d => d.histogram ?? (d.macd - d.signal));
+      
+      const allVals = [...macdLine, ...signalLine].filter(v => v != null);
+      const absMax = Math.max(...allVals.map(Math.abs), 0.01);
+
+      return {
+        type: 'line',
+        data: {
+          labels: macdData.map((_, i) => i),
+          datasets: [
+            {
+              label: 'MACD',
+              data: macdLine,
+              borderColor: '#FF2975',
+              borderWidth: 1.5,
+              pointRadius: 0,
+              tension: 0.2,
+              fill: false
+            },
+            {
+              label: 'Signal',
+              data: signalLine,
+              borderColor: '#00FFFF',
+              borderWidth: 1,
+              pointRadius: 0,
+              tension: 0.2,
+              fill: false,
+              borderDash: [2, 2]
+            },
+            {
+              type: 'bar',
+              label: 'Histogram',
+              data: histogram,
+              backgroundColor: histogram.map(h => h >= 0 ? '#39FF1480' : '#FF004080'),
+              borderWidth: 0,
+              barPercentage: 0.8
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: {
+            x: { display: false },
+            y: { display: false, min: -absMax * 1.1, max: absMax * 1.1 }
+          },
+          animation: false
+        }
+      };
     }
 
     // Global function to update behavior states (called when positions change)
@@ -2479,6 +2770,15 @@
   <!-- UI Overhaul Modules -->
   <script src="../js/ui/visual-tiers.js"></script>
   <script src="../js/ui/telemetry-lockin.js"></script>
+
+  <!-- Chart.js for MACD mini-charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Chart Utilities - Robust data processing -->
+  <script src="../js/data/chart-utils.js"></script>
+  
+  <!-- Indicator Loader - CSV data access -->
+  <script src="../js/data/indicator-loader.js"></script>
 
   <!-- Ship Behavior Engine - State machine for reactive sprites -->
   <script src="../js/ships/ship-behavior.js"></script>

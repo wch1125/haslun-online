@@ -8,12 +8,60 @@
  * 2. Non-monotonic timestamps
  * 3. Too many data points for display width
  * 4. Y-axis scaling issues with area fills
+ * 5. NaN/undefined values causing spiraling lines
  * 
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 const ChartUtils = (function() {
   'use strict';
+
+  /**
+   * Validate and clean a single data point
+   * Returns null if the point is invalid
+   */
+  function validatePoint(point) {
+    if (!point || typeof point !== 'object') return null;
+    
+    // Extract price value
+    const price = parseFloat(point.close ?? point.price ?? point.y);
+    if (!isFinite(price) || isNaN(price)) return null;
+    
+    // Extract date/time
+    let time;
+    if (point.time && typeof point.time === 'number') {
+      time = point.time;
+    } else if (point.date) {
+      time = new Date(point.date).getTime();
+    } else {
+      return null;
+    }
+    
+    if (!isFinite(time) || isNaN(time)) return null;
+    
+    return {
+      date: point.date || new Date(time).toISOString().split('T')[0],
+      close: price,
+      time: time
+    };
+  }
+
+  /**
+   * Validate and clean an entire dataset
+   * Removes invalid points and ensures all values are numeric
+   */
+  function validateData(data) {
+    if (!Array.isArray(data)) return [];
+    
+    const cleaned = [];
+    for (const point of data) {
+      const valid = validatePoint(point);
+      if (valid) cleaned.push(valid);
+    }
+    
+    console.log(`[ChartUtils] Validated ${data.length} → ${cleaned.length} points`);
+    return cleaned;
+  }
 
   /**
    * Ensure data is sorted by time in ascending order
@@ -200,10 +248,11 @@ const ChartUtils = (function() {
 
   /**
    * Prepare data for Chart.js rendering
-   * Applies all fixes: sort, dedupe, monotonic, downsample
+   * Applies all fixes: validate, sort, dedupe, monotonic, downsample
+   * Uses INDEX-BASED X values for maximum stability
    * @param {Array} rawData - Raw data array with {date, close/price} objects
    * @param {Object} options - Configuration options
-   * @returns {Object} {labels, prices, domain}
+   * @returns {Object} {labels, prices, domain, indices}
    */
   function prepareChartData(rawData, options = {}) {
     const {
@@ -212,15 +261,24 @@ const ChartUtils = (function() {
       yKeyFallback = 'price',
       targetPoints = 200,
       useMinMaxDownsample = true,
-      yPadding = 0.05
+      yPadding = 0.05,
+      useIndexBasedX = true  // Force index-based X for stability
     } = options;
 
     if (!rawData || rawData.length === 0) {
-      return { labels: [], prices: [], domain: { min: 0, max: 100 } };
+      return { labels: [], prices: [], domain: { min: 0, max: 100 }, indices: [] };
+    }
+
+    // Step 0: Validate all data points (removes NaN, undefined, invalid)
+    let processed = validateData(rawData);
+
+    if (processed.length === 0) {
+      console.warn('[ChartUtils] All data points invalid after validation');
+      return { labels: [], prices: [], domain: { min: 0, max: 100 }, indices: [] };
     }
 
     // Step 1: Sort by time
-    let processed = sortByTime(rawData);
+    processed = sortByTime(processed);
 
     // Step 2: Deduplicate
     processed = deduplicateByX(processed, xKey);
@@ -244,17 +302,33 @@ const ChartUtils = (function() {
       }
     }
 
-    // Extract labels and prices
-    const labels = processed.map(p => p[xKey]);
-    const prices = processed.map(p => p[yKey] || p[yKeyFallback]);
+    // Extract prices (validated to be numeric)
+    const prices = processed.map(p => {
+      const val = p[yKey] || p[yKeyFallback];
+      return isFinite(val) ? val : null;
+    }).filter(v => v !== null);
 
-    // Calculate Y domain
+    // Generate labels - use index-based for stability
+    const labels = useIndexBasedX 
+      ? processed.map((_, i) => i)
+      : processed.map(p => p[xKey]);
+    
+    // Keep original dates for tooltips
+    const dateLabels = processed.map(p => p[xKey]);
+
+    // Calculate Y domain with safety checks
     const domain = calculateYDomain(prices, yPadding);
 
     // Debug info
-    console.log(`[ChartUtils] Prepared chart data: ${rawData.length} → ${processed.length} points`);
+    console.log(`[ChartUtils] Prepared: ${rawData.length} → ${processed.length} points, domain: [${domain.min.toFixed(2)}, ${domain.max.toFixed(2)}]`);
 
-    return { labels, prices, domain };
+    return { 
+      labels, 
+      prices, 
+      domain,
+      dateLabels,  // Original dates for display
+      indices: labels
+    };
   }
 
   /**
@@ -280,7 +354,7 @@ const ChartUtils = (function() {
 
   /**
    * Create optimal Chart.js configuration for price charts
-   * @param {Object} data - Prepared chart data {labels, prices, domain}
+   * @param {Object} data - Prepared chart data {labels, prices, domain, dateLabels}
    * @param {Object} options - Chart options
    * @returns {Object} Chart.js configuration object
    */
@@ -289,27 +363,45 @@ const ChartUtils = (function() {
       color = '#FF2975',
       label = 'Price',
       showFill = true,
+      fillOpacity = 0.12,  // Reduced from 0x20 (~12.5%) to prevent visual domination
       tension = 0.1,
       pointRadius = 0,
       borderWidth = 2
     } = options;
 
+    // Use dateLabels for display if available
+    const displayLabels = data.dateLabels 
+      ? data.dateLabels.map(l => formatDate(l))
+      : data.labels.map(l => typeof l === 'number' ? `#${l}` : formatDate(l));
+
+    // Calculate fill opacity hex
+    const fillHex = Math.round(fillOpacity * 255).toString(16).padStart(2, '0');
+
     return {
       type: 'line',
       data: {
-        labels: data.labels.map(l => formatDate(l)),
+        labels: displayLabels,
         datasets: [{
           label: label,
           data: data.prices,
           borderColor: color,
-          backgroundColor: showFill ? color + '20' : 'transparent',
-          fill: showFill,
+          backgroundColor: showFill ? color + fillHex : 'transparent',
+          fill: showFill ? 'origin' : false,  // Fill from origin, not from min
           tension: tension,
           pointRadius: pointRadius,
           pointHoverRadius: 4,
           borderWidth: borderWidth,
           // Prevent vertical line drawing on hover
-          spanGaps: true
+          spanGaps: false,  // Don't connect across gaps
+          segment: {
+            // Skip segments with missing data
+            borderColor: ctx => {
+              const p0 = ctx.p0.parsed.y;
+              const p1 = ctx.p1.parsed.y;
+              if (!isFinite(p0) || !isFinite(p1)) return 'transparent';
+              return undefined;
+            }
+          }
         }]
       },
       options: {
@@ -330,7 +422,18 @@ const ChartUtils = (function() {
             titleFont: { family: 'VT323' },
             bodyFont: { family: 'VT323' },
             callbacks: {
-              label: (ctx) => `$${ctx.parsed.y.toFixed(2)}`
+              title: (items) => {
+                // Show the actual date in tooltip
+                const idx = items[0]?.dataIndex;
+                if (data.dateLabels && data.dateLabels[idx]) {
+                  return formatDate(data.dateLabels[idx], 'medium');
+                }
+                return items[0]?.label || '';
+              },
+              label: (ctx) => {
+                const val = ctx.parsed.y;
+                return isFinite(val) ? `$${val.toFixed(2)}` : 'N/A';
+              }
             }
           }
         },
@@ -353,7 +456,7 @@ const ChartUtils = (function() {
             ticks: { 
               color: '#888899', 
               font: { family: 'VT323' },
-              callback: (value) => '$' + value.toFixed(2)
+              callback: (value) => isFinite(value) ? '$' + value.toFixed(2) : ''
             }
           }
         },
@@ -405,10 +508,13 @@ const ChartUtils = (function() {
       issues.push(`${nonMonotonic} non-monotonic X values found`);
     }
 
-    // Check for null/undefined prices
-    const nullPrices = data.filter(d => d.close == null && d.price == null).length;
-    if (nullPrices > 0) {
-      issues.push(`${nullPrices} null/undefined price values`);
+    // Check for null/undefined/NaN prices
+    const invalidPrices = data.filter(d => {
+      const p = d.close ?? d.price;
+      return p == null || !isFinite(p);
+    }).length;
+    if (invalidPrices > 0) {
+      issues.push(`${invalidPrices} invalid price values (null/NaN/undefined)`);
     }
 
     // Check data density
@@ -422,14 +528,160 @@ const ChartUtils = (function() {
       stats: {
         totalPoints: data.length,
         uniqueXValues: uniqueX.size,
-        nullPrices: nullPrices,
+        invalidPrices: invalidPrices,
         nonMonotonic: nonMonotonic
       }
     };
   }
 
+  /**
+   * Create MACD mini-chart configuration
+   * For use in ship cards - shows MACD line, signal line, and histogram
+   * @param {Array} macdData - Array of {macd, signal, histogram} values
+   * @param {Object} options - Chart options
+   * @returns {Object} Chart.js configuration
+   */
+  function createMACDConfig(macdData, options = {}) {
+    const {
+      height = 40,
+      showHistogram = true,
+      macdColor = '#FF2975',
+      signalColor = '#00FFFF',
+      histPosColor = '#39FF14',
+      histNegColor = '#FF0040'
+    } = options;
+
+    // Validate and extract data
+    const macdLine = [];
+    const signalLine = [];
+    const histogram = [];
+    
+    for (const d of macdData) {
+      const m = parseFloat(d.macd ?? d.MACD);
+      const s = parseFloat(d.signal ?? d.signalLine ?? d.Signal);
+      const h = parseFloat(d.histogram ?? d.Histogram ?? (m - s));
+      
+      macdLine.push(isFinite(m) ? m : null);
+      signalLine.push(isFinite(s) ? s : null);
+      histogram.push(isFinite(h) ? h : null);
+    }
+
+    // Calculate domain
+    const allValues = [...macdLine, ...signalLine, ...histogram].filter(v => v !== null);
+    const absMax = Math.max(...allValues.map(Math.abs), 0.01);
+    const domain = { min: -absMax * 1.1, max: absMax * 1.1 };
+
+    const datasets = [
+      {
+        label: 'MACD',
+        data: macdLine,
+        borderColor: macdColor,
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.2,
+        fill: false,
+        order: 1
+      },
+      {
+        label: 'Signal',
+        data: signalLine,
+        borderColor: signalColor,
+        borderWidth: 1,
+        pointRadius: 0,
+        tension: 0.2,
+        fill: false,
+        borderDash: [2, 2],
+        order: 2
+      }
+    ];
+
+    if (showHistogram) {
+      datasets.push({
+        label: 'Histogram',
+        data: histogram,
+        type: 'bar',
+        backgroundColor: histogram.map(h => h >= 0 ? histPosColor + '80' : histNegColor + '80'),
+        borderWidth: 0,
+        barPercentage: 0.8,
+        categoryPercentage: 1.0,
+        order: 3
+      });
+    }
+
+    return {
+      type: 'line',
+      data: {
+        labels: macdData.map((_, i) => i),
+        datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
+        },
+        scales: {
+          x: {
+            display: false,
+            grid: { display: false }
+          },
+          y: {
+            display: false,
+            min: domain.min,
+            max: domain.max,
+            grid: { display: false }
+          }
+        },
+        animation: false,
+        elements: {
+          line: { borderJoinStyle: 'round' }
+        }
+      }
+    };
+  }
+
+  /**
+   * Detect MACD crossover signals
+   * @param {Array} macdData - Array of {macd, signal} values
+   * @returns {Array} Array of {index, type: 'bullish'|'bearish'} crossovers
+   */
+  function detectMACDCrossovers(macdData) {
+    const crossovers = [];
+    
+    for (let i = 1; i < macdData.length; i++) {
+      const prevM = macdData[i-1].macd ?? macdData[i-1].MACD;
+      const prevS = macdData[i-1].signal ?? macdData[i-1].signalLine;
+      const currM = macdData[i].macd ?? macdData[i].MACD;
+      const currS = macdData[i].signal ?? macdData[i].signalLine;
+      
+      if (!isFinite(prevM) || !isFinite(prevS) || !isFinite(currM) || !isFinite(currS)) {
+        continue;
+      }
+      
+      const prevDiff = prevM - prevS;
+      const currDiff = currM - currS;
+      
+      // Bullish crossover: MACD crosses above signal
+      if (prevDiff <= 0 && currDiff > 0) {
+        crossovers.push({ index: i, type: 'bullish' });
+      }
+      // Bearish crossover: MACD crosses below signal
+      else if (prevDiff >= 0 && currDiff < 0) {
+        crossovers.push({ index: i, type: 'bearish' });
+      }
+    }
+    
+    return crossovers;
+  }
+
   // Public API
   return {
+    // Data validation
+    validateData,
+    validatePoint,
+    
+    // Data processing
     sortByTime,
     deduplicateByX,
     enforceMonotonic,
@@ -437,8 +689,16 @@ const ChartUtils = (function() {
     downsampleMinMax,
     calculateYDomain,
     prepareChartData,
+    
+    // Chart creation
     formatDate,
     createChartConfig,
+    createMACDConfig,
+    
+    // MACD utilities
+    detectMACDCrossovers,
+    
+    // Diagnostics
     diagnoseData
   };
 
