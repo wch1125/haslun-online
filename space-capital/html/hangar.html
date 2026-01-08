@@ -902,6 +902,18 @@
             }
           });
         }
+
+        // Subscribe to PositionsStore changes (updates when user imports positions)
+        if (window.PositionsStore) {
+          PositionsStore.onChange(() => {
+            if (currentTicker && shipData) {
+              // Refresh quick stats with updated position data
+              updateQuickStats(shipData);
+              // Refresh options loadout
+              loadOptionsPositions();
+            }
+          });
+        }
       }
 
       function updateBackButton() {
