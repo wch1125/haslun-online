@@ -152,8 +152,33 @@ Fleet Page    Hangar Page (future)
 
 - `html/space-capital.html` - Fleet Power HUD HTML, renderShipCard updates
 - `css/fleet-command.css` - Position chip, HUD, ownership state styles
+- `css/ship-select.css` - Parallax background, floating card shadows
 - `js/data/positions-store.js` - **NEW** - Global position accessor
 - `js/data/load-trades.js` - Surgical fixes (hash, instability docs, normalizedAvgPNL, engineStress)
+- `js/ui/ship-select.js` - Swipe inertia physics + parallax background
+
+---
+
+## Mobile Swipe Improvements
+
+### Inertia Physics
+Cards now have momentum-based scrolling:
+- Velocity tracking during drag (smoothed exponential average)
+- Flick detection (velocity > 0.4, elapsed < 350ms)
+- Friction-based deceleration (0.92 per frame)
+- Soft bounce at boundaries
+- Snaps to nearest card when momentum decays
+
+### Parallax Background  
+Three-layer depth effect:
+- **Grid layer** - Magenta grid, slowest (35% of foreground speed)
+- **Nebula layer** - Color wash with subtle animation
+- **Stars layer** - Twinkling points
+
+Cards float above with enhanced shadows:
+- Deep drop shadow (60px + 120px blur)
+- Inner glow gradient
+- z-index layering for proper depth
 
 ---
 

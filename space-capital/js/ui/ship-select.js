@@ -508,20 +508,29 @@
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // MOBILE SWIPE MODE
-  // Full-screen cards with horizontal touch navigation
+  // MOBILE SWIPE MODE - Full-screen cards with INERTIA + PARALLAX
+  // Cards float above a slower-moving background for depth
   // ─────────────────────────────────────────────────────────────────────────
 
-  const SWIPE_THRESHOLD = 50; // Minimum swipe distance to trigger navigation
+  const SWIPE_THRESHOLD = 50;         // Minimum swipe distance to trigger navigation
   const MOBILE_BREAKPOINT = 768;
+  const INERTIA_FRICTION = 0.92;      // Velocity decay per frame (lower = more friction)
+  const INERTIA_MIN_VELOCITY = 0.5;   // Stop inertia below this threshold
+  const PARALLAX_RATIO = 0.35;        // Background moves 35% of foreground speed
   
   let swipeState = {
     enabled: false,
     currentIndex: 0,
     startX: 0,
     startY: 0,
+    startTime: 0,
     isDragging: false,
+    velocity: 0,
+    lastX: 0,
+    lastTime: 0,
+    inertiaRaf: null,
     grid: null,
+    parallaxBg: null,
     cards: [],
     indicator: null,
     selectedTicker: null
@@ -542,10 +551,39 @@
     
     // Enable swipe mode
     screen.classList.add('swipe-mode');
-    swipeState.enabled = true;
-    swipeState.grid = grid;
-    swipeState.cards = [...cards];
-    swipeState.selectedTicker = selectedTicker;
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // PARALLAX BACKGROUND - Creates depth, cards float above
+    // ═══════════════════════════════════════════════════════════════════
+    let parallaxBg = screen.querySelector('.swipe-parallax-bg');
+    if (!parallaxBg) {
+      parallaxBg = document.createElement('div');
+      parallaxBg.className = 'swipe-parallax-bg';
+      parallaxBg.innerHTML = `
+        <div class="parallax-layer parallax-grid"></div>
+        <div class="parallax-layer parallax-nebula"></div>
+        <div class="parallax-layer parallax-stars"></div>
+      `;
+      screen.insertBefore(parallaxBg, screen.firstChild);
+    }
+    
+    swipeState = {
+      enabled: true,
+      currentIndex: 0,
+      startX: 0,
+      startY: 0,
+      startTime: 0,
+      isDragging: false,
+      velocity: 0,
+      lastX: 0,
+      lastTime: 0,
+      inertiaRaf: null,
+      grid,
+      parallaxBg,
+      cards: [...cards],
+      indicator: null,
+      selectedTicker
+    };
     
     // Find initial index (selected ship or first)
     if (selectedTicker) {
@@ -557,6 +595,7 @@
     
     // Set initial position
     updateSwipePosition(false);
+    updateParallax();
     
     // Create indicator dots
     createSwipeIndicator(container);
@@ -572,25 +611,43 @@
     // Handle resize
     window.addEventListener('resize', handleResize);
     
-    console.log('[ShipSelect] Swipe mode enabled with', cards.length, 'ships');
+    console.log('[ShipSelect] Swipe mode with inertia + parallax,', cards.length, 'ships');
   }
 
   function handleTouchStart(e) {
     if (!swipeState.enabled) return;
     
-    swipeState.startX = e.touches[0].clientX;
-    swipeState.startY = e.touches[0].clientY;
+    // Cancel any ongoing inertia animation
+    if (swipeState.inertiaRaf) {
+      cancelAnimationFrame(swipeState.inertiaRaf);
+      swipeState.inertiaRaf = null;
+    }
+    
+    const touch = e.touches[0];
+    const now = performance.now();
+    
+    swipeState.startX = touch.clientX;
+    swipeState.startY = touch.clientY;
+    swipeState.startTime = now;
+    swipeState.lastX = touch.clientX;
+    swipeState.lastTime = now;
+    swipeState.velocity = 0;
     swipeState.isDragging = true;
     
-    // Remove transition during drag for immediate feedback
+    // Remove transitions during drag for immediate feedback
     swipeState.grid.style.transition = 'none';
+    if (swipeState.parallaxBg) {
+      swipeState.parallaxBg.style.transition = 'none';
+    }
   }
 
   function handleTouchMove(e) {
     if (!swipeState.enabled || !swipeState.isDragging) return;
     
-    const deltaX = e.touches[0].clientX - swipeState.startX;
-    const deltaY = e.touches[0].clientY - swipeState.startY;
+    const touch = e.touches[0];
+    const now = performance.now();
+    const deltaX = touch.clientX - swipeState.startX;
+    const deltaY = touch.clientY - swipeState.startY;
     
     // If vertical scroll is dominant, don't hijack
     if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5) {
@@ -602,11 +659,23 @@
       e.preventDefault();
     }
     
-    // Calculate drag position with resistance at edges
+    // ═══════════════════════════════════════════════════════════════════
+    // VELOCITY TRACKING - Smoothed for natural inertia
+    // ═══════════════════════════════════════════════════════════════════
+    const dt = now - swipeState.lastTime;
+    if (dt > 0) {
+      const instantVelocity = (touch.clientX - swipeState.lastX) / dt;
+      // Exponential smoothing for stable velocity reading
+      swipeState.velocity = swipeState.velocity * 0.7 + instantVelocity * 0.3;
+    }
+    swipeState.lastX = touch.clientX;
+    swipeState.lastTime = now;
+    
+    // Calculate drag position with rubber-band resistance at edges
     const baseOffset = -swipeState.currentIndex * window.innerWidth;
     let resistance = 1;
     
-    // Add resistance at boundaries
+    // Add resistance at boundaries (rubber-band effect)
     if ((swipeState.currentIndex === 0 && deltaX > 0) || 
         (swipeState.currentIndex === swipeState.cards.length - 1 && deltaX < 0)) {
       resistance = 0.3;
@@ -614,6 +683,9 @@
     
     const dragOffset = baseOffset + (deltaX * resistance);
     swipeState.grid.style.transform = `translateX(${dragOffset}px)`;
+    
+    // Parallax background follows slower
+    updateParallaxDrag(dragOffset);
   }
 
   function handleTouchEnd(e) {
@@ -621,32 +693,136 @@
     
     swipeState.isDragging = false;
     
-    const deltaX = e.changedTouches[0].clientX - swipeState.startX;
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - swipeState.startX;
+    const elapsed = performance.now() - swipeState.startTime;
+    const velocity = swipeState.velocity;
     
-    // Re-enable transition
-    swipeState.grid.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)';
+    // Determine if this was a flick (fast swipe) vs slow drag
+    const isFlick = Math.abs(velocity) > 0.4 && elapsed < 350;
     
-    // Check if swipe was significant enough
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
-      // Snap back to current position
+    // ═══════════════════════════════════════════════════════════════════
+    // NAVIGATION DECISION - Flick overrides distance threshold
+    // ═══════════════════════════════════════════════════════════════════
+    let newIndex = swipeState.currentIndex;
+    
+    if (isFlick) {
+      // Flick: use velocity direction regardless of distance
+      if (velocity < -0.2 && swipeState.currentIndex < swipeState.cards.length - 1) {
+        newIndex++;
+      } else if (velocity > 0.2 && swipeState.currentIndex > 0) {
+        newIndex--;
+      }
+    } else if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+      // Drag: use distance
+      if (deltaX < 0 && swipeState.currentIndex < swipeState.cards.length - 1) {
+        newIndex++;
+      } else if (deltaX > 0 && swipeState.currentIndex > 0) {
+        newIndex--;
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // INERTIA - Continue momentum if not changing cards
+    // ═══════════════════════════════════════════════════════════════════
+    if (newIndex === swipeState.currentIndex && Math.abs(velocity) > INERTIA_MIN_VELOCITY) {
+      // Apply inertia physics
+      startInertia(velocity);
+    } else {
+      // Standard snap transition
+      swipeState.currentIndex = newIndex;
+      enableTransitions();
       updateSwipePosition(true);
-      return;
+      updateParallax();
+      updateSwipeIndicator();
+      triggerShipHighlight(swipeState.currentIndex);
+    }
+  }
+
+  /**
+   * INERTIA PHYSICS - Momentum-based scroll that decays naturally
+   */
+  function startInertia(initialVelocity) {
+    let velocity = initialVelocity * 16; // Scale to pixels per frame (~60fps)
+    
+    // Get current position from transform
+    let currentOffset = -swipeState.currentIndex * window.innerWidth;
+    const transform = swipeState.grid.style.transform;
+    const match = transform.match(/translateX\(([^)]+)px\)/);
+    if (match) {
+      currentOffset = parseFloat(match[1]);
     }
     
-    // Navigate
-    if (deltaX < 0 && swipeState.currentIndex < swipeState.cards.length - 1) {
-      // Swipe left - next ship
-      swipeState.currentIndex++;
-    } else if (deltaX > 0 && swipeState.currentIndex > 0) {
-      // Swipe right - previous ship
-      swipeState.currentIndex--;
+    // Keep transitions off during inertia
+    swipeState.grid.style.transition = 'none';
+    if (swipeState.parallaxBg) {
+      swipeState.parallaxBg.style.transition = 'none';
     }
     
-    updateSwipePosition(true);
-    updateSwipeIndicator();
+    function inertiaStep() {
+      // Apply friction
+      velocity *= INERTIA_FRICTION;
+      currentOffset += velocity;
+      
+      // Boundary limits with bounce
+      const minOffset = -(swipeState.cards.length - 1) * window.innerWidth;
+      const maxOffset = 0;
+      
+      if (currentOffset > maxOffset) {
+        currentOffset = maxOffset;
+        velocity = -velocity * 0.25; // Soft bounce
+      } else if (currentOffset < minOffset) {
+        currentOffset = minOffset;
+        velocity = -velocity * 0.25; // Soft bounce
+      }
+      
+      // Apply transforms
+      swipeState.grid.style.transform = `translateX(${currentOffset}px)`;
+      updateParallaxDrag(currentOffset);
+      
+      // Continue or snap to nearest
+      if (Math.abs(velocity) > INERTIA_MIN_VELOCITY) {
+        swipeState.inertiaRaf = requestAnimationFrame(inertiaStep);
+      } else {
+        // Snap to nearest card
+        const nearestIndex = Math.round(-currentOffset / window.innerWidth);
+        swipeState.currentIndex = Math.max(0, Math.min(swipeState.cards.length - 1, nearestIndex));
+        
+        enableTransitions();
+        updateSwipePosition(true);
+        updateParallax();
+        updateSwipeIndicator();
+        triggerShipHighlight(swipeState.currentIndex);
+      }
+    }
     
-    // Trigger special animation on visible ship
-    triggerShipHighlight(swipeState.currentIndex);
+    swipeState.inertiaRaf = requestAnimationFrame(inertiaStep);
+  }
+
+  function enableTransitions() {
+    swipeState.grid.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    if (swipeState.parallaxBg) {
+      swipeState.parallaxBg.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    }
+  }
+
+  /**
+   * PARALLAX - Background moves slower during drag
+   */
+  function updateParallaxDrag(foregroundOffset) {
+    if (!swipeState.parallaxBg) return;
+    const parallaxOffset = foregroundOffset * PARALLAX_RATIO;
+    swipeState.parallaxBg.style.transform = `translateX(${parallaxOffset}px)`;
+  }
+
+  /**
+   * PARALLAX - Background position for current card
+   */
+  function updateParallax() {
+    if (!swipeState.parallaxBg) return;
+    const foregroundOffset = -swipeState.currentIndex * window.innerWidth;
+    const parallaxOffset = foregroundOffset * PARALLAX_RATIO;
+    swipeState.parallaxBg.style.transform = `translateX(${parallaxOffset}px)`;
   }
 
   function updateSwipePosition(animate = true) {
@@ -662,7 +838,7 @@
     if (!animate) {
       // Force reflow then restore transition
       swipeState.grid.offsetHeight;
-      swipeState.grid.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)';
+      swipeState.grid.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
     }
   }
 
