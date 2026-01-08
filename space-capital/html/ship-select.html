@@ -182,6 +182,8 @@
     .ship-sprite-wrap {
       position: relative;
       z-index: 2;
+      display: grid;
+      place-items: center;
     }
     
     .ship-sprite-img {
@@ -189,6 +191,15 @@
       height: 80px;
       object-fit: contain;
       image-rendering: pixelated;
+      filter: drop-shadow(0 0 10px var(--ship-color, #FF2975));
+    }
+    
+    /* Procedural Ship Canvas */
+    .ship-sprite-canvas {
+      width: 80px;
+      height: 80px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
       filter: drop-shadow(0 0 10px var(--ship-color, #FF2975));
     }
     
@@ -643,6 +654,13 @@
   <script src="../js/data/ship-data.js?v=20260108"></script>
   <script src="../js/data/ticker-profiles.js?v=20260108"></script>
   <script src="../js/ui/dial-selector.js?v=20260108"></script>
+  <!-- Procedural Ship Engine -->
+  <script src="../js/render/seed.js?v=20260108"></script>
+  <script src="../js/lib/watercolor/watercolor-engine.js?v=20260108"></script>
+  <script src="../js/render/pixel-ship-engine.js?v=20260108"></script>
+  <script src="../js/render/shippix-bootstrap.js?v=20260108"></script>
+  <!-- Watercolor ambient lighting -->
+  <script src="../js/ui/hangar-watercolor.js?v=20260108"></script>
   
   <script>
     (function() {
@@ -847,10 +865,10 @@
           <div class="ship-display">
             <div class="signal-indicator" style="background: ${signalColor}; box-shadow: 0 0 10px ${signalColor};"></div>
             <div class="ship-sprite-wrap">
-              <img class="ship-sprite-img" 
-                   src="../assets/ships/animated/gifs/${ticker}_idle.gif"
-                   alt="${ticker}"
-                   onerror="this.src='../assets/ships/static/Unclaimed-Drone-ship.png'" />
+              <canvas class="ship-sprite-canvas" 
+                      width="128" height="128"
+                      data-ticker="${ticker}"
+                      style="width: 80px; height: 80px;"></canvas>
             </div>
             <div class="engine-glow" style="
               background: linear-gradient(to bottom, ${shipClass.color}, transparent);
@@ -1013,6 +1031,12 @@
           dial.setActiveTicker(selectedTicker);
         }
         
+        // Render procedural ships for visible cards
+        await renderProceduralShips();
+        
+        // Watch for DOM changes to render new cards (dial creates/destroys on scroll)
+        observeCardCreation();
+        
         // Enter Hangar button
         document.getElementById('enterHangarBtn').addEventListener('click', () => {
           const ticker = dial.getActiveTicker();
@@ -1020,6 +1044,79 @@
         });
         
         console.log('[Hangar] Dial selector initialized with', tickers.length, 'ships');
+      }
+      
+      // Render procedural ships to all visible canvas elements
+      async function renderProceduralShips() {
+        console.log('[ShipSelect] renderProceduralShips called');
+        
+        if (!window.ShipPixReady) {
+          console.warn('[ShipSelect] ShipPix not available - ShipPixReady is undefined');
+          return;
+        }
+        
+        const engine = await window.ShipPixReady;
+        if (!engine) {
+          console.warn('[ShipSelect] ShipPix engine is null');
+          return;
+        }
+        
+        console.log('[ShipSelect] ShipPix engine ready:', !!engine);
+        
+        const canvases = document.querySelectorAll('.ship-sprite-canvas:not([data-rendered])');
+        console.log('[ShipSelect] Found', canvases.length, 'canvases to render');
+        
+        for (const canvas of canvases) {
+          const ticker = canvas.dataset.ticker;
+          if (!ticker) {
+            console.warn('[ShipSelect] Canvas missing ticker');
+            continue;
+          }
+          
+          // Debug canvas state
+          console.log('[ShipSelect] Rendering', ticker, 'canvas:', canvas.width, 'x', canvas.height);
+          
+          // Get telemetry from fleet data
+          const shipData = fleetData?.[ticker] || {};
+          const telemetry = {
+            regime: shipData.regime || 'RANGE',
+            signalState: shipData.signalState || 'neutral',
+            thrust: shipData.visual?.thrust ?? 0.5,
+            damage: shipData.visual?.damage ?? 0,
+            momentum: shipData.momentum ?? 0
+          };
+          
+          try {
+            engine.renderToCanvas(canvas, ticker, telemetry);
+            canvas.dataset.rendered = 'true';
+            console.log('[ShipSelect] Successfully rendered', ticker);
+          } catch (e) {
+            console.error('[ShipSelect] Failed to render:', ticker, e);
+          }
+        }
+      }
+      
+      // Observe for new cards being added to the dial
+      function observeCardCreation() {
+        const mount = document.getElementById('dialMount');
+        if (!mount) return;
+        
+        const observer = new MutationObserver((mutations) => {
+          let hasNewCards = false;
+          for (const mutation of mutations) {
+            if (mutation.addedNodes.length > 0) {
+              hasNewCards = true;
+              break;
+            }
+          }
+          if (hasNewCards) {
+            // Debounce rendering
+            clearTimeout(window._shipRenderTimeout);
+            window._shipRenderTimeout = setTimeout(renderProceduralShips, 50);
+          }
+        });
+        
+        observer.observe(mount, { childList: true, subtree: true });
       }
       
       // Start

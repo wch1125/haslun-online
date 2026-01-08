@@ -6,8 +6,11 @@
  * Renders and manages the Fleet Command panel showing all tracked vessels
  * with their status, stats bars, and P&L data.
  * 
+ * Now uses procedural ship rendering via ShipPix engine.
+ * 
  * Dependencies:
- *   - js/data/ship-data.js (SHIP_SPRITES, SHIP_CLASSES)
+ *   - js/render/shippix-bootstrap.js (procedural ship renderer)
+ *   - js/data/ship-data.js (SHIP_SPRITES as fallback)
  *   - js/data/ticker-profiles.js (TICKER_PROFILES)
  *   - js/ui/shipBrief.js (openShipBrief)
  * 
@@ -82,9 +85,47 @@
   }
   
   /**
-   * Render a single vessel card
+   * Build telemetry for procedural engine from stats
    */
-  function renderVesselCard(ticker, stats, sprite) {
+  function buildTelemetryFromStats(stats) {
+    if (!stats) {
+      return { regime: 'RANGE', signalState: 'neutral', thrust: 0.5, damage: 0, momentum: 0 };
+    }
+    
+    const momentum = (stats.return_1m || 0) / 50; // Normalize to -1 to 1
+    const trend = (stats.return_3m || 0) / 100;
+    const volatility = Math.min(1, Math.abs(stats.return_1w || 0) / 15);
+    
+    // Determine signal state
+    let signalState = 'neutral';
+    if (stats.return_1d > 2) signalState = 'bull';
+    else if (stats.return_1d < -2) signalState = 'bear';
+    
+    // Determine regime
+    let regime = 'RANGE';
+    if (trend > 0.3) regime = 'UPTREND';
+    else if (trend < -0.3) regime = 'DOWNTREND';
+    else if (volatility > 0.7) regime = 'CHOP';
+    
+    // Calculate damage from drawdown
+    const priceRange = stats.high_52w - stats.low_52w;
+    const fromHigh = stats.high_52w - stats.current;
+    const damage = priceRange > 0 ? Math.min(0.5, (fromHigh / priceRange) * 0.5) : 0;
+    
+    return {
+      regime,
+      signalState,
+      thrust: 0.3 + Math.max(0, momentum) * 0.7,
+      damage,
+      momentum: Math.max(-1, Math.min(1, momentum)),
+      jitter: volatility * 0.3
+    };
+  }
+  
+  /**
+   * Render a single vessel card with procedural canvas slot
+   */
+  function renderVesselCard(ticker, stats, fleetData) {
     const designation = SHIP_DESIGNATIONS[ticker] || { 
       class: 'UNKNOWN', 
       code: 'UNK-000', 
@@ -106,7 +147,9 @@
           <span class="vessel-sprite-corner tr"></span>
           <span class="vessel-sprite-corner bl"></span>
           <span class="vessel-sprite-corner br"></span>
-          <img class="vessel-sprite-img" src="${sprite}" alt="${ticker}" onerror="this.src='assets/ships/static/Unclaimed-Drone-ship.png'">
+          <div class="vessel-sprite-slot">
+            <canvas class="vessel-sprite-canvas" width="128" height="128" data-ticker="${ticker}"></canvas>
+          </div>
           <span class="vessel-sprite-class">${designation.class}</span>
         </div>
         
@@ -156,6 +199,65 @@
         </div>
       </div>
     `;
+  }
+  
+  /**
+   * Render procedural ships to all canvas elements in the container
+   */
+  async function renderProceduralShips(container, statsData, fleetData) {
+    console.log('[FleetCommand] renderProceduralShips called');
+    
+    // Wait for ShipPix engine to be ready
+    if (!window.ShipPixReady) {
+      console.warn('[FleetCommand] ShipPix not available - ShipPixReady is undefined');
+      return;
+    }
+    
+    const engine = await window.ShipPixReady;
+    console.log('[FleetCommand] ShipPix engine:', !!engine);
+    
+    if (!engine) {
+      console.warn('[FleetCommand] ShipPix engine failed to initialize');
+      return;
+    }
+    
+    // Find all ship canvas elements
+    const canvases = container.querySelectorAll('.vessel-sprite-canvas');
+    console.log('[FleetCommand] Found', canvases.length, 'canvases to render');
+    
+    canvases.forEach(canvas => {
+      const ticker = canvas.dataset.ticker;
+      if (!ticker) {
+        console.warn('[FleetCommand] Canvas missing ticker');
+        return;
+      }
+      
+      console.log('[FleetCommand] Rendering', ticker, 'canvas:', canvas.width, 'x', canvas.height);
+      
+      // Build telemetry from available data sources
+      const fleetShip = fleetData?.[ticker];
+      const stats = statsData?.stats?.[ticker];
+      
+      let telemetry;
+      if (fleetShip) {
+        // Use fleet telemetry if available (richer data)
+        telemetry = window.buildShipTelemetry ? 
+          window.buildShipTelemetry(fleetShip) : 
+          { regime: fleetShip.regime || 'RANGE', signalState: fleetShip.signalState || 'neutral' };
+      } else {
+        // Fall back to computing from stats
+        telemetry = buildTelemetryFromStats(stats);
+      }
+      
+      try {
+        engine.renderToCanvas(canvas, ticker, telemetry);
+        console.log('[FleetCommand] Successfully rendered', ticker);
+      } catch (e) {
+        console.error('[FleetCommand] Failed to render ship:', ticker, e);
+      }
+    });
+    
+    console.log('[FleetCommand] Rendered', canvases.length, 'procedural ships');
   }
   
   /**
@@ -215,6 +317,7 @@
   window.FleetCommand = {
     container: null,
     statsData: null,
+    fleetData: null,
     positions: ['RKLB', 'BKSY', 'ACHR', 'LUNR', 'ASTS', 'GME', 'JOBY', 'PL', 'KTOS', 'GE'],
     
     /**
@@ -236,23 +339,36 @@
         this.statsData = { stats: {} };
       }
       
-      this.render();
+      // Load fleet telemetry if available
+      try {
+        const response = await fetch('data/telemetry/fleet.json');
+        if (response.ok) {
+          const data = await response.json();
+          // Convert ships array to ticker-keyed object
+          this.fleetData = {};
+          (data.ships || []).forEach(ship => {
+            this.fleetData[ship.ticker] = ship;
+          });
+        }
+      } catch (e) {
+        console.log('FleetCommand: Fleet telemetry not available');
+        this.fleetData = {};
+      }
+      
+      await this.render();
     },
     
     /**
      * Render the Fleet Command panel
      */
-    render() {
+    async render() {
       if (!this.container) return;
-      
-      const sprites = window.SHIP_SPRITES || {};
-      const defaultSprite = 'assets/ships/static/Unclaimed-Drone-ship.png';
       
       let cardsHtml = '';
       this.positions.forEach(ticker => {
         const stats = this.statsData?.stats?.[ticker];
-        const sprite = sprites[ticker] || defaultSprite;
-        cardsHtml += renderVesselCard(ticker, stats, sprite);
+        const fleetShip = this.fleetData?.[ticker];
+        cardsHtml += renderVesselCard(ticker, stats, fleetShip);
       });
       
       this.container.innerHTML = `
@@ -269,6 +385,9 @@
           </div>
         </div>
       `;
+      
+      // Render procedural ships after DOM is ready
+      await renderProceduralShips(this.container, this.statsData, this.fleetData);
     },
     
     /**
@@ -296,9 +415,9 @@
     /**
      * Update positions list
      */
-    setPositions(tickers) {
+    async setPositions(tickers) {
       this.positions = tickers;
-      this.render();
+      await this.render();
     },
     
     /**
@@ -308,7 +427,7 @@
       try {
         const response = await fetch('data/stats.json');
         this.statsData = await response.json();
-        this.render();
+        await this.render();
       } catch (e) {
         console.warn('FleetCommand: Refresh failed:', e);
       }

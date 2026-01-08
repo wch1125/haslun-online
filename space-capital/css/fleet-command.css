@@ -167,6 +167,29 @@
   filter: drop-shadow(0 0 8px rgba(71, 212, 255, 0.5));
 }
 
+/* Procedural Ship Canvas Slot */
+.vessel-sprite-slot {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.vessel-sprite-canvas {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 0 10px rgba(71, 212, 255, 0.4));
+}
+
+/* Glow effect on hover */
+.vessel-card:hover .vessel-sprite-canvas {
+  filter: drop-shadow(0 0 14px rgba(0, 255, 255, 0.5));
+}
+
 .vessel-sprite-class {
   position: absolute;
   bottom: -8px;

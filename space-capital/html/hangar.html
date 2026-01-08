@@ -14,6 +14,11 @@
   <!-- Core -->
   <script src="../js/core/store.js?v=20260108"></script>
   <script src="../js/core/constants.js?v=20260108"></script>
+  <!-- Procedural Ship Engine -->
+  <script src="../js/render/seed.js?v=20260108"></script>
+  <script src="../js/lib/watercolor/watercolor-engine.js?v=20260108"></script>
+  <script src="../js/render/pixel-ship-engine.js?v=20260108"></script>
+  <script src="../js/render/shippix-bootstrap.js?v=20260108"></script>
   <!-- Data Pipeline (required for trades/positions) -->
   <script src="../js/data/player-manager.js?v=20260108"></script>
   <script src="../js/data/position-manager.js?v=20260108"></script>
@@ -198,6 +203,15 @@
       filter: drop-shadow(0 0 15px rgba(255, 41, 117, 0.6));
       position: relative;
       z-index: 1;
+    }
+    
+    /* Procedural Ship Canvas - inherits .ship-sprite and adds canvas-specific styles */
+    .ship-sprite-canvas {
+      width: 160px;
+      height: 160px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 0 15px rgba(255, 41, 117, 0.6));
     }
 
     .ship-quick-stats {
@@ -953,10 +967,10 @@
           <div class="ship-hero">
             <div class="ship-sprite-bay">
               <div class="ship-sprite-glow"></div>
-              <img src="../assets/ships/animated/gifs/${currentTicker}_idle.gif" 
-                   alt="${currentTicker}"
-                   class="ship-sprite"
-                   onerror="this.src='../assets/ships/static/Unclaimed-Drone-ship.png'">
+              <canvas id="hangarShipCanvas" 
+                      class="ship-sprite ship-sprite-canvas"
+                      width="256" height="256"
+                      data-ticker="${currentTicker}"></canvas>
             </div>
             <div class="ship-quick-stats" id="quickStats">
               <div class="quick-stat">
@@ -1113,6 +1127,9 @@
       async function loadShipData() {
         const token = ++loadToken; // Race condition guard
 
+        // Render procedural ship first (uses ticker seed, doesn't need telemetry)
+        await renderProceduralShip();
+
         try {
           // Load fleet data - use telemetry/fleet.json for full telemetry data
           const fleetRes = await fetch('../data/telemetry/fleet.json');
@@ -1135,6 +1152,9 @@
               renderTelemetryBars();
               initChart();
               setupChartControls();
+              
+              // Re-render procedural ship with full telemetry data
+              await renderProceduralShip(position);
             }
           }
         } catch (e) {
@@ -1147,6 +1167,56 @@
 
         // Load options positions
         loadOptionsPositions();
+      }
+
+      // Render procedural ship to the hero canvas
+      async function renderProceduralShip(telemetry = null) {
+        const canvas = document.getElementById('hangarShipCanvas');
+        console.log('[Hangar] renderProceduralShip called, canvas:', canvas?.id, canvas?.width, 'x', canvas?.height);
+        
+        if (!canvas) {
+          console.warn('[Hangar] Canvas element not found');
+          return;
+        }
+
+        // Wait for ShipPix engine
+        if (!window.ShipPixReady) {
+          console.warn('[Hangar] ShipPix not available - ShipPixReady is undefined');
+          return;
+        }
+
+        const engine = await window.ShipPixReady;
+        console.log('[Hangar] ShipPix engine:', !!engine);
+        
+        if (!engine) {
+          console.warn('[Hangar] ShipPix engine failed to load');
+          return;
+        }
+
+        // Build telemetry for the engine
+        const shipTelemetry = telemetry ? {
+          regime: telemetry.regime || 'RANGE',
+          signalState: telemetry.signalState || 'neutral',
+          thrust: telemetry.visual?.thrust ?? 0.5,
+          damage: telemetry.visual?.damage ?? 0,
+          momentum: telemetry.momentum ?? 0,
+          jitter: telemetry.visual?.jitter ?? 0.1
+        } : {
+          regime: 'RANGE',
+          signalState: 'neutral',
+          thrust: 0.5,
+          damage: 0,
+          momentum: 0
+        };
+
+        console.log('[Hangar] Rendering', currentTicker, 'with telemetry:', shipTelemetry);
+
+        try {
+          engine.renderToCanvas(canvas, currentTicker, shipTelemetry);
+          console.log('[Hangar] Successfully rendered procedural ship:', currentTicker);
+        } catch (e) {
+          console.error('[Hangar] Failed to render procedural ship:', e);
+        }
       }
 
       function updateQuickStats(position) {

@@ -649,10 +649,22 @@
       this.paletteGenerator = new PaletteGenerator(this.watercolorEngine);
       this.cache = new RenderCache();
       this.userId = options.userId || null;
+      // Cache ShipRenderer instances per size (micro perf optimization)
+      this._renderers = new Map();
     }
 
     getSeed(ticker) {
       return SeedUtils.getTickerSeed(ticker, this.userId);
+    }
+    
+    // Get or create a ShipRenderer for the given size
+    _getRenderer(size) {
+      let renderer = this._renderers.get(size);
+      if (!renderer) {
+        renderer = new ShipRenderer(size);
+        this._renderers.set(size, renderer);
+      }
+      return renderer;
     }
 
     renderShip(ticker, telemetry = {}, size = CONFIG.baseSize, targetCanvas = null) {
@@ -662,7 +674,7 @@
       const seed = this.getSeed(ticker);
       const blueprintName = chooseBlueprint(ticker, telemetry, seed);
       const palette = this.paletteGenerator.generate(ticker, telemetry);
-      const renderer = new ShipRenderer(size);
+      const renderer = this._getRenderer(size);
       
       if (targetCanvas) {
         // Render directly to target canvas
