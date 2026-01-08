@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procedural Ship Engine Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --card: #12121a;
+      --border: #2a2a3a;
+      --cyan: #00FFFF;
+      --magenta: #FF2975;
+      --yellow: #FFE600;
+      --text: #88aa88;
+      --text-dim: #4a6a4a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-family: 'VT323', monospace;
+      font-size: 2rem;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      color: var(--magenta);
+      margin: 2rem 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h2::before {
+      content: '>';
+      color: var(--cyan);
+    }
+
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Ship Grid */
+    .ship-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    .ship-preview {
+      background: #0a0a12;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .ship-preview:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+    }
+
+    .ship-preview canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      width: 96px;
+      height: 96px;
+      margin-bottom: 0.5rem;
+    }
+
+    .ship-label {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: var(--cyan);
+    }
+
+    .ship-meta {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+    }
+
+    /* Telemetry Controls */
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .control-group label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .control-group input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan);
+    }
+
+    .control-group select {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.5rem;
+      font-family: inherit;
+      font-size: 0.8rem;
+    }
+
+    .control-value {
+      font-family: 'VT323', monospace;
+      color: var(--cyan);
+      font-size: 0.9rem;
+      text-align: right;
+    }
+
+    /* Live Preview */
+    .live-preview {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .preview-large {
+      background: #050508;
+      border: 2px solid var(--border);
+      padding: 1rem;
+      position: relative;
+    }
+
+    .preview-large canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      width: 192px;
+      height: 192px;
+    }
+
+    .preview-large::before {
+      content: 'LIVE';
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-family: 'VT323', monospace;
+      font-size: 0.7rem;
+      color: var(--magenta);
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.5; }
+    }
+
+    .telemetry-readout {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+
+    .telemetry-readout .label {
+      color: var(--text-dim);
+      display: inline-block;
+      width: 100px;
+    }
+
+    .telemetry-readout .value {
+      color: var(--cyan);
+    }
+
+    .telemetry-readout .value.bull { color: var(--cyan); }
+    .telemetry-readout .value.bear { color: var(--magenta); }
+    .telemetry-readout .value.neutral { color: var(--yellow); }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'VT323', monospace;
+      font-size: 2rem;
+      color: var(--cyan);
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* Comparison */
+    .comparison {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .comparison-item {
+      text-align: center;
+    }
+
+    .comparison-item img,
+    .comparison-item canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      width: 128px;
+      height: 128px;
+      border: 1px solid var(--border);
+      background: #050508;
+    }
+
+    .comparison-label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-top: 0.5rem;
+    }
+
+    .vs {
+      font-family: 'VT323', monospace;
+      font-size: 1.5rem;
+      color: var(--magenta);
+    }
+
+    /* Console */
+    .console {
+      background: #050508;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      font-size: 0.75rem;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .console .log { color: var(--text-dim); }
+    .console .info { color: var(--cyan); }
+    .console .warn { color: var(--yellow); }
+    .console .error { color: var(--magenta); }
+  </style>
+</head>
+<body>
+
+  <h1>// PROCEDURAL SHIP ENGINE</h1>
+  <p class="subtitle">Real-time pixel art generation from compact blueprints + telemetry</p>
+
+  <!-- Blueprint Gallery -->
+  <div class="section">
+    <h2>SHIP BLUEPRINTS</h2>
+    <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1rem;">
+      5 base blueprints, infinite variations via telemetry
+    </p>
+    <div class="ship-grid" id="blueprint-grid"></div>
+  </div>
+
+  <!-- Live Controls -->
+  <div class="section">
+    <h2>TELEMETRY CONTROLS</h2>
+    <div class="controls">
+      <div class="control-group">
+        <label>BLUEPRINT</label>
+        <select id="ctrl-blueprint">
+          <option value="interceptor">Interceptor</option>
+          <option value="freighter">Freighter</option>
+          <option value="scout">Scout</option>
+          <option value="dreadnought">Dreadnought</option>
+          <option value="drone">Drone</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>SIGNAL STATE</label>
+        <select id="ctrl-signal">
+          <option value="neutral">Neutral</option>
+          <option value="bull">Bull</option>
+          <option value="bear">Bear</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>THRUST <span class="control-value" id="val-thrust">0.5</span></label>
+        <input type="range" id="ctrl-thrust" min="0" max="100" value="50">
+      </div>
+      <div class="control-group">
+        <label>DAMAGE <span class="control-value" id="val-damage">0.0</span></label>
+        <input type="range" id="ctrl-damage" min="0" max="100" value="0">
+      </div>
+      <div class="control-group">
+        <label>MOMENTUM <span class="control-value" id="val-momentum">0.0</span></label>
+        <input type="range" id="ctrl-momentum" min="-100" max="100" value="0">
+      </div>
+      <div class="control-group">
+        <label>JITTER <span class="control-value" id="val-jitter">0.0</span></label>
+        <input type="range" id="ctrl-jitter" min="0" max="100" value="0">
+      </div>
+    </div>
+
+    <div class="live-preview">
+      <div class="preview-large">
+        <canvas id="live-canvas" width="64" height="64"></canvas>
+      </div>
+      <div class="telemetry-readout" id="telemetry-readout">
+        <div><span class="label">BLUEPRINT:</span> <span class="value" id="ro-blueprint">interceptor</span></div>
+        <div><span class="label">SIGNAL:</span> <span class="value" id="ro-signal">neutral</span></div>
+        <div><span class="label">THRUST:</span> <span class="value" id="ro-thrust">0.50</span></div>
+        <div><span class="label">DAMAGE:</span> <span class="value" id="ro-damage">0.00</span></div>
+        <div><span class="label">MOMENTUM:</span> <span class="value" id="ro-momentum">0.00</span></div>
+        <div><span class="label">JITTER:</span> <span class="value" id="ro-jitter">0.00</span></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" id="stat-blocks">--</div>
+        <div class="stat-label">BLOCKS</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-bytes">--</div>
+        <div class="stat-label">DEFINITION BYTES</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-render">--</div>
+        <div class="stat-label">RENDER MS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signal State Comparison -->
+  <div class="section">
+    <h2>SIGNAL STATE PALETTES</h2>
+    <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1rem;">
+      Same blueprint, different telemetry = different appearance
+    </p>
+    <div class="comparison" id="signal-comparison"></div>
+  </div>
+
+  <!-- Ticker Determinism Demo -->
+  <div class="section">
+    <h2>TICKER DETERMINISM</h2>
+    <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1rem;">
+      Same ticker ALWAYS produces same ship. Letters determine colors.<br>
+      <span style="color: var(--cyan);">1st letter → Hull</span> · 
+      <span style="color: var(--yellow);">2nd letter → Wings</span> · 
+      <span style="color: var(--magenta);">3rd letter → Accent</span> · 
+      4th letter → Engine
+    </p>
+    <div class="ship-grid" id="ticker-grid"></div>
+    <div style="margin-top: 1rem;">
+      <label style="font-size: 0.7rem; color: var(--text-dim);">TEST TICKER:</label>
+      <input type="text" id="custom-ticker" value="TEST" maxlength="5" style="
+        background: var(--bg);
+        color: var(--cyan);
+        border: 1px solid var(--border);
+        padding: 0.5rem;
+        font-family: 'VT323', monospace;
+        font-size: 1.2rem;
+        width: 100px;
+        text-transform: uppercase;
+      ">
+      <button onclick="renderCustomTicker()" style="
+        background: var(--magenta);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-family: 'VT323', monospace;
+        cursor: pointer;
+      ">RENDER</button>
+    </div>
+    <div id="custom-ticker-result" style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;"></div>
+  </div>
+
+  <!-- Console -->
+  <div class="section">
+    <h2>ENGINE LOG</h2>
+    <div class="console" id="console"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/lib/watercolor/watercolor-engine.js"></script>
+  <script src="js/render/seed.js"></script>
+  <script src="js/render/pixel-ship-engine.js"></script>
+  <script>
+    // ═══════════════════════════════════════════════════════════════════
+    // DEMO APPLICATION
+    // ═══════════════════════════════════════════════════════════════════
+
+    const consoleEl = document.getElementById('console');
+    function log(msg, type = 'log') {
+      const line = document.createElement('div');
+      line.className = type;
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      consoleEl.appendChild(line);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    // Initialize engine
+    log('Initializing PixelShipEngine...', 'info');
+    const engine = new PixelShipEngine();
+    log(`Watercolor engine: ${engine.watercolorEngine ? 'LOADED' : 'FALLBACK'}`, 'info');
+    log(`Available blueprints: ${engine.getBlueprints().join(', ')}`, 'info');
+
+    // ─────────────────────────────────────────────────────────────────
+    // Blueprint Gallery
+    // ─────────────────────────────────────────────────────────────────
+    
+    function renderBlueprintGallery() {
+      const grid = document.getElementById('blueprint-grid');
+      const blueprints = engine.getBlueprints();
+      
+      grid.innerHTML = blueprints.map(name => {
+        const bp = SHIP_BLUEPRINTS[name];
+        return `
+          <div class="ship-preview" data-blueprint="${name}">
+            <canvas id="bp-${name}" width="64" height="64"></canvas>
+            <div class="ship-label">${bp.name.toUpperCase()}</div>
+            <div class="ship-meta">${bp.blocks.length} blocks</div>
+          </div>
+        `;
+      }).join('');
+
+      // Render each blueprint with neutral telemetry
+      blueprints.forEach(name => {
+        const canvas = document.getElementById(`bp-${name}`);
+        const telemetry = { signalState: 'neutral', thrust: 0.5 };
+        const renderer = new ShipRenderer(64);
+        const palette = engine.paletteGenerator.generate(telemetry);
+        const rendered = renderer.render(SHIP_BLUEPRINTS[name], palette, telemetry);
+        canvas.getContext('2d').drawImage(rendered, 0, 0);
+      });
+
+      log(`Rendered ${blueprints.length} blueprint previews`, 'info');
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Live Preview Controls
+    // ─────────────────────────────────────────────────────────────────
+    
+    const liveCanvas = document.getElementById('live-canvas');
+    let currentTelemetry = {
+      signalState: 'neutral',
+      thrust: 0.5,
+      damage: 0,
+      momentum: 0,
+      jitter: 0
+    };
+    let currentBlueprint = 'interceptor';
+    let animating = true;
+
+    function updateLivePreview() {
+      const start = performance.now();
+      
+      const renderer = new ShipRenderer(64);
+      const palette = engine.paletteGenerator.generate(currentTelemetry);
+      
+      // Add slight thrust variation for animation
+      const animTelemetry = {
+        ...currentTelemetry,
+        thrust: currentTelemetry.thrust * (0.9 + Math.random() * 0.2)
+      };
+      
+      const rendered = renderer.render(SHIP_BLUEPRINTS[currentBlueprint], palette, animTelemetry);
+      
+      const ctx = liveCanvas.getContext('2d');
+      ctx.clearRect(0, 0, 64, 64);
+      ctx.drawImage(rendered, 0, 0);
+      
+      const elapsed = performance.now() - start;
+      
+      // Update stats
+      document.getElementById('stat-blocks').textContent = SHIP_BLUEPRINTS[currentBlueprint].blocks.length;
+      document.getElementById('stat-bytes').textContent = JSON.stringify(SHIP_BLUEPRINTS[currentBlueprint]).length;
+      document.getElementById('stat-render').textContent = elapsed.toFixed(2);
+      
+      // Update readout
+      document.getElementById('ro-blueprint').textContent = currentBlueprint;
+      document.getElementById('ro-signal').textContent = currentTelemetry.signalState;
+      document.getElementById('ro-signal').className = `value ${currentTelemetry.signalState}`;
+      document.getElementById('ro-thrust').textContent = currentTelemetry.thrust.toFixed(2);
+      document.getElementById('ro-damage').textContent = currentTelemetry.damage.toFixed(2);
+      document.getElementById('ro-momentum').textContent = currentTelemetry.momentum.toFixed(2);
+      document.getElementById('ro-jitter').textContent = currentTelemetry.jitter.toFixed(2);
+      
+      if (animating) {
+        requestAnimationFrame(updateLivePreview);
+      }
+    }
+
+    // Control handlers
+    document.getElementById('ctrl-blueprint').addEventListener('change', (e) => {
+      currentBlueprint = e.target.value;
+      log(`Blueprint changed: ${currentBlueprint}`);
+    });
+
+    document.getElementById('ctrl-signal').addEventListener('change', (e) => {
+      currentTelemetry.signalState = e.target.value;
+      log(`Signal state: ${currentTelemetry.signalState}`);
+      renderSignalComparison();
+    });
+
+    ['thrust', 'damage', 'jitter'].forEach(ctrl => {
+      document.getElementById(`ctrl-${ctrl}`).addEventListener('input', (e) => {
+        const val = parseInt(e.target.value) / 100;
+        currentTelemetry[ctrl] = val;
+        document.getElementById(`val-${ctrl}`).textContent = val.toFixed(1);
+      });
+    });
+
+    document.getElementById('ctrl-momentum').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value) / 100;
+      currentTelemetry.momentum = val;
+      document.getElementById('val-momentum').textContent = val.toFixed(1);
+    });
+
+    // ─────────────────────────────────────────────────────────────────
+    // Signal State Comparison
+    // ─────────────────────────────────────────────────────────────────
+    
+    function renderSignalComparison() {
+      const container = document.getElementById('signal-comparison');
+      const states = ['bull', 'neutral', 'bear'];
+      
+      container.innerHTML = states.map((state, i) => {
+        const id = `cmp-${state}`;
+        return `
+          ${i > 0 ? '<span class="vs">→</span>' : ''}
+          <div class="comparison-item">
+            <canvas id="${id}" width="64" height="64"></canvas>
+            <div class="comparison-label">${state.toUpperCase()}</div>
+          </div>
+        `;
+      }).join('');
+
+      states.forEach(state => {
+        const canvas = document.getElementById(`cmp-${state}`);
+        const telemetry = { signalState: state, thrust: 0.6, momentum: state === 'bull' ? 0.5 : state === 'bear' ? -0.5 : 0 };
+        const renderer = new ShipRenderer(64);
+        const palette = engine.paletteGenerator.generate(telemetry);
+        const rendered = renderer.render(SHIP_BLUEPRINTS[currentBlueprint], palette, telemetry);
+        canvas.getContext('2d').drawImage(rendered, 0, 0);
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Ticker Determinism Demo
+    // ─────────────────────────────────────────────────────────────────
+    
+    function renderTickerDeterminism() {
+      const grid = document.getElementById('ticker-grid');
+      // Real tickers to demonstrate consistent appearance
+      const tickers = ['RKLB', 'ASTS', 'LUNR', 'GME', 'JOBY', 'ACHR'];
+      
+      grid.innerHTML = tickers.map(ticker => `
+        <div class="ship-preview">
+          <canvas id="det-${ticker}" width="64" height="64"></canvas>
+          <div class="ship-label">${ticker}</div>
+          <div class="ship-meta">seed: ${engine.getSeed(ticker).toString(16)}</div>
+        </div>
+      `).join('');
+
+      tickers.forEach(ticker => {
+        const canvas = document.getElementById(`det-${ticker}`);
+        const telemetry = { signalState: 'neutral', thrust: 0.5, regime: 'RANGE' };
+        engine.renderToCanvas(canvas, ticker, telemetry);
+      });
+
+      log(`Rendered ${tickers.length} deterministic ships`, 'info');
+    }
+
+    function renderCustomTicker() {
+      const ticker = document.getElementById('custom-ticker').value.toUpperCase() || 'TEST';
+      const container = document.getElementById('custom-ticker-result');
+      
+      const seed = engine.getSeed(ticker);
+      const info = engine.getShipInfo(ticker, { regime: 'RANGE' });
+      
+      container.innerHTML = `
+        <div class="preview-large" style="padding: 0.5rem;">
+          <canvas id="custom-canvas" width="64" height="64"></canvas>
+        </div>
+        <div class="telemetry-readout">
+          <div><span class="label">TICKER:</span> <span class="value">${ticker}</span></div>
+          <div><span class="label">SEED:</span> <span class="value">${seed.toString(16)}</span></div>
+          <div><span class="label">BLUEPRINT:</span> <span class="value">${info.blueprint}</span></div>
+          <div><span class="label">LETTERS:</span> <span class="value">${ticker.padEnd(4, 'A').split('').join(' → ')}</span></div>
+        </div>
+      `;
+      
+      const canvas = document.getElementById('custom-canvas');
+      engine.renderToCanvas(canvas, ticker, { signalState: 'neutral', thrust: 0.6, regime: 'RANGE' });
+      
+      log(`Custom ticker ${ticker}: seed=${seed.toString(16)}, blueprint=${info.blueprint}`);
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Initialize
+    // ─────────────────────────────────────────────────────────────────
+    
+    renderBlueprintGallery();
+    renderSignalComparison();
+    renderTickerDeterminism();
+    updateLivePreview();
+
+    log('Demo ready!', 'info');
+    log(`Memory estimate: ~${(JSON.stringify(SHIP_BLUEPRINTS).length / 1024).toFixed(1)}KB for all blueprints`, 'info');
+    log('Ships are now DETERMINISTIC - same ticker always = same ship', 'info');
+  </script>
+
+</body>
+</html>
