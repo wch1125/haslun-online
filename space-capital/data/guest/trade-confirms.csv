@@ -1,27 +1,1832 @@
 Trades,Data,Order,Asset Category,Currency,Symbol,Date,Quantity,Price,Amount,RealizedPNL,Code
-Trades,Data,Order,Stocks,USD,RKLB,"Jan 15, 2025 10:30:00",100,12.50,1250.00,0,
-Trades,Data,Order,Stocks,USD,RKLB,"Jan 22, 2025 14:15:00",-50,14.25,-712.50,87.50,
-Trades,Data,Order,Options,USD,RKLB 17JAN25 15 C,"Jan 10, 2025 09:30:00",5,1.20,600.00,0,
-Trades,Data,Order,Options,USD,RKLB 17JAN25 15 C,"Jan 17, 2025 15:00:00",-5,0.00,0.00,-600.00,Ep
-Trades,Data,Order,Stocks,USD,LUNR,"Feb 01, 2025 11:00:00",200,8.75,1750.00,0,
-Trades,Data,Order,Stocks,USD,LUNR,"Feb 10, 2025 13:45:00",-100,9.50,-950.00,75.00,
-Trades,Data,Order,Options,USD,LUNR 21FEB25 10 C,"Feb 05, 2025 10:00:00",3,0.85,255.00,0,
-Trades,Data,Order,Options,USD,LUNR 21FEB25 10 C,"Feb 20, 2025 14:30:00",-3,1.50,-450.00,195.00,
-Trades,Data,Order,Stocks,USD,ASTS,"Jan 20, 2025 09:45:00",150,22.00,3300.00,0,
-Trades,Data,Order,Stocks,USD,ASTS,"Feb 15, 2025 11:30:00",-75,25.50,-1912.50,262.50,
-Trades,Data,Order,Options,USD,ASTS 21MAR25 25 C,"Feb 01, 2025 10:15:00",2,3.50,700.00,0,
-Trades,Data,Order,Stocks,USD,ACHR,"Jan 25, 2025 10:00:00",300,6.25,1875.00,0,
-Trades,Data,Order,Stocks,USD,ACHR,"Feb 05, 2025 14:00:00",-150,5.75,-862.50,-75.00,
-Trades,Data,Order,Stocks,USD,GME,"Jan 18, 2025 09:30:00",50,28.00,1400.00,0,
-Trades,Data,Order,Stocks,USD,GME,"Jan 25, 2025 10:30:00",50,32.00,1600.00,0,
-Trades,Data,Order,Stocks,USD,GME,"Feb 02, 2025 11:00:00",-100,35.50,-3550.00,550.00,
-Trades,Data,Order,Options,USD,GME 21FEB25 35 C,"Jan 30, 2025 09:45:00",3,2.25,675.00,0,
-Trades,Data,Order,Options,USD,GME 21FEB25 35 C,"Feb 10, 2025 15:00:00",-3,4.50,-1350.00,675.00,
-Trades,Data,Order,Stocks,USD,JOBY,"Feb 01, 2025 09:30:00",200,5.50,1100.00,0,
-Trades,Data,Order,Stocks,USD,PL,"Jan 22, 2025 11:00:00",400,3.25,1300.00,0,
-Trades,Data,Order,Stocks,USD,PL,"Feb 08, 2025 13:30:00",-200,3.00,-600.00,-50.00,
-Trades,Data,Order,Stocks,USD,BKSY,"Jan 28, 2025 10:15:00",500,2.10,1050.00,0,
-Trades,Data,Order,Options,USD,BKSY 21MAR25 2.5 C,"Feb 10, 2025 09:30:00",10,0.35,350.00,0,
-Trades,Data,Order,Stocks,USD,COHR,"Feb 05, 2025 14:30:00",25,105.00,2625.00,0,
-Trades,Data,Order,Stocks,USD,KTOS,"Jan 30, 2025 10:00:00",100,28.50,2850.00,0,
-Trades,Data,Order,Stocks,USD,KTOS,"Feb 12, 2025 11:45:00",-50,30.00,-1500.00,75.00,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-22, 12:33:11",500,3.67,-1835,0,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-22, 12:34:36",500,3.6655,-1832.75,0,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-22, 12:38:54",500,3.6699,-1834.95,0,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-22, 12:39:51",500,3.68,-1840,0,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-22, 14:41:59","1,000",3.6462,-3646.2,0,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-23, 10:31:36",437,3.806,-1663.222,0,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-30, 13:25:57",500,3.3554,-1677.7,0,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-30, 13:29:13","2,000",3.3768,-6753.6,0,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-03, 09:40:09","1,000",3.4388,-3438.8,0,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-06, 10:38:41","2,400",3.0667,-7360.08,-0.084,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 16:20:00","3,900",3,-11700,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-18, 15:17:13",400,3.0884,-1235.36,-0.0208,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-18, 15:42:40",500,3.0655,-1532.75,-0.026,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-26, 09:39:45","1,000",2.93,-2930,-0.052,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-02, 16:20:00","1,000",2.5,-2500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-02, 16:20:00","1,000",3,-3000,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-03, 15:30:25","4,000",2.9361,-11744.4,-0.288,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-04, 10:15:35","5,000",2.9175,-14587.5,-0.36,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00","1,000",3,-3000,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00",800,3,-2400,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 16:20:00",100,2.5,-250,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 16:20:00",100,3,-300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-17, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-17, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00","4,100",3,-12300,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00","2,000",3,-6000,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00","1,000",3,-3000,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00","1,000",3,-3000,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 16:20:00",500,3,-1500,0,Ex
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-21, 13:05:57","1,000",3.085,-3085,-0.072,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-11-06, 14:17:40",500,3.2089,-1604.45,-0.036,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-11-08, 11:17:24",500,3.8289,-1914.45,-0.036,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-08-27, 16:20:00","-1,000",3.5,3500,-0.2633,A
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-04, 11:05:18",-800,3.542,2833.6,-0.21157408,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-04, 11:10:51","-3,500",3.54,12390,-0.925442,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-04, 11:12:15",-100,3.55,355,-0.026469,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-06, 15:47:47","-1,000",3.1145,3114.5,-0.2875831,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-09, 15:54:32","-1,000",3.2611,3261.1,-0.30865858,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-10, 15:42:43","-1,400",3.305,4627,-0.4338306,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-11, 16:20:00",-100,3,300,-0.02494,A
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 09:56:00",-100,3.41,341,-0.0312798,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 10:49:43",-100,3.42,342,-0.0313076,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 13:18:45","-1,300",3.3049,4296.37,-0.402839086,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 13:20:10","-2,000",3.3046,6609.2,-0.61973576,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 13:22:43",-500,3.3031,1651.55,-0.15491309,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-13, 13:28:26","-1,000",3.3,3300,-0.30974,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-09-18, 14:10:35",-400,3.1226,1249.04,-0.121923312,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-02, 15:41:45","-1,000",3.1741,3174.1,-0.32623998,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-02, 15:42:26","-1,000",3.183,3183,-0.3264874,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-03, 15:41:32","-4,000",2.9337,11734.8,-1.27822744,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-03, 15:47:15","-1,000",2.9347,2934.7,-0.31958466,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-03, 15:51:48","-1,000",2.945,2945,-0.319871,L
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-04, 12:26:47","-1,000",2.99,2990,-0.321122,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-04, 12:29:50","-1,000",3,3000,-0.3214,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-04, 12:53:39","-2,000",3.0044,6008.8,-0.64304464,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-04, 12:55:26",-100,3.01,301,-0.0321678,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-04, 13:02:32",-900,3.0035,2703.15,-0.28934757,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 15:04:40",-100,3.1049,310.49,-0.032431622,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 15:06:52","-1,000",3.1043,3104.3,-0.32429954,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 15:25:54","-1,000",3.1246,3124.6,-0.32486388,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-07, 15:27:35","-2,000",3.125,6250,-0.64975,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-11, 15:37:13","-1,300",3.0745,3996.85,-0.42051243,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-15, 12:34:19","-1,700",3.125,5312.5,-0.5522875,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-17, 14:11:25","-1,000",3.1741,3174.1,-0.32623998,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 15:44:22","-3,000",3.2014,9604.2,-0.98099676,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 15:46:09","-1,000",3.19,3190,-0.326682,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 15:46:51","-2,000",3.1949,6389.8,-0.65363644,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 15:47:34",-100,3.1949,319.49,-0.032681822,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 15:48:54","-5,000",3.1935,15967.5,-1.6338965,P
+Trades,Data,Order,Stocks,USD,ACHR,"2024-10-18, 15:59:50","-1,000",3.2,3200,-0.30296,
+Trades,Data,Order,Stocks,USD,ACHR,"2024-11-13, 10:36:13","-1,000",4.23,4230,-0.355594,
+Trades,Data,Order,Stocks,USD,ADI,"2024-09-04, 11:32:57",-1,221.64,221.64,-0.006327592,
+Trades,Data,Order,Stocks,USD,ADI,"2024-09-26, 14:50:54",-1,232.229,232.229,-0.006673966,IA
+Trades,Data,Order,Stocks,USD,AI,"2024-09-05, 11:05:03",22,19.7989,-435.5758,-0.00077,
+Trades,Data,Order,Stocks,USD,AI,"2024-09-04, 11:33:39",-12,23.2413,278.8956,-0.009745298,IA
+Trades,Data,Order,Stocks,USD,AI,"2024-09-06, 09:52:01",-17,22.12,376.04,-0.013870912,P
+Trades,Data,Order,Stocks,USD,AI,"2024-09-11, 13:47:14",-9,21.7126,195.4134,-0.007394493,IA
+Trades,Data,Order,Stocks,USD,AI,"2024-09-26, 14:49:48",-1,24.3726,24.3726,-0.000895558,IA
+Trades,Data,Order,Stocks,USD,AMD,"2024-09-26, 15:44:41",-1,168.195,168.195,-0.004893821,
+Trades,Data,Order,Stocks,USD,APH,"2024-09-11, 13:47:31",-2,61.8,123.6,-0.00387208,
+Trades,Data,Order,Stocks,USD,APH,"2024-09-26, 14:52:16",-1,65.91,65.91,-0.002050298,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-08-22, 09:54:03",57,35.5334,-2025.4038,0,P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-08-23, 10:56:34",100,33.07,-3307,0,
+Trades,Data,Order,Stocks,USD,ASTS,"2024-08-23, 11:17:00",100,33.0299,-3302.99,0,
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-05, 10:07:39",300,27.57595,-8272.785,-0.0105,IM;P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-09, 14:40:07",300,25.95,-7785,-0.0156,P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-13, 10:28:31",100,29.41,-2941,-0.0052,
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-13, 16:20:00",200,29.5,-5900,0,Ex
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-16, 09:30:02","1,200",28.91,-34692,-0.0624,
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-18, 15:41:59",100,28.39,-2839,-0.0052,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-20, 11:36:21",200,26.85,-5370,-0.0104,P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-27, 10:39:02",500,22.1,-11050,-0.026,P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-30, 12:28:54",10,26.286,-262.86,-0.00052,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-10-02, 13:43:44",100,23.3774,-2337.74,-0.0072,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-10-02, 14:47:52",100,23.5189,-2351.89,-0.0072,
+Trades,Data,Order,Stocks,USD,ASTS,"2024-10-07, 09:50:00",500,25.4873,-12743.65,-0.036,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-11-06, 12:50:55",100,22.9,-2290,-0.0072,
+Trades,Data,Order,Stocks,USD,ASTS,"2024-11-06, 14:16:28",100,22.7474,-2274.74,-0.0072,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-11-12, 09:55:15",100,24.971,-2497.1,-0.0072,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-08-22, 12:26:10",-50,36,1800,-0.05834,
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-04, 10:50:24",-50,32.4781,1623.905,-0.053444559,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-06, 15:58:20",-500,26.183,13091.5,-0.4644437,P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-11, 13:06:28",-300,27.4253,8227.59,-0.294127002,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-13, 12:10:45",-100,30.2126,3021.26,-0.105791028,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-13, 16:20:00",-900,30,27000,-0.9,Ex
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-13, 16:20:00",-500,31,15500,-0.5139,Ex
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-19, 12:51:05",-100,29.7842,2978.42,-0.104600076,P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-20, 14:24:13",-200,26.2327,5246.54,-0.189453812,P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-27, 15:51:06",-110,25.3913,2793.043,-0.101626595,IA;L
+Trades,Data,Order,Stocks,USD,ASTS,"2024-09-30, 15:32:36",-100,25.87305,2587.305,-0.093727079,P
+Trades,Data,Order,Stocks,USD,ASTS,"2024-10-03, 15:51:49",-16,23.21,371.36,-0.014131808,L
+Trades,Data,Order,Stocks,USD,ASTS,"2024-10-04, 10:35:38",-284,24.454,6944.936,-0.260661221,IA
+Trades,Data,Order,Stocks,USD,ASTS,"2024-10-04, 16:20:00",-500,26,13000,-0.4444,A
+Trades,Data,Order,Stocks,USD,ASTS,"2024-10-07, 13:05:36",-200,25.37,5074,-0.1886572,
+Trades,Data,Order,Stocks,USD,ASTS,"2024-11-12, 11:00:29",-300,24.43,7329,-0.2751462,
+Trades,Data,Order,Stocks,USD,ATRO,"2024-09-04, 11:34:00",-6,20.98,125.88,-0.004495464,
+Trades,Data,Order,Stocks,USD,ATRO,"2024-09-26, 14:51:49",-5,20.03,100.15,-0.00387417,
+Trades,Data,Order,Stocks,USD,AVAV,"2024-09-05, 11:55:54",4,187.5,-750,-0.00014,
+Trades,Data,Order,Stocks,USD,AVAV,"2024-09-11, 13:45:34",-5,181.91,909.55,-0.02637549,
+Trades,Data,Order,Stocks,USD,AVGO,"2024-09-04, 11:34:23",-1,154.52,154.52,-0.004461656,
+Trades,Data,Order,Stocks,USD,AVGO,"2024-09-26, 14:46:24",-1,178.229,178.229,-0.005172766,IA
+Trades,Data,Order,Stocks,USD,BAH,"2024-09-04, 11:31:15",-2,156.36,312.72,-0.009025616,
+Trades,Data,Order,Stocks,USD,BAH,"2024-09-26, 14:48:25",-1,159.82,159.82,-0.004660996,
+Trades,Data,Order,Stocks,USD,BKSY,"2024-10-01, 12:27:00",300,4.5289,-1358.67,-0.0216,
+Trades,Data,Order,Stocks,USD,BKSY,"2024-10-04, 10:49:10",-100,5.4711,547.11,-0.039009658,
+Trades,Data,Order,Stocks,USD,BKSY,"2024-10-07, 10:41:13",-200,5.6711,1134.22,-0.079131316,
+Trades,Data,Order,Stocks,USD,BWXT,"2024-10-17, 12:50:44",10,125.88,-1258.8,-0.00072,
+Trades,Data,Order,Stocks,USD,BWXT,"2024-09-04, 11:31:36",-3,98.4,295.2,-0.00870456,
+Trades,Data,Order,Stocks,USD,BWXT,"2024-09-26, 14:47:28",-1,107.71,107.71,-0.003212338,
+Trades,Data,Order,Stocks,USD,BWXT,"2024-10-23, 14:28:18",-10,122.63,1226.3,-0.03647114,
+Trades,Data,Order,Stocks,USD,CCJ,"2024-09-26, 14:35:39",25,47.8874,-1197.185,-0.0013,IA
+Trades,Data,Order,Stocks,USD,CCJ,"2024-10-07, 10:41:40",-30,51.7729,1553.187,-0.050318599,
+Trades,Data,Order,Stocks,USD,CCOI,"2024-09-04, 11:34:50",-4,70.3,281.2,-0.00848136,
+Trades,Data,Order,Stocks,USD,CCOI,"2024-09-10, 15:40:54",-5,71.71,358.55,-0.01105769,
+Trades,Data,Order,Stocks,USD,CDRE,"2024-09-10, 15:41:49",-5,33.725,168.625,-0.005777775,
+Trades,Data,Order,Stocks,USD,CDRE,"2024-09-26, 14:48:46",-1,37.85,37.85,-0.00127023,
+Trades,Data,Order,Stocks,USD,CODA,"2024-09-26, 14:37:58",100,7.3333,-733.33,-0.0052,
+Trades,Data,Order,Stocks,USD,CODA,"2024-10-01, 12:28:53",99,7.26,-718.74,-0.007128,
+Trades,Data,Order,Stocks,USD,CODA,"2024-09-11, 13:48:04",-30,6.89,206.7,-0.01228626,
+Trades,Data,Order,Stocks,USD,CODA,"2024-10-07, 10:42:33",-200,7.6,1520,-0.089856,
+Trades,Data,Order,Stocks,USD,DCO,"2024-09-11, 13:48:25",-2,63.355,126.71,-0.003958538,
+Trades,Data,Order,Stocks,USD,DCO,"2024-09-26, 14:48:08",-1,65.1811,65.1811,-0.002030035,
+Trades,Data,Order,Stocks,USD,DRS,"2024-09-04, 11:38:03",-4,27.785,111.14,-0.003753692,
+Trades,Data,Order,Stocks,USD,DRS,"2024-09-11, 13:48:43",-3,26.8164,80.4492,-0.002890488,
+Trades,Data,Order,Stocks,USD,DRS,"2024-09-26, 14:51:08",-1,27.915,27.915,-0.000994037,
+Trades,Data,Order,Stocks,USD,ERJ,"2024-09-04, 11:35:34",-5,34.7527,173.7635,-0.005660625,IA
+Trades,Data,Order,Stocks,USD,ERJ,"2024-09-26, 14:43:52",-1,37.1826,37.1826,-0.001251676,
+Trades,Data,Order,Stocks,USD,ESLT,"2024-09-26, 14:49:04",-1,195.32,195.32,-0.005647896,
+Trades,Data,Order,Stocks,USD,ETN,"2024-10-17, 12:51:57",2,348.16,-696.32,-0.000144,
+Trades,Data,Order,Stocks,USD,ETN,"2024-10-23, 14:16:49",-2,340.7,681.4,-0.01941892,
+Trades,Data,Order,Stocks,USD,EVEX,"2024-09-04, 11:36:12",-80,2.75,220,-0.019396,
+Trades,Data,Order,Stocks,USD,EVEX,"2024-10-07, 13:11:38",-10,3.3,33,-0.0032974,
+Trades,Data,Order,Stocks,USD,GD,"2024-09-04, 11:36:32",-1,294.15,294.15,-0.00834337,IA
+Trades,Data,Order,Stocks,USD,GD,"2024-09-11, 13:31:06",-1,297.799,297.799,-0.008496812,IA
+Trades,Data,Order,Stocks,USD,GD,"2024-09-26, 14:53:04",-1,300.809,300.809,-0.00858049,IA
+Trades,Data,Order,Stocks,USD,GE,"2024-09-05, 11:51:25",9,162.98,-1466.82,-0.000315,
+Trades,Data,Order,Stocks,USD,GE,"2024-09-13, 13:22:15",100,178.54,-17854,-0.0052,IA
+Trades,Data,Order,Stocks,USD,GE,"2024-09-26, 10:20:04",10,187.141,-1871.41,-0.00052,IA
+Trades,Data,Order,Stocks,USD,GE,"2024-09-26, 14:14:41",10,186.006,-1860.06,-0.00052,IA
+Trades,Data,Order,Stocks,USD,GE,"2024-10-07, 14:59:36",100,185.501,-18550.1,-0.0072,IA
+Trades,Data,Order,Stocks,USD,GE,"2024-10-17, 10:44:42",35,193.4122,-6769.427,-0.00252,
+Trades,Data,Order,Stocks,USD,GE,"2024-09-03, 15:52:42",-5,163.929,819.645,-0.023616131,IA;L
+Trades,Data,Order,Stocks,USD,GE,"2024-09-10, 15:28:23",-5,166.8867,834.4335,-0.024287251,IA
+Trades,Data,Order,Stocks,USD,GE,"2024-09-11, 13:30:32",-5,165.51,827.55,-0.02409589,P
+Trades,Data,Order,Stocks,USD,GE,"2024-09-13, 15:04:47",-90,177.86,16007.4,-0.46462572,
+Trades,Data,Order,Stocks,USD,GE,"2024-09-16, 11:07:06",-10,177.489,1774.89,-0.051521942,IA
+Trades,Data,Order,Stocks,USD,GE,"2024-09-26, 15:51:36",-3,184.6354,553.9062,-0.016052592,IA;L
+Trades,Data,Order,Stocks,USD,GE,"2024-09-27, 15:51:06",-17,185.772,3158.124,-0.091501847,L
+Trades,Data,Order,Stocks,USD,GE,"2024-10-07, 15:56:08",-100,185.7739,18577.39,-0.540251442,IM;P
+Trades,Data,Order,Stocks,USD,GE,"2024-10-23, 15:51:34",-5,181.4606,907.303,-0.026413023,L
+Trades,Data,Order,Stocks,USD,GE,"2024-10-24, 11:17:46",-20,181.1381,3622.762,-0.105472784,IA
+Trades,Data,Order,Stocks,USD,GE,"2024-10-24, 14:47:58",-10,180.0512,1800.512,-0.052434234,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-09, 15:15:38",100,24.37,-2437,-1.0052,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-09, 15:58:59",100,24.239,-2423.9,-0.0052,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-11, 01:10:45",500,21,-10500,-2.526,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-11, 13:43:26",500,19.9793,-9989.65,-0.026,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-17, 13:00:00",100,19.95,-1995,-0.0052,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-17, 13:00:18",100,19.95,-1995,-0.0052,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-17, 13:53:51",100,20.07,-2007,-0.0052,P
+Trades,Data,Order,Stocks,USD,GME,"2024-09-17, 13:54:07",100,20.069,-2006.9,-0.0052,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-17, 13:54:52",100,20.079,-2007.9,-0.0052,
+Trades,Data,Order,Stocks,USD,GME,"2024-10-02, 13:19:30",100,21.8081,-2180.81,-0.0072,
+Trades,Data,Order,Stocks,USD,GME,"2024-10-04, 10:36:18",200,21.3752,-4275.04,-0.0144,
+Trades,Data,Order,Stocks,USD,GME,"2024-11-11, 10:12:57",100,26.27,-2627,-0.0072,
+Trades,Data,Order,Stocks,USD,GME,"2024-08-30, 13:27:54",-450,22.39,10075.5,-0.3547989,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-03, 15:52:11",-100,22.981,2298.1,-0.08048718,L
+Trades,Data,Order,Stocks,USD,GME,"2024-09-09, 15:51:27",-72,24.255,1746.36,-0.064244808,L
+Trades,Data,Order,Stocks,USD,GME,"2024-09-10, 13:04:13",-28,23.9611,670.9108,-0.02475532,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-10, 15:38:34",-100,23.27,2327,-0.0864906,P
+Trades,Data,Order,Stocks,USD,GME,"2024-09-12, 15:38:14",-250,20.2308,5057.7,-0.19510406,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-13, 15:17:56",-250,20.7,5175,-0.198365,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-16, 15:02:23",-400,20.2508,8100.32,-0.312388896,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-16, 15:03:05",-100,20.25,2025,-0.078095,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-19, 15:45:06",-200,19.49,3898,-0.1519644,
+Trades,Data,Order,Stocks,USD,GME,"2024-09-19, 15:51:07",-215,19.5,4192.5,-0.1634215,L
+Trades,Data,Order,Stocks,USD,GME,"2024-09-19, 15:57:08",-85,19.51,1658.35,-0.06463213,
+Trades,Data,Order,Stocks,USD,GME,"2024-10-04, 12:34:55",-300,21.65,6495,-0.251961,P
+Trades,Data,Order,Stocks,USD,GME,"2024-11-12, 11:07:29",-100,26.07,2607,-0.0962746,
+Trades,Data,Order,Stocks,USD,HEI,"2024-10-17, 10:52:14",7,265.825,-1860.775,-0.000504,
+Trades,Data,Order,Stocks,USD,HEI,"2024-10-18, 10:19:02",-7,263.23,1842.61,-0.052890558,
+Trades,Data,Order,Stocks,USD,HII,"2024-09-25, 10:50:35",10,258.615,-2586.15,-0.00052,
+Trades,Data,Order,Stocks,USD,HII,"2024-10-07, 10:08:03",5,258.13,-1290.65,-0.00036,
+Trades,Data,Order,Stocks,USD,HII,"2024-10-18, 10:19:53",5,262,-1310,-0.00036,
+Trades,Data,Order,Stocks,USD,HII,"2024-10-31, 12:19:12",10,194,-1940,-0.00072,
+Trades,Data,Order,Stocks,USD,HII,"2024-09-04, 11:40:42",-2,274.98,549.96,-0.015620888,
+Trades,Data,Order,Stocks,USD,HII,"2024-09-11, 13:23:42",-1,256.325,256.325,-0.007343835,
+Trades,Data,Order,Stocks,USD,HII,"2024-09-30, 13:52:33",-1,263.8111,263.8111,-0.007551949,
+Trades,Data,Order,Stocks,USD,HII,"2024-10-02, 14:03:20",-5,263.39,1316.95,-0.03780121,
+Trades,Data,Order,Stocks,USD,HII,"2024-10-16, 12:43:01",-10,261.555,2615.55,-0.07509229,
+Trades,Data,Order,Stocks,USD,HII,"2024-10-24, 11:05:18",-5,256.55,1282.75,-0.03685045,
+Trades,Data,Order,Stocks,USD,HII,"2024-11-04, 15:21:36",-10,191.87,1918.7,-0.05571986,
+Trades,Data,Order,Stocks,USD,HON,"2024-10-17, 13:05:23",4,219.46,-877.84,-0.000288,IA
+Trades,Data,Order,Stocks,USD,HON,"2024-10-23, 14:13:15",-4,219.48,877.92,-0.025358176,
+Trades,Data,Order,Stocks,USD,HP,"2024-10-01, 12:14:39",100,31.2346,-3123.46,-0.0072,IA;P
+Trades,Data,Order,Stocks,USD,HP,"2024-10-01, 15:50:14",-20,31.4813,629.626,-0.022263603,IA
+Trades,Data,Order,Stocks,USD,HP,"2024-10-01, 15:51:14",-65,31.4513,2044.3345,-0.072302499,IA;L
+Trades,Data,Order,Stocks,USD,HP,"2024-10-02, 13:47:53",-15,31.66,474.9,-0.01677222,
+Trades,Data,Order,Stocks,USD,HWM,"2024-09-04, 11:36:57",-1,93.4611,93.4611,-0.002764219,
+Trades,Data,Order,Stocks,USD,HWM,"2024-09-26, 14:44:11",-1,99.73,99.73,-0.002990494,
+Trades,Data,Order,Stocks,USD,HXL,"2024-09-11, 13:49:25",-2,60.8,121.6,-0.00381648,
+Trades,Data,Order,Stocks,USD,HXL,"2024-09-26, 14:52:38",-1,61.6411,61.6411,-0.001931623,
+Trades,Data,Order,Stocks,USD,IRDM,"2024-09-26, 14:47:07",19,29.6091,-562.5729,-0.000988,
+Trades,Data,Order,Stocks,USD,IRDM,"2024-10-29, 16:28:43",100,30.5,-3050,-0.0072,SF
+Trades,Data,Order,Stocks,USD,IRDM,"2024-09-11, 13:49:53",-7,26.9814,188.8698,-0.00677658,
+Trades,Data,Order,Stocks,USD,IRDM,"2024-10-02, 13:48:09",-20,31.55,631,-0.0223018,
+Trades,Data,Order,Stocks,USD,IRDM,"2024-10-30, 12:56:49",-100,29.8372,2983.72,-0.106747416,
+Trades,Data,Order,Stocks,USD,ISSC,"2024-09-04, 11:38:39",-25,6.945,173.625,-0.008976775,
+Trades,Data,Order,Stocks,USD,ISSC,"2024-09-11, 13:46:42",-9,6.5311,58.7799,-0.003596081,
+Trades,Data,Order,Stocks,USD,ISSC,"2024-09-26, 14:50:38",-1,6.35,6.35,-0.00039453,
+Trades,Data,Order,Stocks,USD,JOBY,"2024-10-02, 10:42:28",500,5.9787,-2989.35,-0.036,IA
+Trades,Data,Order,Stocks,USD,JOBY,"2024-10-03, 09:43:38",200,5.6889,-1137.78,-0.0144,
+Trades,Data,Order,Stocks,USD,JOBY,"2024-10-18, 16:20:00","1,000",5.5,-5500,0,Ex
+Trades,Data,Order,Stocks,USD,JOBY,"2024-11-06, 13:43:27",100,5.0374,-503.74,-0.0072,P
+Trades,Data,Order,Stocks,USD,JOBY,"2024-10-02, 13:54:53",-500,6.0113,3005.65,-0.20255707,IA
+Trades,Data,Order,Stocks,USD,JOBY,"2024-10-03, 15:56:56",-200,5.6246,1124.92,-0.078872776,
+Trades,Data,Order,Stocks,USD,JOBY,"2024-10-18, 15:51:20","-1,000",5.6143,5614.3,-0.39407754,IM;P
+Trades,Data,Order,Stocks,USD,JOBY,"2024-11-07, 12:09:29",-100,5.0413,504.13,-0.037814814,IA
+Trades,Data,Order,Stocks,USD,KTOS,"2024-10-17, 13:03:16",20,25.4687,-509.374,-0.00144,IA;P
+Trades,Data,Order,Stocks,USD,KTOS,"2024-09-04, 11:23:54",-6,22.5526,135.3156,-0.004757774,IA
+Trades,Data,Order,Stocks,USD,KTOS,"2024-09-26, 14:46:06",-5,23.26,116.3,-0.00432314,
+Trades,Data,Order,Stocks,USD,KTOS,"2024-10-24, 11:18:18",-20,24.1913,483.826,-0.018210363,IA
+Trades,Data,Order,Stocks,USD,LDOS,"2024-10-17, 12:38:44",3,168.06,-504.18,-0.000216,
+Trades,Data,Order,Stocks,USD,LDOS,"2024-09-04, 11:30:44",-2,155.29,310.58,-0.008966124,
+Trades,Data,Order,Stocks,USD,LDOS,"2024-09-26, 14:53:52",-2,158.37,316.74,-0.009241372,
+Trades,Data,Order,Stocks,USD,LDOS,"2024-10-24, 11:04:14",-3,169.61,508.83,-0.014859474,
+Trades,Data,Order,Stocks,USD,LHX,"2024-10-17, 10:50:43",10,247.521,-2475.21,-0.00072,IA
+Trades,Data,Order,Stocks,USD,LHX,"2024-10-24, 11:14:27",5,245.84,-1229.2,-0.00036,
+Trades,Data,Order,Stocks,USD,LHX,"2024-09-26, 14:53:24",-2,232.645,465.29,-0.013371062,
+Trades,Data,Order,Stocks,USD,LHX,"2024-10-24, 11:13:37",-5,245.69,1228.45,-0.03534091,
+Trades,Data,Order,Stocks,USD,LHX,"2024-10-24, 11:13:56",-10,245.71175,2457.1175,-0.070687867,P
+Trades,Data,Order,Stocks,USD,LMT,"2024-10-17, 12:53:25",8,610.17,-4881.36,-0.000576,IA
+Trades,Data,Order,Stocks,USD,LMT,"2024-10-23, 14:17:32",2,573.62,-1147.24,-0.000144,
+Trades,Data,Order,Stocks,USD,LMT,"2024-09-11, 13:20:59",-1,564.009,564.009,-0.01589745,IA
+Trades,Data,Order,Stocks,USD,LMT,"2024-10-14, 15:43:12",-1,610.65,610.65,-0.01721407,IA
+Trades,Data,Order,Stocks,USD,LMT,"2024-10-24, 11:26:42",-10,570.55,5705.5,-0.1609929,
+Trades,Data,Order,Stocks,USD,LOAR,"2024-10-01, 12:32:52",20,73.47,-1469.4,-0.00144,
+Trades,Data,Order,Stocks,USD,LOAR,"2024-09-04, 11:22:26",-2,70.6,141.2,-0.00425736,
+Trades,Data,Order,Stocks,USD,LOAR,"2024-09-26, 14:44:29",-1,73.87,73.87,-0.002271586,
+Trades,Data,Order,Stocks,USD,LOAR,"2024-10-07, 13:35:53",-20,73.5,1470,-0.045626,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-18, 09:57:43",200,7.87,-1574,-0.0104,P
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-18, 15:40:32",500,7.6689,-3834.45,-0.026,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-19, 13:12:10",400,8.447,-3378.8,-0.0208,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-19, 13:54:03",600,9.0789,-5447.34,-0.0312,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-23, 15:01:22",300,8.1565,-2446.95,-0.0156,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-30, 13:09:00",479,8.0689,-3865.0031,-0.024908,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-30, 13:12:46",500,8.1085,-4054.25,-0.026,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-06, 14:06:36",-100,4.944,494.4,-0.03384432,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-18, 13:26:02",-200,7.9611,1592.22,-0.087863716,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-19, 12:50:09",-500,8.3211,4160.55,-0.22466329,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-09-20, 13:40:10",-800,9.1809,7344.72,-0.378583216,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-10-02, 13:58:26",-500,7.5222,3761.1,-0.22355858,
+Trades,Data,Order,Stocks,USD,LUNR,"2024-10-10, 12:25:07","-1,000",7.30349,7303.49,-0.441037022,P
+Trades,Data,Order,Stocks,USD,MOG A,"2024-09-19, 15:47:05",14,204.71,-2865.94,-0.000728,
+Trades,Data,Order,Stocks,USD,MOG A,"2024-10-17, 13:04:26",3,196.455,-589.365,-0.000216,
+Trades,Data,Order,Stocks,USD,MOG A,"2024-10-23, 13:51:50",2,190.87,-381.74,-0.000144,
+Trades,Data,Order,Stocks,USD,MOG A,"2024-09-23, 15:42:35",-15,202.63,3039.45,-0.08776671,
+Trades,Data,Order,Stocks,USD,MOG A,"2024-10-24, 11:03:02",-5,192.16,960.8,-0.02790024,
+Trades,Data,Order,Stocks,USD,MRCY,"2024-09-04, 11:21:50",-5,37.93,189.65,-0.00610227,
+Trades,Data,Order,Stocks,USD,MRCY,"2024-09-26, 14:47:53",-1,36.86,36.86,-0.001242708,
+Trades,Data,Order,Stocks,USD,NOC,"2024-10-17, 10:48:54",5,524.68,-2623.4,-0.00036,
+Trades,Data,Order,Stocks,USD,NOC,"2024-09-04, 11:20:04",-2,525.35,1050.7,-0.02954146,IA
+Trades,Data,Order,Stocks,USD,NOC,"2024-10-14, 15:43:28",-1,533.129,533.129,-0.015058986,IA
+Trades,Data,Order,Stocks,USD,NOC,"2024-10-23, 14:23:55",-5,516.87,2584.35,-0.07303493,
+Trades,Data,Order,Stocks,USD,OII,"2024-09-26, 15:08:16",50,24.06,-1203,-0.0026,
+Trades,Data,Order,Stocks,USD,OII,"2024-09-04, 11:39:14",-3,25.08,75.24,-0.002589672,
+Trades,Data,Order,Stocks,USD,OII,"2024-09-11, 13:51:05",-4,22.6613,90.6452,-0.003391937,
+Trades,Data,Order,Stocks,USD,OII,"2024-10-04, 12:26:20",-26,26.421538462,686.96,-0.025285488,P
+Trades,Data,Order,Stocks,USD,OII,"2024-10-04, 14:56:03",-25,26.3614,659.035,-0.024271173,
+Trades,Data,Order,Stocks,USD,OUST,"2024-10-01, 12:05:09",200,6.12,-1224,-0.0144,
+Trades,Data,Order,Stocks,USD,OUST,"2024-10-07, 10:45:54",-200,6.53,1306,-0.0839068,IA
+Trades,Data,Order,Stocks,USD,PH,"2024-10-17, 12:54:36",1,641.49,-641.49,-0.000072,
+Trades,Data,Order,Stocks,USD,PH,"2024-10-24, 11:01:31",-1,625.65,625.65,-0.01763107,
+Trades,Data,Order,Stocks,USD,PL,"2024-09-06, 09:57:16",394,1.9793,-779.8442,-0.01379,
+Trades,Data,Order,Stocks,USD,PL,"2024-09-12, 15:30:40",-250,2.07,517.5,-0.0688865,
+Trades,Data,Order,Stocks,USD,PL,"2024-10-07, 10:44:55",-250,2.2011,550.275,-0.074797645,
+Trades,Data,Order,Stocks,USD,PLTR,"2024-09-04, 11:23:31",-4,30.592,122.368,-0.00406583,IM;P
+Trades,Data,Order,Stocks,USD,PLTR,"2024-09-11, 13:51:32",-2,34.6313,69.2626,-0.0023615,IA
+Trades,Data,Order,Stocks,USD,PLTR,"2024-09-26, 14:43:14",-1,37.1513,37.1513,-0.001250806,IA
+Trades,Data,Order,Stocks,USD,PSN,"2024-09-04, 11:22:59",-2,93.02,186.04,-0.005503912,
+Trades,Data,Order,Stocks,USD,PSN,"2024-09-11, 13:51:52",-1,95.985,95.985,-0.002886383,
+Trades,Data,Order,Stocks,USD,PSN,"2024-09-26, 14:43:34",-1,103.57,103.57,-0.003097246,
+Trades,Data,Order,Stocks,USD,RDW,"2024-09-11, 13:52:28",-31,6.3111,195.6441,-0.012196906,
+Trades,Data,Order,Stocks,USD,RDW,"2024-09-26, 14:44:53",-10,6.8808,68.808,-0.004092862,
+Trades,Data,Order,Stocks,USD,RDWR,"2024-09-04, 11:24:21",-5,21.14,105.7,-0.00376846,
+Trades,Data,Order,Stocks,USD,RDWR,"2024-10-07, 10:39:20",-5,22.26,111.3,-0.00428414,
+Trades,Data,Order,Stocks,USD,REKR,"2024-10-01, 12:25:33","1,000",1.1589,-1158.9,-0.072,
+Trades,Data,Order,Stocks,USD,REKR,"2024-10-04, 14:52:33","-1,000",1.06,1060,-0.267468,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-08-23, 10:19:26",500,6.9789,-3489.45,0,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-16, 09:53:00",100,7.3789,-737.89,-0.0052,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-19, 11:43:50",900,7.1187,-6406.83,-0.0468,IA
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-25, 10:56:21",100,8.5887,-858.87,-0.0052,IA
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-27, 16:20:00","1,000",7,-7000,0,Ex
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-30, 12:07:54",500,9.7487,-4874.35,-0.026,IA
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-11, 16:20:00",100,9.5,-950,0,Ex
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-11, 16:20:00",100,9.5,-950,0,Ex
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-11, 16:20:00",100,9.5,-950,0,Ex
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-11, 16:20:00",100,9.5,-950,0,Ex
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-11, 16:20:00",100,9.5,-950,0,Ex
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-11, 16:20:00",100,9.5,-950,0,Ex
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-17, 13:00:12",50,10.8287,-541.435,-0.0036,IA
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-31, 12:36:48",100,10.4687,-1046.87,-0.0072,IA
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-06, 14:45:03",100,12.7387,-1273.87,-0.0072,IA
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-07, 10:26:54",100,13.4489,-1344.89,-0.0072,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-08, 15:17:59",100,13.487,-1348.7,-0.0072,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-08, 15:27:01",100,13.5373,-1353.73,-0.0072,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-11, 09:31:31",100,14.49,-1449,-0.0072,P
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-11, 09:32:03",100,14.49,-1449,-0.0072,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-11, 10:29:44",100,14.8967,-1489.67,-0.0072,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-11, 13:44:35",-177,6.6411,1175.4747,-0.071264197,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-13, 16:20:00",-500,7,3500,-0.1803,A
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-20, 15:41:06",-100,7.43,743,-0.0424554,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-27, 15:51:53",-500,9.735,4867.5,-0.2443165,IM;P
+Trades,Data,Order,Stocks,USD,RKLB,"2024-09-30, 15:29:22","-1,000",9.59,9590,-0.484602,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-07, 13:08:56","-1,000",9.7513,9751.3,-0.50908614,IA
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-11, 15:16:47",-300,9.7611,2928.33,-0.152807574,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-11, 15:17:16",-300,9.75,2925,-0.152715,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-10-24, 14:48:38",-50,11.3239,566.195,-0.027640221,IM;P
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-04, 09:38:01",-100,11.0525,1105.25,-0.05452595,
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-07, 12:06:41",-200,13.54,2708,-0.1228824,P
+Trades,Data,Order,Stocks,USD,RKLB,"2024-11-11, 15:30:48",-500,14.8817,7440.85,-0.32585563,
+Trades,Data,Order,Stocks,USD,RTX,"2024-10-17, 10:46:45",50,126.1174,-6305.87,-0.0036,IA
+Trades,Data,Order,Stocks,USD,RTX,"2024-10-22, 09:38:41",42,127.67,-5362.14,-0.003024,
+Trades,Data,Order,Stocks,USD,RTX,"2024-09-03, 15:52:11",-15,121.0026,1815.039,-0.052948084,IA;L
+Trades,Data,Order,Stocks,USD,RTX,"2024-10-21, 15:51:05",-42,125.6108,5275.6536,-0.15665917,L
+Trades,Data,Order,Stocks,USD,RTX,"2024-10-22, 15:51:02",-43,125.6,5400.8,-0.16037624,L
+Trades,Data,Order,Stocks,USD,RTX,"2024-10-24, 11:27:12",-7,126.3426,884.3982,-0.02625227,IA
+Trades,Data,Order,Stocks,USD,SAIC,"2024-09-04, 11:37:33",-4,128.43,513.72,-0.014945416,
+Trades,Data,Order,Stocks,USD,SAIC,"2024-09-26, 14:45:34",-1,136.775,136.775,-0.004020345,
+Trades,Data,Order,Stocks,USD,SATL,"2025-01-17, 16:20:00","2,000",2.5,-5000,0,Ex
+Trades,Data,Order,Stocks,USD,SATL,"2025-01-22, 13:17:03","-2,000",2.9,5800,-0.58524,P
+Trades,Data,Order,Stocks,USD,TXT,"2024-10-17, 12:57:10",18,89.42,-1609.56,-0.001296,
+Trades,Data,Order,Stocks,USD,TXT,"2024-09-11, 13:53:01",-1,86.14,86.14,-0.002612692,
+Trades,Data,Order,Stocks,USD,TXT,"2024-10-07, 13:11:05",-1,86.0112,86.0112,-0.002629111,
+Trades,Data,Order,Stocks,USD,TXT,"2024-10-24, 11:11:52",-18,81.49,1466.82,-0.045061596,
+Trades,Data,Order,Stocks,USD,VAL,"2024-10-01, 12:08:00",20,55.8,-1116,-0.00144,
+Trades,Data,Order,Stocks,USD,VAL,"2024-10-07, 11:59:35",-20,55.95,1119,-0.0358682,
+Trades,Data,Order,Stocks,USD,VSAT,"2024-10-01, 12:17:05",100,11.66,-1166,-0.0072,
+Trades,Data,Order,Stocks,USD,VSAT,"2024-10-11, 15:42:48",-100,10.93,1093,-0.0541854,
+Trades,Data,Order,Stocks,USD,VVX,"2024-09-05, 11:08:47",6,49.26,-295.56,-0.00021,
+Trades,Data,Order,Stocks,USD,VVX,"2024-10-07, 10:40:26",-10,58.3489,583.489,-0.018600994,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 30AUG24 3.5 C,"2024-08-27, 16:20:00",10,0,0,0,A;C
+Trades,Data,Order,Equity and Index Options,USD,ACHR 30AUG24 3.5 C,"2024-08-30, 16:20:00",20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 30AUG24 3.5 C,"2024-08-26, 15:11:05",-30,0.4,1200,-21.02256,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 30AUG24 5 C,"2024-08-30, 16:20:00",-11,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 13SEP24 3 C,"2024-09-11, 16:20:00",1,0,0,0,A;C
+Trades,Data,Order,Equity and Index Options,USD,ACHR 13SEP24 3 C,"2024-09-13, 09:39:55",5,0.43,-215,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 13SEP24 3 C,"2024-09-11, 12:34:40",-6,0.35,210,-4.242678,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 20SEP24 3 C,"2024-09-16, 10:33:43",40,0.25,-1000,-27.734,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 20SEP24 3 C,"2024-09-16, 11:00:15",100,0.2,-2000,-70.335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 20SEP24 3 C,"2024-09-16, 15:59:55",10,0.18,-180,-7.0335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 20SEP24 3 C,"2024-09-17, 09:49:01",-150,0.18,2700,-106.37106,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 04OCT24 3 C,"2024-10-04, 16:20:00",40,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 04OCT24 3 C,"2024-10-02, 14:35:33",-40,0.21,840,-28.348952,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 04OCT24 3.5 C,"2024-09-17, 09:49:01",150,0.08,-1200,-83.3775,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 04OCT24 3.5 C,"2024-09-18, 13:29:36",50,0.05,-250,-39.2875,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 04OCT24 3.5 C,"2024-09-19, 11:32:13",3,0.09,-27,-1.66005,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 04OCT24 3.5 C,"2024-09-20, 12:26:30",97,0.04,-388,-29.66745,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 04OCT24 3.5 C,"2024-10-04, 16:20:00",-300,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-09-30, 13:46:28",50,0.19,-950,-35.1675,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-02, 16:20:00",-10,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-07, 16:20:00",-10,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-07, 16:20:00",-8,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-07, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-07, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-07, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-07, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-07, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11OCT24 3 C,"2024-10-07, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-09-26, 10:29:16",50,0.45,-2250,-35.1675,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-09-27, 12:44:42",10,0.64,-640,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-09-27, 12:45:23",10,0.64,-640,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-09-27, 14:31:15",10,0.6,-600,-7.0335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-04, 10:20:02",1,0.45,-45,-1.05535,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-04, 10:23:26",20,0.45,-900,-14.107,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-07, 10:36:06",1,0.48,-48,-1.05535,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-07, 13:16:57",200,0.51,-10200,-141.07,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-02, 13:16:57",-20,0.7,1400,-14.20172,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-02, 16:20:00",-10,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-07, 14:43:06",-150,0.55,8250,-106.45035,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-07, 14:44:29",-50,0.55,2750,-35.48345,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-07, 15:04:10",-21,0.6,1260,-14.695968,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-07, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-09, 10:18:12",-40,0.55,2200,-28.29076,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 2.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-08-29, 11:35:54",40,0.72,-2880,-27.874,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-08-29, 11:38:14",20,0.7,-1400,-13.937,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-06, 10:30:44",190,0.31,-5890,-133.3135,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-03, 15:46:44",100,0.17,-1700,-70.535,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-04, 10:17:42",100,0.14,-1400,-70.535,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-10, 15:21:27",-25,0.45,1125,-17.684775,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-10, 15:29:14",-5,0.45,225,-3.536955,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-11, 13:10:31",-10,0.45,450,-7.07391,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-11, 13:10:46",-10,0.45,450,-7.07391,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-11, 13:25:18",-50,0.45,2250,-35.36955,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-11, 13:33:01",-50,0.45,2250,-35.36955,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-11, 13:38:47",-50,0.45,2250,-35.36955,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-13, 16:20:00",-39,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-13, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-13, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-09-13, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-15, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-17, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-17, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 15:43:14",-59,0.19,1121,-41.6698238,L
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-41,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-20,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-10,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-10,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 3 C,"2024-10-18, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 4 C,"2024-08-21, 12:54:25",20,0.23,-460,-13.937,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 4 C,"2024-08-21, 15:01:12",10,0.25,-250,-6.9685,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 4 C,"2024-08-22, 12:26:22",4,0.2125,-85,-2.7874,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 4 C,"2024-08-22, 12:31:23",40,0.21,-840,-27.874,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 4 C,"2024-08-22, 13:11:46",96,0.23,-2208,-66.8976,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 4 C,"2024-09-20, 14:34:03",750,0.04,-3000,-227.5125,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 4 C,"2024-10-18, 16:20:00","-1,000",0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 5 C,"2024-08-21, 10:02:09",50,0.08,-400,-34.8425,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 5 C,"2024-08-21, 15:42:25",20,0.09,-180,-13.937,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 5 C,"2024-08-21, 15:47:47",10,0.08,-80,-6.9685,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 5 C,"2024-08-22, 11:32:46",20,0.07,-140,-13.937,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 5 C,"2024-08-22, 12:26:22",5,0.07,-35,-3.48425,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 5 C,"2024-08-22, 12:31:23",50,0.07,-350,-34.8425,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 5 C,"2024-08-22, 13:09:52",45,0.07,-315,-31.35825,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18OCT24 5 C,"2024-10-18, 16:20:00",-250,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15NOV24 4 C,"2024-11-12, 10:47:28",1,0.65,-65,-1.90155,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15NOV24 4 C,"2024-11-12, 11:02:21",10,0.65,-650,-7.0405,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15NOV24 4 C,"2024-11-12, 11:02:34",10,0.65,-650,-7.0405,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15NOV24 4 C,"2024-11-12, 11:02:45",10,0.64,-640,-7.0405,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15NOV24 4 C,"2024-11-12, 11:02:56",10,0.64,-640,-7.0405,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15NOV24 4 C,"2024-11-12, 11:03:08",19,0.64,-1216,-13.32945,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15NOV24 4 C,"2024-11-11, 15:42:14",-60,0.5,3000,-44.8938,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 13DEC24 4.5 C,"2024-11-25, 10:06:34",20,3.12,-6240,-14.081,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 13DEC24 4.5 C,"2024-11-21, 11:31:59",-20,1,2000,-13.9424,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 13DEC24 7.5 C,"2024-11-29, 09:46:21",20,2.1985,-4397,-0.451,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 13DEC24 7.5 C,"2024-11-25, 10:06:34",-20,1.12,2240,-14.199072,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 7 C,"2024-11-25, 09:48:04",7,1.55,-1085,-0.87085,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 7 C,"2024-11-25, 09:49:35",13,1.491538462,-1939,-4.95515,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 7 C,"2024-11-29, 09:58:18",-20,3.0755,6151,-1.9677978,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 8.5 C,"2024-12-16, 10:05:30",10,1.15,-1150,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 8.5 C,"2024-12-24, 10:44:07",-10,2.4,2400,-7.03412,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 10.5 C,"2024-11-29, 09:39:49",10,1.29,-1290,-7.0405,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 10.5 C,"2024-11-27, 11:06:06",-10,1.07,1070,-7.073146,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 11 C,"2024-11-29, 09:58:18",20,1.5755,-3151,-1.741,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 11 C,"2024-11-25, 09:48:04",-7,0.55,385,-0.901083,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 03JAN25 11 C,"2024-11-25, 09:49:35",-13,0.451538462,587,-5.0077386,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3 C,"2024-08-30, 11:29:30",10,0.83,-830,-6.9685,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3 C,"2024-08-30, 12:55:11",15,0.78,-1170,-10.45275,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3 C,"2024-11-11, 09:40:16",10,1.38,-1380,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3 C,"2024-09-11, 13:34:53",-20,0.7,1400,-14.16172,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3 C,"2024-09-18, 15:45:57",-5,0.55,275,-8.538345,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3 C,"2024-11-08, 15:13:20",-10,1.01,1010,-7.071478,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-10-23, 09:31:21",50,0.45,-2250,-34.6475,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-08, 09:43:26",10,0.6,-600,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-08, 09:43:39",10,0.59,-590,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-08, 09:43:57",10,0.59,-590,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-08, 09:44:10",10,0.6,-600,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-08, 11:09:28",10,0.6,-600,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-12, 14:35:08",30,1.38,-4140,-21.0465,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-11, 09:53:30",-10,0.91,910,-7.068698,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-11, 09:58:49",-10,0.91,910,-7.068698,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-11, 09:59:24",-10,0.92,920,-7.068976,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-11, 10:00:45",-10,0.95,950,-7.06981,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-11, 10:19:34",-10,1.08,1080,-7.073424,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-11, 15:46:58",-25,1.07,2675,-17.682865,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-11, 15:47:51",-5,1.1,550,-3.48699,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-21, 11:28:19",-20,2,4000,-13.998,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-21, 12:40:26",-10,2.232,2232,0.3945504,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 3.5 C,"2024-11-21, 12:43:03",-20,2.309,4618,-1.9251804,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-08-21, 10:01:08",10,0.54,-540,-6.9685,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-08, 09:44:32",50,0.35,-1750,-35.0775,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-09-24, 15:44:10",-10,0.21,210,-7.067238,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-11, 10:09:23",-1,0.7,70,-1.056286,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-11, 10:09:56",-9,0.7,630,-6.356574,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-11, 10:18:30",-5,0.75,375,-3.482125,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-11, 10:20:06",-5,0.75,375,-1.132125,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-11, 15:23:17",-2,0.8,160,-1.413128,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-11, 15:34:30",-5,0.76,380,-3.532264,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-11, 15:39:53",-1,0.76,76,-1.0564528,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-11, 15:40:11",-2,0.76,152,-1.4129056,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4 C,"2024-11-12, 14:37:16",-20,0.97,1940,-14.140732,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 5 C,"2024-09-17, 13:39:48",-1,0.15,15,-1.056557,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 5 C,"2024-09-24, 15:44:38",-29,0.1,290,-20.486122,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4.5 P,"2024-11-08, 15:10:55",10,0.8,-800,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4.5 P,"2024-11-12, 14:46:12",5,0.4,-200,-3.45775,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17JAN25 4.5 P,"2024-11-15, 10:28:59",-15,0.75,1125,-10.596375,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 31JAN25 10.5 C,"2025-01-22, 14:28:39",20,0.34,-680,-14.105,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 31JAN25 10.5 C,"2025-01-31, 16:20:00",-20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 28FEB25 9 C,"2025-02-25, 10:02:55",9,0.24,-216,-6.34725,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 28FEB25 9 C,"2025-02-28, 16:20:00",-9,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-08-20, 12:18:18",10,1.15,-1150,-6.9685,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-11, 13:28:24",1,1,-100,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-11, 13:29:16",4,0.98,-392,-2.8134,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-11, 13:36:34",10,0.95,-950,-7.0335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-11, 13:37:15",10,0.95,-950,-7.0335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-11, 13:57:38",10,0.9,-900,-7.0335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-23, 15:41:35",15,0.73,-1095,-10.55025,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-26, 10:59:37",-10,0.57,570,-7.077246,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-26, 15:33:50",-10,0.61,610,-7.078358,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-26, 15:38:07",-20,0.61,1220,-14.156716,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 3 C,"2024-09-26, 15:40:46",-20,0.62,1240,-14.157272,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 4 C,"2024-11-21, 12:43:03",20,2.209,-4418,-1.741,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 4 C,"2024-11-29, 09:46:21",-20,5.3635,10727,-0.8050106,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 5 C,"2024-11-21, 12:40:26",10,1.573,-1573,0.4845,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 5 C,"2024-12-18, 11:44:12",-10,5.07,5070,-7.108346,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 6 C,"2024-11-20, 11:24:12",5,0.63,-315,-3.50775,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 6 C,"2024-11-20, 12:03:32",25,0.64,-1600,-17.53875,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 6 C,"2024-12-17, 12:54:22",10,3.91,-3910,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 6 C,"2024-11-21, 12:27:36",-10,1.13,1130,-7.074814,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 6 C,"2024-11-29, 09:39:49",-10,3.9,3900,-7.17682,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 6 C,"2024-11-29, 09:40:53",-10,4.01,4010,-7.179878,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 6 C,"2025-01-03, 10:06:40",-10,5.35,5350,-7.15913,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 7 C,"2024-11-20, 11:19:47",5,0.44,-220,-3.50775,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 7 C,"2024-11-20, 11:21:41",5,0.44,-220,-3.50775,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 7 C,"2024-12-18, 11:45:17",-10,3.83,3830,-7.073874,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 8 C,"2024-11-20, 11:22:18",5,0.34,-170,-3.50775,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 8 C,"2024-11-20, 11:23:02",5,0.34,-170,-3.50775,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 8 C,"2024-11-25, 10:04:05",10,1.814,-1814,-0.9655,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 8 C,"2024-12-17, 12:57:07",10,2.96,-2960,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 8 C,"2024-11-21, 12:26:59",-10,0.67,670,-7.062026,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 8 C,"2024-11-22, 10:13:43",-10,0.9,900,-6.96842,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 8 C,"2025-01-03, 10:07:15",-10,4.03,4030,-7.122434,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 9 C,"2024-12-18, 11:44:12",10,2.96,-2960,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 9 C,"2025-01-03, 10:23:26",-5,3.2,1600,-3.54968,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 9 C,"2025-01-03, 10:38:40",-1,3.6,360,-1.061048,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 9 C,"2025-01-03, 10:39:19",-3,3.6,1080,-2.133144,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 9 C,"2025-01-03, 10:45:47",-1,3.65,365,-1.081487,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 10 C,"2024-11-25, 09:37:13",3,1.18,-354,-2.10465,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 10 C,"2024-12-18, 11:45:17",10,2.62,-2620,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 10 C,"2024-11-22, 12:22:21",-3,0.75,225,-2.119275,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 10 C,"2025-01-03, 10:47:09",-10,3.15,3150,-7.09797,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 11 C,"2024-12-18, 11:38:48",10,2.4,-2400,-6.9395,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 11 C,"2024-11-25, 10:04:05",-10,1.17,1170,-1.025926,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 13 C,"2024-12-18, 11:15:29",10,1.962,-1962,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 13 C,"2024-11-27, 11:04:18",-10,1.71,1710,-7.090938,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 17 C,"2025-01-03, 10:22:12",10,1.09,-1090,-7.1725,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 17 C,"2024-12-18, 11:15:29",-10,1.312,1312,-7.0038736,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 18 C,"2025-01-03, 10:07:15",10,1.12,-1120,-6.9825,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 18 C,"2024-12-17, 12:57:07",-10,1,1000,-6.9952,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 19 C,"2025-01-03, 10:06:40",10,1,-1000,-6.9825,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 19 C,"2025-01-03, 10:21:37",10,0.85,-850,-6.9825,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 19 C,"2024-12-17, 12:54:22",-10,0.92,920,-6.992976,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 17APR25 19 C,"2024-12-24, 12:14:52",-10,1.18,1180,-7.000204,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 27JUN25 10.5 C,"2025-06-24, 12:39:56",5,0.38,-190,-3.53975,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 27JUN25 10.5 C,"2025-06-27, 12:43:55",-5,0.14,70,-3.5537,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 27JUN25 11 C,"2025-06-24, 12:39:07",20,0.17,-340,-14.159,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 27JUN25 11 C,"2025-06-27, 16:20:00",-20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11JUL25 13 C,"2025-07-11, 16:20:00",2,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 11JUL25 13 C,"2025-06-24, 12:37:02",-2,0.12,24,-1.42148,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18JUL25 10 C,"2025-06-24, 12:37:02",2,1.16,-232,-1.4159,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 18JUL25 10 C,"2025-07-15, 11:10:01",-2,1.45,290,-1.41288,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 08AUG25 11 C,"2025-08-04, 13:49:10",20,0.15,-300,-14.029,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 08AUG25 11 C,"2025-08-08, 16:20:00",-20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15AUG25 9.5 C,"2025-08-08, 15:09:31",5,0.72,-360,-3.50725,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15AUG25 9.5 C,"2025-08-15, 12:48:02",-5,0.42,210,-3.5212,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 22AUG25 10 C,"2025-08-15, 12:48:02",5,0.35,-175,-3.50725,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 3.5 C,"2024-09-06, 10:05:55",10,1.145,-1145,-7.0165,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 3.5 C,"2024-10-02, 14:13:55",-10,1.01,1010,-7.109478,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 11:17:13",10,0.58,-580,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 11:18:08",100,0.55,-5500,-70.155,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 14:43:19",-3,0.6,180,-2.118024,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 14:58:12",-5,0.56,280,-3.529484,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 15:28:11",-2,0.55,110,-1.411738,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 15:32:19",-10,0.55,550,-7.05869,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 15:32:30",-10,0.55,550,-7.05869,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 15:32:55",-40,0.56,2240,-28.235872,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 15:33:18",-20,0.55,1100,-14.13488,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 15:33:49",-10,0.55,550,-7.05869,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 10 C,"2024-11-12, 15:33:57",-10,0.55,550,-7.08369,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 12 C,"2024-09-27, 12:10:53",10,0.2,-200,-7.0335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 16JAN26 12 C,"2024-09-06, 10:05:55",-10,0.155,155,-7.048709,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-09-25, 15:00:21",1,2,-200,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-09-25, 15:04:48",2,2,-400,-1.4067,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-09-25, 15:05:17",2,2,-400,-1.4067,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-09-25, 15:45:04",1,1.95,-195,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-09-25, 15:45:04",1,1.99,-199,-0.25335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-09-25, 15:45:23",1,1.9,-190,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-09-25, 15:45:34",1,1.85,-185,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-09-25, 15:45:46",1,1.8,-180,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-10-07, 15:21:49",5,1.9,-950,-3.47675,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-10-07, 15:26:45",5,1.85,-925,-3.47675,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-11-12, 11:12:31",10,3,-3000,-6.9155,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-11-20, 11:27:04",5,3.48,-1740,-3.52025,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-12-19, 13:14:44",-10,6.55,6550,-7.14949,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2024-12-19, 13:20:18",-20,6.458,12916,-14.2938648,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 2 C,"2025-01-03, 10:45:26",-5,9.3,4650,-3.63447,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 5 C,"2024-11-25, 10:11:14",20,4.678,-9356,-7.766,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 5 C,"2024-11-20, 12:02:56",-20,2.23,4460,-14.210788,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 7 C,"2024-11-25, 10:10:02",15,4.059333333,-6089,0.02675,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 7 C,"2024-11-20, 11:17:55",-2,1.82,364,-1.4237992,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 7 C,"2024-11-20, 11:18:23",-1,1.82,182,-1.0618996,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 7 C,"2024-11-20, 11:20:31",-2,1.85,370,-1.418966,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 7 C,"2024-11-20, 11:24:37",-1,1.82,182,-1.0618996,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 7 C,"2024-11-20, 11:27:04",-5,1.8,900,-3.55922,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 7 C,"2024-11-20, 11:30:06",-3,1.85,555,-4.678449,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 7 C,"2024-11-20, 11:31:37",-1,1.82,182,-1.0618996,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 10 C,"2024-12-17, 10:18:53",35,4.586857143,-16054,-24.28825,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 10 C,"2024-11-25, 10:10:02",-15,3.259333333,4889,-0.1510142,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 10 C,"2024-11-25, 10:11:14",-20,3.148,6296,-7.9968288,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 17 C,"2024-12-19, 13:14:44",10,3.25,-3250,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 17 C,"2024-12-19, 13:20:18",20,3.233,-6466,-13.879,P
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 17 C,"2025-01-03, 10:33:24",5,4.45,-2225,-3.49125,
+Trades,Data,Order,Equity and Index Options,USD,ACHR 15JAN27 17 C,"2024-12-17, 10:18:53",-35,3.586857143,12554,-24.7349012,P
+Trades,Data,Order,Equity and Index Options,USD,AI 17JAN25 20 C,"2024-09-05, 10:00:19",2,2.95,-590,-1.4033,
+Trades,Data,Order,Equity and Index Options,USD,AI 17JAN25 20 C,"2024-09-06, 09:47:54",-1,4.16,416,-1.0660048,
+Trades,Data,Order,Equity and Index Options,USD,AI 17JAN25 20 C,"2024-09-12, 14:17:18",-1,4.53,453,-1.0687334,
+Trades,Data,Order,Equity and Index Options,USD,AI 17JAN25 30 C,"2024-09-05, 10:01:07",10,0.55,-550,-7.0165,P
+Trades,Data,Order,Equity and Index Options,USD,AI 17JAN25 30 C,"2024-09-06, 09:46:42",-5,0.88,440,-3.534432,P
+Trades,Data,Order,Equity and Index Options,USD,AI 17JAN25 30 C,"2024-09-12, 15:44:29",-5,0.97,485,-3.244183,P
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 20 C,"2024-09-05, 11:36:04",5,5.45,-2725,-3.50825,P
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 20 C,"2024-09-06, 11:53:35",2,5.75,-1150,-1.4033,
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 20 C,"2024-09-06, 09:48:39",-2,6.79,1358,-1.4466324,P
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 20 C,"2024-09-06, 10:42:05",-2,6.6,1320,-1.445576,
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 20 C,"2024-09-12, 15:31:18",-1,7,700,-1.0756,
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 20 C,"2024-09-17, 13:31:44",-2,7.38,1476,-1.4533128,P
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 25 C,"2024-09-12, 15:44:29",5,5.14,-2570,-3.21675,P
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 25 C,"2024-09-17, 14:05:36",-3,5.36,1608,-2.1706224,P
+Trades,Data,Order,Equity and Index Options,USD,AI 16JAN26 25 C,"2024-09-18, 15:23:18",-2,5.4,1080,-1.422304,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 800 C,"2024-10-08, 14:56:37",1,44.61,-4461,-1.05535,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 800 C,"2024-10-09, 10:24:08",-1,52.18,5218,-1.2008004,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 930 C,"2024-09-24, 15:28:42",1,5.48,-548,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 930 C,"2024-09-26, 09:41:05",-1,12.87,1287,-1.0919186,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 940 C,"2024-09-24, 15:27:53",1,4.58,-458,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 940 C,"2024-09-26, 09:41:58",-1,11.2,1120,-1.087276,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 1000 C,"2024-09-24, 15:34:13",1,1.59,-159,-1.90335,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 1000 C,"2024-09-24, 15:34:57",1,1.65,-165,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 1000 C,"2024-09-24, 15:35:29",4,1.65,-660,0.1866,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 1000 C,"2024-09-26, 09:42:23",-1,4.09,409,-1.0675102,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 1000 C,"2024-10-18, 16:20:00",-5,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 1140 C,"2024-09-24, 15:33:01",5,0.34,-170,-7.76675,
+Trades,Data,Order,Equity and Index Options,USD,ASML 18OCT24 1140 C,"2024-10-18, 16:20:00",-5,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASML 17JAN25 700 C,"2024-10-17, 11:09:23",1,49.67,-4967,-1.05295,
+Trades,Data,Order,Equity and Index Options,USD,ASML 17JAN25 700 C,"2024-10-17, 14:38:05",-1,56,5600,-1.21392,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 23AUG24 35 C,"2024-08-23, 16:20:00",1,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASTS 23AUG24 35 C,"2024-08-23, 11:02:23",-1,0.4,40,-1.050752,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 30AUG24 32.5 C,"2024-08-30, 16:20:00",2,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASTS 30AUG24 32.5 C,"2024-08-26, 14:18:40",-2,2.72,544,-1.4144032,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 28.5 C,"2024-09-05, 10:15:07",10,1.071,-1071,-7.0165,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 28.5 C,"2024-09-06, 10:13:55",1,0.62,-62,-1.05165,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 28.5 C,"2024-09-05, 10:59:03",-8,1.66,1328,-5.6724384,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 28.5 C,"2024-09-05, 11:16:35",-3,1.55,465,-2.126247,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 29 C,"2024-09-06, 11:03:47",5,0.28,-140,-3.50825,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 29 C,"2024-09-06, 11:09:57",5,0.1,-50,-3.50825,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 29 C,"2024-09-06, 10:22:52",-5,0.5,250,-3.52915,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 29 C,"2024-09-06, 16:20:00",-5,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 30 C,"2024-09-05, 10:59:03",8,1.02,-816,-5.6132,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 30 C,"2024-09-06, 10:12:51",2,0.21,-42,-1.4033,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 30 C,"2024-09-05, 10:15:07",-10,0.644,644,-7.0623032,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 33 C,"2024-09-06, 10:10:24",2,0.04,-8,-1.4033,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 06SEP24 33 C,"2024-09-04, 10:46:19",-2,1.5,300,-1.41022,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 25.5 C,"2024-09-12, 09:53:19",4,1.34,-536,-2.8134,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 25.5 C,"2024-09-12, 14:05:32",-4,1.65,660,-2.842908,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 26 C,"2024-09-11, 13:02:59",3,2.95,-885,-2.11005,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 26 C,"2024-09-10, 15:16:44",-3,2.21,663,-2.1368514,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 28 C,"2024-09-13, 12:07:02",6,2.1,-1260,-4.1601,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 28 C,"2024-09-13, 10:21:17",-5,1.08,540,-3.558212,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 28 C,"2024-09-13, 10:24:58",-1,1.03,103,-1.0590034,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 28.5 C,"2024-09-13, 10:34:50",5,1.33,-665,-3.52925,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 28.5 C,"2024-09-13, 10:28:54",-1,1.19,119,-1.0619482,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 28.5 C,"2024-09-13, 11:46:51",-4,2.1425,857,-2.8583846,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29 C,"2024-09-11, 12:58:09",10,1.57,-1570,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29 C,"2024-09-09, 14:49:29",-3,1.26,378,-2.1289284,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29 C,"2024-09-10, 15:13:27",-3,1.13,339,-2.1278442,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29 C,"2024-09-12, 09:53:19",-4,0.37,148,-2.8286744,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29.5 C,"2024-09-13, 11:46:51",4,1.28,-512,-2.8234,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29.5 C,"2024-09-13, 12:09:15",2,0.92,-184,-1.4067,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29.5 C,"2024-09-13, 12:14:26",1,0.85,-85,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29.5 C,"2024-09-13, 10:34:50",-5,0.65,325,-3.552235,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29.5 C,"2024-09-13, 16:20:00",-2,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 30.5 C,"2024-09-13, 15:46:47",1,0.03,-3,-1.05335,L
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 30.5 C,"2024-09-13, 12:09:15",-1,0.35,35,-1.057113,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27 P,"2024-09-11, 11:49:01",5,1.85,-925,-3.51675,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27 P,"2024-09-12, 09:37:43",-2,2.65,530,-1.427014,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27 P,"2024-09-12, 09:39:18",-3,2.65,795,-2.140521,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27.5 P,"2024-09-11, 12:58:09",10,2.17,-2170,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27.5 P,"2024-09-12, 09:35:49",-1,2.95,295,-1.064341,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27.5 P,"2024-09-12, 09:36:01",-1,2.95,295,-1.064341,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27.5 P,"2024-09-12, 09:37:39",-2,2.95,590,-1.428682,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27.5 P,"2024-09-12, 09:37:39",-1,2.95,295,-1.064341,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27.5 P,"2024-09-12, 09:37:39",-1,3,300,-1.06448,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 27.5 P,"2024-09-12, 09:41:46",-4,2.7,1080,-2.854584,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29 P,"2024-09-13, 10:24:58",1,0.68,-68,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 29 P,"2024-09-13, 16:20:00",-1,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 30 P,"2024-09-13, 10:28:54",1,0.87,-87,-1.05585,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 30 P,"2024-09-13, 12:06:17",10,0.45,-450,-7.0335,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 30 P,"2024-09-13, 15:51:32",-2,0.23,46,-1.4135588,L;P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 30 P,"2024-09-13, 16:20:00",-9,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 31 P,"2024-09-13, 10:34:50",5,1.57,-785,-3.52925,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 13SEP24 31 P,"2024-09-13, 16:20:00",-5,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,ASTS 27SEP24 23.5 C,"2024-09-27, 15:28:25",5,1.75,-875,-3.52925,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 27SEP24 23.5 C,"2024-09-27, 12:54:43",-5,0.48,240,-3.537372,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 27SEP24 33 C,"2024-08-20, 12:07:20",2,6.76,-1352,-1.3937,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 27SEP24 33 C,"2024-08-21, 11:29:42",-1,7.8,780,-1.071324,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 27SEP24 33 C,"2024-08-21, 12:05:22",-1,8.5,850,-1.07327,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 04OCT24 25 C,"2024-09-30, 15:32:19",2,1.85,-370,-1.4067,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 04OCT24 25 C,"2024-10-02, 13:48:57",2,0.45,-90,-1.4107,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 04OCT24 25 C,"2024-09-30, 12:31:41",-4,2.05,820,-2.807356,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 04OCT24 26 C,"2024-10-04, 16:20:00",5,0,0,0,A;C
+Trades,Data,Order,Equity and Index Options,USD,ASTS 04OCT24 26 C,"2024-10-02, 14:49:33",-5,0.25,125,-3.544175,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 11OCT24 20 C,"2024-10-09, 13:40:12",10,2.75,-2750,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 11OCT24 20 C,"2024-10-10, 15:50:13",-1,3.13,313,-1.0644414,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 11OCT24 20 C,"2024-10-10, 15:51:22",-5,3.1,1550,-3.52179,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 11OCT24 20 C,"2024-10-11, 09:50:13",-4,3.55,1420,1.337564,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 11OCT24 23 C,"2024-10-09, 13:41:22",15,0.72,-1080,-10.54425,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 11OCT24 23 C,"2024-10-11, 09:50:25",-15,0.8,1200,-10.61946,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 11OCT24 25 C,"2024-10-07, 09:50:52",5,1.77,-885,-3.52675,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 11OCT24 25 C,"2024-10-04, 13:03:37",-5,2.25,1125,-3.521975,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-05, 09:54:17",2,6.35,-1270,-1.4033,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-09, 15:00:03",1,5.45,-545,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-09, 15:00:04",3,5.4,-1620,-2.11005,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-12, 09:42:55",4,4.56,-1824,-2.8134,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-18, 10:07:21",4,5.4,-2160,-2.7734,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-25, 10:19:41",10,2.8,-2800,-6.9335,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-25, 15:09:52",5,2.59,-1295,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-27, 09:53:41",30,1.45,-4350,-21.1005,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-10-02, 14:46:03",10,1.65,-1650,-7.0535,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-10-10, 09:57:31",5,0.7,-350,-7.76475,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-10-10, 09:58:13",15,0.72,-1080,-10.54425,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-12, 15:39:51",-4,5.22,2088,-2.8826064,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-18, 15:43:47",-5,5.4,2700,-3.60576,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-27, 11:27:22",-30,1.65,4950,-21.32181,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-27, 15:09:52",-5,2.75,1375,-4.378925,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-27, 15:28:25",-5,2.854,1427,-3.5828706,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-27, 15:29:39",-5,2.9,1450,-3.52101,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-09-30, 12:28:27",-5,3.3,1650,-3.52657,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 25 C,"2024-10-11, 15:20:34",-30,0.93,2790,-21.249762,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 30 C,"2024-09-09, 14:57:54",2,3.65,-730,-1.4067,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 30 C,"2024-09-05, 09:54:17",-2,4.48,896,-1.4337888,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 40 C,"2024-09-03, 11:40:09",4,2.18,-872,-2.7926,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 40 C,"2024-09-16, 09:42:38",10,1.42,-1420,-7.0585,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 40 C,"2024-09-20, 12:02:54",25,0.81,-2025,-17.58375,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 40 C,"2024-09-25, 10:25:35",25,0.3,-750,-17.33375,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 40 C,"2024-09-27, 11:29:34",1,0.2,-20,-1.90335,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 40 C,"2024-09-04, 10:58:18",-4,4.44,1776,-2.8531328,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 40 C,"2024-09-17, 14:02:54",-1,1.27,127,-1.0596706,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 40 C,"2024-10-18, 16:20:00",-60,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 45 C,"2024-09-04, 10:58:18",2,3.52,-704,-1.3963,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 45 C,"2024-09-03, 11:40:09",-2,1.56,312,-1.4105536,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 50 C,"2024-09-17, 14:02:54",1,0.58,-58,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 50 C,"2024-09-27, 11:29:22",9,0.13,-117,-6.33015,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 18OCT24 50 C,"2024-09-16, 09:42:38",-10,0.62,620,-7.103636,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 01NOV24 26.5 C,"2024-10-25, 15:40:46",20,1.05,-2100,-14.059,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 01NOV24 26.5 C,"2024-10-25, 13:17:44",-20,1.95,3900,-14.22322,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 01NOV24 27 C,"2024-10-29, 13:52:00",30,1.12,-3360,-21.1635,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 01NOV24 27 C,"2024-10-29, 14:01:14",1,1.05,-105,-2.05295,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 01NOV24 27 C,"2024-10-30, 12:47:24",-31,0.5,1550,-21.92103,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23 C,"2024-11-06, 12:49:52",10,0.65,-650,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23 C,"2024-11-07, 11:08:09",-2,0.8,160,-1.413128,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23 C,"2024-11-07, 11:08:23",-2,0.85,170,-1.413406,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23 C,"2024-11-07, 11:16:59",-2,0.85,170,-1.413406,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23 C,"2024-11-07, 11:29:22",-2,0.95,190,-1.413962,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23 C,"2024-11-07, 12:00:59",-1,0.3,30,-1.055174,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23 C,"2024-11-08, 16:20:00",-1,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23.5 C,"2024-11-06, 12:50:18",10,0.45,-450,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23.5 C,"2024-11-07, 11:08:09",-2,0.55,110,-1.411738,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23.5 C,"2024-11-07, 11:09:22",-2,0.56,112,-1.4117936,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23.5 C,"2024-11-07, 11:21:36",-2,0.6,120,-1.412016,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23.5 C,"2024-11-07, 11:29:18",-2,0.65,130,-1.412294,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 23.5 C,"2024-11-07, 11:30:52",-2,0.7,140,-1.412572,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 24 C,"2024-11-06, 12:48:56",10,0.34,-340,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 24 C,"2024-11-07, 11:21:36",-2,0.4,80,-1.410904,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 24 C,"2024-11-07, 11:22:22",-4,0.42,168,-2.8220304,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 24 C,"2024-11-07, 11:30:01",-2,0.45,90,-1.411182,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 08NOV24 24 C,"2024-11-07, 11:32:53",-2,0.5,100,-1.41146,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 20 C,"2024-11-07, 11:35:10",10,3.71,-3710,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 20 C,"2024-11-07, 12:21:37",2,2.65,-530,-1.4031,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 20 C,"2024-11-07, 12:22:06",1,2.68,-268,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 20 C,"2024-11-07, 12:31:21",2,3.01,-602,-1.4031,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 20 C,"2024-11-07, 12:40:28",10,3.026,-3026,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 20 C,"2024-11-11, 09:52:52",-5,4.11,2055,-3.578829,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 20 C,"2024-11-11, 15:59:00",-10,5.3,5300,-7.09074,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 20 C,"2024-11-12, 11:01:22",-10,4.88,4880,-7.179064,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 27 C,"2024-11-08, 11:27:07",10,0.65,-650,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 27 C,"2024-11-08, 11:27:34",10,0.65,-650,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 27 C,"2024-11-07, 11:35:10",-10,0.85,850,-7.06703,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 27 C,"2024-11-07, 12:40:28",-10,0.886,886,-7.0680308,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 35 C,"2024-11-15, 10:11:30",10,0.02,-20,-11.5155,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 15NOV24 35 C,"2024-11-13, 11:07:06",-10,1.46,1460,-7.083988,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-24, 12:06:16",1,6.9,-690,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-24, 12:11:47",1,7,-700,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-24, 12:12:03",8,6.99,-5592,-5.6236,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-24, 12:13:54",1,6.95,-695,-0.00295,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-24, 13:18:48",1,6.85,-685,-0.00295,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-24, 13:18:55",1,6.8,-680,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-24, 14:10:57",1,6.6,-660,-1.05295,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-24, 15:59:13",6,6.2,-3720,-4.2177,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 20 C,"2024-10-28, 14:49:52",-20,7.1,14200,-14.30956,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 25 C,"2024-11-13, 09:43:28",10,4,-4000,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 22NOV24 25 C,"2024-11-18, 11:07:27",-10,1.95,1950,-8.10011,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 29NOV24 26 C,"2024-11-18, 11:07:27",10,1.9,-1900,-8.018,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 29NOV24 26 C,"2024-11-29, 16:20:00",-10,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,ASTS 16JAN26 3 C,"2024-09-12, 09:50:35",2,23,-4600,-1.4067,P
+Trades,Data,Order,Equity and Index Options,USD,ASTS 16JAN26 3 C,"2024-09-17, 14:07:43",-1,25.74,2574,-1.1301972,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 16JAN26 3 C,"2024-09-17, 14:09:12",-1,25.99,2599,-0.3783922,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 16JAN26 55 C,"2024-09-17, 14:07:43",1,11.05,-1105,-1.05585,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 16JAN26 55 C,"2024-09-17, 14:09:12",1,10.99,-1099,-0.30335,
+Trades,Data,Order,Equity and Index Options,USD,ASTS 16JAN26 55 C,"2024-09-12, 09:50:35",-2,9.83,1966,-1.4669348,P
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 15 C,"2024-10-24, 15:10:41",1,3.5,-350,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 15 C,"2024-10-24, 15:24:55",1,3.4,-340,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 15 C,"2024-10-24, 15:29:16",1,3.3,-330,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 15 C,"2024-11-06, 09:48:39",-1,5.2,520,-1.068796,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 15 C,"2024-11-06, 10:01:13",-1,5.2,520,-1.068796,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 15 C,"2024-11-06, 10:07:10",-1,5.4,540,-1.069352,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 17.5 C,"2024-10-24, 15:13:52",1,1.5,-150,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 17.5 C,"2024-10-24, 15:24:55",1,1.4,-140,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 17.5 C,"2024-10-24, 15:27:42",1,1.4,-140,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 17.5 C,"2024-10-24, 15:29:15",1,1.3,-130,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 17.5 C,"2024-11-06, 09:49:33",-1,2.73,273,-1.0619294,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 17.5 C,"2024-11-06, 09:50:00",-1,2.6,260,-1.061568,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 17.5 C,"2024-11-06, 09:52:14",-1,2.8,280,-1.062124,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 17.5 C,"2024-11-06, 10:02:04",-1,3,300,-1.06268,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 20 C,"2024-10-24, 15:02:31",1,0.45,-45,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 20 C,"2024-10-24, 15:26:24",9,0.45,-405,-6.23655,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 20 C,"2024-11-06, 10:01:29",-1,1,100,-1.05712,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 20 C,"2024-11-06, 10:04:04",-1,1,100,-1.05712,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 20 C,"2024-11-06, 10:26:53",-1,1.1,110,-1.057398,
+Trades,Data,Order,Equity and Index Options,USD,ATRO 15NOV24 20 C,"2024-11-15, 16:20:00",-7,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-19, 12:01:43",1,2.3,-230,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-19, 12:01:59",5,2.3,-1150,-3.46675,
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-19, 12:02:22",1,2.25,-225,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-19, 12:03:21",1,2.2,-220,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-19, 12:03:52",1,2.15,-215,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-19, 12:06:39",1,2.1,-210,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-19, 12:08:05",1,2.05,-205,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-19, 12:21:37",1,1.95,-195,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-23, 15:34:51",-7,0.92,644,-4.9608832,P
+Trades,Data,Order,Equity and Index Options,USD,AXON 18OCT24 360 P,"2024-09-26, 10:59:04",-5,0.96,480,-3.544044,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-07, 15:30:43",5,0.75,-375,1.47325,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-07, 15:57:46",50,0.8,-4000,14.7325,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-10, 12:30:42",15,1.2,-1800,4.45575,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-14, 11:20:00",24,1.05,-2520,7.1292,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-09, 10:06:38",-35,1.165714286,4080,-24.814324,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-09, 10:10:07",-20,1.1435,2287,-7.9133786,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-09, 14:37:34",-5,1.31,655,-3.546909,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-09, 14:38:35",-5,1.32,660,-3.547048,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-09, 14:41:11",-5,1.35,675,1.452535,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 5 C,"2024-10-11, 15:36:07",-24,1.22,2928,-17.0191584,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 7.5 C,"2024-10-07, 15:31:56",10,0.15,-150,2.9465,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 18OCT24 7.5 C,"2024-10-09, 14:47:22",-10,0.2,200,-7.06296,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-07, 10:40:51",2,1.32,-264,-1.4107,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-07, 15:49:45",5,1.19,-595,-3.52675,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-07, 15:57:03",1,1.15,-115,-0.05535,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-09, 10:10:07",20,1.5285,-3057,-7.794,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-17, 11:17:36",6,1.42,-852,-4.2177,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-04, 12:34:12",-2,1.4,280,0.575936,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-09, 10:08:06",-1,1.45,145,-1.059771,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-10, 15:03:55",-1,1.6,160,-2.060188,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 5 C,"2024-10-17, 14:31:59",-30,1.33,3990,-21.358122,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 7.5 C,"2024-11-06, 10:30:22",10,0.6,-600,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 7.5 C,"2024-11-08, 10:51:47",-5,0.75,375,-3.532125,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 15NOV24 7.5 C,"2024-11-08, 11:16:03",-5,0.7,350,-3.53143,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 20DEC24 7.5 C,"2024-11-06, 10:35:31",1,1,-100,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 20DEC24 7.5 C,"2024-11-06, 10:58:52",1,0.9,-90,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 20DEC24 7.5 C,"2024-11-08, 10:48:15",-1,1.21,121,-1.0577038,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 20DEC24 7.5 C,"2024-11-08, 15:06:41",-1,1.3,130,-1.057954,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-26, 14:19:07",1,2.75,-275,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-26, 14:20:03",1,2.8,-280,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-26, 14:20:51",1,2.8,-280,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-26, 14:21:24",1,2.8,-280,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-26, 14:22:51",1,2.8,-280,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-26, 14:49:23",1,2.7,-270,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-27, 15:59:09",1,2.44,-244,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-27, 15:59:36",1,2.44,-244,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-27, 15:59:49",1,2.4,-240,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-30, 13:49:56",1,2.75,-275,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-30, 14:14:43",-5,2.75,1375,-3.518925,
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 2.5 C,"2024-09-30, 15:30:15",-5,2.41,1205,-3.564199,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 5 C,"2024-10-07, 15:37:50",5,1.88,-940,-3.52675,P
+Trades,Data,Order,Equity and Index Options,USD,BKSY 16MAY25 5 C,"2024-10-09, 14:21:39",-5,2.3,1150,-3.57317,
+Trades,Data,Order,Equity and Index Options,USD,BWXT 15NOV24 110 C,"2024-11-04, 15:07:41",1,11.5,-1150,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,BWXT 15NOV24 110 C,"2024-11-08, 14:48:03",-1,15,1500,-1.09604,
+Trades,Data,Order,Equity and Index Options,USD,BYRN 20SEP24 7.5 C,"2024-08-28, 10:50:54",-1,4,400,-1.06076,
+Trades,Data,Order,Equity and Index Options,USD,CHWY 01NOV24 28 C,"2024-10-28, 14:14:13",40,0.26,-1040,-28.188,P
+Trades,Data,Order,Equity and Index Options,USD,CHWY 01NOV24 28 C,"2024-11-01, 16:20:00",-40,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,CHWY 01NOV24 28.5 C,"2024-10-28, 14:13:35",50,0.18,-900,-35.1475,P
+Trades,Data,Order,Equity and Index Options,USD,CHWY 01NOV24 28.5 C,"2024-11-01, 16:20:00",-50,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,CHWY 01NOV24 29 C,"2024-10-28, 11:41:50",50,0.13,-650,-35.1475,P
+Trades,Data,Order,Equity and Index Options,USD,CHWY 01NOV24 29 C,"2024-11-01, 16:20:00",-50,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,DJT 08NOV24 20 P,"2024-11-04, 14:44:04",2,2.4,-480,-1.4031,P
+Trades,Data,Order,Equity and Index Options,USD,DJT 08NOV24 20 P,"2024-11-05, 09:42:45",1,1.68,-168,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,DJT 08NOV24 20 P,"2024-11-05, 10:22:03",2,1.85,-370,-1.4031,P
+Trades,Data,Order,Equity and Index Options,USD,DJT 08NOV24 20 P,"2024-11-05, 15:22:22",-5,2.5,1250,-3.55645,P
+Trades,Data,Order,Equity and Index Options,USD,EVEX 20SEP24 2.5 C,"2024-09-11, 13:13:05",-4,0.37,148,-2.8286744,P
+Trades,Data,Order,Equity and Index Options,USD,EVEX 18OCT24 2.5 C,"2024-09-10, 15:44:55",-5,0.4,200,-3.53626,P
+Trades,Data,Order,Equity and Index Options,USD,EVEX 18OCT24 2.5 C,"2024-09-11, 13:17:34",-25,0.42,1050,-17.68269,P
+Trades,Data,Order,Equity and Index Options,USD,EVEX 18OCT24 2.5 C,"2024-09-11, 13:22:34",-15,0.45,675,-10.610865,
+Trades,Data,Order,Equity and Index Options,USD,EVEX 18OCT24 2.5 C,"2024-09-18, 15:50:05",-5,0.45,225,-3.486955,
+Trades,Data,Order,Equity and Index Options,USD,EVEX 18OCT24 2.5 C,"2024-09-23, 15:46:14",-20,0.58,1160,-14.155048,P
+Trades,Data,Order,Equity and Index Options,USD,EVEX 18OCT24 5 C,"2024-10-18, 16:20:00",-221,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,EVEX 18OCT24 7.5 C,"2024-10-18, 16:20:00",-52,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,EVEX 17APR25 2.5 C,"2024-09-17, 10:58:02",10,0.75,-750,-6.9335,
+Trades,Data,Order,Equity and Index Options,USD,EVEX 17APR25 2.5 C,"2024-09-17, 11:00:01",10,0.8,-800,-6.9335,
+Trades,Data,Order,Equity and Index Options,USD,EVEX 17APR25 2.5 C,"2024-09-17, 11:03:02",10,0.75,-750,-6.9335,
+Trades,Data,Order,Equity and Index Options,USD,EVEX 17APR25 2.5 C,"2024-09-17, 11:44:08",10,0.7,-700,-6.9335,
+Trades,Data,Order,Equity and Index Options,USD,EVEX 17APR25 2.5 C,"2024-09-19, 14:31:28",-40,0.68,2720,-28.321216,P
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 175 C,"2024-09-10, 15:36:10",10,0.82,-820,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 175 C,"2024-09-11, 10:14:51",-1,0.33,33,-1.0570574,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 175 C,"2024-09-11, 10:15:40",-1,0.3,30,-1.056974,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 175 C,"2024-09-11, 10:19:20",-1,0.34,34,-1.0570852,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 175 C,"2024-09-12, 14:12:56",-5,1.15,575,-3.546685,P
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 175 C,"2024-09-13, 11:40:39",-2,3.23,646,-1.4302388,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 180 C,"2024-09-12, 14:12:56",15,0.33,-495,-10.55025,P
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 180 C,"2024-09-13, 11:18:36",-5,0.85,425,-2.292515,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 180 C,"2024-09-13, 11:18:50",-5,0.9,450,-3.54321,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 180 C,"2024-09-13, 11:34:01",-5,1,500,-3.5446,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-10, 15:36:10",10,1.758,-1758,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:08:44",-1,3.08,308,-1.0647024,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:10:22",-1,3.2,320,-1.065036,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:11:51",-2,3.25,650,-1.43035,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:14:51",-1,3.22,322,-1.0650916,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:14:58",-1,3.3,330,-1.065314,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:14:58",-1,3.3,330,-1.065314,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:15:40",-1,3.3,330,-1.065314,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:19:16",-1,3.4,340,-1.065592,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 162.5 P,"2024-09-11, 10:19:20",-1,3.36,336,-1.0654808,
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 170 P,"2024-09-12, 14:12:56",5,2.94,-1470,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,GE 20SEP24 170 P,"2024-09-20, 16:20:00",-5,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GE 18OCT24 195 C,"2024-09-24, 15:31:12",1,2.28,-228,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,GE 18OCT24 195 C,"2024-10-07, 15:00:29",-1,0.67,67,-1.0600026,
+Trades,Data,Order,Equity and Index Options,USD,GE 18OCT24 202.5 C,"2024-09-24, 15:30:47",10,0.72,-720,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,GE 18OCT24 202.5 C,"2024-10-18, 16:20:00",-10,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GE 19SEP25 175 C,"2024-09-10, 12:55:42",2,19.14,-3828,-1.4067,
+Trades,Data,Order,Equity and Index Options,USD,GE 19SEP25 175 C,"2024-09-18, 15:14:16",-1,31.65,3165,-1.146627,
+Trades,Data,Order,Equity and Index Options,USD,GE 19SEP25 175 C,"2024-09-18, 15:31:35",-1,31.55,3155,-0.793849,
+Trades,Data,Order,Equity and Index Options,USD,GE 19SEP25 200 C,"2024-09-18, 15:14:16",1,19.32,-1932,-1.05585,
+Trades,Data,Order,Equity and Index Options,USD,GE 19SEP25 200 C,"2024-09-18, 15:31:35",1,19.23,-1923,-0.70335,
+Trades,Data,Order,Equity and Index Options,USD,GE 19SEP25 200 C,"2024-09-10, 12:55:42",-2,10.31,2062,-1.4696036,
+Trades,Data,Order,Equity and Index Options,USD,GE 18DEC26 165 C,"2024-09-13, 11:25:04",1,42.47,-4247,-0.70335,
+Trades,Data,Order,Equity and Index Options,USD,GE 18DEC26 165 C,"2024-09-17, 13:45:16",-1,46.7,4670,-1.188466,
+Trades,Data,Order,Equity and Index Options,USD,GE 18DEC26 260 C,"2024-09-17, 13:45:16",1,13.21,-1321,-1.05585,
+Trades,Data,Order,Equity and Index Options,USD,GE 18DEC26 260 C,"2024-09-13, 11:25:04",-1,10.97,1097,-0.7366366,
+Trades,Data,Order,Equity and Index Options,USD,GME 23AUG24 22.5 C,"2024-08-23, 16:20:00",3,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 23AUG24 22.5 C,"2024-08-22, 11:41:45",-3,0.33,99,-2.1016722,
+Trades,Data,Order,Equity and Index Options,USD,GME 30AUG24 20 C,"2024-08-29, 13:38:38",-1,2.38,238,-1.0562564,
+Trades,Data,Order,Equity and Index Options,USD,GME 30AUG24 20 C,"2024-08-30, 14:03:02",-2,3.18,636,-1.4169608,P
+Trades,Data,Order,Equity and Index Options,USD,GME 30AUG24 20 C,"2024-08-30, 14:04:41",-2,3.28,656,-1.4175168,P
+Trades,Data,Order,Equity and Index Options,USD,GME 30AUG24 24 C,"2024-08-29, 13:41:58",-16,0.23,368,-11.2044704,P
+Trades,Data,Order,Equity and Index Options,USD,GME 06SEP24 34 C,"2024-08-29, 13:41:58",16,0.18,-288,-11.1496,P
+Trades,Data,Order,Equity and Index Options,USD,GME 06SEP24 34 C,"2024-09-06, 16:20:00",-16,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 19.5 C,"2024-09-11, 11:17:42",5,0.86,-430,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 19.5 C,"2024-09-11, 13:37:40",5,0.8,-400,-3.51675,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 19.5 C,"2024-09-12, 14:30:06",-5,1,500,-3.5446,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 19.5 C,"2024-09-12, 14:30:14",-1,1.02,102,-1.0589756,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 19.5 C,"2024-09-12, 14:41:24",-1,1.04,104,-1.0590312,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 19.5 C,"2024-09-12, 14:43:06",-1,1.06,106,-1.0590868,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 19.5 C,"2024-09-13, 11:41:47",-2,1.39,278,-1.4200084,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 24 C,"2024-09-10, 13:58:06",2,1.71,-342,-1.4067,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 24 C,"2024-09-10, 15:10:37",3,1.53,-459,-2.11005,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 24 C,"2024-09-13, 16:20:00",-5,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 27 C,"2024-09-11, 10:26:17",1,0.05,-5,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 27 C,"2024-09-09, 15:15:38",-1,1.02,102,-1.0589756,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 23 P,"2024-09-09, 15:15:38",1,1.07,-107,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,GME 13SEP24 23 P,"2024-09-11, 10:19:20",-1,3.28,328,-1.0652584,
+Trades,Data,Order,Equity and Index Options,USD,GME 04OCT24 23 C,"2024-09-17, 14:00:21",15,0.55,-825,-10.58775,P
+Trades,Data,Order,Equity and Index Options,USD,GME 04OCT24 23 C,"2024-09-20, 15:42:13",-5,0.95,475,-3.543905,P
+Trades,Data,Order,Equity and Index Options,USD,GME 04OCT24 23 C,"2024-09-23, 15:48:17",-10,0.93,930,-7.112254,P
+Trades,Data,Order,Equity and Index Options,USD,GME 04OCT24 28 C,"2024-09-23, 15:48:17",10,0.36,-360,-7.0585,P
+Trades,Data,Order,Equity and Index Options,USD,GME 04OCT24 28 C,"2024-10-04, 16:20:00",5,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 04OCT24 28 C,"2024-09-17, 14:00:21",-15,0.26,390,-10.640442,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21 C,"2024-10-10, 10:35:33",45,0.24,-1080,-31.63275,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21 C,"2024-10-10, 11:53:34",60,0.319666667,-1918,-42.467,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21 C,"2024-10-11, 15:38:49",80,0.01,-80,-62.276,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21 C,"2024-10-10, 10:18:19",-45,0.3,1350,-31.79583,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21 C,"2024-10-10, 11:24:19",-60,0.349166667,2095,-42.882641,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21 C,"2024-10-11, 11:09:49",-60,0.16,960,-42.371088,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21 C,"2024-10-11, 11:38:29",-20,0.2,400,-14.12592,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21.5 C,"2024-10-10, 15:56:48",60,0.13,-780,-42.177,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 21.5 C,"2024-10-10, 11:53:34",-60,0.17,1020,-42.662756,P
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 25 C,"2024-10-11, 15:40:34",5,0.01,-5,0.88525,
+Trades,Data,Order,Equity and Index Options,USD,GME 11OCT24 25 C,"2024-09-30, 12:37:22",-5,1,500,-3.5571,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-08-23, 11:10:33",10,3.75,-3750,-6.9685,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-08-29, 13:38:38",1,3.98,-398,-1.04685,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-11, 10:29:35",5,1.8,-900,-3.51675,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-11, 10:30:45",5,1.75,-875,-3.51675,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-12, 09:57:00",5,2.1,-1050,-3.51675,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-12, 14:19:44",5,2.28,-1140,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-17, 13:29:22",1,1.78,-178,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-17, 13:41:12",10,1.751,-1751,-7.0585,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-17, 13:41:34",4,1.76,-704,-2.8134,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-18, 13:17:57",5,1.47,-735,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-02, 13:01:09",5,2.36,-1180,-3.52675,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-02, 13:25:03",5,2.364,-1182,-3.52675,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-09, 12:56:20",80,0.99,-7920,-56.236,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-11, 15:46:21",25,1.05,-2625,-17.57375,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-11, 15:48:54",6,1.05,-630,-4.1577,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-11, 15:50:45",44,1.1,-4840,-30.4898,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-06, 12:11:50",-6,5.95,3570,-4.325886,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-19, 14:37:24",-10,1.23,1230,-7.095594,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-20, 14:39:38",-10,2.53,2530,-7.131734,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-20, 15:39:22",-2,2.7,540,-1.427292,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-20, 15:41:04",-3,2.65,795,-2.148021,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-24, 15:29:28",-5,3.07,1535,-3.573373,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-24, 15:42:36",-4,3.09,1236,-2.8589208,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-30, 12:41:59",-1,3.78,378,-1.0666484,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-09-30, 13:05:18",-5,3.67,1835,-3.581713,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-10, 15:06:45",-5,1.13,565,-3.544407,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-10, 15:53:46",-5,1.2,600,-3.54538,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-11, 14:56:04",-15,1.27,1905,-10.639059,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-14, 14:24:25",-50,1.27,6350,-35.58853,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-14, 14:24:40",-50,1.3,6500,-20.3277,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-14, 15:37:20",-25,1.59,3975,-17.754005,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 20 C,"2024-10-16, 15:50:56",-25,1.69,4225,-17.760955,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 21 C,"2024-10-04, 10:38:43",10,1.334,-1334,-7.0535,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 21 C,"2024-10-14, 15:32:44",-10,0.79,790,-8.359362,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 22 C,"2024-10-14, 11:46:47",140,0.619714286,-8676,-82.833,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 22 C,"2024-10-18, 16:20:00",-140,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23 C,"2024-10-14, 11:30:23",20,0.19,-380,-14.059,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23 C,"2024-10-14, 11:41:01",10,0.3,-300,-11.9295,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23 C,"2024-10-14, 11:41:18",110,0.319909091,-3519,-75.2545,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23 C,"2024-10-14, 11:46:47",-140,0.409857143,5738,-83.3831164,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23.5 C,"2024-10-14, 14:18:10",60,0.17,-1020,-69.307,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23.5 C,"2024-10-14, 14:18:32",59,0.18,-1062,-40.85405,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23.5 C,"2024-10-14, 14:28:48",1,0.18,-18,-1.05295,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23.5 C,"2024-10-14, 11:44:16",-60,0.29,1740,-42.392772,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 23.5 C,"2024-10-18, 16:20:00",-60,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 25 C,"2024-10-02, 15:15:59",20,0.64,-1280,-14.107,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 25 C,"2024-10-14, 14:19:39",60,0.13,-780,-42.327,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 25 C,"2024-10-14, 11:30:23",-20,0.1,200,-14.12036,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 25 C,"2024-10-14, 11:43:02",-60,0.190833333,1145,-30.416231,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 27 C,"2024-10-16, 12:30:27",1,0.06,-6,-1.55295,
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 27 C,"2024-10-16, 12:30:39",179,0.07,-1253,-98.35805,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 27 C,"2024-10-11, 15:53:17",-180,0.12,2160,-211.883248,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 30 C,"2024-10-10, 12:04:16",15,0.14,-210,-12.98425,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 30 C,"2024-10-02, 13:25:03",-5,0.414,207,-3.5464546,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 30 C,"2024-10-04, 10:38:43",-10,0.334,334,-7.0906852,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 60 C,"2024-09-19, 14:37:24",10,0.14,-140,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18OCT24 60 C,"2024-09-17, 13:41:12",-10,0.2,200,-7.09196,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 20 C,"2024-10-25, 15:25:23",5,0.87,-435,-3.51475,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 20 C,"2024-10-29, 10:09:30",10,2.631,-2631,-5.5695,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 20 C,"2024-10-28, 10:41:11",-5,1.23,615,-3.495797,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 20 C,"2024-10-29, 11:31:51",-10,2.8,2800,-7.03524,
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 10:02:16",50,1.77,-8850,-35.1475,
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 10:32:01",20,1.43,-2860,-14.109,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 10:33:13",10,1.45,-1450,-6.9295,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:09:49",10,1.6,-1600,-6.9295,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 10:03:15",-10,1.85,1850,-7.10883,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 10:03:57",-10,1.9,1900,-7.01022,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:23:56",-10,1.77,1770,-7.131606,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:24:23",-10,1.75,1750,-7.13105,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:24:47",-10,1.8,1800,-7.00744,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:24:58",-10,1.8,1800,-7.10744,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:26:55",-10,1.85,1850,-7.00883,
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:31:51",-10,1.9,1900,-7.01022,
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:32:56",-5,1.99,995,-3.506361,
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21 C,"2024-10-29, 11:33:31",-5,2.15,1075,-3.508585,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21.5 C,"2024-10-29, 11:43:53",10,1.66,-1660,-7.0545,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 21.5 C,"2024-10-28, 13:45:14",-10,1.11,1110,-7.088258,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 22 C,"2024-10-29, 12:24:37",50,1.1,-5500,-35.2725,
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 22 C,"2024-10-29, 13:17:05",-40,1,4000,-27.9408,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 22 C,"2024-10-29, 14:46:40",-10,1.06,1060,-7.086868,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 22.5 C,"2024-10-29, 11:48:42",20,1.0915,-2183,-11.199,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 22.5 C,"2024-10-29, 14:52:18",-3,0.84,252,-2.7242256,
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 22.5 C,"2024-10-29, 14:52:38",-17,0.85,1445,-11.017751,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 23 C,"2024-10-29, 12:00:40",10,0.73,-730,-3.6595,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 23 C,"2024-10-29, 11:43:53",-10,0.85,850,-7.10603,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 24 C,"2024-10-29, 09:51:54",20,0.45,-900,-13.859,
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 24 C,"2024-10-29, 12:02:38",10,0.53,-530,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 24 C,"2024-10-29, 13:26:08",20,0.44,-880,-14.059,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 24 C,"2024-10-29, 14:18:01",30,0.51,-1530,-21.1635,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 24 C,"2024-10-28, 14:09:30",-20,0.54,1080,-13.944824,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 24 C,"2024-10-29, 10:09:30",-10,0.481,481,-5.6107718,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 24 C,"2024-10-29, 11:48:42",-20,0.6365,1273,-11.2901894,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01NOV24 24 C,"2024-10-29, 14:00:42",-30,0.46,1380,-21.285564,
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 22 C,"2024-10-29, 12:34:28",20,1.57,-3140,-14.859,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 22 C,"2024-11-04, 14:17:18",10,0.9,-900,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 22 C,"2024-10-28, 14:52:09",-20,1.359,2718,-14.1903604,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 22 C,"2024-11-05, 15:40:34",-10,1.38,1380,-7.081764,
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 22.5 C,"2024-10-24, 14:28:41",40,0.4185,-1674,-25.068,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 22.5 C,"2024-10-23, 13:43:25",-40,0.4,1600,-28.27408,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 23 C,"2024-10-30, 09:37:15",10,1.79,-1790,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 23 C,"2024-10-30, 09:56:23",-10,2.18,2180,-7.118004,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 23.5 C,"2024-11-05, 15:52:36",10,0.57,-570,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 23.5 C,"2024-11-05, 15:31:31",-10,0.79,790,-7.065362,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-10-25, 15:11:06",30,0.35,-1050,-21.0885,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-10-29, 14:52:18",3,0.83,-249,-2.70885,
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-10-29, 14:52:38",17,0.84,-1428,-10.93015,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-10-30, 15:36:41",10,0.88,-880,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-11-07, 10:50:15",10,0.22,-220,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-10-23, 13:46:49",-20,0.26,520,-22.669256,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-10-25, 11:21:04",-10,0.38,380,-7.067964,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-10-29, 14:18:01",-30,0.84,2520,-21.317256,P
+Trades,Data,Order,Equity and Index Options,USD,GME 08NOV24 25 C,"2024-11-06, 14:34:15",-10,0.27,270,-7.050906,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 19 C,"2024-10-09, 13:02:05",10,2.62,-2620,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 19 C,"2024-10-14, 15:38:46",-5,3.13,1565,-3.572207,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 19 C,"2024-10-16, 15:51:52",-5,3.15,1575,-3.572485,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 20 C,"2024-10-04, 14:31:29",20,3.16,-6320,-12.907,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 20 C,"2024-10-14, 14:24:25",25,2.32,-5800,-17.63625,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 20 C,"2024-10-14, 14:24:40",25,2.35,-5875,-10.00375,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 20 C,"2024-10-17, 14:44:12",10,2.31,-2310,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 20 C,"2024-10-17, 14:45:57",20,2.318,-4636,-10.859,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 20 C,"2024-10-23, 13:36:46",-40,1.31,5240,-28.375272,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 20 C,"2024-10-28, 13:21:31",-60,2.54,15240,-25.398072,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 22 C,"2024-10-23, 13:44:38",20,0.69,-1380,-14.109,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 22 C,"2024-10-17, 14:45:57",-20,1.423,2846,-10.9939188,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 24 C,"2024-11-08, 11:42:37",10,1.123,-1123,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 24 C,"2024-11-08, 13:59:30",-10,1.507,1507,-7.0852946,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 26 C,"2024-11-08, 13:59:30",10,0.917,-917,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 26 C,"2024-11-08, 11:42:37",-10,0.63,630,-7.060914,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 28 C,"2024-11-07, 10:51:07",10,0.5,-500,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 28 C,"2024-11-06, 14:35:29",-10,0.54,540,-7.058412,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 30 C,"2024-11-08, 11:42:37",10,0.337,-337,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 30 C,"2024-11-08, 13:59:30",-10,0.51,510,-7.057578,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 35 C,"2024-10-14, 14:27:12",20,0.46,-920,-14.059,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15NOV24 35 C,"2024-10-04, 14:31:29",-20,0.82,1640,-13.008392,P
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 20 C,"2024-10-25, 15:18:51",10,1.75,-1750,-6.9295,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 20 C,"2024-10-28, 15:45:56",-10,3.1,3100,-7.04358,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 21 C,"2024-11-08, 10:43:13",3,3.12,-936,-2.10465,P
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 21 C,"2024-11-07, 10:32:03",-3,2.51,753,-2.1339534,P
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-12, 11:05:01",1,0.74,-74,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-18, 10:51:10",7,0.19,-133,-1.55085,P
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-11, 14:31:04",-1,0.95,95,-1.056981,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-12, 10:04:28",-1,1.05,105,-0.707259,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-12, 10:04:51",-1,1.05,105,-0.707259,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-12, 10:07:02",-1,0.88,88,-1.0592864,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-12, 10:07:18",-1,0.88,88,-0.7067864,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-12, 10:08:16",-1,0.88,88,-0.7067864,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-12, 10:43:26",-1,0.73,73,-0.7063694,
+Trades,Data,Order,Equity and Index Options,USD,GME 22NOV24 40 C,"2024-11-12, 10:43:26",-1,0.75,75,-0.716425,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 20 C,"2024-10-31, 12:41:25",2,3.37,-674,-1.0059,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 20 C,"2024-11-07, 12:12:01",1,3.69,-369,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 20 C,"2024-11-07, 12:27:55",-1,3.7,370,-1.064626,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 20 C,"2024-11-08, 10:59:30",-2,4.32,864,-1.4326992,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-28, 13:21:31",60,2.486,-14916,-24.807,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-28, 15:37:41",40,2.74,-10960,-28.218,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 11:08:15",5,3.15,-1575,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 11:09:13",5,3.1,-1550,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 12:57:22",5,3.2,-1600,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 13:09:46",5,3.35,-1675,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 13:26:46",5,3.3,-1650,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-31, 11:23:32",5,2.58,-1290,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-28, 15:58:22",-20,2.95,5900,-14.07882,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-28, 15:59:54",-20,3,6000,-14.0816,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 09:51:27",-20,3.79,7580,-14.375524,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 09:58:50",-5,3.99,1995,-3.584161,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 15:42:22",-5,3.24,1620,-3.586236,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-10-30, 15:59:59",-10,3,3000,-2.3408,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-11-07, 12:25:29",-20,2.88,5760,-14.246928,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-11-07, 12:29:46",-5,2.928,1464,-3.5623992,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-11-07, 12:30:10",-5,2.92,1460,-3.562288,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-11-07, 12:38:22",-19,2.835789474,5388,-13.5322464,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 21 C,"2024-11-08, 10:50:15",-1,3.27,327,-1.0634306,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-10-30, 09:51:27",20,2.77,-5540,-14.109,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-10-30, 10:45:11",5,2.58,-1290,-3.51475,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-10-30, 10:45:12",5,2.55,-1275,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-10-30, 10:45:36",5,2.55,-1275,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-10-30, 10:45:57",5,2.5,-1250,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-07, 12:25:29",20,1.83,-3660,-14.031,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-07, 12:27:55",1,1.85,-185,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-07, 12:29:46",5,1.87,-935,-3.50775,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-07, 12:30:10",5,1.87,-935,-3.50775,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-07, 12:38:22",19,1.827368421,-3472,-13.32945,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-08, 10:50:15",1,2.07,-207,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-10-29, 15:54:25",-40,1.95,7800,-28.04644,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-08, 10:40:09",-30,2.19,6570,-21.312846,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-08, 10:43:13",-3,2.07,621,-2.1302838,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 23 C,"2024-11-08, 10:54:17",-18,2.152222222,3874,-12.7858172,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 25 C,"2024-11-08, 10:40:09",30,1.53,-4590,-21.0465,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 25 C,"2024-11-05, 11:54:19",-30,1,3000,-21.2136,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 30 C,"2024-11-08, 10:54:17",18,0.797777778,-1436,-12.6279,P
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 30 C,"2024-11-08, 10:59:00",2,0.82,-164,-1.4031,
+Trades,Data,Order,Equity and Index Options,USD,GME 29NOV24 30 C,"2024-11-07, 12:15:29",-20,0.71,1420,-14.126276,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-11, 10:21:22",1,7.23,-723,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-11, 10:21:30",1,7.24,-724,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-11, 10:21:38",1,7.19,-719,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-11, 10:21:48",1,7.17,-717,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-11, 10:22:08",1,7.2,-720,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-11, 14:45:10",1,7.93,-793,-1.05405,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 10:04:28",1,7.55,-755,-0.70155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 10:04:51",1,7.55,-755,-0.70155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 10:07:02",1,7.07,-707,-1.05405,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 10:07:18",1,7.06,-706,-0.70155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 10:08:16",1,7.08,-708,-0.70155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 10:43:26",1,6.73,-673,-0.70155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 10:43:26",1,6.75,-675,-0.71155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 14:32:04",1,7.6,-760,-1.04155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 14:33:24",1,7.5,-750,-1.04155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 15:04:34",1,7.7,-770,-1.05405,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 15:04:49",1,7.85,-785,-1.05405,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 15:05:20",1,7.77,-777,-1.05405,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 15:06:25",1,7.74,-774,-0.70155,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-12, 15:07:05",1,7.71,-771,-1.05405,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-12-05, 13:53:34",5,9.08,-4540,-3.46975,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-20, 13:08:03",-2,9.65,1930,-1.442334,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-20, 13:08:35",-2,9.7,1940,-1.462612,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-20, 13:11:53",-2,9.84,1968,-1.4633904,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-20, 13:13:09",-2,9.75,1950,-1.46289,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-11-20, 13:14:08",-2,9.93,1986,-0.9438908,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 20 C,"2024-12-05, 14:05:06",-15,9.328,13992,-10.8400776,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 40 C,"2024-11-20, 12:08:33",6,2.09,-1254,-4.2093,P
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 40 C,"2024-11-11, 14:45:10",-1,2.55,255,-1.063929,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 40 C,"2024-11-12, 15:04:34",-1,2.85,285,-1.064763,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 40 C,"2024-11-12, 15:04:49",-1,3,300,-1.06518,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 40 C,"2024-11-12, 15:05:20",-1,2.92,292,-1.0649576,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 40 C,"2024-11-12, 15:06:25",-1,2.94,294,-0.7125132,
+Trades,Data,Order,Equity and Index Options,USD,GME 13DEC24 40 C,"2024-11-12, 15:07:05",-1,2.94,294,-1.0650132,
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 20 C,"2024-11-04, 15:31:07",1,3.81,-381,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 20 C,"2024-11-07, 11:14:53",-1,4.6,460,-1.067128,
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 25 C,"2024-12-05, 13:55:40",10,6.64,-6640,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 25 C,"2024-12-17, 09:33:52",-10,5.488,5488,-7.1199664,P
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 32 C,"2024-12-18, 12:08:18",30,0.93,-2790,-20.8185,
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 32 C,"2024-12-17, 09:45:17",-30,1.28,3840,-21.008952,
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 35 C,"2024-12-17, 11:21:29",20,0.805,-1610,-13.879,P
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 35 C,"2024-12-20, 16:20:00",-20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 45 C,"2024-12-20, 16:20:00",20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 20DEC24 45 C,"2024-12-17, 11:21:29",-20,0.305,610,-13.951758,P
+Trades,Data,Order,Equity and Index Options,USD,GME 27DEC24 24 C,"2024-12-05, 13:57:33",5,5.79,-2895,-3.46975,P
+Trades,Data,Order,Equity and Index Options,USD,GME 27DEC24 24 C,"2024-12-05, 14:06:50",-5,6.1,3050,-3.56849,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 20 C,"2024-12-05, 14:03:38",1,9,-900,-1.04395,
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 20 C,"2024-12-05, 14:05:06",15,9.828,-14742,-10.40925,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 20 C,"2024-12-05, 14:06:50",5,9.5,-4750,-3.46975,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 20 C,"2024-12-05, 14:07:55",4,9.7,-3880,-2.7758,
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 20 C,"2024-12-17, 09:48:16",-25,10.6984,26746,-18.1620388,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 25 C,"2024-12-17, 09:48:16",25,6.39,-15975,-17.34875,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 25 C,"2025-01-10, 12:40:11",-20,7.25,14500,-14.4239,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 25 C,"2025-01-10, 12:55:06",-5,7.4,3700,-3.60806,
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 26 C,"2024-12-17, 09:33:52",10,5.558,-5558,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 26 C,"2025-01-10, 12:37:32",-10,6.28,6280,-7.184984,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 31.5 C,"2025-01-10, 11:04:14",40,0.54,-2160,-27.93,
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 31.5 C,"2025-01-10, 13:01:09",-25,0.92,2300,-18.06494,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 31.5 C,"2025-01-10, 13:13:19",-15,1.2,1800,-10.56564,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 32 C,"2025-01-10, 12:37:32",100,0.478,-4780,-69.825,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 32 C,"2025-01-10, 13:27:05",-50,0.75,3750,-35.15625,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 32 C,"2025-01-10, 13:57:37",-5,0.9,450,-3.51771,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 32 C,"2025-01-10, 13:58:07",-5,0.95,475,-3.518405,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 32 C,"2025-01-10, 14:41:04",-5,0.8,400,-3.51632,
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 32 C,"2025-01-10, 15:10:42",-5,0.75,375,-3.590125,P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 32 C,"2025-01-10, 15:18:42",-20,0.53,1060,-14.348268,L;P
+Trades,Data,Order,Equity and Index Options,USD,GME 10JAN25 32 C,"2025-01-10, 15:27:57",-10,0.45,450,-7.17191,P
+Trades,Data,Order,Equity and Index Options,USD,GME 17JAN25 30 C,"2025-01-14, 15:54:11",100,0.54,-5400,-71.315,P
+Trades,Data,Order,Equity and Index Options,USD,GME 17JAN25 30 C,"2025-01-17, 16:20:00",-100,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 24JAN25 30 C,"2025-01-10, 15:35:40",25,3.6,-9000,-17.45625,P
+Trades,Data,Order,Equity and Index Options,USD,GME 24JAN25 30 C,"2025-01-24, 16:20:00",-25,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 31JAN25 30 C,"2025-01-14, 15:50:01",50,1.67,-8350,-34.9125,P
+Trades,Data,Order,Equity and Index Options,USD,GME 31JAN25 30 C,"2025-01-31, 16:20:00",-50,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 06JUN25 31 C,"2025-06-03, 09:50:18",10,0.8,-800,-7.0795,
+Trades,Data,Order,Equity and Index Options,USD,GME 06JUN25 31 C,"2025-06-06, 16:20:00",-10,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GME 20JUN25 22 C,"2025-06-12, 11:39:49",4,1.7,-680,-2.8318,P
+Trades,Data,Order,Equity and Index Options,USD,GME 20JUN25 22 C,"2025-06-20, 15:37:18",-4,1.23,492,-2.84296,P
+Trades,Data,Order,Equity and Index Options,USD,GME 20JUN25 25 C,"2025-01-22, 14:26:21",8,7.37,-5896,-5.642,P
+Trades,Data,Order,Equity and Index Options,USD,GME 20JUN25 25 C,"2025-05-27, 11:15:46",-4,10.55,4220,-2.84296,P
+Trades,Data,Order,Equity and Index Options,USD,GME 20JUN25 25 C,"2025-06-12, 11:39:49",-4,0.7,280,-2.84296,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18JUL25 20 C,"2025-06-12, 11:43:49",5,3.642,-1821,-3.53975,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18JUL25 20 C,"2025-07-14, 10:41:30",-5,3.73,1865,-3.5322,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18JUL25 30 C,"2025-07-14, 10:41:30",5,0.04,-20,-3.51825,P
+Trades,Data,Order,Equity and Index Options,USD,GME 18JUL25 30 C,"2025-06-12, 11:43:49",-5,0.916,458,-3.5537,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01AUG25 22 C,"2025-07-31, 15:29:52",5,0.6,-300,-3.51825,P
+Trades,Data,Order,Equity and Index Options,USD,GME 01AUG25 22 C,"2025-08-01, 15:31:18",-4,0.16,64,-2.81696,L;P
+Trades,Data,Order,Equity and Index Options,USD,GME 01AUG25 22 C,"2025-08-01, 15:39:37",-1,0.14,14,-1.05424,
+Trades,Data,Order,Equity and Index Options,USD,GME 12SEP25 20 C,"2025-07-31, 15:34:20",1,3.31,-331,-1.05365,
+Trades,Data,Order,Equity and Index Options,USD,GME 17OCT25 22 C,"2025-06-12, 11:34:17",5,4.772,-2386,-3.53975,P
+Trades,Data,Order,Equity and Index Options,USD,GME 17OCT25 30 C,"2025-06-12, 11:35:36",5,2.85,-1425,-3.53975,P
+Trades,Data,Order,Equity and Index Options,USD,GME 17OCT25 31 C,"2025-06-12, 11:34:17",-5,2.672,1336,-3.5537,P
+Trades,Data,Order,Equity and Index Options,USD,GME 17OCT25 35 C,"2025-06-12, 11:35:36",-5,2.23,1115,-3.5537,P
+Trades,Data,Order,Equity and Index Options,USD,GME 15JAN27 20 C,"2025-01-10, 15:31:39",2,19,-3800,-1.3965,
+Trades,Data,Order,Equity and Index Options,USD,GSAT 17JAN25 2 C,"2024-12-18, 13:37:37",50,0.28,-1400,-34.6975,P
+Trades,Data,Order,Equity and Index Options,USD,GSAT 17JAN25 2 C,"2025-01-17, 16:20:00",-50,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,GSAT 17APR25 1.5 C,"2024-11-05, 15:28:26",15,0.56,-840,-10.52325,
+Trades,Data,Order,Equity and Index Options,USD,GSAT 17APR25 1.5 C,"2024-11-06, 15:52:36",15,0.6,-900,-10.52325,P
+Trades,Data,Order,Equity and Index Options,USD,GSAT 17APR25 1.5 C,"2024-11-11, 15:32:14",-15,0.66,990,-10.592622,P
+Trades,Data,Order,Equity and Index Options,USD,GSAT 17APR25 1.5 C,"2025-01-03, 10:14:06",-10,0.85,850,-7.03403,
+Trades,Data,Order,Equity and Index Options,USD,GSAT 17APR25 2 C,"2024-11-29, 10:00:12",15,0.39,-585,-10.52325,P
+Trades,Data,Order,Equity and Index Options,USD,GSAT 17APR25 2 C,"2024-11-18, 11:46:42",-15,0.25,375,-10.575525,
+Trades,Data,Order,Equity and Index Options,USD,HII 15NOV24 240 C,"2024-10-30, 15:44:28",1,16,-1600,-1.04295,
+Trades,Data,Order,Equity and Index Options,USD,HII 15NOV24 240 C,"2024-11-06, 10:26:35",1,0.12,-12,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,HII 15NOV24 240 C,"2024-11-15, 16:20:00",-2,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,HII 15NOV24 250 C,"2024-10-31, 12:23:28",1,0.1,-10,-1.05295,
+Trades,Data,Order,Equity and Index Options,USD,HII 15NOV24 250 C,"2024-10-31, 12:24:04",9,0.1,-90,-6.34905,
+Trades,Data,Order,Equity and Index Options,USD,HII 15NOV24 250 C,"2024-11-15, 16:20:00",-10,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-10-31, 12:22:14",10,0.95,-950,-6.9295,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-06, 09:54:44",-1,1.51,151,-1.0585378,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-06, 09:55:06",-1,1.55,155,-1.058649,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-06, 09:59:00",-1,1.55,155,-1.058649,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-06, 09:59:00",-1,1.6,160,-1.058788,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-06, 10:23:44",-1,1.8,180,-1.059344,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-07, 11:06:02",-1,1.32,132,-1.0580096,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-07, 11:06:19",-1,1.32,132,-1.0580096,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-07, 11:07:06",-2,1.3,260,-1.415908,
+Trades,Data,Order,Equity and Index Options,USD,HII 21MAR25 260 C,"2024-11-07, 12:13:32",-1,1.3,130,-1.057954,
+Trades,Data,Order,Equity and Index Options,USD,HP 15NOV24 37.5 C,"2024-10-21, 15:42:13",20,0.77,-1540,-14.059,
+Trades,Data,Order,Equity and Index Options,USD,HP 15NOV24 37.5 C,"2024-10-24, 11:09:14",-20,0.35,700,-14.13426,
+Trades,Data,Order,Equity and Index Options,USD,HWM 15NOV24 95 C,"2024-11-05, 10:26:45",1,8.36,-836,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,HWM 15NOV24 95 C,"2024-11-05, 15:59:13",-1,8.8,880,-1.078804,
+Trades,Data,Order,Equity and Index Options,USD,INTC 15NOV24 18 P,"2024-09-20, 15:36:55",10,0.56,-560,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,INTC 15NOV24 18 P,"2024-09-23, 15:31:25",-10,0.4,400,-7.07252,
+Trades,Data,Order,Equity and Index Options,USD,INTC 15NOV24 19 P,"2024-09-20, 15:36:15",10,0.78,-780,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,INTC 15NOV24 19 P,"2024-09-23, 15:32:03",-5,0.6,300,-3.53904,
+Trades,Data,Order,Equity and Index Options,USD,INTC 15NOV24 19 P,"2024-09-23, 15:49:05",-5,0.59,295,-2.428901,P
+Trades,Data,Order,Equity and Index Options,USD,INTC 15NOV24 22 P,"2024-09-20, 15:37:43",5,1.91,-955,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,INTC 15NOV24 22 P,"2024-09-23, 15:32:33",5,1.73,-865,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,INTC 15NOV24 22 P,"2024-09-26, 15:52:39",-10,1.1,1100,-7.11698,
+Trades,Data,Order,Equity and Index Options,USD,IRDM 17APR25 25 C,"2024-10-29, 15:58:24",5,6.6,-3300,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,IRDM 17APR25 25 C,"2024-10-31, 11:23:47",-4,6.3,2520,-2.893016,
+Trades,Data,Order,Equity and Index Options,USD,IRDM 17APR25 25 C,"2024-11-05, 12:02:31",-1,6.78,678,-1.0731884,
+Trades,Data,Order,Equity and Index Options,USD,ITA 15NOV24 150 C,"2024-11-04, 15:20:05",10,0.9,-900,-7.0155,
+Trades,Data,Order,Equity and Index Options,USD,ITA 15NOV24 150 C,"2024-11-05, 15:51:04",-1,1,100,-1.05712,
+Trades,Data,Order,Equity and Index Options,USD,ITA 15NOV24 150 C,"2024-11-05, 15:54:20",-1,1,100,-1.05712,
+Trades,Data,Order,Equity and Index Options,USD,ITA 15NOV24 150 C,"2024-11-05, 15:54:46",-2,1,200,-1.41424,
+Trades,Data,Order,Equity and Index Options,USD,ITA 15NOV24 150 C,"2024-11-05, 15:55:11",-1,1.05,105,-1.057259,
+Trades,Data,Order,Equity and Index Options,USD,ITA 15NOV24 150 C,"2024-11-05, 15:55:26",-1,1.05,105,-1.057259,
+Trades,Data,Order,Equity and Index Options,USD,ITA 15NOV24 150 C,"2024-11-06, 09:33:43",-4,2.5,1000,-2.84516,
+Trades,Data,Order,Equity and Index Options,USD,IWM 01OCT24 219 C,"2024-09-18, 13:54:03",1,4.68,-468,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,IWM 01OCT24 219 C,"2024-09-19, 14:39:59",-1,6.43,643,-1.0740154,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 5.5 C,"2024-10-03, 09:44:38",40,0.35,-1400,-28.214,P
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 5.5 C,"2024-10-04, 11:56:41",-5,0.4,200,-3.54626,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 5.5 C,"2024-10-04, 12:16:25",-20,0.45,900,-14.18782,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 5.5 C,"2024-10-04, 12:25:47",-5,0.5,250,-3.54765,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 5.5 C,"2024-10-04, 13:51:02",-10,0.383,383,-0.3420474,P
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 6 C,"2024-10-04, 16:20:00",20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 6 C,"2024-10-02, 14:32:50",-20,0.45,900,-14.18782,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 6.5 C,"2024-10-04, 16:20:00",20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,JOBY 04OCT24 6.5 C,"2024-10-02, 14:30:19",-20,0.22,440,-14.175032,P
+Trades,Data,Order,Equity and Index Options,USD,JOBY 11OCT24 6.5 C,"2024-10-02, 10:48:41",40,0.24,-960,-28.214,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 11OCT24 6.5 C,"2024-10-07, 12:36:11",-40,0.15,600,-28.34228,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 11OCT24 7 C,"2024-10-02, 10:49:03",50,0.17,-850,-35.2675,P
+Trades,Data,Order,Equity and Index Options,USD,JOBY 11OCT24 7 C,"2024-10-02, 15:29:12",-50,0.2,1000,-35.4348,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 18OCT24 5 C,"2024-10-02, 10:44:25",20,1.12,-2240,-14.107,P
+Trades,Data,Order,Equity and Index Options,USD,JOBY 18OCT24 5 C,"2024-10-03, 09:46:30",20,0.85,-1700,-14.107,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 18OCT24 5 C,"2024-10-07, 11:45:27",-40,1,4000,-28.0368,P
+Trades,Data,Order,Equity and Index Options,USD,JOBY 18OCT24 5.5 C,"2024-10-04, 13:51:02",10,0.583,-583,-0.3035,P
+Trades,Data,Order,Equity and Index Options,USD,JOBY 18OCT24 5.5 C,"2024-10-18, 16:20:00",-10,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,JOBY 18OCT24 6 C,"2024-10-02, 10:44:57",50,0.5,-2500,-35.2675,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 18OCT24 6 C,"2024-10-02, 14:13:28",-30,0.5,1500,-21.2859,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 18OCT24 6 C,"2024-10-18, 16:20:00",-20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,JOBY 15NOV24 5 C,"2024-11-06, 13:45:17",30,0.29,-870,-21.0465,
+Trades,Data,Order,Equity and Index Options,USD,JOBY 15NOV24 5 C,"2024-11-07, 10:26:25",-30,0.25,750,-21.15105,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-09-19, 12:26:07",100,0.23,-2300,-70.335,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-09-19, 13:37:57",20,0.24,-480,-14.117,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-09-30, 15:36:44",-20,0.2,400,-14.13392,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-01, 10:35:50",-10,0.428,428,-7.0932984,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-01, 10:45:20",-30,0.55,1650,-21.29007,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-01, 15:23:40",-5,0.91,455,-3.553349,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-01, 15:29:17",-5,0.9,450,-3.55321,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-01, 15:45:17",-10,0.92,920,-7.106976,
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-02, 11:14:25",-10,0.85,850,-7.10503,
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-02, 14:33:16",-5,1.05,525,-3.555295,
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-02, 15:33:31",-9,1.05,945,-6.399531,
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 25 C,"2024-10-11, 15:41:37",-16,0.5,800,-11.31408,
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 20 P,"2024-09-19, 13:37:57",20,0.21,-420,-14.117,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 20 P,"2024-10-01, 10:35:50",10,0.128,-128,-7.0535,P
+Trades,Data,Order,Equity and Index Options,USD,KTOS 18OCT24 20 P,"2024-10-18, 16:20:00",-30,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,LOAR 17JAN25 75 C,"2024-12-30, 10:07:33",1,2,-200,-1.04395,
+Trades,Data,Order,Equity and Index Options,USD,LOAR 17JAN25 75 C,"2024-12-30, 10:21:16",1,2.1,-210,-1.04395,
+Trades,Data,Order,Equity and Index Options,USD,LOAR 17JAN25 75 C,"2024-12-30, 10:23:56",1,2,-200,-1.04395,
+Trades,Data,Order,Equity and Index Options,USD,LOAR 17JAN25 75 C,"2025-01-03, 10:30:56",-1,2.54,254,-1.0771012,
+Trades,Data,Order,Equity and Index Options,USD,LOAR 17JAN25 75 C,"2025-01-03, 10:44:34",-2,2.5,500,-1.41598,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 30AUG24 5.5 C,"2024-08-30, 16:20:00",1,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,LUNR 30AUG24 5.5 C,"2024-08-26, 14:27:16",-1,0.27,27,-1.0503906,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 06SEP24 5.5 C,"2024-09-06, 16:20:00",1,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,LUNR 06SEP24 5.5 C,"2024-09-04, 11:12:16",-1,0.35,35,-1.051913,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 5 C,"2024-08-20, 12:01:09",5,1.8,-900,-3.48425,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 5 C,"2024-08-21, 15:56:23",-5,1.3,650,-3.51627,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 7 C,"2024-09-19, 14:00:48",10,2.308,-2308,-1.8935,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 7 C,"2024-09-19, 14:01:36",4,2.22,-888,0.1866,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 7 C,"2024-09-19, 14:17:17",-10,2.13,2130,-7.120614,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 7 C,"2024-09-19, 14:24:56",-4,2.42,968,-2.8514704,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 8 C,"2024-09-18, 09:49:41",20,0.822,-1644,-5.817,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 8 C,"2024-09-18, 10:03:56",2,0.65,-130,-1.4067,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 8 C,"2024-09-18, 10:00:20",-2,0.7,140,-1.416172,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 8 C,"2024-09-18, 10:26:41",-2,1.3,260,-2.219508,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 8 C,"2024-09-19, 13:00:37",-8,0.6,480,-5.662464,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 8 C,"2024-09-19, 13:09:23",-6,0.6,360,-4.246848,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 8 C,"2024-09-19, 13:14:57",-4,0.65,260,-2.831788,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 10 C,"2024-09-18, 10:26:41",2,0.55,-110,-2.2067,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 10 C,"2024-09-20, 13:33:42",1,0.03,-3,-0.25335,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 10 C,"2024-09-20, 13:38:53",9,0.04,-36,-2.73015,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 10 C,"2024-09-20, 16:20:00",22,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 10 C,"2024-09-18, 09:49:41",-20,0.322,644,-5.8907032,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 10 C,"2024-09-19, 14:00:48",-10,0.408,408,-1.9327424,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 20SEP24 10 C,"2024-09-19, 14:01:36",-4,0.37,148,0.1713256,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 6 C,"2024-09-19, 14:16:07",10,3.23,-3230,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 6 C,"2024-09-25, 15:27:54",-5,2,1000,-3.5585,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 6 C,"2024-09-26, 10:26:17",-5,2.06,1030,-3.559334,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 7.5 C,"2024-09-26, 10:23:35",15,0.664666667,-997,-1.12025,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 7.5 C,"2024-09-26, 10:44:46",5,0.676,-338,-1.75675,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 7.5 C,"2024-09-26, 15:44:08",-10,0.5,500,-7.0753,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 7.5 C,"2024-09-27, 09:37:29",-10,0.81,810,-1.083918,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 8 C,"2024-09-19, 14:24:34",4,1.81,-724,-2.8134,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 8 C,"2024-09-23, 15:25:24",10,0.56,-560,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 8 C,"2024-09-23, 15:25:56",20,0.5445,-1089,-14.067,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 8 C,"2024-09-23, 15:29:21",10,0.55,-550,-7.0335,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 8 C,"2024-09-25, 15:49:53",-14,0.27,378,-9.8964684,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 8 C,"2024-09-26, 10:23:35",-15,0.315333333,473,-1.1752494,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 8 C,"2024-09-26, 10:40:27",-10,0.349,349,-0.3211022,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 27SEP24 8 C,"2024-09-26, 10:44:46",-5,0.326,163,-1.7752314,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 04OCT24 7 C,"2024-09-26, 10:40:27",10,1.299,-1299,-0.2835,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 04OCT24 7 C,"2024-09-27, 09:40:01",-10,1.35,1350,-7.09893,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 04OCT24 8.5 C,"2024-09-30, 15:34:13",5,0.3,-150,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 04OCT24 8.5 C,"2024-10-04, 16:20:00",5,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,LUNR 04OCT24 8.5 C,"2024-09-27, 09:56:58",-5,0.52,260,-3.537928,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 04OCT24 8.5 C,"2024-09-27, 10:53:59",-5,0.76,380,-3.541264,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 3 C,"2024-09-06, 12:19:26",15,1.84,-2760,-10.52475,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 3 C,"2024-09-06, 13:55:58",-5,1.95,975,-3.549305,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 3 C,"2024-09-09, 11:31:01",-1,2.45,245,-1.062951,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 3 C,"2024-09-09, 11:35:04",-1,2.5,250,-1.06309,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 3 C,"2024-09-09, 11:57:36",-1,2.55,255,-1.063229,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 3 C,"2024-09-09, 13:11:29",-5,2.542,1271,-3.5660338,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 3 C,"2024-09-10, 10:36:31",-1,2.8,280,-1.063924,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 3 C,"2024-09-11, 13:50:42",-1,2.75,275,-1.063785,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 4 C,"2024-08-20, 11:49:41",5,2.46,-1230,-3.48425,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 4 C,"2024-08-22, 12:43:41",-5,1.79,895,-3.523081,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 6.5 C,"2024-09-26, 10:26:17",5,1.8,-900,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 6.5 C,"2024-09-27, 09:38:37",-5,1.94,970,-3.557666,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-09-30, 11:53:10",10,0.87,-870,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-09-30, 13:08:10",10,0.89,-890,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-10-02, 14:44:59",1,0.54,-54,-1.05535,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-10-07, 09:52:08",30,0.399333333,-1198,-22.0105,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-10-11, 09:58:06",100,0.23,-2300,-70.295,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-10-16, 15:49:39",10,0.46,-460,-7.0295,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-09-30, 15:34:57",-1,0.9,90,-1.058642,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-10-08, 10:16:25",-20,0.46,920,-14.188376,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-10-11, 11:40:25",-100,0.2503,2503,-153.1735834,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-10-11, 12:14:39",-30,0.27,810,-21.269718,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 18OCT24 8 C,"2024-10-15, 12:37:55",-10,0.33,330,-7.066574,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 25OCT24 7 C,"2024-10-11, 12:14:39",30,0.94,-2820,-21.1635,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 25OCT24 7 C,"2024-10-16, 15:47:35",-20,1.418,2836,-14.1936408,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 25OCT24 7 C,"2024-10-16, 15:50:12",-10,1.37,1370,-7.095486,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 21MAR25 4 C,"2024-09-09, 13:11:29",5,2.512,-1256,-3.51675,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 21MAR25 4 C,"2024-09-18, 09:55:22",3,4.3,-1290,-2.08005,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 21MAR25 4 C,"2024-09-27, 09:59:18",-3,4.51,1353,-2.1560334,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 21MAR25 4 C,"2024-09-27, 11:09:30",-5,5.006,2503,-0.5502834,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 21MAR25 6 C,"2024-09-19, 13:07:50",6,3.5,-2100,-4.1601,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 21MAR25 6 C,"2024-09-19, 13:58:38",-6,4.1,2460,-4.245228,
+Trades,Data,Order,Equity and Index Options,USD,LUNR 16JAN26 5 C,"2024-09-27, 11:09:30",5,5.116,-2558,-0.46675,P
+Trades,Data,Order,Equity and Index Options,USD,LUNR 16JAN26 5 C,"2024-09-30, 13:11:22",-5,4.19,2095,-3.588941,P
+Trades,Data,Order,Equity and Index Options,USD,MOG A 18OCT24 220 C,"2024-09-19, 15:43:04",1,1.5,-150,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,MOG A 18OCT24 220 C,"2024-10-18, 16:20:00",-1,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,MOG A 15NOV24 180 C,"2024-10-23, 14:00:53",1,14,-1400,-1.05295,
+Trades,Data,Order,Equity and Index Options,USD,MOG A 15NOV24 180 C,"2024-10-28, 13:31:19",-1,16,1600,-1.10022,
+Trades,Data,Order,Equity and Index Options,USD,MOG A 15NOV24 185 C,"2024-10-23, 13:59:14",1,10,-1000,-1.05295,
+Trades,Data,Order,Equity and Index Options,USD,MOG A 15NOV24 185 C,"2024-10-28, 13:46:02",-1,12,1200,-1.0891,
+Trades,Data,Order,Equity and Index Options,USD,MOG A 15NOV24 190 C,"2024-10-23, 13:59:40",1,7,-700,-1.05295,
+Trades,Data,Order,Equity and Index Options,USD,MOG A 15NOV24 190 C,"2024-11-05, 14:19:37",-1,11.2,1120,-1.085476,
+Trades,Data,Order,Equity and Index Options,USD,MOG A 15NOV24 195 C,"2024-10-23, 14:01:12",1,4.5,-450,-1.05295,
+Trades,Data,Order,Equity and Index Options,USD,MOG A 15NOV24 195 C,"2024-10-30, 15:36:18",-1,5.5,550,-1.07103,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-09-19, 15:20:39",30,0.4,-1200,-20.8005,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-09-30, 12:16:38",1,0.7,-70,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-09-24, 15:57:10",-10,0.45,450,-7.07391,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-01, 15:53:46",-1,0.55,55,-1.059669,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-01, 15:53:57",-1,0.6,60,-1.059808,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-01, 15:54:40",-1,0.55,55,-1.059669,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-01, 15:59:40",-2,0.55,110,-1.419338,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-02, 13:05:35",-1,0.6,60,-1.059808,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-02, 13:06:34",-1,0.6,60,-1.059808,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-02, 13:06:35",-1,0.7,70,-1.060086,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-02, 13:06:35",-1,0.65,65,-1.059947,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-02, 13:08:41",-1,0.55,55,-1.059669,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 18OCT24 40 C,"2024-10-18, 16:20:00",-11,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,MRCY 15NOV24 35 C,"2024-11-05, 10:28:55",2,1.32,-264,-1.4031,P
+Trades,Data,Order,Equity and Index Options,USD,MRCY 15NOV24 35 C,"2024-11-05, 15:53:52",-1,1.6,160,-1.058788,
+Trades,Data,Order,Equity and Index Options,USD,MRCY 15NOV24 35 C,"2024-11-06, 09:31:49",-1,6,600,-1.07102,
+Trades,Data,Order,Equity and Index Options,USD,NOVA 18OCT24 6 C,"2024-10-10, 09:42:11",10,1,-1000,-6.9295,
+Trades,Data,Order,Equity and Index Options,USD,NOVA 18OCT24 6 C,"2024-10-10, 09:45:56",10,0.95,-950,-6.9295,
+Trades,Data,Order,Equity and Index Options,USD,NOVA 18OCT24 6 C,"2024-10-10, 09:47:57",5,0.9,-450,-3.46475,
+Trades,Data,Order,Equity and Index Options,USD,NOVA 18OCT24 6 C,"2024-10-18, 16:20:00",-25,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,NOVA 18OCT24 7 C,"2024-10-10, 09:39:55",20,0.4,-800,-13.859,
+Trades,Data,Order,Equity and Index Options,USD,NOVA 18OCT24 7 C,"2024-10-18, 16:20:00",-20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,NOVA 15NOV24 5 C,"2024-10-14, 15:51:51",20,1.67,-3340,-14.109,
+Trades,Data,Order,Equity and Index Options,USD,NOVA 15NOV24 5 C,"2024-10-25, 15:15:19",-20,1.045,2090,-14.172902,P
+Trades,Data,Order,Equity and Index Options,USD,OII 18OCT24 25 C,"2024-09-26, 15:09:56",1,0.65,-65,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,OII 18OCT24 25 C,"2024-09-26, 15:10:20",10,0.59,-590,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,OII 18OCT24 25 C,"2024-09-26, 15:10:40",4,0.59,-236,-2.8134,P
+Trades,Data,Order,Equity and Index Options,USD,OII 18OCT24 25 C,"2024-10-03, 10:32:15",-5,1.6,800,-3.56294,
+Trades,Data,Order,Equity and Index Options,USD,OII 18OCT24 25 C,"2024-10-04, 12:26:52",-5,1.76,880,-3.565164,P
+Trades,Data,Order,Equity and Index Options,USD,OII 18OCT24 25 C,"2024-10-04, 12:29:27",-5,1.8,900,-3.51572,
+Trades,Data,Order,Equity and Index Options,USD,OII 17JAN25 25 C,"2024-12-30, 10:53:51",10,1.3,-1300,-6.9395,
+Trades,Data,Order,Equity and Index Options,USD,OII 17JAN25 25 C,"2025-01-03, 10:09:52",-2,2.4,480,-1.453424,P
+Trades,Data,Order,Equity and Index Options,USD,OII 17JAN25 25 C,"2025-01-03, 10:10:03",-2,2.4,480,-1.453424,P
+Trades,Data,Order,Equity and Index Options,USD,OII 17JAN25 25 C,"2025-01-03, 10:10:45",-2,2.4,480,-1.415424,
+Trades,Data,Order,Equity and Index Options,USD,OII 17JAN25 25 C,"2025-01-17, 09:49:39",-2,1.75,350,-1.42581,
+Trades,Data,Order,Equity and Index Options,USD,OII 17JAN25 25 C,"2025-01-17, 09:53:58",-2,1.8,360,-1.426088,
+Trades,Data,Order,Equity and Index Options,USD,OII 17APR25 35 C,"2024-09-26, 15:03:55",1,0.73,-73,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,OII 17APR25 35 C,"2024-09-26, 15:04:13",1,0.61,-61,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,OII 17APR25 35 C,"2024-09-26, 15:04:26",1,0.6,-60,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,OII 17APR25 35 C,"2024-09-26, 15:06:07",1,0.7,-70,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,OII 17APR25 35 C,"2024-09-26, 15:09:02",1,0.8,-80,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,OII 17APR25 35 C,"2024-10-02, 13:33:07",-1,0.8,80,-1.060364,
+Trades,Data,Order,Equity and Index Options,USD,OII 17APR25 35 C,"2024-10-02, 13:45:14",-2,0.8,160,-1.420728,
+Trades,Data,Order,Equity and Index Options,USD,OII 17APR25 35 C,"2024-10-04, 12:18:14",-2,1,200,-1.40184,
+Trades,Data,Order,Equity and Index Options,USD,OUST 16MAY25 4 C,"2024-10-21, 15:32:13",10,4.56,-4560,-7.0545,P
+Trades,Data,Order,Equity and Index Options,USD,OUST 16MAY25 4 C,"2024-10-24, 11:21:24",-5,4.41,2205,-3.589999,P
+Trades,Data,Order,Equity and Index Options,USD,OUST 16MAY25 4 C,"2024-10-25, 15:40:21",-5,4.02,2010,-3.584578,P
+Trades,Data,Order,Equity and Index Options,USD,PL 20SEP24 2.5 C,"2024-09-06, 11:07:01",1,0.03,-3,-1.05165,
+Trades,Data,Order,Equity and Index Options,USD,PL 20SEP24 2.5 C,"2024-09-04, 12:29:42",-1,0.3,30,-1.051774,
+Trades,Data,Order,Equity and Index Options,USD,PL 18OCT24 2.5 C,"2024-08-20, 14:03:21",5,0.62,-310,-3.48425,P
+Trades,Data,Order,Equity and Index Options,USD,PL 18OCT24 2.5 C,"2024-08-21, 14:49:07",-5,0.65,325,-3.507235,
+Trades,Data,Order,Equity and Index Options,USD,PL 17APR25 1.5 C,"2024-09-09, 14:19:25",30,0.75,-2250,-21.1005,P
+Trades,Data,Order,Equity and Index Options,USD,PL 17APR25 1.5 C,"2024-09-16, 09:49:55",10,0.87,-870,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,PL 17APR25 1.5 C,"2024-09-19, 13:27:08",-30,0.83,2490,-21.328422,P
+Trades,Data,Order,Equity and Index Options,USD,PL 17APR25 1.5 C,"2024-09-25, 15:51:37",-10,0.88,880,-7.085864,P
+Trades,Data,Order,Equity and Index Options,USD,PL 17APR25 5 C,"2024-09-19, 13:27:08",30,0.12,-360,-21.1755,P
+Trades,Data,Order,Equity and Index Options,USD,PL 17APR25 5 C,"2024-09-09, 14:19:25",-30,0.1,300,-21.19254,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 18OCT24 6 C,"2024-09-19, 15:26:50",20,0.73,-1460,-14.067,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 18OCT24 6 C,"2024-09-25, 10:45:28",-5,1,500,-3.4946,
+Trades,Data,Order,Equity and Index Options,USD,RDW 18OCT24 6 C,"2024-09-25, 11:43:35",-5,1.05,525,-3.545295,
+Trades,Data,Order,Equity and Index Options,USD,RDW 18OCT24 6 C,"2024-10-04, 11:36:00",-10,1.217,1217,-7.1152326,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 18OCT24 7 C,"2024-10-07, 13:29:58",10,0.72,-720,-7.0785,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 18OCT24 7 C,"2024-09-25, 10:49:10",-10,0.424,424,-7.0731872,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 15NOV24 6 C,"2024-10-04, 11:36:00",10,1.467,-1467,-7.0535,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 15NOV24 6 C,"2024-10-08, 15:00:31",-10,1.76,1760,-7.155328,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 15NOV24 7 C,"2024-10-16, 15:53:02",10,1.6,-1600,-6.9295,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 15NOV24 7 C,"2024-10-23, 14:05:24",7,1.85,-1295,-4.85065,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 15NOV24 7 C,"2024-10-07, 13:29:58",-10,1.05,1050,-7.13559,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 15NOV24 7 C,"2024-10-17, 12:39:32",-7,1.8,1260,-4.905208,
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 6 C,"2024-10-08, 15:00:31",10,1.94,-1940,-7.0785,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 6 C,"2024-10-17, 14:23:07",8,2.76,-2208,-5.6436,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 6 C,"2024-10-17, 11:11:12",-1,2.88,288,-1.0637464,
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 6 C,"2024-10-17, 11:11:24",-1,2.9,290,-1.053802,
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 6 C,"2024-10-17, 11:11:59",-1,2.85,285,-1.053663,
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 6 C,"2024-10-24, 11:01:08",-10,3.06,3060,-7.142468,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 6 C,"2024-10-24, 14:46:15",-5,2.84,1420,-3.568176,P
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 8 C,"2024-10-23, 14:08:18",8,1.35,-1080,-5.5436,
+Trades,Data,Order,Equity and Index Options,USD,RDW 20DEC24 8 C,"2024-10-17, 14:23:07",-8,1.35,1080,-5.695944,P
+Trades,Data,Order,Equity and Index Options,USD,RES 15NOV24 5 C,"2024-10-21, 15:47:04",10,1.47,-1470,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,RES 15NOV24 5 C,"2024-10-24, 13:43:29",-10,1,1000,-7.0852,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 30AUG24 7 C,"2024-08-30, 16:20:00",5,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,RKLB 30AUG24 7 C,"2024-08-26, 14:30:35",-5,0.17,85,-3.500563,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 13SEP24 7 C,"2024-09-13, 16:20:00",5,0,0,0,A;C
+Trades,Data,Order,Equity and Index Options,USD,RKLB 13SEP24 7 C,"2024-09-12, 14:25:14",-5,0.11,55,-3.532229,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 13SEP24 6 P,"2024-09-11, 12:51:17",3,0.04,-12,-2.11005,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 13SEP24 6 P,"2024-09-11, 12:53:48",7,0.04,-28,-4.92345,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 13SEP24 6 P,"2024-09-13, 16:20:00",-10,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,RKLB 13SEP24 6.5 P,"2024-09-11, 12:54:15",10,0.18,-180,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 13SEP24 6.5 P,"2024-09-13, 16:20:00",-10,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 6 C,"2024-09-03, 12:35:21",10,0.53,-530,-6.9815,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 6 C,"2024-09-04, 11:02:39",-4,0.725,290,-2.811822,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 6 C,"2024-09-12, 14:28:17",-2,1,200,-1.41784,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 6 C,"2024-09-12, 15:32:39",-4,0.98,392,-2.8354576,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 7 C,"2024-09-27, 12:16:49",10,2.83,-2830,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 7 C,"2024-09-25, 09:52:27",-10,1.05,1050,-6.99059,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 7.5 C,"2024-09-04, 11:02:39",2,0.235,-47,-1.3963,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 7.5 C,"2024-09-12, 14:28:17",1,0.25,-25,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 7.5 C,"2024-09-12, 15:32:39",2,0.26,-52,-1.4067,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 7.5 C,"2024-09-27, 12:17:26",5,2.32,-1160,-0.15675,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 7.5 C,"2024-09-03, 12:35:21",-5,0.166,83,-3.5070074,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 7.5 C,"2024-09-25, 10:03:58",-5,0.75,375,-3.541125,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 8 C,"2024-09-26, 15:28:10",10,0.83,-830,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 8 C,"2024-09-25, 09:59:51",-10,0.3,300,-7.06974,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 9.5 C,"2024-09-26, 15:20:51",5,0.08,-40,-2.76675,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 9.5 C,"2024-09-25, 10:57:27",-5,0.1,50,-3.53209,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 10 C,"2024-09-27, 11:23:14",4,0.2,-80,-2.8134,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 27SEP24 10 C,"2024-09-27, 10:20:55",-4,0.26,104,-0.8274512,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7 C,"2024-09-19, 11:46:48",20,0.5,-1000,-28.487,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7 C,"2024-09-19, 11:47:19",10,0.5,-500,-6.9335,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7 C,"2024-09-19, 13:29:41",20,0.5,-1000,-13.867,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7 C,"2024-09-27, 13:15:25",10,2.74,-2740,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7 C,"2024-09-25, 09:47:50",-25,1.01,2525,-17.723695,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7 C,"2024-09-26, 15:24:28",-25,1.8272,4568,-1.9304904,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7 C,"2024-09-27, 12:16:49",-10,2.82,2820,-7.139796,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7.5 C,"2024-09-27, 13:08:46",5,2.25,-1125,-3.51675,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 7.5 C,"2024-09-27, 12:17:26",-5,2.32,1160,-0.202948,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-09-30, 13:34:28",50,0.64,-3200,-35.2925,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-09-30, 15:28:26",-3,0.5,150,-2.12759,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-10-04, 10:55:01",-5,0.25,125,-3.544175,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-10-04, 10:58:20",-7,0.3,210,-4.962818,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-10-04, 10:59:35",-5,0.35,175,-3.545565,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-10-04, 11:14:26",-5,0.35,175,-3.545565,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-10-04, 11:17:21",-5,0.35,175,-3.545565,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-10-04, 11:37:04",-5,0.4,200,-3.54626,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-10-04, 11:39:27",-10,0.45,450,-7.09391,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 04OCT24 9.5 C,"2024-10-04, 11:43:06",-5,0.5,250,-3.54765,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-09-30, 14:07:33",50,0.8084,-4042,-1.1275,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-09, 14:52:40",3,0.33,-99,-2.10885,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-08, 10:14:47",-33,0.6,1980,-23.423664,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-11, 15:14:57",-14,0.25,350,-9.89009,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 9.5 C,"2024-10-11, 16:20:00",-1,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 10.5 C,"2024-10-07, 12:36:24",33,0.15,-495,-23.27655,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 10.5 C,"2024-10-09, 14:51:33",17,0.08,-136,-9.40015,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 11OCT24 10.5 C,"2024-09-30, 14:07:33",-50,0.4156,2078,-1.3247684,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 7 C,"2024-09-26, 15:24:28",25,1.9252,-4813,-1.73375,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 7 C,"2024-09-27, 09:41:24",-5,2.55,1275,-3.516145,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 7 C,"2024-09-27, 15:35:37",-10,2.75,2750,-7.03785,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 7 C,"2024-09-27, 16:20:00",-10,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 C,"2024-10-04, 11:49:04",100,0.92,-9200,-70.535,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 C,"2024-10-10, 09:36:23",20,0.4255,-851,-1.769,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 C,"2024-10-10, 12:16:44",30,0.4,-1200,-21.0885,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 C,"2024-10-11, 15:01:58",-50,0.56,2800,-35.36484,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 C,"2024-10-11, 15:18:34",-50,0.55,2750,-77.86345,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 C,"2024-10-11, 15:23:02",-50,0.523,2615,-9.509697,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 10 C,"2024-09-27, 12:38:53",10,0.8,-800,-6.9435,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 10 C,"2024-09-30, 09:48:37",100,0.9,-9000,-70.345,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 10 C,"2024-10-15, 12:54:00",50,0.4,-2000,-34.6475,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 10 C,"2024-09-27, 09:43:05",-10,0.61,610,-7.103358,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 10 C,"2024-10-04, 11:49:04",-100,0.67,6700,-71.00026,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 10 C,"2024-10-11, 15:25:45",-50,0.31,1550,-35.45509,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 11 C,"2024-10-17, 10:12:48",12,0.29,-348,-18.6354,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 11 C,"2024-10-17, 10:13:28",38,0.29,-1102,-26.7121,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 11 C,"2024-10-16, 15:56:03",-50,0.42,2100,-35.34538,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 8.5 P,"2024-09-27, 09:43:05",10,0.35,-350,-7.0585,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 8.5 P,"2024-09-27, 09:44:06",10,0.35,-350,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 8.5 P,"2024-09-27, 10:12:36",10,0.25,-250,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 8.5 P,"2024-10-02, 11:11:25",-15,0.4,600,-10.63878,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 8.5 P,"2024-10-16, 12:33:54",-6,0.01,6,-5.2846068,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 8.5 P,"2024-10-18, 16:20:00",-9,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 P,"2024-10-04, 12:02:11",50,0.44,-2200,-35.2675,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 P,"2024-10-10, 09:36:23",-20,0.5255,1051,-1.8540178,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18OCT24 9.5 P,"2024-10-10, 09:41:05",-30,0.5,1500,-20.9139,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 25OCT24 9 C,"2024-10-11, 15:23:02",50,1.023,-5115,-9.2975,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 25OCT24 9 C,"2024-10-17, 11:14:47",-50,1.76,8800,-5.24164,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 25OCT24 11 C,"2024-10-21, 09:31:19",50,0.4,-2000,-34.6475,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 25OCT24 11 C,"2024-10-17, 14:42:27",-50,0.42,2100,-35.34538,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 25OCT24 12 C,"2024-10-24, 11:02:55",25,0.15,-375,-17.57375,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 25OCT24 12 C,"2024-10-24, 10:46:41",-25,0.22,550,-17.65879,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 9.5 C,"2024-10-17, 11:14:47",50,1.658,-8290,-4.8575,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 9.5 C,"2024-10-24, 10:55:31",-50,2.35,11750,-1.57365,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 11.5 C,"2024-10-25, 14:05:08",50,0.65,-3250,-35.1475,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 11.5 C,"2024-10-29, 12:13:50",20,0.63,-1260,-14.059,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 11.5 C,"2024-11-05, 10:30:35",10,0.53,-530,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 11.5 C,"2024-10-24, 15:33:02",-50,0.71,3550,-35.38569,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 11.5 C,"2024-10-28, 14:47:00",-20,0.6,1200,-30.84816,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 11.5 C,"2024-11-05, 09:39:44",-10,0.67,670,-7.062026,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 13 C,"2024-11-08, 15:20:31",10,0.51,-510,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 13 C,"2024-11-08, 15:20:55",10,0.51,-510,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 08NOV24 13 C,"2024-11-08, 15:50:59",-20,0.55,1100,-14.11738,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 9.5 C,"2024-10-24, 10:55:31",50,2.5,-12500,-1.1075,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 9.5 C,"2024-10-28, 14:55:05",-30,1.97,5910,-21.411498,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 9.5 C,"2024-10-28, 14:59:17",-20,1.95,3900,-14.27322,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 14 C,"2024-11-08, 13:11:30",10,0.64,-640,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 14 C,"2024-11-08, 14:57:55",-10,0.71,710,-7.063138,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 16 C,"2024-11-12, 15:39:27",5,0.73,-365,-3.50775,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 16 C,"2024-11-11, 14:33:41",-5,0.91,455,-3.534349,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 11.5 P,"2024-11-06, 15:24:56",20,0.335,-670,-14.031,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 11.5 P,"2024-11-06, 15:24:14",-10,0.3,300,-7.05174,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 11.5 P,"2024-11-08, 11:22:26",-10,0.22,220,-7.049516,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 12 P,"2024-11-06, 14:27:59",10,0.53,-530,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 12 P,"2024-11-08, 11:24:03",5,0.39,-195,-3.50775,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 12 P,"2024-11-08, 11:44:02",5,0.44,-220,-3.50775,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15NOV24 12 P,"2024-11-12, 15:40:57",-20,0.21,420,-14.098476,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 22NOV24 10 C,"2024-10-28, 14:55:05",30,1.76,-5280,-21.1635,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 22NOV24 10 C,"2024-10-28, 15:25:33",-30,1.8,5400,-21.32232,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-10-28, 14:59:17",20,1.81,-3620,-14.109,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-10-29, 12:15:47",20,1.9,-3800,-13.859,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-10-31, 11:47:13",5,1.32,-660,1.73525,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-10-29, 13:19:26",-20,2.02,4040,-0.837112,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-11-01, 13:23:45",-5,1.88,940,-3.547832,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-11-01, 14:53:45",-5,1.9,950,-3.54811,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-11-01, 14:55:30",-5,1.95,975,-3.548805,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-11-01, 15:24:54",-5,2,1000,-3.5495,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 29NOV24 10 C,"2024-11-04, 09:33:20",-5,1.7,850,-3.54533,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 06DEC24 10 C,"2024-10-29, 13:19:26",20,2.17,-4340,-0.669,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 06DEC24 10 C,"2024-10-31, 11:47:13",5,1.42,-710,1.73525,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 06DEC24 10 C,"2024-11-01, 14:53:45",-5,2,1000,-3.5495,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 06DEC24 10 C,"2024-11-01, 15:18:57",-5,2.05,1025,-3.550195,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 06DEC24 10 C,"2024-11-01, 15:24:54",-5,2.1,1050,-3.55089,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 06DEC24 10 C,"2024-11-05, 11:36:36",-10,2.2,2200,-7.10456,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 06DEC24 11.5 C,"2024-11-05, 09:32:32",10,1.38,-1380,-7.0155,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 06DEC24 11.5 C,"2024-11-04, 09:37:07",-10,1.05,1050,-7.07259,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 15 C,"2024-11-13, 09:57:11",10,6.631,-6631,-4.7655,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 15 C,"2024-11-21, 10:22:56",-5,6.87,3435,-0.257193,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 15 C,"2024-11-21, 11:35:03",-5,7.2,3600,-0.30178,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 20 C,"2024-11-13, 10:55:21",10,4.95,-4950,-7.0405,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 20 C,"2024-11-22, 09:49:06",-2,4.97,994,-1.4363132,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 20 C,"2024-11-22, 09:53:51",-8,4.94,3952,-5.7645856,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 21 C,"2024-11-13, 11:09:09",10,4.8,-4800,-0.6855,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 21 C,"2024-11-29, 10:03:34",-10,7.245,7245,-4.287311,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 22 C,"2024-11-21, 10:22:56",5,2.97,-1485,-0.14775,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 22 C,"2024-11-21, 11:35:03",5,3.25,-1625,-0.18775,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 22 C,"2024-11-13, 09:57:11",-10,3.131,3131,-4.8804418,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 25 C,"2024-11-22, 09:49:06",2,2.87,-574,-1.4031,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 25 C,"2024-11-22, 09:53:51",8,2.87,-2296,-5.6324,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 25 C,"2024-11-13, 10:55:21",-10,3.12,3120,-7.155136,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 26 C,"2024-11-29, 10:03:34",10,4.44,-4440,-4.058,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17JAN25 26 C,"2024-11-13, 11:09:09",-10,3.106,3106,-0.7997468,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17APR25 5 C,"2024-09-16, 09:46:42",2,3.08,-616,0.0933,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17APR25 5 C,"2024-09-17, 13:34:39",-2,2.83,566,-1.4330148,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17APR25 7 P,"2024-09-16, 09:46:42",2,1.47,-294,0.0933,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 17APR25 7 P,"2024-09-17, 13:34:39",-2,1.49,298,-1.4255644,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 20JUN25 5 P,"2024-09-27, 12:40:15",50,0.45,-2250,-35.1675,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 20JUN25 5 P,"2024-09-30, 13:03:14",-50,0.45,2250,-35.36955,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 20JUN25 6 P,"2024-09-27, 11:49:32",10,0.7,-700,-6.9335,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 20JUN25 6 P,"2024-10-17, 11:16:40",-10,0.55,550,-7.07269,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 20JUN25 7 P,"2024-09-27, 11:00:08",10,1.1,-1100,-6.9335,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 20JUN25 7 P,"2024-10-04, 15:07:17",-10,1.07,1070,-7.111146,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15AUG25 30 C,"2025-08-08, 15:05:33",1,15.43,-1543,-1.05145,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15AUG25 30 C,"2025-07-14, 10:49:28",-1,13.18,1318,-1.05644,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15AUG25 32 P,"2025-07-14, 10:49:05",10,0.87,-870,-7.0365,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15AUG25 32 P,"2025-08-15, 16:20:00",-10,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,RKLB 19SEP25 25 C,"2025-07-14, 10:49:28",1,18.24,-1824,-1.05365,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 19SEP25 25 C,"2025-08-08, 15:05:33",-1,20.6,2060,-1.05424,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18DEC26 4 C,"2024-09-12, 10:00:54",10,4.08,-4080,-7.0335,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18DEC26 4 C,"2024-09-18, 15:35:58",-10,4.568,4568,-0.4383904,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18DEC26 12 C,"2024-09-18, 15:35:58",10,2.418,-2418,-0.2835,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 18DEC26 12 C,"2024-09-12, 10:00:54",-10,1.96,1960,-7.115888,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 4 C,"2024-09-30, 09:46:14",5,7.128,-3564,0.23325,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 4 C,"2024-09-30, 13:20:12",-5,7.01,3505,-3.640639,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 7 C,"2024-09-16, 09:51:19",1,3.8,-380,-1.05335,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 7 C,"2024-09-16, 09:51:35",1,3.8,-380,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 7 C,"2024-09-16, 09:52:03",4,3.72,-1488,-2.8134,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 7 C,"2024-09-16, 09:52:28",4,3.7,-1480,-2.8134,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 7 C,"2024-09-16, 10:28:05",1,3.6,-360,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 7 C,"2024-09-19, 13:29:11",-11,3.4,3740,-7.871512,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 10 C,"2024-11-11, 10:25:35",1,8.69,-869,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 10 C,"2024-11-11, 10:25:45",1,8.7,-870,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 10 C,"2024-11-11, 10:25:53",1,8.73,-873,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 10 C,"2024-11-11, 10:26:04",1,8.72,-872,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 10 C,"2024-11-11, 10:26:17",1,8.68,-868,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 10 C,"2024-11-13, 10:34:03",5,14.14,-7070,-3.52025,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 10 C,"2024-12-19, 13:17:00",-10,16.03,16030,-7.413034,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 12 C,"2024-09-30, 13:20:12",5,4.34,-2170,-3.52925,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 12 C,"2024-09-30, 09:46:14",-5,4.328,2164,0.1591408,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 20 C,"2024-12-19, 13:17:00",10,12.26,-12260,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 20 C,"2024-11-12, 15:41:53",-5,5.8,2900,-3.61482,P
+Trades,Data,Order,Equity and Index Options,USD,RKLB 15JAN27 20 C,"2024-11-13, 10:34:03",-5,10.38,5190,-3.678482,P
+Trades,Data,Order,Equity and Index Options,USD,SATL 17JAN25 2.5 C,"2024-12-30, 10:48:41",10,1.02,-1020,-6.9395,P
+Trades,Data,Order,Equity and Index Options,USD,SATL 17JAN25 2.5 C,"2024-12-30, 10:50:02",10,1,-1000,-6.9395,
+Trades,Data,Order,Equity and Index Options,USD,SATL 17JAN25 2.5 C,"2025-01-17, 16:20:00",-20,0,0,0,C;Ex
+Trades,Data,Order,Equity and Index Options,USD,SPCE 18OCT24 8 C,"2024-09-13, 15:17:05",2,0.53,-106,-1.2867,P
+Trades,Data,Order,Equity and Index Options,USD,SPCE 18OCT24 8 C,"2024-09-17, 13:21:00",-2,0.45,90,-1.394782,
+Trades,Data,Order,Equity and Index Options,USD,SPCE 18OCT24 5 P,"2024-08-22, 12:43:56",-21,0.43,903,-14.7175434,
+Trades,Data,Order,Equity and Index Options,USD,SPCE 18OCT24 5 P,"2024-10-18, 16:20:00",-20,0,0,0,C;Ep
+Trades,Data,Order,Equity and Index Options,USD,SPCE 18OCT24 8 P,"2024-08-21, 14:07:35",3,1.95,-585,-2.09055,P
+Trades,Data,Order,Equity and Index Options,USD,SPCE 18OCT24 8 P,"2024-09-06, 10:54:57",-3,2.43,729,-2.1335862,
+Trades,Data,Order,Equity and Index Options,USD,SPCE 18OCT24 10 P,"2024-09-13, 15:17:05",2,3.34,-668,-1.2867,P
+Trades,Data,Order,Equity and Index Options,USD,SPCE 18OCT24 10 P,"2024-09-19, 14:34:52",-2,3.52,704,-1.4368512,P
+Trades,Data,Order,Equity and Index Options,USD,SPY 18SEP24 560 P,"2024-09-18, 13:56:57",1,1.75,-175,-1.04335,
+Trades,Data,Order,Equity and Index Options,USD,SPY 18SEP24 560 P,"2024-09-18, 14:06:01",2,0.62,-124,-2.3267,
+Trades,Data,Order,Equity and Index Options,USD,SPY 18SEP24 560 P,"2024-09-18, 15:39:21",-3,0.1,30,-2.089254,P
+Trades,Data,Order,Equity and Index Options,USD,VAL 15NOV24 57.5 C,"2024-10-28, 15:19:45",10,0.55,-550,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,VAL 15NOV24 57.5 C,"2024-10-31, 09:50:25",-10,0.7,700,-6.97686,
+Trades,Data,Order,Equity and Index Options,USD,VAL 15NOV24 62.5 C,"2024-10-14, 15:58:21",20,0.77,-1540,-14.059,P
+Trades,Data,Order,Equity and Index Options,USD,VAL 15NOV24 62.5 C,"2024-10-31, 12:43:24",-20,0.16,320,-14.123696,
+Trades,Data,Order,Equity and Index Options,USD,VVX 15NOV24 60 C,"2024-11-04, 15:04:38",1,4.37,-437,-1.05155,
+Trades,Data,Order,Equity and Index Options,USD,VVX 15NOV24 60 C,"2024-11-06, 09:40:56",-1,6.5,650,-1.07241,
+Trades,Data,Order,Equity and Index Options,USD,ZIM 01NOV24 22.5 C,"2024-10-31, 09:44:20",10,0.98,-980,-7.0545,P
+Trades,Data,Order,Equity and Index Options,USD,ZIM 01NOV24 22.5 C,"2024-10-31, 12:00:20",-10,1.14,1140,-7.089092,
+Trades,Data,Order,Equity and Index Options,USD,ZIM 01NOV24 23 C,"2024-10-31, 09:44:45",10,0.69,-690,-7.0295,P
+Trades,Data,Order,Equity and Index Options,USD,ZIM 01NOV24 23 C,"2024-10-31, 12:20:19",-10,0.76,760,-4.578528,
+Trades,Data,Order,Equity and Index Options,USD,ZIM 17APR25 18 C,"2024-10-07, 14:03:22",1,3.3,-330,-1.05535,
+Trades,Data,Order,Equity and Index Options,USD,ZIM 17APR25 18 C,"2024-10-07, 14:04:15",1,3.3,-330,-0.80535,
+Trades,Data,Order,Equity and Index Options,USD,ZIM 17APR25 18 C,"2024-10-07, 14:04:52",1,3.3,-330,-1.05535,
+Trades,Data,Order,Equity and Index Options,USD,ZIM 17APR25 18 C,"2024-10-07, 14:05:17",1,3.3,-330,-0.80535,
+Trades,Data,Order,Equity and Index Options,USD,ZIM 17APR25 18 C,"2024-10-14, 14:34:43",-4,4.5,1800,-1.873,P

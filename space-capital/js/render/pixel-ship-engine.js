@@ -1,14 +1,19 @@
 /**
- * PixelShipEngine v0.3 - Optimized Deterministic Procedural Ships
+ * ═══════════════════════════════════════════════════════════════════════════
+ * SPACE CAPITAL - Unified Pixel Ship Engine v1.0
+ * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Performance improvements:
- *   - Optional targetCanvas to avoid allocation
- *   - Cached pigments array
- *   - Cutout layer support for negative space
- *   - More param tags for silhouette variation
+ * Merges three systems:
+ * 1. HOLO_SHIPS - Unique per-ticker SVG geometry → pixel silhouettes
+ * 2. SPRITE_UPGRADES - Stats-driven visual upgrades (wings, engines, etc.)
+ * 3. WatercolorEngine - Deterministic color palettes from ticker seed
+ * 
+ * Every ticker gets a unique ship shape. Stats determine upgrade parts.
+ * Same ticker + stats always produces identical visual.
  * 
  * @requires SeedUtils (seed.js)
- * @requires WatercolorEngine (optional)
+ * @requires WatercolorEngine (optional, for rich palettes)
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 (function(global) {
@@ -21,307 +26,523 @@
     animationFps: 12,
   };
 
-  // ═══════════════════════════════════════════════════════════════════
-  // SHIP BLUEPRINTS
-  // Block: [x, y, w, h, shadeIndex, layer, tag?]
-  // Layers: 'hull' | 'wing' | 'accent' | 'engine' | 'cutout'
-  // ═══════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
+  // TICKER-SPECIFIC SHIP GEOMETRY (converted from holo-ships.js SVG)
+  // Each ship has unique silhouette blocks
+  // ═══════════════════════════════════════════════════════════════════════
 
-  const BLUEPRINTS = {
-    interceptor: {
-      name: 'Interceptor',
-      desc: 'Fast strike craft',
-      params: { wingSpan: [-2, 4], noseLen: [0, 5], engineWidth: [-1, 2] },
-      blocks: [
-        // Core hull
-        [28, 18, 8, 32, 0, 'hull'],
-        [24, 22, 4, 24, 1, 'hull'],
-        [36, 22, 4, 24, 1, 'hull'],
-        [26, 20, 2, 28, 2, 'hull'],
-        [36, 20, 2, 28, 2, 'hull'],
-        // Nose - twin prongs
-        [28, 10, 3, 10, 2, 'hull', 'nose'],
-        [33, 10, 3, 10, 2, 'hull', 'nose'],
-        [29, 6, 2, 6, 3, 'hull', 'nose-tip'],
-        [33, 6, 2, 6, 3, 'hull', 'nose-tip'],
-        // Cockpit notch (cutout for negative space)
-        [30, 12, 4, 4, 0, 'cutout'],
-        // Wings - swept back
-        [10, 32, 14, 4, 1, 'wing', 'wing-left'],
-        [6, 34, 10, 3, 0, 'wing', 'wing-left-outer'],
-        [2, 36, 6, 2, 0, 'wing', 'wing-left-tip'],
-        [40, 32, 14, 4, 1, 'wing', 'wing-right'],
-        [48, 34, 10, 3, 0, 'wing', 'wing-right-outer'],
-        [56, 36, 6, 2, 0, 'wing', 'wing-right-tip'],
-        // Cockpit
-        [29, 18, 6, 6, 0, 'accent'],
-        [30, 19, 4, 4, 1, 'accent'],
-        // Engine housing
-        [26, 48, 12, 6, 0, 'hull', 'engine-housing'],
-        // Engine glow
-        [28, 54, 8, 4, 0, 'engine'],
-        [30, 58, 4, 6, 1, 'engine'],
+  const TICKER_SHIPS = {
+    RKLB: {
+      name: 'Orbital Bus',
+      class: 'transport',
+      // Main hull - hexagonal bus shape
+      hull: [
+        [10, 30, 20, 8, 0],   // left hull
+        [34, 30, 20, 8, 0],   // right hull
+        [30, 10, 10, 20, 1],  // center body
+        [20, 14, 24, 12, 0],  // main cabin
       ],
-      enginePoints: [[30, 58, 4, 8]],
-      beaconPoints: [[30, 8], [34, 8]],
+      // Nose section
+      nose: [
+        [30, 5, 4, 8, 2],     // top spike
+        [26, 8, 12, 6, 1],    // nose cone
+      ],
+      // Wings - angled panels
+      wings: [
+        [6, 28, 16, 4, 0],    // left wing
+        [42, 28, 16, 4, 0],   // right wing
+      ],
+      // Engine section
+      engines: [
+        [26, 50, 6, 6, 0],    // left engine
+        [32, 50, 6, 6, 0],    // right engine
+      ],
+      engineGlow: [[28, 56, 4, 8], [34, 56, 4, 8]],
+      beacons: [[32, 6]],
     },
 
-    freighter: {
-      name: 'Freighter',
-      desc: 'Heavy cargo hauler',
-      params: { cargoWidth: [-2, 4], podSize: [-1, 3], bridgeHeight: [0, 3] },
-      blocks: [
-        // Main cargo hull
-        [16, 16, 32, 34, 0, 'hull'],
-        [18, 14, 28, 4, 1, 'hull'],
-        [20, 12, 24, 2, 2, 'hull'],
-        // Cargo ribs (detail)
-        [18, 20, 28, 2, 2, 'hull'],
-        [18, 28, 28, 2, 2, 'hull'],
-        [18, 36, 28, 2, 2, 'hull'],
-        [18, 44, 28, 2, 2, 'hull'],
-        // Hollow cargo bay (cutout)
-        [22, 22, 20, 4, 0, 'cutout'],
-        [22, 30, 20, 4, 0, 'cutout'],
-        // Bridge
-        [26, 4, 12, 10, 1, 'hull', 'bridge'],
-        [28, 2, 8, 4, 2, 'hull', 'bridge-top'],
-        // Cockpit
-        [29, 6, 6, 5, 0, 'accent'],
-        [30, 7, 4, 3, 1, 'accent'],
-        // Side pods
-        [4, 26, 12, 18, 0, 'wing', 'pod-left'],
-        [2, 28, 4, 14, 1, 'wing', 'pod-left-outer'],
-        [48, 26, 12, 18, 0, 'wing', 'pod-right'],
-        [58, 28, 4, 14, 1, 'wing', 'pod-right-outer'],
-        // Engine array
-        [20, 50, 8, 4, 0, 'hull'],
-        [30, 50, 4, 4, 0, 'hull'],
-        [40, 50, 8, 4, 0, 'hull'],
-        [22, 54, 4, 4, 0, 'engine'],
-        [31, 54, 2, 4, 1, 'engine'],
-        [42, 54, 4, 4, 0, 'engine'],
+    LUNR: {
+      name: 'Lunar Scout',
+      class: 'scout',
+      hull: [
+        [10, 35, 15, 10, 0],  // left body
+        [39, 35, 15, 10, 0],  // right body
+        [25, 20, 14, 25, 1],  // center spine
       ],
-      enginePoints: [[22, 54, 4, 6], [31, 54, 2, 4], [42, 54, 4, 6]],
-      beaconPoints: [[31, 3], [6, 28], [58, 28]],
+      nose: [
+        [28, 14, 8, 10, 1],   // sensor dome
+        [30, 10, 4, 6, 2],    // antenna
+      ],
+      wings: [
+        [4, 32, 18, 6, 0],    // left swept wing
+        [42, 32, 18, 6, 0],   // right swept wing
+      ],
+      engines: [
+        [28, 48, 8, 6, 0],    // center engine
+      ],
+      engineGlow: [[30, 54, 4, 8]],
+      beacons: [[31, 11], [8, 34], [54, 34]],
     },
 
-    scout: {
-      name: 'Scout',
-      desc: 'Sensor recon vessel',
-      params: { dishSize: [0, 4], wingAngle: [-2, 3], spineLen: [0, 4] },
-      blocks: [
-        // Long thin spine
-        [30, 18, 4, 28, 0, 'hull', 'spine'],
-        [28, 22, 2, 20, 1, 'hull'],
-        [34, 22, 2, 20, 1, 'hull'],
-        // Wide sensor dish
-        [24, 6, 16, 6, 2, 'hull', 'dish'],
-        [26, 4, 12, 4, 1, 'accent', 'dish-inner'],
-        [30, 2, 4, 4, 2, 'accent', 'dish-antenna'],
-        // Dish detail (cutout arc)
-        [28, 8, 8, 2, 0, 'cutout'],
-        // Small wings
-        [14, 32, 14, 3, 1, 'wing', 'wing-left'],
-        [10, 34, 8, 2, 0, 'wing', 'wing-left-tip'],
-        [36, 32, 14, 3, 1, 'wing', 'wing-right'],
-        [46, 34, 8, 2, 0, 'wing', 'wing-right-tip'],
-        // Cockpit
-        [29, 20, 6, 5, 0, 'accent'],
-        [30, 21, 4, 3, 1, 'accent'],
-        // Engine
-        [29, 46, 6, 4, 0, 'hull'],
-        [30, 50, 4, 4, 0, 'engine'],
-        [31, 54, 2, 4, 1, 'engine'],
+    JOBY: {
+      name: 'eVTOL Frame',
+      class: 'vtol',
+      hull: [
+        [15, 35, 15, 10, 0],  // left fuselage
+        [34, 35, 15, 10, 0],  // right fuselage
+        [26, 25, 12, 20, 1],  // center body
       ],
-      enginePoints: [[30, 54, 4, 5]],
-      beaconPoints: [[31, 3], [12, 33], [50, 33]],
+      nose: [
+        [28, 18, 8, 10, 1],   // cockpit
+      ],
+      // Rotors instead of wings
+      wings: [
+        [20, 12, 14, 14, 0],  // left rotor disc
+        [30, 12, 14, 14, 0],  // right rotor disc
+      ],
+      rotors: [
+        { cx: 27, cy: 19, r: 7 },
+        { cx: 37, cy: 19, r: 7 },
+      ],
+      engines: [
+        [24, 48, 6, 4, 0],
+        [34, 48, 6, 4, 0],
+      ],
+      engineGlow: [[26, 52, 3, 6], [36, 52, 3, 6]],
+      beacons: [[27, 12], [37, 12]],
     },
 
-    dreadnought: {
-      name: 'Dreadnought',
-      desc: 'Capital warship',
-      params: { armorThickness: [0, 4], weaponLen: [-1, 3], towerHeight: [0, 5] },
-      blocks: [
-        // Massive hammerhead hull
-        [18, 10, 28, 44, 0, 'hull'],
-        [14, 14, 8, 36, 1, 'hull'],
-        [42, 14, 8, 36, 1, 'hull'],
-        // Armored prow (hammerhead)
-        [12, 4, 40, 8, 1, 'hull', 'prow'],
-        [20, 2, 24, 4, 2, 'hull', 'prow-tip'],
-        [28, 0, 8, 4, 3, 'hull', 'prow-point'],
-        // Dorsal tower
-        [28, 12, 8, 8, 2, 'hull', 'bridge'],
-        [29, 10, 6, 4, 0, 'accent', 'bridge-window'],
-        [30, 11, 4, 2, 1, 'accent'],
-        // Hull ridges
-        [20, 20, 24, 2, 2, 'hull'],
-        [20, 32, 24, 2, 2, 'hull'],
-        [20, 44, 24, 2, 2, 'hull'],
-        // Weapon arrays
-        [4, 18, 10, 8, 0, 'wing', 'weapon-left'],
-        [2, 20, 4, 4, 1, 'accent', 'weapon-left-barrel'],
-        [50, 18, 10, 8, 0, 'wing', 'weapon-right'],
-        [58, 20, 4, 4, 1, 'accent', 'weapon-right-barrel'],
-        // Engine bank
-        [18, 54, 6, 4, 0, 'hull'],
-        [26, 54, 4, 4, 0, 'hull'],
-        [34, 54, 4, 4, 0, 'hull'],
-        [42, 54, 6, 4, 0, 'hull'],
-        [19, 58, 4, 4, 0, 'engine'],
-        [27, 58, 2, 3, 1, 'engine'],
-        [35, 58, 2, 3, 1, 'engine'],
-        [43, 58, 4, 4, 0, 'engine'],
+    ACHR: {
+      name: 'Archer VTOL',
+      class: 'vtol',
+      hull: [
+        [20, 30, 15, 15, 0],  // left hull
+        [29, 30, 15, 15, 0],  // right hull
+        [26, 15, 12, 30, 1],  // spine
       ],
-      enginePoints: [[19, 58, 4, 6], [27, 58, 2, 4], [35, 58, 2, 4], [43, 58, 4, 6]],
-      beaconPoints: [[31, 1], [4, 22], [60, 22]],
+      nose: [
+        [28, 10, 8, 8, 1],    // cockpit bubble
+      ],
+      wings: [
+        [25, 14, 10, 10, 0],  // left rotor
+        [29, 14, 10, 10, 0],  // right rotor
+      ],
+      rotors: [
+        { cx: 30, cy: 19, r: 5 },
+        { cx: 34, cy: 19, r: 5 },
+      ],
+      engines: [
+        [28, 48, 8, 6, 0],
+      ],
+      engineGlow: [[30, 54, 4, 8]],
+      beacons: [[32, 11]],
     },
 
-    drone: {
-      name: 'Drone',
-      desc: 'Autonomous unit',
-      params: { bodyShape: [0, 3], sensorSize: [0, 2], finOffset: [-2, 2] },
-      blocks: [
-        // Compact body (asymmetric)
-        [26, 22, 10, 18, 0, 'hull'],
-        [24, 26, 4, 10, 1, 'hull'],
-        [36, 28, 4, 8, 1, 'hull'],
-        // Off-center sensor
-        [28, 16, 6, 8, 2, 'hull', 'sensor'],
-        [30, 14, 4, 4, 0, 'accent', 'sensor-eye'],
-        // Asymmetric fins
-        [18, 28, 8, 4, 1, 'wing', 'wing-left'],
-        [38, 32, 10, 4, 1, 'wing', 'wing-right'],
-        // Single engine
-        [28, 40, 6, 4, 0, 'hull'],
-        [30, 44, 4, 3, 0, 'engine'],
+    ASTS: {
+      name: 'Bluebird Sat',
+      class: 'satellite',
+      hull: [
+        [24, 20, 16, 20, 0],  // main body
+        [26, 22, 12, 16, 1],  // inner core
       ],
-      enginePoints: [[30, 44, 4, 4]],
-      beaconPoints: [[31, 15]],
+      nose: [
+        [28, 14, 8, 8, 2],    // antenna array
+      ],
+      // Solar panels instead of wings
+      wings: [
+        [4, 26, 20, 8, 0],    // left panel
+        [40, 26, 20, 8, 0],   // right panel
+        [6, 28, 16, 4, 1],    // left panel detail
+        [42, 28, 16, 4, 1],   // right panel detail
+      ],
+      engines: [
+        [28, 42, 8, 4, 0],
+      ],
+      engineGlow: [[30, 46, 4, 4]],
+      beacons: [[31, 15], [12, 29], [52, 29]],
     },
 
-    corvette: {
-      name: 'Corvette',
-      desc: 'Multi-role frigate',
-      params: { hullLength: [-2, 4], wingStyle: [0, 3], stabilizerSize: [0, 2] },
-      blocks: [
-        // Sleek hull
-        [26, 14, 12, 36, 0, 'hull'],
-        [24, 18, 4, 28, 1, 'hull'],
-        [36, 18, 4, 28, 1, 'hull'],
-        // Nose
-        [28, 8, 8, 8, 1, 'hull'],
-        [30, 4, 4, 6, 2, 'hull'],
-        // Swept wings
-        [12, 26, 14, 4, 1, 'wing'],
-        [8, 28, 10, 3, 0, 'wing'],
-        [38, 26, 14, 4, 1, 'wing'],
-        [46, 28, 10, 3, 0, 'wing'],
-        // Aft stabilizers
-        [18, 42, 8, 3, 1, 'wing', 'stabilizer-left'],
-        [38, 42, 8, 3, 1, 'wing', 'stabilizer-right'],
-        // Cockpit
-        [29, 12, 6, 6, 0, 'accent'],
-        [30, 13, 4, 4, 1, 'accent'],
-        // Dual engines
-        [26, 50, 5, 4, 0, 'hull'],
-        [33, 50, 5, 4, 0, 'hull'],
-        [27, 54, 3, 5, 0, 'engine'],
-        [34, 54, 3, 5, 0, 'engine'],
+    BKSY: {
+      name: 'BlackSky Sat',
+      class: 'satellite',
+      hull: [
+        [26, 18, 12, 24, 0],  // cylindrical body
+        [28, 20, 8, 20, 1],   // inner
       ],
-      enginePoints: [[27, 54, 3, 6], [34, 54, 3, 6]],
-      beaconPoints: [[31, 5], [10, 28], [52, 28]],
+      nose: [
+        [30, 12, 4, 8, 2],    // sensor pod
+      ],
+      wings: [
+        [6, 24, 20, 12, 0],   // left array
+        [38, 24, 20, 12, 0],  // right array
+        [8, 28, 16, 4, 1],
+        [40, 28, 16, 4, 1],
+      ],
+      engines: [
+        [28, 44, 8, 4, 0],
+      ],
+      engineGlow: [[30, 48, 4, 4]],
+      beacons: [[31, 13], [14, 29], [50, 29]],
     },
 
-    hauler: {
-      name: 'Hauler',
-      desc: 'Bulk transport',
-      params: { cargoDepth: [0, 5], strutLength: [-1, 3], moduleCount: [0, 2] },
-      blocks: [
-        // Wide cargo bay
-        [12, 18, 40, 26, 0, 'hull'],
-        [14, 16, 36, 4, 1, 'hull'],
-        [16, 14, 32, 2, 2, 'hull'],
-        // Modular cargo blocks
-        [14, 22, 36, 2, 2, 'hull'],
-        [14, 30, 36, 2, 2, 'hull'],
-        [14, 38, 36, 2, 2, 'hull'],
-        // Cargo bay cutouts (stacked crates look)
-        [18, 24, 12, 4, 0, 'cutout'],
-        [34, 24, 12, 4, 0, 'cutout'],
-        [18, 32, 12, 4, 0, 'cutout'],
-        [34, 32, 12, 4, 0, 'cutout'],
-        // Small bridge
-        [28, 8, 8, 8, 1, 'hull'],
-        [30, 10, 4, 4, 0, 'accent'],
-        // Support struts
-        [6, 24, 8, 14, 0, 'wing'],
-        [50, 24, 8, 14, 0, 'wing'],
-        // Engine array
-        [16, 44, 10, 4, 0, 'hull'],
-        [30, 44, 4, 4, 0, 'hull'],
-        [38, 44, 10, 4, 0, 'hull'],
-        [18, 48, 6, 4, 0, 'engine'],
-        [31, 48, 2, 3, 1, 'engine'],
-        [40, 48, 6, 4, 0, 'engine'],
+    GME: {
+      name: 'Power Core',
+      class: 'heavy',
+      // Hexagonal power core shape
+      hull: [
+        [24, 10, 16, 45, 0],  // main hex body
+        [20, 18, 24, 30, 1],  // outer ring
+        [26, 22, 12, 22, 2],  // inner core
       ],
-      enginePoints: [[18, 48, 6, 5], [31, 48, 2, 3], [40, 48, 6, 5]],
-      beaconPoints: [[31, 9], [9, 26], [54, 26]],
+      nose: [
+        [28, 6, 8, 8, 2],     // top vertex
+      ],
+      wings: [
+        [14, 25, 12, 16, 0],  // left facet
+        [38, 25, 12, 16, 0],  // right facet
+      ],
+      engines: [
+        [26, 52, 12, 6, 0],
+      ],
+      engineGlow: [[29, 58, 6, 6]],
+      beacons: [[31, 7]],
+    },
+
+    EVEX: {
+      name: 'Transport',
+      class: 'transport',
+      hull: [
+        [15, 32, 20, 10, 0],
+        [29, 32, 20, 10, 0],
+        [24, 22, 16, 20, 1],
+      ],
+      nose: [
+        [28, 16, 8, 8, 1],
+      ],
+      wings: [
+        [22, 12, 12, 12, 0],  // left rotor
+        [30, 12, 12, 12, 0],  // right rotor
+      ],
+      rotors: [
+        { cx: 28, cy: 18, r: 6 },
+        { cx: 36, cy: 18, r: 6 },
+      ],
+      engines: [
+        [26, 48, 6, 4, 0],
+        [32, 48, 6, 4, 0],
+      ],
+      engineGlow: [[28, 52, 3, 5], [34, 52, 3, 5]],
+      beacons: [[28, 13], [36, 13]],
+    },
+
+    GE: {
+      name: 'Aerospace',
+      class: 'heavy',
+      hull: [
+        [20, 35, 15, 15, 0],
+        [29, 35, 15, 15, 0],
+        [26, 20, 12, 30, 1],
+      ],
+      nose: [
+        [28, 12, 8, 10, 1],
+      ],
+      wings: [
+        [8, 30, 18, 8, 0],
+        [38, 30, 18, 8, 0],
+      ],
+      // Center turbine
+      turbine: { cx: 32, cy: 35, r: 8 },
+      engines: [
+        [28, 52, 8, 6, 0],
+      ],
+      engineGlow: [[30, 58, 4, 6]],
+      beacons: [[31, 13], [14, 33], [50, 33]],
+    },
+
+    LHX: {
+      name: 'Helix UAV',
+      class: 'drone',
+      hull: [
+        [26, 20, 12, 20, 0],  // elliptical body
+        [28, 22, 8, 16, 1],
+      ],
+      nose: [
+        [30, 16, 4, 6, 2],
+      ],
+      // X-wing configuration
+      wings: [
+        [10, 16, 18, 4, 0],   // upper left
+        [36, 16, 18, 4, 0],   // upper right
+        [10, 36, 18, 4, 0],   // lower left
+        [36, 36, 18, 4, 0],   // lower right
+      ],
+      engines: [
+        [28, 42, 8, 4, 0],
+      ],
+      engineGlow: [[30, 46, 4, 5]],
+      beacons: [[31, 17]],
+    },
+
+    RTX: {
+      name: 'Defense Sys',
+      class: 'heavy',
+      hull: [
+        [15, 30, 15, 15, 0],
+        [34, 30, 15, 15, 0],
+        [24, 15, 16, 30, 1],
+      ],
+      nose: [
+        [28, 10, 8, 8, 1],
+      ],
+      wings: [
+        [6, 26, 20, 8, 0],
+        [38, 26, 20, 8, 0],
+      ],
+      // Targeting cross
+      targeting: { cx: 32, cy: 30, size: 6 },
+      engines: [
+        [26, 48, 6, 4, 0],
+        [32, 48, 6, 4, 0],
+      ],
+      engineGlow: [[28, 52, 3, 5], [34, 52, 3, 5]],
+      beacons: [[31, 11], [12, 29], [52, 29]],
+    },
+
+    KTOS: {
+      name: 'Strike Drone',
+      class: 'drone',
+      // Aggressive angular shape
+      hull: [
+        [24, 20, 16, 25, 0],
+        [28, 24, 8, 18, 1],
+      ],
+      nose: [
+        [30, 12, 4, 10, 2],   // sharp nose
+        [28, 16, 8, 6, 1],
+      ],
+      wings: [
+        [4, 28, 22, 6, 0],    // swept left
+        [38, 28, 22, 6, 0],   // swept right
+        [8, 30, 14, 3, 1],
+        [42, 30, 14, 3, 1],
+      ],
+      engines: [
+        [28, 48, 8, 4, 0],
+      ],
+      engineGlow: [[30, 52, 4, 6]],
+      beacons: [[31, 13], [10, 30], [54, 30]],
+    },
+
+    PL: {
+      name: 'Planet Labs',
+      class: 'satellite',
+      hull: [
+        [22, 20, 20, 20, 0],
+        [24, 22, 16, 16, 1],
+      ],
+      nose: [
+        [28, 14, 8, 8, 2],    // camera array
+      ],
+      wings: [
+        [4, 22, 18, 6, 0],    // solar panel left
+        [42, 22, 18, 6, 0],   // solar panel right
+        [4, 32, 18, 6, 0],
+        [42, 32, 18, 6, 0],
+      ],
+      engines: [
+        [28, 42, 8, 4, 0],
+      ],
+      engineGlow: [[30, 46, 4, 4]],
+      beacons: [[31, 15]],
+    },
+
+    RDW: {
+      name: 'Recon Sat',
+      class: 'satellite',
+      hull: [
+        [24, 18, 16, 24, 0],
+        [26, 20, 12, 20, 1],
+      ],
+      nose: [
+        [30, 12, 4, 8, 2],
+      ],
+      wings: [
+        [8, 18, 16, 10, 0],   // left dish
+        [40, 18, 16, 10, 0],  // right dish
+      ],
+      engines: [
+        [28, 44, 8, 4, 0],
+      ],
+      engineGlow: [[30, 48, 4, 4]],
+      beacons: [[31, 13], [14, 22], [50, 22]],
+    },
+
+    COHR: {
+      name: 'Laser Array',
+      class: 'weapon',
+      hull: [
+        [24, 22, 16, 16, 0],
+        [26, 24, 12, 12, 1],
+      ],
+      nose: [
+        [28, 16, 8, 8, 2],
+      ],
+      // Laser emitters
+      wings: [
+        [4, 28, 20, 4, 0],
+        [40, 28, 20, 4, 0],
+      ],
+      lasers: [
+        { x: 4, y: 29, dir: 'left' },
+        { x: 60, y: 29, dir: 'right' },
+      ],
+      engines: [
+        [28, 40, 8, 4, 0],
+      ],
+      engineGlow: [[30, 44, 4, 4]],
+      beacons: [[31, 17]],
     },
   };
 
-  // Regime → Blueprint pools
-  const REGIME_POOLS = {
-    'UPTREND':   ['interceptor', 'scout', 'corvette'],
-    'DOWNTREND': ['dreadnought', 'freighter', 'hauler'],
-    'BREAKOUT':  ['interceptor', 'dreadnought', 'corvette'],
-    'CHOP':      ['drone', 'scout'],
-    'RANGE':     ['freighter', 'corvette', 'hauler', 'scout'],
-    'UNKNOWN':   ['drone', 'scout']
+  // Fallback ship for unknown tickers
+  const DEFAULT_SHIP = {
+    name: 'Unknown Vessel',
+    class: 'drone',
+    hull: [
+      [24, 20, 16, 24, 0],
+      [26, 22, 12, 20, 1],
+    ],
+    nose: [
+      [28, 14, 8, 8, 1],
+    ],
+    wings: [
+      [12, 28, 14, 4, 0],
+      [38, 28, 14, 4, 0],
+    ],
+    engines: [
+      [28, 46, 8, 4, 0],
+    ],
+    engineGlow: [[30, 50, 4, 6]],
+    beacons: [[31, 15]],
   };
 
-  function chooseBlueprint(ticker, telemetry, seed) {
-    const regime = telemetry.regime || 'RANGE';
-    const pool = REGIME_POOLS[regime] || REGIME_POOLS['UNKNOWN'];
-    const rand = SeedUtils.mulberry32(seed);
-    return pool[Math.floor(rand() * pool.length)];
+  // ═══════════════════════════════════════════════════════════════════════
+  // UPGRADE PARTS - Visual enhancements based on stats
+  // Imported from sprite-upgrades.js concept
+  // ═══════════════════════════════════════════════════════════════════════
+
+  const UPGRADE_PARTS = {
+    // Wings: Based on momentum
+    wings: {
+      tiers: [
+        { min: 0.00, max: 0.25, scale: 0.8,  label: 'Scout' },
+        { min: 0.25, max: 0.50, scale: 1.0,  label: 'Standard' },
+        { min: 0.50, max: 0.75, scale: 1.15, label: 'Combat' },
+        { min: 0.75, max: 1.00, scale: 1.3,  label: 'Elite', glow: true },
+      ],
+      stat: 'momentum',
+    },
+    
+    // Engines: Based on strength/thrust
+    engines: {
+      tiers: [
+        { min: 0.00, max: 0.33, intensity: 0.4, flames: 1, label: 'Basic' },
+        { min: 0.33, max: 0.66, intensity: 0.7, flames: 2, label: 'Ion' },
+        { min: 0.66, max: 1.00, intensity: 1.0, flames: 3, label: 'Plasma', glow: true },
+      ],
+      stat: 'thrust',
+    },
+    
+    // Armor: Based on damage/volatility
+    armor: {
+      tiers: [
+        { min: 0.00, max: 0.30, plates: 0, label: 'None' },
+        { min: 0.30, max: 0.60, plates: 2, label: 'Light' },
+        { min: 0.60, max: 1.00, plates: 4, label: 'Heavy' },
+      ],
+      stat: 'damage',
+    },
+    
+    // Antenna: Based on signal activity
+    antenna: {
+      tiers: [
+        { min: 0.00, max: 0.40, size: 0, label: 'None' },
+        { min: 0.40, max: 0.70, size: 4, label: 'Comm' },
+        { min: 0.70, max: 1.00, size: 8, label: 'Command', pulse: true },
+      ],
+      stat: 'activity',
+    },
+    
+    // Shield: Based on consistency/low jitter
+    shield: {
+      tiers: [
+        { min: 0.00, max: 0.60, radius: 0, label: 'None' },
+        { min: 0.60, max: 1.00, radius: 1.2, label: 'Active', pulse: true },
+      ],
+      stat: 'consistency',
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // UTILITY FUNCTIONS
+  // ═══════════════════════════════════════════════════════════════════════
+
+  function getTickerShip(ticker) {
+    return TICKER_SHIPS[ticker?.toUpperCase()] || DEFAULT_SHIP;
   }
 
-  function getShipParams(seed, blueprint) {
-    const bp = typeof blueprint === 'string' ? BLUEPRINTS[blueprint] : blueprint;
-    if (!bp || !bp.params) return {};
-    const rand = SeedUtils.mulberry32(seed);
-    const params = {};
-    for (const [key, [min, max]] of Object.entries(bp.params)) {
-      params[key] = Math.round(min + (max - min) * rand());
+  function getUpgradeTier(partType, normalizedValue) {
+    const part = UPGRADE_PARTS[partType];
+    if (!part) return null;
+    
+    for (const tier of part.tiers) {
+      if (normalizedValue >= tier.min && normalizedValue < tier.max) {
+        return tier;
+      }
     }
-    return params;
+    return part.tiers[part.tiers.length - 1];
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  // PALETTE GENERATION - Cached pigments, letter→color mapping
-  // ═══════════════════════════════════════════════════════════════════
+  function buildUpgrades(telemetry) {
+    const upgrades = {};
+    
+    // Map telemetry to normalized 0-1 values
+    const stats = {
+      momentum: Math.abs(telemetry.momentum || 0),
+      thrust: telemetry.thrust ?? 0.5,
+      damage: telemetry.damage ?? 0,
+      activity: telemetry.jitter ?? 0.3,
+      consistency: 1 - (telemetry.jitter ?? 0.3),
+    };
+    
+    for (const [partType, config] of Object.entries(UPGRADE_PARTS)) {
+      const statValue = stats[config.stat] ?? 0.5;
+      upgrades[partType] = getUpgradeTier(partType, statValue);
+    }
+    
+    return upgrades;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // PALETTE GENERATION
+  // ═══════════════════════════════════════════════════════════════════════
 
   class PaletteGenerator {
     constructor(watercolorEngine = null) {
       this.wc = watercolorEngine;
-      // Cache pigments array (ChatGPT fix)
       this._pigments = watercolorEngine?.getAllPigments?.() || null;
     }
 
     generate(ticker, telemetry = {}) {
       const signalState = telemetry.signalState || 'neutral';
-      const stress = telemetry.damage || 0;
-      const momentum = Math.max(-1, Math.min(1, Math.round((telemetry.momentum || 0) * 4) / 4));
       
       if (this.wc && this._pigments) {
-        return this._generateWithWatercolor(ticker, signalState, stress, momentum);
+        return this._generateWithWatercolor(ticker, signalState, telemetry);
       }
-      return this._generateFallback(ticker, signalState, stress, momentum);
+      return this._generateFallback(ticker, signalState);
     }
 
-    _generateWithWatercolor(ticker, signalState, stress, momentum) {
+    _generateWithWatercolor(ticker, signalState, telemetry) {
       const wc = this.wc;
       const all = this._pigments;
       const n = all.length || 1;
@@ -331,215 +552,210 @@
       const hullPig = all[(SeedUtils.letterIndex(letters[0]) * 7) % n];
       const wingPig = all[(SeedUtils.letterIndex(letters[1]) * 11) % n];
       const accentPig = all[(SeedUtils.letterIndex(letters[2]) * 13) % n];
-      const engineBasePig = all[(SeedUtils.letterIndex(letters[3]) * 17) % n];
+      const enginePig = all[(SeedUtils.letterIndex(letters[3]) * 17) % n];
 
       let hullRamp = wc.getDilutionGradient(hullPig, 4);
       let wingRamp = wc.getDilutionGradient(wingPig, 4);
+      const engineRamp = wc.getDilutionGradient(enginePig, 4);
 
       const accentPalette = wc.generatePalette(accentPig, 'complementary');
       const accentColor = accentPalette[1]?.hex || accentPig?.hex || '#00FFFF';
-
-      let enginePig = engineBasePig;
-      if (momentum > 0.25) enginePig = wc.findPigment('Indian Yellow') || engineBasePig;
-      else if (momentum < -0.25) enginePig = wc.findPigment('Carmine') || engineBasePig;
-      const engineRamp = wc.getDilutionGradient(enginePig, 4);
 
       // Signal state tint
       if (signalState === 'bull') {
         const tint = wc.findPigment('Cyan');
         if (tint) hullRamp = hullRamp.map(c => wc.lerp(c, tint.hex, 0.15));
       } else if (signalState === 'bear') {
-        const tint = wc.findPigment('Magenta') || wc.findPigment('Carmine');
+        const tint = wc.findPigment('Carmine');
         if (tint) hullRamp = hullRamp.map(c => wc.lerp(c, tint.hex, 0.15));
       }
 
-      // Stress glaze
-      if (stress > 0.3) {
-        const stressPig = wc.findPigment("Payne's Grey") || wc.findPigment('English Red');
-        if (stressPig) {
-          hullRamp = hullRamp.map(c => wc.lerp(c, stressPig.hex, stress * 0.35));
-          wingRamp = wingRamp.map(c => wc.lerp(c, stressPig.hex, stress * 0.25));
-        }
-      }
-
-      return { hull: hullRamp, wing: wingRamp, accent: accentColor, engine: engineRamp, damage: '#FF2975' };
+      return {
+        hull: hullRamp,
+        wing: wingRamp,
+        accent: accentColor,
+        engine: engineRamp,
+        shield: 'rgba(51, 255, 153, 0.3)',
+        beacon: accentColor,
+      };
     }
 
-    _generateFallback(ticker, signalState, stress, momentum) {
-      const letters = (ticker || 'AAA').toUpperCase().padEnd(4, 'A');
-      const hullHue = (SeedUtils.letterIndex(letters[0]) / 26) * 360;
-      const wingHue = (SeedUtils.letterIndex(letters[1]) / 26) * 360;
-      const accentHue = (SeedUtils.letterIndex(letters[2]) / 26) * 360;
-      const engineHue = (SeedUtils.letterIndex(letters[3]) / 26) * 360;
-
-      let sat = signalState === 'bull' ? 50 : signalState === 'bear' ? 35 : 40;
-      sat = sat * (1 - stress * 0.3);
-
-      const makeRamp = (h, s) => [
-        `hsl(${h}, ${s}%, 12%)`,
-        `hsl(${h}, ${s}%, 22%)`,
-        `hsl(${h}, ${s}%, 32%)`,
-        `hsl(${h}, ${s}%, 42%)`
-      ];
-
-      const adjEngHue = momentum > 0.25 ? 45 : momentum < -0.25 ? 350 : engineHue;
-
+    _generateFallback(ticker, signalState) {
+      const seed = SeedUtils.getTickerSeed(ticker);
+      const rand = SeedUtils.mulberry32(seed);
+      
+      const hue = rand() * 360;
+      const sat = 40 + rand() * 30;
+      
+      const hullBase = `hsl(${hue}, ${sat}%, 45%)`;
+      const hullLight = `hsl(${hue}, ${sat}%, 55%)`;
+      const hullDark = `hsl(${hue}, ${sat}%, 35%)`;
+      
+      const wingHue = (hue + 30) % 360;
+      const wingBase = `hsl(${wingHue}, ${sat}%, 50%)`;
+      
       return {
-        hull: makeRamp(hullHue, sat),
-        wing: makeRamp(wingHue, sat * 0.9),
-        accent: `hsl(${accentHue}, 70%, 60%)`,
-        engine: [
-          `hsl(${adjEngHue}, 90%, 50%)`,
-          `hsl(${adjEngHue}, 85%, 65%)`,
-          `hsl(${adjEngHue}, 80%, 80%)`,
-          `hsl(${adjEngHue}, 70%, 95%)`
-        ],
-        damage: '#FF2975'
+        hull: [hullDark, hullBase, hullLight, `hsl(${hue}, ${sat}%, 65%)`],
+        wing: [wingBase, `hsl(${wingHue}, ${sat}%, 60%)`],
+        accent: '#00FFFF',
+        engine: ['#FF6600', '#FFAA00', '#FFDD44', '#FFFFAA'],
+        shield: 'rgba(51, 255, 153, 0.3)',
+        beacon: '#33FF99',
       };
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  // CANVAS RENDERER - Optional targetCanvas, cutout support
-  // ═══════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
+  // SHIP RENDERER
+  // ═══════════════════════════════════════════════════════════════════════
 
   class ShipRenderer {
     constructor(size = CONFIG.baseSize) {
       this.size = size;
-      this.scale = size / CONFIG.baseSize;
+      this.scale = size / 64;
     }
 
-    // ChatGPT fix: optional targetCanvas to avoid allocation
-    render(blueprint, palette, telemetry = {}, tickerSeed = 0, frameIndex = 0, targetCanvas = null) {
+    render(ticker, palette, telemetry, seed, frameIndex, targetCanvas) {
       const canvas = targetCanvas || document.createElement('canvas');
       if (!targetCanvas) {
         canvas.width = this.size;
         canvas.height = this.size;
       }
+      
       const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, this.size, this.size);
 
-      const bp = typeof blueprint === 'string' ? BLUEPRINTS[blueprint] : blueprint;
-      if (!bp) return canvas;
+      const ship = getTickerShip(ticker);
+      const upgrades = buildUpgrades(telemetry);
+      const scale = this.scale;
 
-      const params = getShipParams(tickerSeed, bp);
-      const thrust = telemetry.thrust ?? 0.5;
-      const damage = telemetry.damage ?? 0;
-      const jitter = telemetry.jitter ?? 0;
+      // 1. Render shield (behind everything if active)
+      if (upgrades.shield?.radius > 0) {
+        this._renderShield(ctx, upgrades.shield, palette, frameIndex);
+      }
 
-      // Render solid layers first, then cutouts
-      this._renderBlocks(ctx, bp.blocks, palette, damage, jitter, tickerSeed, frameIndex, params, false);
-      this._renderBlocks(ctx, bp.blocks, palette, damage, jitter, tickerSeed, frameIndex, params, true);
-      this._renderEngines(ctx, bp.enginePoints, palette.engine, thrust, tickerSeed, frameIndex);
-      this._renderBeacons(ctx, bp.beaconPoints, palette.accent, telemetry.signalState, frameIndex);
+      // 2. Render engines (behind hull)
+      this._renderEngines(ctx, ship, palette, upgrades.engines, telemetry.thrust ?? 0.5, seed, frameIndex);
 
-      if (damage > 0.2) this._renderDamage(ctx, damage, tickerSeed, frameIndex);
+      // 3. Render wings with upgrade scaling
+      this._renderWings(ctx, ship, palette, upgrades.wings, seed);
+
+      // 4. Render main hull
+      this._renderHull(ctx, ship, palette, telemetry.damage ?? 0, seed);
+
+      // 5. Render nose
+      this._renderNose(ctx, ship, palette);
+
+      // 6. Render armor plates
+      if (upgrades.armor?.plates > 0) {
+        this._renderArmor(ctx, ship, upgrades.armor, palette, seed);
+      }
+
+      // 7. Render antenna
+      if (upgrades.antenna?.size > 0) {
+        this._renderAntenna(ctx, ship, upgrades.antenna, palette, frameIndex);
+      }
+
+      // 8. Render beacons
+      this._renderBeacons(ctx, ship, palette, telemetry.signalState, frameIndex);
+
+      // 9. Render special features (rotors, lasers, etc.)
+      this._renderSpecialFeatures(ctx, ship, palette, frameIndex);
+
+      // 10. Render damage sparks
+      if ((telemetry.damage ?? 0) > 0.2) {
+        this._renderDamage(ctx, telemetry.damage, seed, frameIndex);
+      }
 
       return canvas;
     }
 
-    _renderBlocks(ctx, blocks, palette, damage, jitter, tickerSeed, frameIndex, params, cutoutPass) {
+    _renderHull(ctx, ship, palette, damage, seed) {
       const scale = this.scale;
-
-      blocks.forEach((block, blockIndex) => {
-        const [x, y, w, h, shadeIndex, layer, tag] = block;
+      const rand = SeedUtils.mulberry32(seed);
+      
+      (ship.hull || []).forEach(([x, y, w, h, shade]) => {
+        // Skip some blocks if damaged
+        if (damage > 0.4 && rand() < damage * 0.2) return;
         
-        // Separate cutout pass
-        const isCutout = layer === 'cutout';
-        if (cutoutPass !== isCutout) return;
-
-        const rand = SeedUtils.getBlockRng(tickerSeed, frameIndex, blockIndex);
-        const jx = jitter > 0 ? (rand() - 0.5) * jitter * 2 : 0;
-        const jy = jitter > 0 ? (rand() - 0.5) * jitter * 2 : 0;
-
-        // Param offsets
-        let offsetX = 0, offsetY = 0, offsetW = 0, offsetH = 0;
-        if (tag && params) {
-          if (tag.includes('wing-left') && params.wingSpan !== undefined) {
-            offsetX = -params.wingSpan; offsetW = params.wingSpan;
-          }
-          if (tag.includes('wing-right') && params.wingSpan !== undefined) {
-            offsetW = params.wingSpan;
-          }
-          if (tag.includes('nose') && params.noseLen !== undefined) {
-            offsetY = -params.noseLen; offsetH = params.noseLen;
-          }
-          if (tag.includes('pod-left') && params.podSize !== undefined) {
-            offsetX = -params.podSize; offsetW = params.podSize;
-          }
-          if (tag.includes('pod-right') && params.podSize !== undefined) {
-            offsetW = params.podSize;
-          }
-          if (tag.includes('bridge') && params.bridgeHeight !== undefined) {
-            offsetY = -params.bridgeHeight; offsetH = params.bridgeHeight;
-          }
-          if (tag.includes('weapon') && params.weaponLen !== undefined) {
-            if (tag.includes('left')) offsetX = -params.weaponLen;
-            offsetW = params.weaponLen;
-          }
-          if (tag.includes('spine') && params.spineLen !== undefined) {
-            offsetH = params.spineLen;
-          }
-          if (tag.includes('dish') && params.dishSize !== undefined) {
-            offsetX = -params.dishSize / 2; offsetW = params.dishSize;
-          }
-          if (tag.includes('stabilizer') && params.stabilizerSize !== undefined) {
-            offsetW = params.stabilizerSize;
-          }
-        }
-
-        // Cutouts erase pixels
-        if (isCutout) {
-          ctx.globalCompositeOperation = 'destination-out';
-          ctx.fillStyle = 'rgba(0,0,0,1)';
-        } else {
-          ctx.globalCompositeOperation = 'source-over';
-          let colorRamp;
-          switch (layer) {
-            case 'accent':
-              ctx.fillStyle = typeof palette.accent === 'string' ? palette.accent : palette.accent[shadeIndex];
-              break;
-            case 'engine':
-              ctx.fillStyle = palette.engine[shadeIndex] || palette.engine[0];
-              break;
-            case 'wing':
-              colorRamp = palette.wing || palette.hull;
-              ctx.fillStyle = colorRamp[shadeIndex] || colorRamp[0];
-              break;
-            default:
-              ctx.fillStyle = palette.hull[shadeIndex] || palette.hull[0];
-          }
-
-          // Damage: skip some hull/wing blocks
-          if (damage > 0.3 && (layer === 'hull' || layer === 'wing') && rand() < damage * 0.3) return;
-        }
-
+        ctx.fillStyle = palette.hull[shade] || palette.hull[0];
         ctx.fillRect(
-          Math.round((x + jx + offsetX) * scale),
-          Math.round((y + jy + offsetY) * scale),
-          Math.ceil((w + offsetW) * scale),
-          Math.ceil((h + offsetH) * scale)
+          Math.round(x * scale),
+          Math.round(y * scale),
+          Math.ceil(w * scale),
+          Math.ceil(h * scale)
         );
       });
-
-      ctx.globalCompositeOperation = 'source-over';
     }
 
-    _renderEngines(ctx, enginePoints, engineColors, thrust, tickerSeed, frameIndex) {
-      if (!enginePoints) return;
+    _renderNose(ctx, ship, palette) {
       const scale = this.scale;
-      const thrustLen = thrust * 1.5;
+      
+      (ship.nose || []).forEach(([x, y, w, h, shade]) => {
+        ctx.fillStyle = palette.hull[shade] || palette.hull[0];
+        ctx.fillRect(
+          Math.round(x * scale),
+          Math.round(y * scale),
+          Math.ceil(w * scale),
+          Math.ceil(h * scale)
+        );
+      });
+    }
 
-      enginePoints.forEach((pt, i) => {
-        const [x, y, w, maxLen] = pt;
-        const len = maxLen * thrustLen;
-        const rand = SeedUtils.getBlockRng(tickerSeed, frameIndex, 1000 + i);
+    _renderWings(ctx, ship, palette, wingTier, seed) {
+      const scale = this.scale;
+      const wingScale = wingTier?.scale ?? 1.0;
+      const centerX = 32;
+      
+      (ship.wings || []).forEach(([x, y, w, h, shade]) => {
+        // Scale wings from center
+        const offsetX = (x - centerX) * wingScale + centerX;
+        const scaledW = w * wingScale;
+        
+        ctx.fillStyle = palette.wing[shade] || palette.wing[0];
+        ctx.fillRect(
+          Math.round(offsetX * scale),
+          Math.round(y * scale),
+          Math.ceil(scaledW * scale),
+          Math.ceil(h * scale)
+        );
+      });
+      
+      // Wing glow for elite tier
+      if (wingTier?.glow) {
+        ctx.shadowColor = palette.accent;
+        ctx.shadowBlur = 8 * scale;
+      }
+    }
 
+    _renderEngines(ctx, ship, palette, engineTier, thrust, seed, frameIndex) {
+      const scale = this.scale;
+      const intensity = engineTier?.intensity ?? 0.5;
+      const flames = engineTier?.flames ?? 1;
+      
+      // Engine housings
+      (ship.engines || []).forEach(([x, y, w, h, shade]) => {
+        ctx.fillStyle = palette.hull[0];
+        ctx.fillRect(
+          Math.round(x * scale),
+          Math.round(y * scale),
+          Math.ceil(w * scale),
+          Math.ceil(h * scale)
+        );
+      });
+      
+      // Engine glow/flames
+      (ship.engineGlow || []).forEach(([x, y, w, maxLen], i) => {
+        const rand = SeedUtils.getBlockRng(seed, frameIndex, 1000 + i);
+        const len = maxLen * thrust * intensity;
+        
         for (let j = 0; j < len; j++) {
-          const ci = Math.min(Math.floor((j / len) * engineColors.length), engineColors.length - 1);
-          ctx.fillStyle = engineColors[ci];
-          ctx.globalAlpha = 1 - (j / len) * 0.7;
-          const flickerW = w * (0.8 + rand() * 0.4);
+          const ci = Math.min(Math.floor((j / len) * palette.engine.length), palette.engine.length - 1);
+          ctx.fillStyle = palette.engine[ci];
+          ctx.globalAlpha = (1 - j / len) * intensity;
+          
+          const flickerW = w * (0.7 + rand() * 0.6);
           ctx.fillRect(
             Math.round((x + (w - flickerW) / 2) * scale),
             Math.round((y + j) * scale),
@@ -548,45 +764,190 @@
           );
         }
       });
+      
       ctx.globalAlpha = 1;
     }
 
-    _renderBeacons(ctx, beaconPoints, accentColor, signalState, frameIndex) {
-      if (!beaconPoints) return;
+    _renderArmor(ctx, ship, armorTier, palette, seed) {
+      const scale = this.scale;
+      const plates = armorTier.plates || 0;
+      const rand = SeedUtils.mulberry32(seed + 500);
+      
+      // Add armor plates on hull
+      for (let i = 0; i < plates; i++) {
+        const x = 20 + rand() * 24;
+        const y = 18 + rand() * 28;
+        const w = 4 + rand() * 6;
+        const h = 3 + rand() * 4;
+        
+        ctx.fillStyle = 'rgba(100, 120, 140, 0.6)';
+        ctx.fillRect(
+          Math.round(x * scale),
+          Math.round(y * scale),
+          Math.ceil(w * scale),
+          Math.ceil(h * scale)
+        );
+      }
+    }
+
+    _renderAntenna(ctx, ship, antennaTier, palette, frameIndex) {
+      const scale = this.scale;
+      const size = antennaTier.size || 0;
+      
+      // Antenna mast
+      ctx.strokeStyle = palette.accent;
+      ctx.lineWidth = 2 * scale;
+      ctx.beginPath();
+      ctx.moveTo(32 * scale, 12 * scale);
+      ctx.lineTo(32 * scale, (12 - size) * scale);
+      ctx.stroke();
+      
+      // Antenna tip with pulse
+      if (antennaTier.pulse) {
+        const pulse = (Math.sin(frameIndex * 0.3) + 1) / 2;
+        ctx.globalAlpha = 0.5 + pulse * 0.5;
+      }
+      
+      ctx.fillStyle = palette.beacon;
+      ctx.beginPath();
+      ctx.arc(32 * scale, (12 - size) * scale, 2 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.globalAlpha = 1;
+    }
+
+    _renderShield(ctx, shieldTier, palette, frameIndex) {
+      const scale = this.scale;
+      const radius = shieldTier.radius || 0;
+      const pulse = shieldTier.pulse ? (Math.sin(frameIndex * 0.15) + 1) / 2 : 1;
+      
+      ctx.globalAlpha = 0.15 + pulse * 0.1;
+      ctx.fillStyle = palette.shield;
+      ctx.beginPath();
+      ctx.ellipse(
+        32 * scale, 32 * scale,
+        28 * radius * scale, 30 * radius * scale,
+        0, 0, Math.PI * 2
+      );
+      ctx.fill();
+      
+      ctx.globalAlpha = 1;
+    }
+
+    _renderBeacons(ctx, ship, palette, signalState, frameIndex) {
       const scale = this.scale;
       const pulseSpeed = signalState === 'bull' ? 6 : signalState === 'bear' ? 3 : 8;
       const pulse = (Math.sin(frameIndex / pulseSpeed) + 1) / 2;
 
-      beaconPoints.forEach(([x, y]) => {
-        ctx.globalAlpha = 0.5 + pulse * 0.5;
-        ctx.fillStyle = accentColor;
-        ctx.fillRect(Math.round(x * scale), Math.round(y * scale), Math.ceil(2 * scale), Math.ceil(2 * scale));
+      (ship.beacons || []).forEach(([x, y]) => {
+        ctx.globalAlpha = 0.4 + pulse * 0.6;
+        ctx.fillStyle = palette.beacon;
+        ctx.fillRect(
+          Math.round((x - 1) * scale),
+          Math.round((y - 1) * scale),
+          Math.ceil(2 * scale),
+          Math.ceil(2 * scale)
+        );
       });
+      
       ctx.globalAlpha = 1;
     }
 
-    _renderDamage(ctx, damage, tickerSeed, frameIndex) {
+    _renderSpecialFeatures(ctx, ship, palette, frameIndex) {
       const scale = this.scale;
-      const rand = SeedUtils.getBlockRng(tickerSeed, frameIndex, 2000);
+      
+      // Rotors (for VTOL ships)
+      if (ship.rotors) {
+        const rotorAngle = frameIndex * 0.5;
+        ship.rotors.forEach(({ cx, cy, r }) => {
+          ctx.save();
+          ctx.translate(cx * scale, cy * scale);
+          ctx.rotate(rotorAngle);
+          
+          ctx.strokeStyle = palette.accent;
+          ctx.lineWidth = 1.5 * scale;
+          ctx.globalAlpha = 0.7;
+          
+          // Rotor blades
+          for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(r * scale, 0);
+            ctx.stroke();
+            ctx.rotate(Math.PI * 2 / 3);
+          }
+          
+          ctx.restore();
+        });
+        ctx.globalAlpha = 1;
+      }
+      
+      // Turbine (for GE)
+      if (ship.turbine) {
+        const { cx, cy, r } = ship.turbine;
+        ctx.strokeStyle = palette.hull[2] || palette.hull[0];
+        ctx.lineWidth = 2 * scale;
+        ctx.beginPath();
+        ctx.arc(cx * scale, cy * scale, r * scale, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      
+      // Targeting reticle (for RTX)
+      if (ship.targeting) {
+        const { cx, cy, size } = ship.targeting;
+        ctx.strokeStyle = palette.accent;
+        ctx.lineWidth = 1 * scale;
+        
+        // Crosshairs
+        ctx.beginPath();
+        ctx.moveTo((cx - size) * scale, cy * scale);
+        ctx.lineTo((cx + size) * scale, cy * scale);
+        ctx.moveTo(cx * scale, (cy - size) * scale);
+        ctx.lineTo(cx * scale, (cy + size) * scale);
+        ctx.stroke();
+      }
+      
+      // Lasers (for COHR)
+      if (ship.lasers) {
+        const pulse = (Math.sin(frameIndex * 0.4) + 1) / 2;
+        ctx.fillStyle = `rgba(255, 100, 100, ${0.3 + pulse * 0.4})`;
+        
+        ship.lasers.forEach(({ x, y, dir }) => {
+          const length = dir === 'left' ? -12 : 12;
+          ctx.fillRect(
+            Math.round(x * scale),
+            Math.round((y - 1) * scale),
+            Math.ceil(length * scale),
+            Math.ceil(2 * scale)
+          );
+        });
+      }
+    }
+
+    _renderDamage(ctx, damage, seed, frameIndex) {
+      const scale = this.scale;
+      const rand = SeedUtils.getBlockRng(seed, frameIndex, 2000);
+      
       ctx.fillStyle = '#FF2975';
-      for (let i = 0; i < Math.floor(damage * 10); i++) {
+      const sparkCount = Math.floor(damage * 8);
+      
+      for (let i = 0; i < sparkCount; i++) {
         ctx.globalAlpha = 0.3 + rand() * 0.7;
         ctx.fillRect(
           Math.round((18 + rand() * 28) * scale),
-          Math.round((8 + rand() * 48) * scale),
-          Math.ceil(2 * scale), Math.ceil(2 * scale)
+          Math.round((10 + rand() * 44) * scale),
+          Math.ceil(2 * scale),
+          Math.ceil(2 * scale)
         );
       }
+      
       ctx.globalAlpha = 1;
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  // RENDER CACHE - Stores ImageBitmap (not canvas elements)
-  // ChatGPT fix: Canvas elements can only exist in one DOM location.
-  // Caching canvases causes "teleportation" bugs when rendering same 
-  // ship in multiple places. ImageBitmap can be drawn to any canvas.
-  // ═══════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
+  // RENDER CACHE - ImageBitmap storage
+  // ═══════════════════════════════════════════════════════════════════════
 
   class RenderCache {
     constructor(maxSize = CONFIG.maxCacheSize) {
@@ -595,14 +956,12 @@
     }
 
     _hashTelemetry(telemetry) {
-      const regime = telemetry.regime || 'RANGE';
       const signal = telemetry.signalState || 'neutral';
-      // Align quantization with palette (ChatGPT suggestion)
       const thrust = Math.round((telemetry.thrust ?? 0.5) * 10);
       const damage = Math.round((telemetry.damage ?? 0) * 10);
-      const momentum = Math.round((telemetry.momentum ?? 0) * 4); // quarters
+      const momentum = Math.round((telemetry.momentum ?? 0) * 4);
       const jitter = Math.round((telemetry.jitter ?? 0) * 10);
-      return `${regime}:${signal}:${thrust}:${damage}:${momentum}:${jitter}`;
+      return `${signal}:${thrust}:${damage}:${momentum}:${jitter}`;
     }
 
     get(ticker, size, telemetry) {
@@ -613,14 +972,14 @@
     async set(ticker, size, telemetry, canvas) {
       if (!CONFIG.enableCache) return;
       const key = `${ticker}:${size}:${this._hashTelemetry(telemetry)}`;
+      
       if (this.cache.size >= this.maxSize) {
-        // Evict oldest entry
         const oldestKey = this.cache.keys().next().value;
         const oldBitmap = this.cache.get(oldestKey);
-        if (oldBitmap && oldBitmap.close) oldBitmap.close(); // Release ImageBitmap memory
+        if (oldBitmap?.close) oldBitmap.close();
         this.cache.delete(oldestKey);
       }
-      // Store ImageBitmap instead of canvas element
+      
       try {
         const bitmap = await createImageBitmap(canvas);
         this.cache.set(key, bitmap);
@@ -629,18 +988,17 @@
       }
     }
 
-    clear() { 
-      // Release all ImageBitmap resources
+    clear() {
       this.cache.forEach(bitmap => {
-        if (bitmap && bitmap.close) bitmap.close();
+        if (bitmap?.close) bitmap.close();
       });
-      this.cache.clear(); 
+      this.cache.clear();
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   // MAIN ENGINE
-  // ═══════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
 
   class PixelShipEngine {
     constructor(options = {}) {
@@ -649,15 +1007,13 @@
       this.paletteGenerator = new PaletteGenerator(this.watercolorEngine);
       this.cache = new RenderCache();
       this.userId = options.userId || null;
-      // Cache ShipRenderer instances per size (micro perf optimization)
       this._renderers = new Map();
     }
 
     getSeed(ticker) {
       return SeedUtils.getTickerSeed(ticker, this.userId);
     }
-    
-    // Get or create a ShipRenderer for the given size
+
     _getRenderer(size) {
       let renderer = this._renderers.get(size);
       if (!renderer) {
@@ -668,24 +1024,17 @@
     }
 
     renderShip(ticker, telemetry = {}, size = CONFIG.baseSize, targetCanvas = null) {
-      // If targetCanvas provided, always render fresh (no cache lookup for direct renders)
-      // Cache is only used for creating new canvas elements
-      
       const seed = this.getSeed(ticker);
-      const blueprintName = chooseBlueprint(ticker, telemetry, seed);
       const palette = this.paletteGenerator.generate(ticker, telemetry);
       const renderer = this._getRenderer(size);
-      
+
       if (targetCanvas) {
-        // Render directly to target canvas
-        renderer.render(blueprintName, palette, telemetry, seed, 0, targetCanvas);
+        renderer.render(ticker, palette, telemetry, seed, 0, targetCanvas);
         return targetCanvas;
       }
-      
-      // Check cache for ImageBitmap
+
       const cachedBitmap = this.cache.get(ticker, size, telemetry);
       if (cachedBitmap) {
-        // Create new canvas and draw cached bitmap to it
         const canvas = document.createElement('canvas');
         canvas.width = size;
         canvas.height = size;
@@ -693,23 +1042,19 @@
         ctx.drawImage(cachedBitmap, 0, 0);
         return canvas;
       }
-      
-      // Render to new canvas
-      const canvas = renderer.render(blueprintName, palette, telemetry, seed, 0, null);
-      
-      // Cache asynchronously (don't block return)
-      this.cache.set(ticker, size, telemetry, canvas);
-      
-      return canvas;
-    }
 
-    renderToDataURL(ticker, telemetry = {}, size = CONFIG.baseSize) {
-      return this.renderShip(ticker, telemetry, size).toDataURL('image/png');
+      const canvas = renderer.render(ticker, palette, telemetry, seed, 0, null);
+      this.cache.set(ticker, size, telemetry, canvas);
+      return canvas;
     }
 
     renderToCanvas(targetCanvas, ticker, telemetry = {}) {
       const size = Math.min(targetCanvas.width, targetCanvas.height);
       this.renderShip(ticker, telemetry, size, targetCanvas);
+    }
+
+    renderToDataURL(ticker, telemetry = {}, size = CONFIG.baseSize) {
+      return this.renderShip(ticker, telemetry, size).toDataURL('image/png');
     }
 
     createAnimatedSprite(ticker, telemetry = {}, size = CONFIG.baseSize) {
@@ -719,8 +1064,7 @@
       canvas.dataset.ticker = ticker;
 
       const seed = this.getSeed(ticker);
-      const blueprintName = chooseBlueprint(ticker, telemetry, seed);
-      const renderer = new ShipRenderer(size);
+      const renderer = this._getRenderer(size);
 
       let frameIndex = 0, animating = true, lastTime = 0;
       const frameInterval = 1000 / CONFIG.animationFps;
@@ -733,7 +1077,7 @@
           const thrustVar = Math.sin(frameIndex * 0.5) * 0.1;
           const animTelemetry = { ...telemetry, thrust: (telemetry.thrust ?? 0.5) + thrustVar };
           const palette = this.paletteGenerator.generate(ticker, animTelemetry);
-          renderer.render(blueprintName, palette, animTelemetry, seed, frameIndex, canvas);
+          renderer.render(ticker, palette, animTelemetry, seed, frameIndex, canvas);
         }
         requestAnimationFrame(animate);
       };
@@ -744,34 +1088,42 @@
       return canvas;
     }
 
-    // ChatGPT fix: don't call chooseBlueprint twice
     getShipInfo(ticker, telemetry = {}) {
       const seed = this.getSeed(ticker);
-      const blueprint = chooseBlueprint(ticker, telemetry, seed);
+      const ship = getTickerShip(ticker);
+      const upgrades = buildUpgrades(telemetry);
+      
       return {
         ticker,
         seed,
         seedHex: seed.toString(16).toUpperCase().padStart(8, '0'),
-        blueprint,
-        blueprintData: BLUEPRINTS[blueprint],
-        params: getShipParams(seed, blueprint),
-        regime: telemetry.regime || 'RANGE',
-        letters: (ticker || 'AAAA').toUpperCase().padEnd(4, 'A').split('')
+        shipName: ship.name,
+        shipClass: ship.class,
+        upgrades,
+        telemetry,
       };
     }
 
-    getBlueprints() { return Object.keys(BLUEPRINTS); }
-    getBlueprintData(name) { return BLUEPRINTS[name]; }
-    clearCache() { this.cache.clear(); }
+    getAvailableTickers() {
+      return Object.keys(TICKER_SHIPS);
+    }
+
+    clearCache() {
+      this.cache.clear();
+    }
   }
 
-  // Exports
+  // ═══════════════════════════════════════════════════════════════════════
+  // EXPORTS
+  // ═══════════════════════════════════════════════════════════════════════
+
   global.PixelShipEngine = PixelShipEngine;
-  global.SHIP_BLUEPRINTS = BLUEPRINTS;
+  global.TICKER_SHIPS = TICKER_SHIPS;
+  global.UPGRADE_PARTS = UPGRADE_PARTS;
   global.ShipRenderer = ShipRenderer;
 
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { PixelShipEngine, BLUEPRINTS, ShipRenderer };
+    module.exports = { PixelShipEngine, TICKER_SHIPS, UPGRADE_PARTS, ShipRenderer };
   }
 
 })(typeof window !== 'undefined' ? window : global);
