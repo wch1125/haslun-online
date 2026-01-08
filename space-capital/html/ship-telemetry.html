@@ -19,11 +19,23 @@
   <script src="../js/core/store.js?v=20260108"></script>
   <style>
     :root {
-      --magenta: #FF2975;
-      --cyan: #00FFFF;
-      --green-neon: #39FF14;
-      --yellow: #FFE600;
-      --red-alert: #FF0040;
+      /* === LOCKED HOTLINE MIAMI PALETTE === */
+      /* Only THREE pigments - everything else is derived */
+      --hm-magenta: rgb(255, 41, 117);
+      --hm-cyan: rgb(0, 255, 255);
+      --hm-yellow: rgb(255, 230, 0);
+      
+      /* UI semantic mapping - INTENTIONALLY COLLAPSED */
+      --ui-primary: var(--hm-magenta);
+      --ui-secondary: var(--hm-cyan);
+      --ui-warning: var(--hm-yellow);
+      
+      /* Legacy aliases */
+      --magenta: var(--hm-magenta);
+      --cyan: var(--hm-cyan);
+      --yellow: var(--hm-yellow);
+      --green-neon: var(--hm-cyan); /* Collapsed to cyan */
+      --red-alert: var(--hm-magenta); /* Collapsed to magenta */
       --bg-void: #0A0A0F;
       --bg-panel: #12121A;
       --bg-surface: #1A1A24;
@@ -73,15 +85,24 @@
       padding: 1rem;
     }
 
-    /* Header */
+    /* Header - Miami Style */
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 1rem;
       background: var(--bg-panel);
-      border: 1px solid var(--border-dim);
+      border: 1px solid rgba(255, 41, 117, 0.4);
       margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255, 41, 117, 0.08) 0%, transparent 50%);
+      pointer-events: none;
     }
 
     .header-left {
@@ -133,21 +154,52 @@
       }
     }
 
-    /* Panel Styling */
+    /* Panel Styling - Miami Aesthetic + CRT Damage */
     .panel {
       background: var(--bg-panel);
-      border: 1px solid var(--border-dim);
+      border: 1px solid var(--ui-primary);
+      border-color: rgba(255, 41, 117, 0.4);
       padding: 1rem;
+      position: relative;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 41, 117, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* CRT DAMAGE OVERLAY - kills "dashboard polish" */
+    .panel::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255, 255, 255, 0.012),
+          rgba(255, 255, 255, 0.012) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      z-index: 10;
     }
 
     .panel-title {
       font-family: 'Orbitron', sans-serif;
       font-size: 0.9rem;
-      color: var(--cyan);
+      color: var(--ui-primary);
       letter-spacing: 0.1em;
       margin-bottom: 1rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border-dim);
+      border-bottom: 1px solid rgba(255, 41, 117, 0.3);
+      position: relative;
+      z-index: 5;
     }
 
     /* Ship Display */
@@ -161,12 +213,25 @@
       width: 200px;
       height: 200px;
       background: var(--bg-surface);
-      border: 2px solid var(--border-dim);
+      border: 2px solid var(--magenta);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1rem;
       position: relative;
+      box-shadow: 0 0 20px rgba(255, 41, 117, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Miami grid overlay on ship container */
+    .ship-sprite-container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent 49%, rgba(255, 41, 117, 0.1) 49%, rgba(255, 41, 117, 0.1) 51%, transparent 51%),
+        linear-gradient(0deg, transparent 49%, rgba(255, 41, 117, 0.1) 49%, rgba(255, 41, 117, 0.1) 51%, transparent 51%);
+      background-size: 20px 20px;
+      pointer-events: none;
     }
 
     .ship-sprite {
@@ -190,9 +255,9 @@
       border: 1px solid;
     }
 
-    .behavior-badge.thrust { border-color: var(--green-neon); color: var(--green-neon); }
+    .behavior-badge.thrust { border-color: var(--cyan); color: var(--cyan); }
     .behavior-badge.drift { border-color: var(--yellow); color: var(--yellow); }
-    .behavior-badge.fail { border-color: var(--red-alert); color: var(--red-alert); }
+    .behavior-badge.fail { border-color: var(--magenta); color: var(--magenta); }
 
     /* Stats Grid */
     .stats-grid {
@@ -218,11 +283,11 @@
       font-weight: bold;
     }
 
-    .stat-value.positive { color: var(--green-neon); }
-    .stat-value.negative { color: var(--red-alert); }
+    .stat-value.positive { color: var(--cyan); }
+    .stat-value.negative { color: var(--magenta); }
     .stat-value.neutral { color: var(--cyan); }
 
-    /* Chart Panel */
+    /* Chart Panel - VHS Memory Quality */
     .chart-panel {
       display: flex;
       flex-direction: column;
@@ -232,6 +297,24 @@
       flex: 1;
       min-height: 400px;
       position: relative;
+      /* VHS degradation on the chart */
+      filter: contrast(1.05) saturate(1.1);
+    }
+
+    .chart-container::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255, 255, 255, 0.008),
+          rgba(255, 255, 255, 0.008) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      pointer-events: none;
+      mix-blend-mode: overlay;
     }
 
     .chart-controls {
@@ -243,7 +326,7 @@
     .chart-btn {
       padding: 0.4rem 0.8rem;
       background: transparent;
-      border: 1px solid var(--border-dim);
+      border: 1px solid rgba(255, 41, 117, 0.4);
       color: var(--text-dim);
       font-family: 'VT323', monospace;
       font-size: 0.9rem;
@@ -251,9 +334,16 @@
       transition: all 0.2s;
     }
 
-    .chart-btn:hover, .chart-btn.active {
+    .chart-btn:hover {
       border-color: var(--cyan);
       color: var(--cyan);
+    }
+    
+    .chart-btn.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(0, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
     }
 
     /* Telemetry Panel */
@@ -288,12 +378,22 @@
       transition: width 0.3s;
     }
 
-    .telemetry-bar-fill.green { background: var(--green-neon); }
+    .telemetry-bar-fill.green { background: var(--cyan); }
     .telemetry-bar-fill.yellow { background: var(--yellow); }
-    .telemetry-bar-fill.red { background: var(--red-alert); }
+    .telemetry-bar-fill.red { background: var(--magenta); }
     .telemetry-bar-fill.cyan { background: var(--cyan); }
+    /* Miami gradient bars */
+    .telemetry-bar-fill.momentum-pos { background: linear-gradient(90deg, var(--cyan), #00CCCC); }
+    .telemetry-bar-fill.momentum-neg { background: linear-gradient(90deg, var(--magenta), #CC1F5C); }
+    .telemetry-bar-fill.trend-pos { background: linear-gradient(90deg, var(--cyan), #00DDDD); }
+    .telemetry-bar-fill.trend-neg { background: linear-gradient(90deg, var(--magenta), #CC1F5C); }
+    .telemetry-bar-fill.volatility { background: linear-gradient(90deg, var(--yellow), #CCBB00); }
+    .telemetry-bar-fill.activity { background: linear-gradient(90deg, var(--cyan), #00BBBB); }
+    .telemetry-bar-fill.thrust { background: linear-gradient(90deg, var(--cyan), #00DDDD); }
+    .telemetry-bar-fill.damage { background: linear-gradient(90deg, var(--magenta), #FF0040); }
+    .telemetry-bar-fill.glow { background: linear-gradient(90deg, var(--cyan), #44DDFF); }
 
-    /* Behavior State Grid */
+    /* Behavior State Grid - Miami Palette */
     .behavior-state-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -319,14 +419,15 @@
       letter-spacing: 0.05em;
     }
 
-    .behavior-state-value.positive { color: var(--green-neon); border-color: var(--green-neon); }
-    .behavior-state-value.negative { color: var(--red-alert); border-color: var(--red-alert); }
-    .behavior-state-value.warning { color: var(--yellow); border-color: var(--yellow); }
-    .behavior-state-value.neutral { color: var(--cyan); border-color: var(--cyan); }
-    .behavior-state-value.extreme { color: var(--magenta); border-color: var(--magenta); }
+    /* Miami color mapping: cyan for good, yellow for warning, magenta for critical */
+    .behavior-state-value.positive { color: var(--cyan); }
+    .behavior-state-value.negative { color: var(--magenta); }
+    .behavior-state-value.warning { color: var(--yellow); }
+    .behavior-state-value.neutral { color: var(--cyan); }
+    .behavior-state-value.extreme { color: var(--magenta); }
 
-    .behavior-state-item.positive { border-left-color: var(--green-neon); }
-    .behavior-state-item.negative { border-left-color: var(--red-alert); }
+    .behavior-state-item.positive { border-left-color: var(--cyan); }
+    .behavior-state-item.negative { border-left-color: var(--magenta); }
     .behavior-state-item.warning { border-left-color: var(--yellow); }
     .behavior-state-item.neutral { border-left-color: var(--cyan); }
     .behavior-state-item.extreme { border-left-color: var(--magenta); }
@@ -713,14 +814,15 @@
     function renderTelemetry() {
       const grid = document.getElementById('telemetryGrid');
       
+      // Miami color palette for telemetry - use gradient class names
       const metrics = [
-        { label: 'VOLATILITY', value: telemetryData.volatility || 0.5, color: 'yellow' },
-        { label: 'MOMENTUM', value: (telemetryData.momentum + 1) / 2 || 0.5, color: telemetryData.momentum > 0 ? 'green' : 'red' },
-        { label: 'TREND', value: (telemetryData.trend + 1) / 2 || 0.5, color: telemetryData.trend > 0 ? 'green' : 'red' },
-        { label: 'ACTIVITY', value: telemetryData.activity || 0.5, color: 'cyan' },
-        { label: 'THRUST', value: telemetryData.visual?.thrust || 0.5, color: 'green' },
-        { label: 'DAMAGE', value: telemetryData.visual?.damage || 0, color: 'red' },
-        { label: 'GLOW', value: telemetryData.visual?.glow || 0.5, color: 'cyan' }
+        { label: 'VOLATILITY', value: telemetryData.volatility || 0.5, color: 'volatility' },
+        { label: 'MOMENTUM', value: (telemetryData.momentum + 1) / 2 || 0.5, color: telemetryData.momentum > 0 ? 'momentum-pos' : 'momentum-neg' },
+        { label: 'TREND', value: (telemetryData.trend + 1) / 2 || 0.5, color: telemetryData.trend > 0 ? 'trend-pos' : 'trend-neg' },
+        { label: 'ACTIVITY', value: telemetryData.activity || 0.5, color: 'activity' },
+        { label: 'THRUST', value: telemetryData.visual?.thrust || 0.5, color: 'thrust' },
+        { label: 'DAMAGE', value: telemetryData.visual?.damage || 0, color: 'damage' },
+        { label: 'GLOW', value: telemetryData.visual?.glow || 0.5, color: 'glow' }
       ];
 
       grid.innerHTML = metrics.map(m => `
@@ -1090,18 +1192,26 @@
       const days = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': 500 }[range] || 30;
       const basePrice = telemetryData.current_price || telemetryData.stock_price || 30;
       const data = [];
-
+      
+      // Use a proper random walk with mean reversion
+      let price = basePrice;
+      const drift = (Math.random() - 0.5) * 0.001; // Slight trend bias for the entire period
+      const volatilityFactor = basePrice * 0.02; // 2% daily volatility
+      
       for (let i = days; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         
-        // Random walk with drift
-        const noise = (Math.random() - 0.5) * basePrice * 0.05;
-        const trend = (days - i) / days * basePrice * 0.1 * (Math.random() > 0.5 ? 1 : -1);
+        // Random walk with mean reversion toward base price
+        const randomShock = (Math.random() - 0.5) * 2 * volatilityFactor;
+        const meanReversion = (basePrice - price) * 0.02; // Pull back toward base
+        
+        price = price + randomShock + meanReversion + drift * basePrice;
+        price = Math.max(basePrice * 0.5, Math.min(basePrice * 1.5, price)); // Clamp to reasonable range
         
         data.push({
           date: date.toISOString().split('T')[0],
-          close: Math.max(1, basePrice + noise + trend),
+          close: price,
           time: date.getTime()
         });
       }

@@ -1,42 +1,57 @@
 /* =========================================================================
    SPACE CAPITAL - Canonical Theme Variables
    Hotline Miami aesthetic design system
+   "VHS murder terminal pretending to be a dashboard"
    ========================================================================= */
 
 :root {
   /* ═══════════════════════════════════════════════════════════════════════
-     PRIMARY COLORS - Hot Magenta
+     LOCKED HOTLINE MIAMI PALETTE
+     Only THREE pigments - everything else is derived
+     "If something looks boring, that's good" - repetition + motion, not breadth
      ═══════════════════════════════════════════════════════════════════════ */
-  --magenta: #FF2975;
+  --hm-magenta: rgb(255, 41, 117);
+  --hm-cyan: rgb(0, 255, 255);
+  --hm-yellow: rgb(255, 230, 0);
+  
+  /* UI Semantic Mapping - INTENTIONALLY COLLAPSED */
+  --ui-primary: var(--hm-magenta);
+  --ui-secondary: var(--hm-cyan);
+  --ui-warning: var(--hm-yellow);
+  
+  /* ═══════════════════════════════════════════════════════════════════════
+     PRIMARY COLORS - Hot Magenta (derived from locked palette)
+     ═══════════════════════════════════════════════════════════════════════ */
+  --magenta: var(--hm-magenta);
   --magenta-dark: #CC1F5C;
   --magenta-glow: rgba(255, 41, 117, 0.4);
   --magenta-ghost: rgba(255, 41, 117, 0.15);
 
   /* ═══════════════════════════════════════════════════════════════════════
-     ACCENT COLORS
+     ACCENT COLORS - COLLAPSED TO 3 CORE
      ═══════════════════════════════════════════════════════════════════════ */
   /* Electric Cyan */
-  --cyan: #00FFFF;
+  --cyan: var(--hm-cyan);
   --cyan-dark: #00CCCC;
   --cyan-dim: rgba(0, 255, 255, 0.3);
   
   /* Neon Yellow - Data/Warning */
-  --yellow: #FFE600;
+  --yellow: var(--hm-yellow);
   --yellow-dim: rgba(255, 230, 0, 0.3);
   
-  /* Toxic Green - Success/Positive */
-  --green-neon: #39FF14;
-  --green-dim: rgba(57, 255, 20, 0.3);
+  /* COLLAPSED: Use cyan instead of green for positive */
+  --green-neon: var(--hm-cyan);
+  --green-dim: rgba(0, 255, 255, 0.3);
   
-  /* Blood Orange - Action/Danger */
+  /* Blood Orange - Secondary warning (yellow-derived feel) */
   --orange: #FF6B35;
   --orange-dim: rgba(255, 107, 53, 0.3);
   
-  /* Alert Red */
-  --red-alert: #FF0040;
-  --red-dim: rgba(255, 0, 64, 0.3);
+  /* COLLAPSED: Use magenta instead of red for negative */
+  --red-alert: var(--hm-magenta);
+  --red-dim: rgba(255, 41, 117, 0.3);
   
-  /* Psychedelic Purple */
+  /* Psychedelic Purple - Rare accent only */
   --purple: #9D4EDD;
   --purple-dim: rgba(157, 78, 221, 0.3);
 
@@ -80,14 +95,14 @@
   --border-subtle: rgba(255, 255, 255, 0.08);
 
   /* ═══════════════════════════════════════════════════════════════════════
-     SEMANTIC COLORS
+     SEMANTIC COLORS - COLLAPSED TO MIAMI TRIAD
      ═══════════════════════════════════════════════════════════════════════ */
-  --signal-positive: var(--green-neon);
-  --signal-negative: var(--red-alert);
-  --signal-warning: var(--yellow);
+  --signal-positive: var(--hm-cyan);     /* Was green - now cyan */
+  --signal-negative: var(--hm-magenta);  /* Was red - now magenta */
+  --signal-warning: var(--hm-yellow);
   --signal-neutral: var(--text-dim);
-  --signal-bull: var(--green-neon);
-  --signal-bear: var(--red-alert);
+  --signal-bull: var(--hm-cyan);         /* Was green - now cyan */
+  --signal-bear: var(--hm-magenta);      /* Was red - now magenta */
 
   /* ═══════════════════════════════════════════════════════════════════════
      TYPOGRAPHY
@@ -107,13 +122,19 @@
   --text-3xl: 2.5rem;    /* 40px */
 
   /* ═══════════════════════════════════════════════════════════════════════
-     EFFECTS & ANIMATION
+     EFFECTS & ANIMATION - VHS Murder Terminal
      ═══════════════════════════════════════════════════════════════════════ */
-  --scanline-opacity: 0.03;
-  --noise-opacity: 0.02;
+  --scanline-opacity: 0.04;
+  --noise-opacity: 0.03;
   --glow-spread: 20px;
   --glow-spread-sm: 10px;
   --glow-spread-lg: 40px;
+  
+  /* VHS Degradation Effects */
+  --vhs-blur: 0.5px;
+  --vhs-contrast: 1.1;
+  --vhs-saturate: 1.2;
+  --artifact-persistence: 0.15;
   
   /* Timing */
   --transition-fast: 0.1s;
@@ -150,20 +171,40 @@
   box-shadow: 0 0 var(--glow-spread) var(--cyan-dim);
 }
 .glow-green { 
-  box-shadow: 0 0 var(--glow-spread) var(--green-dim);
+  /* COLLAPSED: green is now cyan */
+  box-shadow: 0 0 var(--glow-spread) var(--cyan-dim);
 }
 
-/* Text colors */
-.text-magenta { color: var(--magenta); }
-.text-cyan { color: var(--cyan); }
-.text-green { color: var(--green-neon); }
-.text-yellow { color: var(--yellow); }
-.text-orange { color: var(--orange); }
-.text-red { color: var(--red-alert); }
+/* Text colors - COLLAPSED to Miami triad */
+.text-magenta { color: var(--hm-magenta); }
+.text-cyan { color: var(--hm-cyan); }
+.text-green { color: var(--hm-cyan); }  /* COLLAPSED to cyan */
+.text-yellow { color: var(--hm-yellow); }
+.text-orange { color: var(--hm-yellow); } /* COLLAPSED to yellow family */
+.text-red { color: var(--hm-magenta); }   /* COLLAPSED to magenta */
 .text-purple { color: var(--purple); }
 
-/* Signal states */
-.text-positive { color: var(--signal-positive); }
-.text-negative { color: var(--signal-negative); }
-.text-warning { color: var(--signal-warning); }
+/* Signal states - COLLAPSED */
+.text-positive { color: var(--hm-cyan); }
+.text-negative { color: var(--hm-magenta); }
+.text-warning { color: var(--hm-yellow); }
 .text-neutral { color: var(--signal-neutral); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VHS DAMAGE OVERLAY - Apply to any container for CRT menace
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vhs-damage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015),
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}

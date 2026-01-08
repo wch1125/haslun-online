@@ -213,6 +213,59 @@
       color: orange;
     }
 
+    /* Guest pilot - "You inherited someone else's cockpit" */
+    .pilot-badge.guest {
+      background: rgba(255, 41, 117, 0.2);
+      border-color: #FF2975;
+      color: #FF2975;
+    }
+
+    .pilot-slot.guest-pilot {
+      border-color: rgba(255, 41, 117, 0.5);
+    }
+
+    .pilot-slot.guest-pilot.selected {
+      border-color: #FF2975;
+      box-shadow: 0 0 20px rgba(255, 41, 117, 0.4);
+    }
+
+    .pilot-subtitle {
+      font-size: 0.6rem;
+      color: #888;
+      letter-spacing: 0.15em;
+      margin-top: 0.25rem;
+      opacity: 0.8;
+    }
+
+    /* Guest data loading notification */
+    .guest-data-status {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(18, 18, 26, 0.95);
+      border: 1px solid #FF2975;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.85rem;
+      color: #FF2975;
+      z-index: 1500;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .guest-data-status::before {
+      content: '■ ';
+      animation: blink 1s step-start infinite;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
     /* ═══════════════════════════════════════════════════════════════════════════
        ACTIONS
        ═══════════════════════════════════════════════════════════════════════════ */
@@ -549,6 +602,8 @@
     </div>
   </div>
 
+  <!-- Trade Loader (for Guest canonical data) -->
+  <script src="../js/data/load-trades.js"></script>
   <!-- Player Manager -->
   <script src="../js/data/player-manager.js"></script>
 
@@ -562,6 +617,33 @@
 
       let selectedSlotIndex = null;
       let newPilotAvatar = 'ghost';
+      let guestDataShown = false;
+
+      // Listen for Guest trade data load
+      PlayerManager.onChange((event, data) => {
+        if (event === 'guestDataLoaded' && !guestDataShown) {
+          showGuestDataNotification(data.stats);
+          guestDataShown = true;
+        }
+      });
+
+      /**
+       * Show "Recovered trade confirms loaded" notification
+       * "No tutorial. No explanation."
+       */
+      function showGuestDataNotification(stats) {
+        const notification = document.createElement('div');
+        notification.className = 'guest-data-status';
+        notification.innerHTML = `RECOVERED TRADE CONFIRMS LOADED<br><span style="color: #00FFFF; font-size: 0.75rem;">PILOT MEMORY RECONSTRUCTED // ${stats.tradeCount} TRADES</span>`;
+        document.body.appendChild(notification);
+
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+          notification.style.opacity = '0';
+          notification.style.transition = 'opacity 0.5s ease';
+          setTimeout(() => notification.remove(), 500);
+        }, 4000);
+      }
 
       // ─────────────────────────────────────────────────────────────────────────
       // RENDER PILOT GRID
@@ -576,15 +658,26 @@
           if (profile) {
             const isActive = profile.id === activeId;
             const avatarPath = PlayerManager.getAvatarPath(profile.avatar);
+            const isGuest = profile.type === 'guest' || profile.id === 'guest';
+            
+            // Guest pilot has special display
+            const badgeHtml = isGuest 
+              ? '<span class="pilot-badge guest">GUEST</span>' 
+              : (profile.isDemo ? '<span class="pilot-badge demo">DEMO</span>' : '');
+            
+            const subtitleHtml = isGuest && profile.subtitle
+              ? `<div class="pilot-subtitle">${profile.subtitle}</div>`
+              : '';
             
             return `
-              <div class="pilot-slot ${isActive ? 'selected' : ''}" data-index="${index}" data-id="${profile.id}">
-                ${profile.isDemo ? '<span class="pilot-badge demo">DEMO</span>' : ''}
+              <div class="pilot-slot ${isActive ? 'selected' : ''} ${isGuest ? 'guest-pilot' : ''}" data-index="${index}" data-id="${profile.id}">
+                ${badgeHtml}
                 <div class="pilot-avatar">
                   <img src="${avatarPath}" alt="${profile.name}" onerror="this.parentElement.innerHTML='<span class=\\'empty-icon\\'>👤</span>'">
                 </div>
                 <div class="pilot-name">${profile.name}</div>
                 <div class="pilot-callsign">${profile.callsign}</div>
+                ${subtitleHtml}
               </div>
             `;
           } else {

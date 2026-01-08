@@ -32,21 +32,34 @@ window.PlayerManager = (function() {
     { id: 'franken', name: 'Franken', file: 'frankenstein-pilot.png' }
   ];
 
-  // Default demo profile
-  const DEMO_PROFILE = {
-    id: 'demo',
-    name: 'DEMO PILOT',
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GUEST PILOT - Read-only with canonical trade data
+  // "You inherited someone else's cockpit"
+  // ═══════════════════════════════════════════════════════════════════════════
+  const GUEST_PROFILE = {
+    id: 'guest',
+    name: 'GUEST PILOT',
     callsign: 'GHOST-00',
     avatar: 'ghost',
     created: '2024-01-01T00:00:00Z',
     lastActive: null,
-    isDemo: true,
-    source: 'demo'
+    type: 'guest',          // Guest = read-only pilot
+    locked: true,           // Cannot modify
+    subtitle: 'ARCHIVED FLIGHT DATA',
+    source: 'canonical',
+    tradeDataPath: '../data/guest/trade-confirms.csv'
   };
+
+  // Legacy alias
+  const DEMO_PROFILE = GUEST_PROFILE;
 
   let profiles = {};
   let activeProfileId = null;
   let listeners = [];
+  
+  // Cached trade data and pilot stats
+  let guestTradeData = null;
+  let guestPilotStats = null;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // STORAGE
@@ -63,27 +76,80 @@ window.PlayerManager = (function() {
         }
       }
 
-      // Ensure demo profile exists
-      if (!profiles['demo']) {
-        profiles['demo'] = { ...DEMO_PROFILE };
+      // Ensure guest profile exists (canonical, read-only)
+      // Use 'guest' as primary, keep 'demo' for backward compatibility
+      if (!profiles['guest']) {
+        profiles['guest'] = { ...GUEST_PROFILE };
       }
+      // Migrate old 'demo' to 'guest'
+      if (profiles['demo'] && !profiles['guest']) {
+        profiles['guest'] = { ...GUEST_PROFILE };
+      }
+      delete profiles['demo']; // Remove legacy demo
 
       // Load active profile
-      activeProfileId = localStorage.getItem(STORAGE_ACTIVE_KEY) || 'demo';
+      activeProfileId = localStorage.getItem(STORAGE_ACTIVE_KEY);
       
-      // Validate active profile exists
-      if (!profiles[activeProfileId]) {
-        activeProfileId = 'demo';
+      // Migrate 'demo' to 'guest'
+      if (activeProfileId === 'demo') {
+        activeProfileId = 'guest';
+      }
+      
+      // Default to guest
+      if (!activeProfileId || !profiles[activeProfileId]) {
+        activeProfileId = 'guest';
       }
 
       console.log('[PlayerManager] Loaded', Object.keys(profiles).length, 'profiles, active:', activeProfileId);
+      
+      // Load Guest trade data asynchronously
+      loadGuestTradeData();
+      
       return true;
     } catch (e) {
       console.warn('[PlayerManager] Failed to load:', e);
-      profiles = { 'demo': { ...DEMO_PROFILE } };
-      activeProfileId = 'demo';
+      profiles = { 'guest': { ...GUEST_PROFILE } };
+      activeProfileId = 'guest';
       return false;
     }
+  }
+
+  /**
+   * Load canonical trade data for Guest pilot
+   * "Recovered trade confirms loaded - Pilot memory reconstructed"
+   */
+  async function loadGuestTradeData() {
+    if (guestTradeData) return guestTradeData; // Already loaded
+    
+    try {
+      if (typeof TradeLoader !== 'undefined') {
+        console.log('[PlayerManager] Loading Guest canonical trade data...');
+        guestTradeData = await TradeLoader.loadTradeConfirms({ type: 'guest' });
+        guestPilotStats = TradeLoader.derivePilotStats(guestTradeData);
+        
+        console.log('[PlayerManager] Guest pilot stats derived:', guestPilotStats);
+        notifyListeners('guestDataLoaded', { tradeData: guestTradeData, stats: guestPilotStats });
+        
+        return guestTradeData;
+      }
+    } catch (e) {
+      console.warn('[PlayerManager] Failed to load Guest trade data:', e);
+    }
+    return null;
+  }
+
+  /**
+   * Get Guest pilot stats (derived from real trade data)
+   */
+  function getGuestPilotStats() {
+    return guestPilotStats || (typeof TradeLoader !== 'undefined' ? TradeLoader.getDefaultPilotStats() : null);
+  }
+
+  /**
+   * Get Guest trade data
+   */
+  function getGuestTradeData() {
+    return guestTradeData;
   }
 
   function save() {
@@ -154,13 +220,13 @@ window.PlayerManager = (function() {
     const slots = [];
     const profileList = Object.values(profiles);
     
-    // Demo always first
-    slots.push(profiles['demo'] || null);
+    // Guest always first
+    slots.push(profiles['guest'] || null);
     
     // Fill remaining slots
-    const nonDemo = profileList.filter(p => p.id !== 'demo');
+    const nonGuest = profileList.filter(p => p.id !== 'guest');
     for (let i = 0; i < MAX_PROFILES - 1; i++) {
-      slots.push(nonDemo[i] || null);
+      slots.push(nonGuest[i] || null);
     }
     
     return slots;
@@ -168,6 +234,13 @@ window.PlayerManager = (function() {
 
   function update(id, updates) {
     if (!profiles[id]) return null;
+    
+    // Guest profile is read-only
+    if (id === 'guest' || profiles[id].type === 'guest') {
+      console.warn('[PlayerManager] Guest profile is read-only');
+      return profiles[id];
+    }
+    
     if (id === 'demo' && updates.isDemo === false) {
       // Can't convert demo to non-demo
       delete updates.isDemo;
@@ -185,8 +258,8 @@ window.PlayerManager = (function() {
   }
 
   function remove(id) {
-    if (id === 'demo') {
-      console.warn('[PlayerManager] Cannot delete demo profile');
+    if (id === 'guest' || id === 'demo') {
+      console.warn('[PlayerManager] Cannot delete guest profile');
       return false;
     }
 
@@ -198,9 +271,9 @@ window.PlayerManager = (function() {
     // Also clear position data for this profile
     localStorage.removeItem(`space-capital-positions-${id}`);
 
-    // If this was active, switch to demo
+    // If this was active, switch to guest
     if (activeProfileId === id) {
-      activeProfileId = 'demo';
+      activeProfileId = 'guest';
     }
 
     save();
@@ -213,7 +286,7 @@ window.PlayerManager = (function() {
   // ═══════════════════════════════════════════════════════════════════════════
 
   function getActive() {
-    return profiles[activeProfileId] || profiles['demo'];
+    return profiles[activeProfileId] || profiles['guest'];
   }
 
   function getActiveId() {
@@ -356,6 +429,7 @@ window.PlayerManager = (function() {
     // Constants
     MAX_PROFILES,
     PILOT_AVATARS,
+    GUEST_PROFILE,
 
     // Profile CRUD
     create,
@@ -369,6 +443,12 @@ window.PlayerManager = (function() {
     getActive,
     getActiveId,
     setActive,
+
+    // Guest pilot data (canonical trade history)
+    loadGuestTradeData,
+    getGuestTradeData,
+    getGuestPilotStats,
+    isGuestProfile: (id) => id === 'guest' || profiles[id]?.type === 'guest',
 
     // Callsigns
     generateCallsign,

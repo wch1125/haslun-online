@@ -20,21 +20,37 @@
   <style>
     /* =========================================================================
        HOTLINE MIAMI AESTHETIC - SPACE CAPITAL
+       "VHS murder terminal pretending to be a dashboard"
        ========================================================================= */
     :root {
-      /* Core Hotline Miami palette */
-      --magenta: #FF2975;
+      /* === LOCKED HOTLINE MIAMI PALETTE === */
+      /* Only THREE pigments - everything else is derived */
+      --hm-magenta: rgb(255, 41, 117);
+      --hm-cyan: rgb(0, 255, 255);
+      --hm-yellow: rgb(255, 230, 0);
+      
+      /* UI semantic mapping - INTENTIONALLY COLLAPSED */
+      --ui-primary: var(--hm-magenta);
+      --ui-secondary: var(--hm-cyan);
+      --ui-warning: var(--hm-yellow);
+      
+      /* Legacy aliases (for compatibility) */
+      --magenta: var(--hm-magenta);
       --magenta-dark: #CC1F5C;
       --magenta-glow: #FF69B4;
-      --cyan: #00FFFF;
+      --magenta-ghost: rgba(255, 41, 117, 0.3);
+      --cyan: var(--hm-cyan);
       --cyan-dark: #00CCCC;
-      --yellow: #FFE600;
+      --yellow: var(--hm-yellow);
+      --yellow-dim: rgba(255, 230, 0, 0.6);
       --orange: #FF6B35;
+      --orange-dim: rgba(255, 107, 53, 0.6);
       --purple: #9D4EDD;
-      --green-neon: #39FF14;
-      --red-alert: #FF0040;
+      /* REMOVED: green-neon, red-alert - use magenta/cyan instead */
+      --green-neon: var(--hm-cyan); /* Collapsed to cyan */
+      --red-alert: var(--hm-magenta); /* Collapsed to magenta */
       
-      /* Backgrounds */
+      /* Backgrounds - warm magenta-tinted blacks */
       --bg-void: #0A0A0F;
       --bg-panel: #12121A;
       --bg-surface: #1A1A24;
@@ -45,18 +61,21 @@
       --text-dim: #888899;
       --text-muted: #555566;
       
-      /* Borders */
-      --border-harsh: #FF2975;
+      /* Borders - always magenta-derived */
+      --border-harsh: var(--hm-magenta);
       --border-dim: #333344;
       --border-panel: #2A2A3A;
       
       /* Typography */
       --font-main: 'VT323', monospace;
+      --font-display: 'VT323', monospace;
       
-      /* Effects */
-      --scanline-opacity: 0.03;
-      --noise-opacity: 0.02;
+      /* VHS/CRT Effects */
+      --scanline-opacity: 0.04;
+      --noise-opacity: 0.03;
       --glow-spread: 20px;
+      --vhs-blur: 0.5px;
+      --artifact-persistence: 0.15;
     }
 
     /* Reset & Base */
@@ -143,6 +162,41 @@
       70% { transform: translate(0, -1%); }
       80% { transform: translate(0, 1%); }
       90% { transform: translate(-1%, -1%); }
+    }
+
+    /* =========================================================================
+       PALETTE COLLAPSE - Hotline Miami uses REPETITION not variety
+       "If something looks boring, that's good"
+       ========================================================================= */
+    
+    /* All buttons default to primary (magenta) */
+    button,
+    .btn,
+    [role="button"] {
+      color: var(--ui-primary);
+      border-color: var(--ui-primary);
+    }
+    
+    /* All data/graphs default to secondary (cyan) */
+    .graph-line,
+    .metric-highlight,
+    .telemetry-value,
+    .stat-value.neutral,
+    .data-readout {
+      color: var(--ui-secondary);
+    }
+    
+    /* All warnings/volatility to yellow */
+    .warning,
+    .volatility,
+    .caution {
+      color: var(--ui-warning);
+    }
+    
+    /* Graph secondary lines always cyan */
+    .graph-secondary,
+    .signal-line {
+      color: var(--ui-secondary);
     }
 
     /* Chromatic Aberration on hover */
@@ -431,34 +485,76 @@
       gap: 1rem;
     }
 
+    /* ═══════════════════════════════════════════════════════════════════════
+       SHIP CARDS - Hotline Miami Aesthetic
+       "VHS murder terminal" - scarred, not polished
+       ═══════════════════════════════════════════════════════════════════════ */
     .ship-card {
       background: var(--bg-surface);
-      border: 2px solid var(--border-dim);
+      border: 2px solid var(--ui-primary);
       padding: 1rem;
       position: relative;
       transition: all 0.2s ease;
       cursor: pointer;
+      /* Corner cut aesthetic */
+      clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+    }
+
+    /* Magenta gradient wash */
+    .ship-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 41, 117, 0.08) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* CRT DAMAGE OVERLAY - kills "dashboard polish", adds menace */
+    .ship-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255, 255, 255, 0.015),
+          rgba(255, 255, 255, 0.015) 1px,
+          transparent 1px,
+          transparent 3px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255, 41, 117, 0.01),
+          rgba(255, 41, 117, 0.01) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      z-index: 10;
     }
 
     .ship-card:hover {
-      border-color: var(--magenta);
-      box-shadow: 0 0 20px rgba(255, 41, 117, 0.3), inset 0 0 30px rgba(255, 41, 117, 0.05);
+      border-color: var(--ui-primary);
+      box-shadow: 
+        0 0 25px rgba(255, 41, 117, 0.4), 
+        0 0 50px rgba(255, 41, 117, 0.15), 
+        inset 0 0 30px rgba(255, 41, 117, 0.08);
     }
 
-    .ship-card.positive {
-      border-color: var(--green-neon);
-    }
-
-    .ship-card.positive:hover {
-      box-shadow: 0 0 20px rgba(57, 255, 20, 0.3), inset 0 0 30px rgba(57, 255, 20, 0.05);
-    }
-
+    /* P&L classes only affect text color, NOT borders */
+    .ship-card.positive,
     .ship-card.negative {
-      border-color: var(--red-alert);
+      border-color: var(--ui-primary);
     }
 
+    .ship-card.positive:hover,
     .ship-card.negative:hover {
-      box-shadow: 0 0 20px rgba(255, 0, 64, 0.3), inset 0 0 30px rgba(255, 0, 64, 0.05);
+      box-shadow: 
+        0 0 25px rgba(255, 41, 117, 0.4), 
+        0 0 50px rgba(255, 41, 117, 0.15), 
+        inset 0 0 30px rgba(255, 41, 117, 0.08);
     }
 
     /* Focused state - when navigating from another page with ?ticker= */
@@ -473,7 +569,7 @@
       50% { transform: translateY(-4px); box-shadow: 0 0 50px rgba(0, 255, 255, 0.8); }
     }
 
-    /* Ship Header */
+    /* Ship Header - Miami Typography */
     .ship-header {
       display: flex;
       align-items: center;
@@ -488,6 +584,7 @@
     }
 
     .ship-ticker {
+      font-family: var(--font-display);
       font-size: 1.5rem;
       font-weight: bold;
       letter-spacing: 0.1em;
@@ -496,44 +593,81 @@
     }
 
     .ship-class {
+      font-family: var(--font-display);
       font-size: 0.75rem;
       letter-spacing: 0.15em;
       color: var(--text-dim);
       text-transform: uppercase;
       padding: 0.25rem 0.5rem;
-      border: 1px solid var(--border-dim);
+      border: 1px solid var(--magenta-ghost);
       background: var(--bg-panel);
     }
 
     .ship-pnl {
+      font-family: var(--font-display);
       font-size: 1.125rem;
       font-weight: bold;
       letter-spacing: 0.05em;
     }
 
+    /* P&L text colors (borders stay magenta) */
     .ship-pnl.positive {
-      color: var(--green-neon);
-      text-shadow: 0 0 10px var(--green-neon);
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
     }
 
     .ship-pnl.negative {
-      color: var(--red-alert);
-      text-shadow: 0 0 10px var(--red-alert);
+      color: var(--magenta);
+      text-shadow: 0 0 10px var(--magenta);
     }
 
-    /* Ship Visualization */
+    /* Ship Visualization - With MACD as backdrop */
     .ship-display {
-      height: 100px;
+      height: 120px;
       margin: 0.75rem 0;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: var(--bg-void);
+      border: 1px solid var(--magenta-ghost);
+      overflow: hidden;
+    }
+
+    /* Grid overlay on ship display */
+    .ship-display::before {
+      content: '';
+      position: absolute;
+      inset: 0;
       background: 
-        linear-gradient(90deg, transparent 49%, var(--border-dim) 49%, var(--border-dim) 51%, transparent 51%),
-        linear-gradient(0deg, transparent 49%, var(--border-dim) 49%, var(--border-dim) 51%, transparent 51%);
+        linear-gradient(90deg, transparent 49%, rgba(255, 41, 117, 0.1) 49%, rgba(255, 41, 117, 0.1) 51%, transparent 51%),
+        linear-gradient(0deg, transparent 49%, rgba(255, 41, 117, 0.1) 49%, rgba(255, 41, 117, 0.1) 51%, transparent 51%);
       background-size: 20px 20px;
-      border: 1px solid var(--border-dim);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* MACD backdrop layer - sits behind ship */
+    .macd-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .macd-backdrop canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .macd-backdrop .macd-zero-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(255, 41, 117, 0.3);
     }
 
     /* Ship Sprite - Pixel Art Style */
@@ -734,7 +868,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
-       BEHAVIOR STATUS BADGES
+       BEHAVIOR STATUS BADGES - Hotline Miami Palette
        Visual state indicators below ship display
        ═══════════════════════════════════════════════════════════════════════ */
     
@@ -745,7 +879,7 @@
       margin-top: 0.25rem;
       padding: 0.25rem;
       background: var(--bg-void);
-      border: 1px solid var(--border-dim);
+      border: 1px solid var(--magenta-ghost);
       font-size: 0.5rem;
       letter-spacing: 0.05em;
     }
@@ -753,65 +887,68 @@
     .behavior-badge {
       padding: 0.15rem 0.35rem;
       background: var(--bg-panel);
-      border: 1px solid var(--border-dim);
+      border: 1px solid var(--magenta-ghost);
       color: var(--text-muted);
       text-transform: uppercase;
+      font-family: var(--font-display);
       transition: all 0.2s ease;
     }
     
-    /* Thrust states */
+    /* Thrust states - Cyan for data */
     .behavior-badge[data-state="THRUST++"] {
-      color: var(--green-neon);
-      border-color: var(--green-neon);
-      box-shadow: 0 0 4px rgba(57, 255, 20, 0.3);
+      color: var(--cyan);
+      border-color: var(--cyan);
+      box-shadow: 0 0 4px rgba(0, 255, 255, 0.3);
     }
     .behavior-badge[data-state="THRUST+"] {
       color: var(--cyan);
-      border-color: var(--cyan);
+      border-color: var(--cyan-dark);
     }
     .behavior-badge[data-state="DRIFT"] {
-      color: var(--orange);
-      border-color: var(--orange);
+      color: var(--yellow);
+      border-color: var(--yellow-dim);
     }
     .behavior-badge[data-state="FAIL"] {
-      color: var(--red-alert);
-      border-color: var(--red-alert);
+      color: var(--magenta);
+      border-color: var(--magenta);
       animation: badge-pulse 0.5s ease-in-out infinite;
     }
     
     /* Stability states */
     .behavior-badge[data-state="STABLE"] {
       color: var(--cyan);
+      border-color: var(--cyan-dark);
     }
     .behavior-badge[data-state="ELEV"] {
       color: var(--yellow);
-      border-color: var(--yellow);
+      border-color: var(--yellow-dim);
     }
     .behavior-badge[data-state="HIGH"] {
       color: var(--orange);
-      border-color: var(--orange);
+      border-color: var(--orange-dim);
     }
     .behavior-badge[data-state="EXTREME"] {
-      color: var(--red-alert);
-      border-color: var(--red-alert);
+      color: var(--magenta);
+      border-color: var(--magenta);
       animation: badge-pulse 0.3s ease-in-out infinite;
     }
     
     /* Hull states */
     .behavior-badge[data-state="HULL OK"] {
-      color: var(--green-neon);
+      color: var(--cyan);
+      border-color: var(--cyan-dark);
     }
     .behavior-badge[data-state="STRESS"] {
       color: var(--yellow);
-      border-color: var(--yellow);
+      border-color: var(--yellow-dim);
     }
     .behavior-badge[data-state="CRIT"] {
       color: var(--orange);
-      border-color: var(--orange);
+      border-color: var(--orange-dim);
     }
     .behavior-badge[data-state="HULL!"] {
-      color: var(--red-alert);
-      border-color: var(--red-alert);
+      color: var(--magenta);
+      border-color: var(--magenta);
       animation: badge-pulse 0.3s ease-in-out infinite;
     }
     
@@ -820,7 +957,7 @@
       50% { opacity: 0.5; }
     }
 
-    /* Telemetry bars - mini horizontal indicators */
+    /* Telemetry bars - mini horizontal indicators (Miami palette) */
     .telemetry-bars {
       display: flex;
       flex-direction: column;
@@ -828,7 +965,7 @@
       margin: 0.5rem 0;
       padding: 0.5rem;
       background: var(--bg-panel);
-      border: 1px solid var(--border-dim);
+      border: 1px solid var(--magenta-ghost);
     }
 
     .telem-bar-row {
@@ -839,6 +976,7 @@
 
     .telem-bar-label {
       font-size: 0.5rem;
+      font-family: var(--font-display);
       letter-spacing: 0.05em;
       color: var(--text-muted);
       width: 52px;
@@ -850,7 +988,7 @@
       flex: 1;
       height: 6px;
       background: var(--bg-void);
-      border: 1px solid var(--border-dim);
+      border: 1px solid var(--magenta-ghost);
       position: relative;
       overflow: hidden;
     }
@@ -863,24 +1001,37 @@
       transition: width 0.3s ease;
     }
 
+    /* Miami color scheme for telemetry bars */
+    .telem-bar-fill.trend {
+      background: linear-gradient(90deg, var(--magenta), var(--cyan)) !important;
+    }
+    
+    .telem-bar-fill.momentum {
+      background: linear-gradient(90deg, var(--cyan-dark), var(--cyan)) !important;
+    }
+    
+    .telem-bar-fill.volatility {
+      background: linear-gradient(90deg, var(--yellow-dim), var(--yellow)) !important;
+    }
+
     .telem-bar-center {
       position: absolute;
       top: 0;
       left: 50%;
       width: 1px;
       height: 100%;
-      background: var(--text-muted);
+      background: var(--magenta);
       opacity: 0.5;
     }
 
-    /* Telemetry Display */
+    /* Telemetry Display - Miami Typography */
     .ship-telemetry {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 0.5rem;
       margin-top: 0.75rem;
       padding-top: 0.75rem;
-      border-top: 1px solid var(--border-dim);
+      border-top: 1px solid var(--magenta-ghost);
     }
 
     .telemetry-item {
@@ -888,6 +1039,7 @@
     }
 
     .telemetry-label {
+      font-family: var(--font-display);
       font-size: 0.625rem;
       letter-spacing: 0.15em;
       color: var(--text-muted);
@@ -896,101 +1048,132 @@
     }
 
     .telemetry-value {
+      font-family: var(--font-display);
       font-size: 1rem;
       color: var(--cyan);
       text-shadow: 0 0 5px var(--cyan);
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
-       MACD MINI-CHART - Compact momentum indicator
+       MACD BACKDROP - VHS Memory Ghost
+       "Chart bends around ship" - not just behind, but BELONGING to it
        ═══════════════════════════════════════════════════════════════════════ */
     
+    /* Original MACD container (hidden, replaced by backdrop) */
     .macd-mini-chart {
-      margin: 0.5rem 0;
-      padding: 0.35rem;
-      background: var(--bg-void);
-      border: 1px solid var(--border-dim);
-      position: relative;
+      display: none; /* Hide original - we use backdrop version */
     }
 
-    .macd-mini-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.25rem;
+    /* MACD Backdrop - Behind ship, with VHS degradation */
+    .macd-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      /* VHS DEGRADATION - ghosting, memory trails */
+      opacity: 0.45;
+      filter: blur(0.5px) contrast(1.15) saturate(1.3);
+      mix-blend-mode: screen;
     }
 
-    .macd-mini-label {
-      font-size: 0.5rem;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .macd-mini-signal {
-      font-size: 0.5rem;
-      letter-spacing: 0.05em;
-      padding: 0.1rem 0.25rem;
-      border: 1px solid;
-    }
-
-    .macd-mini-signal.bullish {
-      color: var(--green-neon);
-      border-color: var(--green-neon);
-    }
-
-    .macd-mini-signal.bearish {
-      color: var(--red-alert);
-      border-color: var(--red-alert);
-    }
-
-    .macd-mini-signal.neutral {
-      color: var(--text-muted);
-      border-color: var(--border-dim);
-    }
-
-    .macd-canvas-wrap {
-      height: 28px;
-      position: relative;
-    }
-
-    .macd-canvas-wrap canvas {
+    .macd-backdrop canvas {
       width: 100%;
       height: 100%;
+      /* Let artifacts accumulate - don't fully clear */
+      image-rendering: auto;
     }
 
-    .macd-zero-line {
+    /* Zero line with VHS glow */
+    .macd-backdrop-zero {
       position: absolute;
       left: 0;
       right: 0;
       top: 50%;
       height: 1px;
-      background: var(--border-dim);
-      pointer-events: none;
+      background: var(--ui-primary);
+      opacity: 0.4;
+      box-shadow: 
+        0 0 4px var(--ui-primary),
+        0 0 8px rgba(255, 41, 117, 0.3);
+      /* Subtle flicker */
+      animation: zero-line-flicker 3s ease-in-out infinite;
     }
 
-    /* Crossover markers */
-    .macd-crossover {
+    @keyframes zero-line-flicker {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.25; }
+      75% { opacity: 0.5; }
+    }
+
+    /* Ship display now has memory/hallucination quality */
+    .ship-display {
+      /* Override for VHS feel */
+      overflow: hidden;
+      background: 
+        radial-gradient(ellipse at center, rgba(255, 41, 117, 0.03) 0%, transparent 70%),
+        var(--bg-void);
+    }
+
+    /* MACD Signal badge (appears in ship header) */
+    .macd-signal-badge {
+      font-size: 0.5rem;
+      font-family: var(--font-display);
+      letter-spacing: 0.05em;
+      padding: 0.1rem 0.35rem;
+      border: 1px solid;
+      text-transform: uppercase;
+    }
+
+    .macd-signal-badge.bullish {
+      color: var(--cyan);
+      border-color: var(--cyan);
+      background: rgba(0, 255, 255, 0.1);
+    }
+
+    .macd-signal-badge.bearish {
+      color: var(--magenta);
+      border-color: var(--magenta);
+      background: rgba(255, 41, 117, 0.1);
+    }
+
+    .macd-signal-badge.neutral {
+      color: var(--text-muted);
+      border-color: var(--border-dim);
+    }
+
+    /* Timeframe dots (moved to ship display area) */
+    .timeframe-dots {
       position: absolute;
-      width: 4px;
-      height: 4px;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      z-index: 5;
+    }
+
+    .timeframe-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+      border: 1px solid var(--magenta-ghost);
+      background: var(--bg-void);
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    .macd-crossover.bullish {
-      background: var(--green-neon);
-      box-shadow: 0 0 4px var(--green-neon);
+    .timeframe-dot:hover {
+      border-color: var(--magenta);
     }
 
-    .macd-crossover.bearish {
-      background: var(--red-alert);
-      box-shadow: 0 0 4px var(--red-alert);
+    .timeframe-dot.active {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan);
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
-       SHIP JOURNEY VISUALIZATION - Historical data display
+       SHIP JOURNEY VISUALIZATION - Miami Aesthetic
        ═══════════════════════════════════════════════════════════════════════ */
 
     /* 52-Week Range Indicator */
@@ -998,7 +1181,7 @@
       margin-top: 0.5rem;
       padding: 0.4rem 0.5rem;
       background: var(--bg-panel);
-      border: 1px solid var(--border-dim);
+      border: 1px solid var(--magenta-ghost);
     }
 
     .journey-range-header {
@@ -1009,6 +1192,7 @@
     }
 
     .journey-range-label {
+      font-family: var(--font-display);
       font-size: 0.5rem;
       letter-spacing: 0.15em;
       color: var(--text-muted);
@@ -1016,6 +1200,7 @@
     }
 
     .journey-range-pct {
+      font-family: var(--font-display);
       font-size: 0.6rem;
       color: var(--cyan);
       font-weight: bold;
@@ -1025,11 +1210,10 @@
       position: relative;
       height: 6px;
       background: linear-gradient(90deg, 
-        var(--red-alert) 0%, 
-        var(--yellow) 25%,
-        var(--text-dim) 50%, 
-        var(--cyan) 75%,
-        var(--green-neon) 100%
+        var(--magenta) 0%, 
+        var(--yellow) 35%,
+        var(--cyan) 65%, 
+        var(--cyan) 100%
       );
       border-radius: 3px;
       overflow: visible;
@@ -1924,14 +2108,23 @@
             <span class="ship-ticker" style="color: ${config.color}; text-shadow: 0 0 ${10 * glowIntensity}px ${config.color};">${position.ticker}</span>
             <span class="ship-class">${config.class}</span>
           </div>
-          <div class="ship-pnl ${pnlClass}">
-            ${displayPct >= 0 ? '+' : ''}${displayPct.toFixed(1)}%
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="macd-signal-badge neutral" data-macd-signal>--</span>
+            <div class="ship-pnl ${pnlClass}">
+              ${displayPct >= 0 ? '+' : ''}${displayPct.toFixed(1)}%
+            </div>
           </div>
         </div>
         
         <div class="ship-display">
+          <!-- MACD as backdrop behind ship -->
+          <div class="macd-backdrop" data-ticker="${position.ticker}">
+            <div class="macd-backdrop-zero"></div>
+            <canvas data-macd-canvas></canvas>
+          </div>
+          
           <div class="signal-indicator" style="background: ${signalColor}; box-shadow: 0 0 10px ${signalColor};"></div>
-          <div class="ship-sprite-wrap" style="--ship-color: ${config.color};">
+          <div class="ship-sprite-wrap" style="--ship-color: ${config.color}; z-index: 2;">
             <img class="ship-sprite-img ship-behavior" 
                  data-ticker="${position.ticker}"
                  data-ship-class="${config.class}"
@@ -1949,7 +2142,16 @@
             background: linear-gradient(to bottom, ${config.color}, transparent);
             height: ${thrustLength}px;
             opacity: ${0.4 + activity * 0.6};
+            z-index: 3;
           "></div>
+          
+          <!-- Timeframe dots -->
+          <div class="timeframe-dots">
+            <div class="timeframe-dot" data-tf="1D" title="1 Day"></div>
+            <div class="timeframe-dot" data-tf="1W" title="1 Week"></div>
+            <div class="timeframe-dot active" data-tf="1M" title="1 Month"></div>
+            <div class="timeframe-dot" data-tf="3M" title="3 Months"></div>
+          </div>
         </div>
 
         <div class="behavior-badges">
@@ -1962,34 +2164,22 @@
           <div class="telem-bar-row">
             <span class="telem-bar-label">TREND</span>
             <div class="telem-bar">
-              <div class="telem-bar-fill trend" style="width: ${50 + trend * 50}%; background: ${trend > 0 ? 'var(--green-neon)' : 'var(--red-alert)'};"></div>
+              <div class="telem-bar-fill trend" style="width: ${50 + trend * 50}%;"></div>
               <div class="telem-bar-center"></div>
             </div>
           </div>
           <div class="telem-bar-row">
             <span class="telem-bar-label">MOMENTUM</span>
             <div class="telem-bar">
-              <div class="telem-bar-fill momentum" style="width: ${50 + momentum * 50}%; background: ${momentum > 0 ? 'var(--cyan)' : 'var(--orange)'};"></div>
+              <div class="telem-bar-fill momentum" style="width: ${50 + momentum * 50}%;"></div>
               <div class="telem-bar-center"></div>
             </div>
           </div>
           <div class="telem-bar-row">
             <span class="telem-bar-label">VOLATILITY</span>
             <div class="telem-bar">
-              <div class="telem-bar-fill volatility" style="width: ${volatility * 100}%; background: var(--yellow);"></div>
+              <div class="telem-bar-fill volatility" style="width: ${volatility * 100}%;"></div>
             </div>
-          </div>
-        </div>
-
-        <!-- MACD Mini-Chart -->
-        <div class="macd-mini-chart" data-ticker="${position.ticker}">
-          <div class="macd-mini-header">
-            <span class="macd-mini-label">MACD</span>
-            <span class="macd-mini-signal neutral" data-macd-signal>--</span>
-          </div>
-          <div class="macd-canvas-wrap">
-            <div class="macd-zero-line"></div>
-            <canvas data-macd-canvas></canvas>
           </div>
         </div>
 
@@ -2169,11 +2359,21 @@
         return setTimeout(renderMACDMiniCharts, 200);
       }
 
-      const containers = document.querySelectorAll('.macd-mini-chart[data-ticker]');
+      // Find MACD backdrops (now inside ship-display)
+      const containers = document.querySelectorAll('.macd-backdrop[data-ticker]');
       
       for (const container of containers) {
         const ticker = container.dataset.ticker;
         if (!ticker) continue;
+
+        // Find signal badge in the card header (now separate from backdrop)
+        const card = container.closest('.ship-card');
+        const signalBadge = card?.querySelector('[data-macd-signal]');
+        
+        // Attach badge to container for renderMACDChart to find
+        if (signalBadge) {
+          container._signalBadge = signalBadge;
+        }
 
         // Try to load indicator data, fall back to synthetic
         let macdData = null;
@@ -2241,7 +2441,8 @@
 
     function renderMACDChart(container, ticker, macdData) {
       const canvas = container.querySelector('[data-macd-canvas]');
-      const signalBadge = container.querySelector('[data-macd-signal]');
+      // Signal badge may be attached by parent function or be inside container
+      const signalBadge = container._signalBadge || container.querySelector('[data-macd-signal]');
       if (!canvas) return;
 
       // Destroy previous chart instance
@@ -2253,6 +2454,27 @@
         renderMACDPlaceholder(container);
         return;
       }
+
+      // Get ship telemetry for VHS degradation effects
+      const pos = window._fleetPositions?.[ticker];
+      const volatility = pos?.volatility ?? 0.5;
+      const thrust = pos?.visual?.thrust ?? 0.3;
+      
+      // === VHS DEGRADATION EFFECTS ===
+      // Let the watercolor engine "ruin clarity"
+      const ctx = canvas.getContext('2d');
+      
+      // Apply VHS filter based on volatility - more volatile = more degraded
+      const blurAmount = 0.4 + volatility * 0.8;
+      const contrastAmount = 1.1 + volatility * 0.1;
+      const saturateAmount = 1.2 + thrust * 0.3;
+      
+      // Store filter for Chart.js plugin
+      canvas._vhsFilter = `blur(${blurAmount}px) contrast(${contrastAmount}) saturate(${saturateAmount})`;
+      canvas._vhsAlpha = 0.35 + volatility * 0.35; // More volatile = more ghostly
+      
+      // Ship influence for coupling effect
+      canvas._shipInfluence = thrust * 0.4 + volatility * 0.6;
 
       // Determine signal state
       const lastMacd = macdData[macdData.length - 1];
@@ -2279,24 +2501,64 @@
 
       if (signalBadge) {
         signalBadge.textContent = signalText;
-        signalBadge.className = `macd-mini-signal ${signalState}`;
+        signalBadge.className = `macd-signal-badge ${signalState}`;
       }
 
-      // Create chart config
-      const config = window.ChartUtils
-        ? ChartUtils.createMACDConfig(macdData)
-        : createSimpleMACDConfig(macdData);
+      // Create chart config with VHS plugin
+      const config = createSimpleMACDConfig(macdData);
+      
+      // Add VHS degradation plugin
+      config.plugins = config.plugins || [];
+      config.plugins.push({
+        id: 'vhsDegradation',
+        beforeDraw: (chart) => {
+          const ctx = chart.ctx;
+          const influence = canvas._shipInfluence || 0.5;
+          const time = performance.now();
+          
+          // Ship ↔ MACD coupling: chart subtly warps around ship
+          ctx.save();
+          ctx.translate(
+            Math.sin(time * 0.002) * influence * 1.5,
+            Math.cos(time * 0.0015) * influence * 1.5
+          );
+        },
+        afterDraw: (chart) => {
+          const ctx = chart.ctx;
+          ctx.restore();
+          
+          // Apply VHS ghosting - don't fully clear
+          ctx.globalAlpha = canvas._vhsAlpha || 0.5;
+          ctx.filter = canvas._vhsFilter || 'none';
+        }
+      });
 
-      const ctx = canvas.getContext('2d');
       const chart = new Chart(ctx, config);
       macdChartInstances.set(ticker, chart);
+      
+      // Start subtle animation loop for ship coupling
+      if (!canvas._animating) {
+        canvas._animating = true;
+        const animate = () => {
+          if (!macdChartInstances.has(ticker)) {
+            canvas._animating = false;
+            return;
+          }
+          // Only update if visible and not too frequent
+          if (document.visibilityState === 'visible') {
+            chart.update('none');
+          }
+          setTimeout(() => requestAnimationFrame(animate), 100); // ~10fps for subtle effect
+        };
+        requestAnimationFrame(animate);
+      }
     }
 
     function renderMACDPlaceholder(container) {
-      const signalBadge = container.querySelector('[data-macd-signal]');
+      const signalBadge = container._signalBadge || container.querySelector('[data-macd-signal]');
       if (signalBadge) {
         signalBadge.textContent = 'N/A';
-        signalBadge.className = 'macd-mini-signal neutral';
+        signalBadge.className = 'macd-signal-badge neutral';
       }
     }
 
@@ -2351,7 +2613,7 @@
               type: 'bar',
               label: 'Hist',
               data: histogram,
-              backgroundColor: histogram.map(h => h >= 0 ? '#39FF1480' : '#FF004080'),
+              backgroundColor: histogram.map(h => h >= 0 ? 'rgba(0, 255, 255, 0.4)' : 'rgba(255, 41, 117, 0.4)'),
               borderWidth: 0,
               barPercentage: 0.8
             }
@@ -2889,6 +3151,9 @@
 
   <!-- Ship Behavior Engine - State machine for reactive sprites -->
   <script src="../js/ships/ship-behavior.js?v=20260108"></script>
+
+  <!-- Trade Loader - Canonical trade data for Guest pilot -->
+  <script src="../js/data/load-trades.js?v=20260108"></script>
 
   <!-- Player Manager - Pilot profiles -->
   <script src="../js/data/player-manager.js?v=20260108"></script>
