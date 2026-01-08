@@ -520,10 +520,21 @@
         border-top: 1px solid var(--border);
       }
       
+      .asp-radar {
+        display: none; /* Hide radar on mobile for cleaner layout */
+      }
+      
       .asp-change-btn {
         width: 100%;
         text-align: center;
         margin-top: 0.5rem;
+      }
+    }
+    
+    @media (max-width: 1200px) {
+      .asp-radar canvas {
+        width: 100px;
+        height: 100px;
       }
     }
     
@@ -736,6 +747,16 @@
     .stat-bar-fill.low { background: var(--red); box-shadow: 0 0 10px var(--red); }
     .stat-why { font-size: 0.7rem; color: var(--text-dim); line-height: 1.4; }
     
+    /* Data provenance tags - show market data sources */
+    .stat-provenance {
+      font-size: 0.6rem;
+      color: var(--cyan);
+      letter-spacing: 0.05em;
+      opacity: 0.7;
+      margin-bottom: 0.3rem;
+      font-family: 'VT323', monospace;
+    }
+    
     /* Polish: Extreme stat narrative microcopy */
     .stat-extreme {
       font-size: 0.65rem;
@@ -746,6 +767,170 @@
       background: rgba(255,170,51,0.08);
       border-left: 2px solid var(--amber);
     }
+    
+    /* Ship Signature Radar in Active Ship Panel */
+    .asp-radar {
+      margin-left: auto;
+      padding: 4px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+    }
+    
+    .active-ship-panel.no-ship .asp-radar {
+      display: none;
+    }
+    
+    #shipRadar {
+      display: block;
+    }
+    
+    /* Mission doctrine lines */
+    .mission-doctrine {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-style: italic;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      background: rgba(0,255,255,0.05);
+      border-left: 2px solid var(--cyan);
+    }
+    
+    .doctrine-label {
+      color: var(--cyan);
+      font-style: normal;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+    }
+    
+    /* Mission risk icon */
+    .mission-risk-icon {
+      font-size: 0.8rem;
+      color: var(--amber);
+      margin-left: 0.5rem;
+      opacity: 0.8;
+    }
+    
+    /* Difficulty label */
+    .difficulty-label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+    
+    /* Deploy Confirmation Modal */
+    .deploy-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: modal-fade-in 0.2s ease;
+    }
+    
+    @keyframes modal-fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .deploy-modal {
+      background: var(--bg-dark);
+      border: 2px solid var(--magenta);
+      box-shadow: 0 0 40px var(--magenta-dim), inset 0 0 60px rgba(0,0,0,0.5);
+      padding: 0;
+      min-width: 360px;
+      max-width: 90vw;
+      font-family: 'VT323', monospace;
+    }
+    
+    .deploy-modal-header {
+      background: var(--magenta);
+      color: var(--bg-dark);
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+    }
+    
+    .deploy-modal-body {
+      padding: 1.25rem;
+    }
+    
+    .deploy-info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    
+    .deploy-label {
+      color: var(--text-dim);
+    }
+    
+    .deploy-value {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+    
+    .deploy-warning {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: rgba(255,41,117,0.1);
+      border-left: 3px solid var(--magenta);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    
+    .deploy-modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: rgba(0,0,0,0.2);
+      border-top: 1px solid var(--border);
+    }
+    
+    .deploy-confirm-btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: var(--magenta);
+      color: var(--bg-dark);
+      border: none;
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .deploy-confirm-btn:hover {
+      background: var(--magenta-bright);
+      box-shadow: 0 0 20px var(--magenta-dim);
+    }
+    
+    .deploy-abort-btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .deploy-abort-btn:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+    
     .latest-bar { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); }
     .latest-bar strong { color: var(--text); }
     
@@ -1063,6 +1248,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════
          ACTIVE SHIP PANEL — Read-only display of currently selected ship
          Shows ship from Store, reinforces ownership context
+         Now includes Ship Signature Radar for gestalt visualization
          ═══════════════════════════════════════════════════════════════════ -->
     <div class="active-ship-panel" id="active-ship-panel">
       <div class="asp-icon" id="asp-ship-icon"></div>
@@ -1084,22 +1270,26 @@
           <span class="asp-stat-value asp-status" id="asp-status">IDLE</span>
         </div>
       </div>
+      <!-- Ship Signature Radar - gestalt visualization -->
+      <div class="asp-radar" id="asp-radar-container">
+        <canvas id="shipRadar" width="140" height="140"></canvas>
+      </div>
       <a href="ship-select.html" class="asp-change-btn">CHANGE SHIP</a>
     </div>
     
-    <!-- Controls -->
+    <!-- Controls with Temporal HUD Language -->
     <div class="controls">
       <div class="control-group">
-        <label>Sector:</label>
+        <label>Market Sector:</label>
         <select id="ticker-select"><option value="">Loading...</option></select>
       </div>
       <button id="compute-btn" disabled>Analyze Sector</button>
       <div class="control-group">
-        <label>Sim Speed:</label>
-        <select id="speed-select">
-          <option value="1x">1x (1 bar / 4s)</option>
-          <option value="5x">5x (1 bar / 0.8s)</option>
-          <option value="20x">20x (5 bars / s)</option>
+        <label>Time Flow:</label>
+        <select id="speed-select" title="Simulation compresses market time into tactical intervals">
+          <option value="1x">1x — Tactical (1 bar = 4s)</option>
+          <option value="5x">5x — Accelerated (1 bar = 0.8s)</option>
+          <option value="20x">20x — Fast Forward (5 bars/s)</option>
         </select>
       </div>
     </div>
@@ -1273,6 +1463,9 @@
   
   <!-- Pixel Icons (emoji replacement) -->
   <script src="../js/data/pixel-icons.js?v=20260108"></script>
+  
+  <!-- Ship Signature Radar - gestalt visualization -->
+  <script src="../js/ui/ship-signature-radar.js?v=20260108"></script>
   
   <!-- Mission System -->
   <script src="../js/mission-system.js?v=20260108"></script>
@@ -1571,12 +1764,40 @@
       renderEnvironment(env) {
         // Use PixelIcons for stat icons
         const PI = window.PixelIcons || { toSvg: () => '◈' };
+        
+        // Stats with data provenance tags (what market data derives each stat)
         const stats = [
-          { key: 'hull', name: 'Hull', icon: PI.toSvg('shield', '#47d4ff', 14) },
-          { key: 'firepower', name: 'Firepower', icon: PI.toSvg('lightning', '#ffaa33', 14) },
-          { key: 'sensors', name: 'Sensors', icon: PI.toSvg('satellite', '#47d4ff', 14) },
-          { key: 'fuel', name: 'Fuel', icon: PI.toSvg('fuel', '#ffaa33', 14) },
-          { key: 'threat', name: 'Threat', icon: PI.toSvg('warning', '#ff4444', 14), inverted: true }
+          { 
+            key: 'hull', 
+            name: 'Hull', 
+            icon: PI.toSvg('shield', '#47d4ff', 14),
+            provenance: 'Liquidity · ATR · Order Depth'
+          },
+          { 
+            key: 'firepower', 
+            name: 'Firepower', 
+            icon: PI.toSvg('lightning', '#ffaa33', 14),
+            provenance: 'Momentum · Trend Strength · Delta'
+          },
+          { 
+            key: 'sensors', 
+            name: 'Sensors', 
+            icon: PI.toSvg('satellite', '#47d4ff', 14),
+            provenance: 'Volume Flow · MA Dispersion'
+          },
+          { 
+            key: 'fuel', 
+            name: 'Fuel', 
+            icon: PI.toSvg('fuel', '#ffaa33', 14),
+            provenance: 'Time · Theta · Trend Age'
+          },
+          { 
+            key: 'threat', 
+            name: 'Threat', 
+            icon: PI.toSvg('warning', '#ff4444', 14), 
+            inverted: true,
+            provenance: 'Volatility · IV Rank · Regime Stress'
+          }
         ];
         
         let html = '';
@@ -1610,6 +1831,7 @@
                 <span class="stat-value ${colorClass}">${value}</span>
               </div>
               <div class="stat-bar"><div class="stat-bar-fill ${colorClass}" style="width:${value}%"></div></div>
+              <div class="stat-provenance" title="Data sources for this stat">${stat.provenance}</div>
               <div class="stat-why">${why}</div>
               ${extremeNote}
             </div>`;
@@ -1622,6 +1844,28 @@
           </div>`;
         
         this.envStats.innerHTML = html;
+        
+        // Update Ship Signature Radar with environment data
+        this.renderShipSignature(env);
+      },
+      
+      renderShipSignature(env) {
+        if (!window.ShipSignatureRadar) return;
+        
+        const canvas = document.getElementById('shipRadar');
+        if (!canvas) return;
+        
+        // Map environment stats to radar traits
+        const traits = [
+          { label: 'HULL', value: env.hull || 50 },
+          { label: 'FIRE', value: env.firepower || 50 },
+          { label: 'SENS', value: env.sensors || 50 },
+          { label: 'FUEL', value: env.fuel || 50 },
+          { label: 'THRT', value: env.threat || 50 },
+          { label: 'ANOM', value: env.anomaly || 50 }  // Options weirdness composite
+        ];
+        
+        ShipSignatureRadar.drawRadar(canvas, traits);
       },
       
       renderMissionCards(recommendations) {
@@ -1632,6 +1876,26 @@
         // Step 3.1: Check if current ticker is BENCHMARK
         const isBenchmark = this.tickerStatuses?.[this.currentTicker] === 'BENCHMARK';
         const PI = window.PixelIcons || { starRating: (n) => '★'.repeat(n) };
+        
+        // Mission doctrines - tradable philosophies
+        const doctrines = {
+          'DEEP_STRIKE': 'When volatility expands ahead of direction, commit size early or be left behind.',
+          'ESCORT': 'Structure outperforms conviction when the market is undecided.',
+          'RECON': 'Clarity comes from patience. Observe before committing.',
+          'SIEGE': 'Time decay favors the patient. Let theta work for you.',
+          'INTERCEPT': 'Swift action beats perfect analysis when momentum aligns.',
+          'PATROL': 'Steady accumulation outperforms aggressive timing in stable regimes.'
+        };
+        
+        // Risk icons for visual profile
+        const riskIcons = {
+          'DEEP_STRIKE': 'Δ',   // Delta
+          'ESCORT': 'Γ',        // Gamma
+          'RECON': '◎',         // Target
+          'SIEGE': 'Θ',         // Theta
+          'INTERCEPT': '⚡',    // Speed
+          'PATROL': '∿'         // Wave
+        };
         
         let html = '';
         for (const m of recommendations) {
@@ -1650,9 +1914,11 @@
           }
           
           const cardClass = m.recommended ? 'recommended' : '';
+          const doctrine = doctrines[m.type] || '';
+          const riskIcon = riskIcons[m.type] || '◈';
           
           // Determine button text and title
-          let btnText = 'Launch Mission';
+          let btnText = 'Deploy Mission';
           let btnTitle = '';
           if (isBenchmark) {
             btnText = 'Benchmark Only';
@@ -1662,14 +1928,15 @@
           }
           
           html += `
-            <div class="mission-card ${cardClass}">
+            <div class="mission-card ${cardClass}" data-mission-type="${m.type}">
               <div class="mission-card-header">
                 <div class="mission-card-title">
                   <span class="mission-icon">${m.icon}</span>
                   <span class="mission-name">${m.name}</span>
+                  <span class="mission-risk-icon" title="Primary risk: ${riskIcon}">${riskIcon}</span>
                 </div>
                 <div class="mission-meta">
-                  <div class="difficulty-stars">${stars}</div>
+                  <div class="difficulty-label">DIFFICULTY: ${stars}</div>
                   <div class="suitability-container" title="${fitTooltip}">
                     <div class="fit-bar ${fitClass}"><div class="fit-fill" style="width:${m.suitability}%"></div></div>
                     <span class="suitability-text">${m.suitability}%</span>
@@ -1678,9 +1945,10 @@
               </div>
               <div class="mission-concept">${m.concept}</div>
               <div class="mission-betting"><strong>Betting on:</strong> ${m.bettingOn}</div>
+              ${doctrine ? `<div class="mission-doctrine"><span class="doctrine-label">DOCTRINE:</span> ${doctrine}</div>` : ''}
               <div class="mission-why-now">${m.whyNow}</div>
               <div class="mission-actions">
-                <button class="launch-btn" ${canLaunch ? '' : 'disabled'} title="${btnTitle}" onclick="UI.launchMission('${m.type}', ${m.difficulty})">
+                <button class="launch-btn" ${canLaunch ? '' : 'disabled'} title="${btnTitle}" onclick="UI.confirmDeploy('${m.type}', ${m.difficulty}, '${m.name}')">
                   ${btnText}
                 </button>
                 <select class="duration-select" id="duration-${m.type}" style="font-size:0.75rem;padding:0.3rem;" ${isBenchmark ? 'disabled' : ''}>
@@ -1691,6 +1959,71 @@
         }
         
         this.missionsGrid.innerHTML = html;
+      },
+      
+      // Deploy confirmation modal - creates commitment ritual
+      confirmDeploy(type, difficulty, missionName) {
+        if (!this.currentTicker || !this.currentTickerData || !this.currentEnv) {
+          alert('Please analyze a sector first');
+          return;
+        }
+        
+        // Check for existing active mission
+        if (MissionSystem.getActiveMissionForTicker(this.currentTicker)) {
+          alert('This sector already has an active mission');
+          return;
+        }
+        
+        const durationKey = document.getElementById(`duration-${type}`)?.value || '1D';
+        
+        // Build confirmation modal
+        const modal = document.createElement('div');
+        modal.className = 'deploy-modal-overlay';
+        modal.innerHTML = `
+          <div class="deploy-modal">
+            <div class="deploy-modal-header">CONFIRM DEPLOYMENT</div>
+            <div class="deploy-modal-body">
+              <div class="deploy-info-row">
+                <span class="deploy-label">Mission:</span>
+                <span class="deploy-value">${missionName}</span>
+              </div>
+              <div class="deploy-info-row">
+                <span class="deploy-label">Ship:</span>
+                <span class="deploy-value">${this.currentTicker}</span>
+              </div>
+              <div class="deploy-info-row">
+                <span class="deploy-label">Duration:</span>
+                <span class="deploy-value">${durationKey}</span>
+              </div>
+              <div class="deploy-info-row">
+                <span class="deploy-label">Environment:</span>
+                <span class="deploy-value">Hull ${this.currentEnv.hull} · Threat ${this.currentEnv.threat}</span>
+              </div>
+              <div class="deploy-warning">
+                This mission will lock capital and expose the ship to regime shifts.
+              </div>
+            </div>
+            <div class="deploy-modal-actions">
+              <button class="deploy-confirm-btn" onclick="UI.executeDeploy('${type}', ${difficulty})">CONFIRM DEPLOY</button>
+              <button class="deploy-abort-btn" onclick="UI.closeDeployModal()">ABORT</button>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+        this.deployModal = modal;
+      },
+      
+      closeDeployModal() {
+        if (this.deployModal) {
+          this.deployModal.remove();
+          this.deployModal = null;
+        }
+      },
+      
+      async executeDeploy(type, difficulty) {
+        this.closeDeployModal();
+        await this.launchMission(type, difficulty);
       },
       
       async launchMission(type, difficulty) {
