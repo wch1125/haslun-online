@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HASLUN.ONLINE — ARCADE</title>
   <meta name="description" content="Haslun.online — a small arcade of weird, beautiful web toys.">
+  <!-- BUILD: 2026-01-08 — Transition fix (WARP → LOCKING IN) -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
@@ -410,8 +411,10 @@
       color: var(--lime);
     }
 
-    /* Warp transition */
-    #warp{
+    /* ═══════════════════════════════════════════════════════════════════════
+       TRANSITION OVERLAY — CRT Boot / Lock-in style (replaces WARP tunnel)
+       ═══════════════════════════════════════════════════════════════════════ */
+    #transition{
       position:fixed;
       inset:0;
       background: var(--black);
@@ -419,71 +422,108 @@
       opacity:0;
       pointer-events:none;
       overflow:hidden;
-      transition: opacity .15s ease;
+      transition: opacity .12s ease;
     }
 
-    #warp.active{
+    #transition.active{
       opacity:1;
       pointer-events:auto;
     }
 
-    .warp-lines{
+    /* CRT scanline noise (replaces conic warp tunnel) */
+    .transition-noise{
       position:absolute;
       inset:0;
-      background: 
-        repeating-conic-gradient(
-          from 0deg at 50% 50%,
-          transparent 0deg 4deg,
-          rgba(255,0,102,.15) 4deg 5deg
-        );
-      animation: warp-spin 2s linear infinite paused;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,0,102,.06) 0px,
+          rgba(255,0,102,.06) 1px,
+          transparent 1px,
+          transparent 4px
+        ),
+        radial-gradient(ellipse at center, rgba(0,255,200,.10), transparent 55%);
+      opacity:0.9;
     }
 
-    #warp.active .warp-lines{
-      animation-play-state: running;
+    /* Subtle CRT flicker on the noise */
+    #transition.active .transition-noise{
+      animation: transition-flicker 0.15s steps(2) infinite;
     }
 
-    @keyframes warp-spin{
-      to{ transform: rotate(360deg) scale(3); }
+    @keyframes transition-flicker{
+      0%,100%{ opacity: 0.9; }
+      50%{ opacity: 0.7; }
     }
 
-    .warp-flash{
+    /* Flash on exit */
+    .transition-flash{
       position:absolute;
       inset:0;
-      background: linear-gradient(45deg, var(--hot), var(--cyan));
+      background: linear-gradient(135deg, var(--hot), var(--cyan));
       opacity:0;
     }
 
-    #warp.active .warp-flash{
-      animation: flash 0.3s ease-out 0.6s;
+    #transition.active .transition-flash{
+      animation: transition-flash 0.2s ease-out 0.2s;
     }
 
-    @keyframes flash{
+    @keyframes transition-flash{
       0%{ opacity:0; }
-      50%{ opacity:1; }
+      50%{ opacity:0.8; }
       100%{ opacity:0; }
     }
 
-    .warp-text{
+    /* System status text (bottom-left, with blinking cursor) */
+    .transition-text{
       position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      font-size: clamp(36px, 8vw, 72px);
-      letter-spacing:.3em;
+      left:28px;
+      bottom:28px;
+      font-size:18px;
+      letter-spacing:.25em;
       color: var(--hot);
-      text-shadow: 0 0 30px var(--hot), 0 0 60px var(--magenta);
+      text-shadow: 0 0 10px var(--hot);
       opacity:0;
+      text-transform: uppercase;
     }
 
-    #warp.active .warp-text{
-      animation: warp-text-in .4s ease-out forwards;
+    #transition.active .transition-text{
+      opacity:1;
+      animation: transition-text-in 0.15s ease-out forwards;
     }
 
-    @keyframes warp-text-in{
-      from{ opacity:0; transform: scale(0.5); }
-      to{ opacity:1; transform: scale(1); }
+    @keyframes transition-text-in{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform: translateY(0); }
     }
+
+    /* Blinking cursor after text */
+    .transition-text::after{
+      content:" ▮";
+      animation: cursor-blink 0.6s steps(2) infinite;
+    }
+
+    @keyframes cursor-blink{
+      50%{ opacity:0; }
+    }
+
+    /* Corner brackets (matching Space Capital aesthetic) */
+    .transition-corner{
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--hot);
+      opacity: 0;
+    }
+
+    #transition.active .transition-corner{
+      opacity: 0.6;
+    }
+
+    .transition-corner.tl{ top: 20px; left: 20px; border-right: none; border-bottom: none; }
+    .transition-corner.tr{ top: 20px; right: 20px; border-left: none; border-bottom: none; }
+    .transition-corner.bl{ bottom: 20px; left: 20px; border-right: none; border-top: none; }
+    .transition-corner.br{ bottom: 20px; right: 20px; border-left: none; border-top: none; }
 
     /* Decorative elements */
     .deco-cross{
@@ -532,6 +572,20 @@
       transform: rotate(-30deg);
       margin-left:4px;
     }
+
+    /* Reduced motion: skip animation entirely */
+    @media (prefers-reduced-motion: reduce) {
+      #transition,
+      #transition.active {
+        transition: none;
+        animation: none;
+      }
+      #transition.active .transition-noise,
+      #transition.active .transition-flash,
+      #transition.active .transition-text {
+        animation: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -565,8 +619,9 @@
             A trading cockpit dressed as a retro space sim. Real market data drives ship personality. Your fleet remembers everything.
           </div>
           <div class="btn-row">
-            <a class="btn btn-primary warp-trigger" href="./space-capital/">▶ LAUNCH</a>
-            <a class="btn btn-secondary warp-trigger" href="./space-capital/#hangar">◇ HANGAR</a>
+            <!-- Cache-busted links to ensure latest build -->
+            <a class="btn btn-primary transition-trigger" href="./space-capital/?v=20260108" data-message="LOCKING IN">▶ LAUNCH</a>
+            <a class="btn btn-secondary transition-trigger" href="./space-capital/?v=20260108#hangar" data-message="OPENING HANGAR">◇ HANGAR</a>
           </div>
 
           <div class="kill-marks">
@@ -583,15 +638,15 @@
         <div class="side">
           <div class="section">
             <div class="section-title">× UPCOMING</div>
-            <a class="list-item wip warp-trigger" href="./space-capital/#battle">
+            <a class="list-item wip transition-trigger" href="./space-capital/?v=20260108#battle" data-message="MODULE OFFLINE">
               <span>Battle Arena</span>
               <small>WIP</small>
             </a>
-            <a class="list-item wip warp-trigger" href="./space-capital/#garage">
+            <a class="list-item wip transition-trigger" href="./space-capital/?v=20260108#garage" data-message="MODULE OFFLINE">
               <span>Telemetry Lab</span>
               <small>WIP</small>
             </a>
-            <a class="list-item wip warp-trigger" href="./space-capital/#garage">
+            <a class="list-item wip transition-trigger" href="./space-capital/?v=20260108#garage" data-message="MODULE OFFLINE">
               <span>Paint Bay</span>
               <small>WIP</small>
             </a>
@@ -613,27 +668,55 @@
 
       <div class="footer">
         <span>SYS: GREENLINE</span>
-        <span>v0.1 — ARCADE SHELL</span>
+        <span>v0.2 — ARCADE SHELL</span>
       </div>
     </section>
   </div>
 
-  <!-- Warp overlay -->
-  <div id="warp">
-    <div class="warp-lines"></div>
-    <div class="warp-text">WARPING</div>
-    <div class="warp-flash"></div>
+  <!-- Transition overlay (CRT boot style, replaces WARP tunnel) -->
+  <div id="transition">
+    <div class="transition-noise"></div>
+    <div class="transition-text">LOCKING IN</div>
+    <div class="transition-flash"></div>
+    <div class="transition-corner tl"></div>
+    <div class="transition-corner tr"></div>
+    <div class="transition-corner bl"></div>
+    <div class="transition-corner br"></div>
   </div>
 
   <script>
-    document.querySelectorAll('.warp-trigger').forEach(link => {
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        const target = link.href;
-        document.getElementById('warp').classList.add('active');
-        setTimeout(() => window.location.href = target, 800);
+    (function() {
+      'use strict';
+      
+      const transitionEl = document.getElementById('transition');
+      const transitionText = transitionEl.querySelector('.transition-text');
+      
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      document.querySelectorAll('.transition-trigger').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const target = link.href;
+          
+          // If user prefers reduced motion, skip transition entirely
+          if (prefersReducedMotion) {
+            window.location.href = target;
+            return;
+          }
+          
+          // Dynamic message based on destination (from data attribute)
+          const message = link.dataset.message || 'LOCKING IN';
+          transitionText.textContent = message;
+          
+          // Activate transition
+          transitionEl.classList.add('active');
+          
+          // Navigate after short delay (350ms instead of 800ms)
+          setTimeout(() => window.location.href = target, 350);
+        });
       });
-    });
+    })();
   </script>
 </body>
 </html>
