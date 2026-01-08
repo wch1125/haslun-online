@@ -329,6 +329,7 @@
       };
       
       let statsData = {};
+      let fleetData = {};
       let dial = null;
       
       // ─────────────────────────────────────────────────────────────────────
@@ -343,6 +344,23 @@
           return data.stats || data;
         } catch (err) {
           console.warn('[Hangar] Stats unavailable:', err);
+          return {};
+        }
+      }
+      
+      async function loadFleetData() {
+        try {
+          const response = await fetch('../data/telemetry/fleet.json');
+          if (!response.ok) throw new Error('Fleet not found');
+          const data = await response.json();
+          // Convert array to map by ticker
+          const map = {};
+          (data.ships || []).forEach(ship => {
+            map[ship.ticker] = ship;
+          });
+          return map;
+        } catch (err) {
+          console.warn('[Hangar] Fleet unavailable:', err);
           return {};
         }
       }
@@ -466,7 +484,12 @@
       
       async function init() {
         // Load data
-        statsData = await loadStatsData();
+        const [stats, fleet] = await Promise.all([
+          loadStatsData(),
+          loadFleetData()
+        ]);
+        statsData = stats;
+        fleetData = fleet;
         
         // Get available tickers
         const tickers = Object.keys(window.SHIP_SPRITES || SHIP_CLASSES);
