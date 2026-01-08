@@ -11,6 +11,39 @@ Positions are now visible throughout the Fleet page, transforming ship cards fro
 
 ---
 
+## ChatGPT Surgical Fixes (Also Implemented)
+
+Per ChatGPT's code review feedback, these additional refinements were applied:
+
+### 1. `computeTradeHash()` Checksum
+Added P&L sample to avoid stale dossiers on reorder/middle edits:
+```javascript
+const sample = trades.slice(0, 5).map(t => t.realizedPNL).join('|');
+return `${trades.length}-${trades[0]?.dateTime}-${trades.at(-1)?.dateTime}-${sample}`;
+```
+
+### 2. Instability Formula Documentation
+Added design comment explaining weight rationale:
+- `normalizedVariance (0.4)` = emotional volatility from P&L swings
+- `optionRatio (0.3)` = leverage risk / complexity exposure
+- `clusterScore (0.3)` = impulsive/bursty trading behavior
+
+### 3. `normalizedAvgPNL` Added
+Raw `avgPNL` for text display, `normalizedAvgPNL` for animation/color:
+```javascript
+normalizedAvgPNL: Math.tanh(avgPNL / 1000)  // Compresses outliers
+```
+
+### 4. `engineStress` Improved
+Changed from linear to log1p for smoother animation curves:
+```javascript
+// Before: Math.min(1, tradesPerDay / 5)
+// After:
+engineStress: Math.min(1, Math.log1p(tradesPerDay) / Math.log1p(20))
+```
+
+---
+
 ## New Components
 
 ### 1. PositionsStore (`js/data/positions-store.js`)
@@ -120,6 +153,7 @@ Fleet Page    Hangar Page (future)
 - `html/space-capital.html` - Fleet Power HUD HTML, renderShipCard updates
 - `css/fleet-command.css` - Position chip, HUD, ownership state styles
 - `js/data/positions-store.js` - **NEW** - Global position accessor
+- `js/data/load-trades.js` - Surgical fixes (hash, instability docs, normalizedAvgPNL, engineStress)
 
 ---
 

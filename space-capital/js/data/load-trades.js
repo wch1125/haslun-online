@@ -28,7 +28,9 @@ const TradeLoader = (function() {
 
   function computeTradeHash(trades) {
     if (!trades || trades.length === 0) return 'empty';
-    return `${trades.length}-${trades[0]?.dateTime || ''}-${trades[trades.length - 1]?.dateTime || ''}`;
+    // Include sample of P&L values to catch reorders and middle edits
+    const sample = trades.slice(0, 5).map(t => t.realizedPNL).join('|');
+    return `${trades.length}-${trades[0]?.dateTime || ''}-${trades.at(-1)?.dateTime || ''}-${sample}`;
   }
 
   function invalidateCache() {
@@ -417,7 +419,14 @@ const TradeLoader = (function() {
       clusterScore = Math.min(1, Math.sqrt(gapVariance) / 30); // Normalize against 30-day spread
     }
 
-    // INSTABILITY: Derived from variance + options + clustering (NOT declared)
+    // ═══════════════════════════════════════════════════════════════════
+    // INSTABILITY FORMULA - DESIGN CONSTANT
+    // Weights are tuned, not guessed:
+    // - normalizedVariance (0.4) = emotional volatility from P&L swings
+    // - optionRatio (0.3) = leverage risk / complexity exposure  
+    // - clusterScore (0.3) = impulsive/bursty trading behavior
+    // DO NOT CHANGE without understanding animation/behavior coupling
+    // ═══════════════════════════════════════════════════════════════════
     const instability = Math.min(1, 
       normalizedVariance * 0.4 + 
       optionRatio * 0.3 + 
@@ -451,11 +460,14 @@ const TradeLoader = (function() {
       damageScore,
       hullIntegrity: 1 - damageScore,
       wearLevel: Math.min(1, uniqueDays / 100),
-      engineStress: Math.min(1, tradesPerDay / 5),
+      // log1p gives sensitivity early, compression later → smoother animation curves
+      engineStress: Math.min(1, Math.log1p(tradesPerDay) / Math.log1p(20)),
       
-      // Raw values for display
+      // Raw values for display (text, tooltips)
       totalPNL,
-      avgPNL
+      avgPNL,
+      // Normalized avgPNL for animation/color (use tanh to compress outliers)
+      normalizedAvgPNL: Math.tanh(avgPNL / 1000)
     };
   }
 
