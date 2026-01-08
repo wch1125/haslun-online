@@ -2004,6 +2004,164 @@
       color: #0a0e0a;
     }
 
+    /* Terminal Tabs */
+    .registry-tabs {
+      display: flex;
+      background: #0d120d;
+      border-bottom: 1px solid #1a2a1a;
+      padding: 0 0.5rem;
+    }
+
+    .registry-tab {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      color: #4a7a4a;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .registry-tab:hover {
+      color: var(--hm-cyan);
+      background: rgba(0, 255, 255, 0.03);
+    }
+
+    .registry-tab.active {
+      color: var(--hm-cyan);
+      border-bottom-color: var(--hm-cyan);
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .registry-tab::before {
+      content: '//';
+      margin-right: 0.3rem;
+      opacity: 0.5;
+    }
+
+    .registry-tab-panel {
+      display: none;
+      flex: 1;
+      overflow: auto;
+    }
+
+    .registry-tab-panel.active {
+      display: block;
+    }
+
+    /* Legend Panel Styles */
+    .legend-content {
+      padding: 1rem 1.5rem;
+      color: #88aa88;
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .legend-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .legend-section-title {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: var(--hm-cyan);
+      letter-spacing: 0.15em;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-section-title::before {
+      content: '>';
+      color: var(--hm-magenta);
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .legend-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      background: rgba(0, 20, 0, 0.3);
+      border-left: 2px solid var(--hm-magenta);
+    }
+
+    .legend-term {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: var(--hm-cyan);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .legend-def {
+      color: #6a9a6a;
+      font-size: 0.7rem;
+    }
+
+    .legend-formula {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--hm-magenta);
+      background: rgba(255, 41, 117, 0.1);
+      padding: 0.15rem 0.3rem;
+      margin-top: 0.25rem;
+      display: inline-block;
+    }
+
+    .legend-color-sample {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      vertical-align: middle;
+      margin-right: 0.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .legend-regime-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .legend-regime-badge {
+      font-family: 'VT323', monospace;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--hm-cyan);
+      color: var(--hm-cyan);
+      background: rgba(0, 255, 255, 0.05);
+    }
+
+    /* Positions Panel Styles */
+    .positions-content {
+      padding: 1rem;
+    }
+
+    .positions-empty {
+      text-align: center;
+      color: #4a7a4a;
+      padding: 2rem;
+    }
+
+    .positions-empty-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+
     .registry-toolbar {
       display: flex;
       gap: 1rem;
@@ -2121,6 +2279,61 @@
       font-size: 0.7rem;
       line-height: 1.4;
       max-width: 300px;
+    }
+
+    /* New market-derived registry styles */
+    .registry-regime {
+      font-family: 'VT323', monospace;
+      font-size: 0.8rem;
+      color: var(--hm-cyan);
+      letter-spacing: 0.05em;
+    }
+
+    .registry-score {
+      display: inline-block;
+      min-width: 28px;
+      padding: 0.2rem 0.4rem;
+      text-align: center;
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      font-weight: bold;
+      border: 1px solid;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .registry-price {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      color: #88aa88;
+    }
+
+    .registry-chg {
+      font-family: 'VT323', monospace;
+      font-size: 0.7rem;
+    }
+
+    .registry-chg.positive { color: var(--hm-cyan); }
+    .registry-chg.negative { color: var(--hm-magenta); }
+
+    .registry-metric {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: var(--hm-cyan);
+    }
+
+    .registry-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.55rem;
+      color: #4a6a4a;
+      letter-spacing: 0.1em;
+    }
+
+    .registry-table td.positive {
+      color: var(--hm-cyan);
+    }
+
+    .registry-table td.negative {
+      color: var(--hm-magenta);
     }
 
     .registry-footer {
@@ -4023,37 +4236,285 @@
       <div class="registry-header">
         <div class="registry-title">
           <span class="registry-title-icon">::</span>
-          VESSEL REGISTRY // SPACE CAPITAL FLEET DATABASE
+          FLEET COMMAND TERMINAL
         </div>
-        <div class="registry-meta">v2.1.4 // SECTOR ALPHA</div>
+        <div class="registry-meta">v3.0.0 // ALL DATA MARKET-DERIVED</div>
         <button class="registry-close" id="registryClose" title="Close (ESC)">[X]</button>
       </div>
-      <div class="registry-toolbar">
-        <div class="registry-toolbar-item">VESSELS: <span class="registry-toolbar-value" id="registryCount">--</span></div>
-        <div class="registry-toolbar-item">TIERS: <span class="registry-toolbar-value">S/A/B/C/?</span></div>
-        <div class="registry-toolbar-item">SORT: <span class="registry-toolbar-value">TICKER ↑</span></div>
-        <div class="registry-toolbar-item">STATUS: <span class="registry-toolbar-value" style="color: var(--hm-cyan);">ONLINE</span></div>
+      
+      <!-- Tab Navigation -->
+      <div class="registry-tabs">
+        <button class="registry-tab active" data-tab="positions">POSITIONS</button>
+        <button class="registry-tab" data-tab="fleet">FLEET DATABASE</button>
+        <button class="registry-tab" data-tab="legend">LEGEND</button>
       </div>
-      <div class="registry-content">
-        <table class="registry-table">
-          <thead>
-            <tr>
-              <th>TICKER</th>
-              <th>DESIGNATION</th>
-              <th>TIER</th>
-              <th>CLASS</th>
-              <th>SPECIALTY</th>
-              <th>PROFILE</th>
-            </tr>
-          </thead>
-          <tbody id="registryTableBody">
-            <!-- Populated by JS -->
-          </tbody>
-        </table>
+      
+      <!-- Positions Panel -->
+      <div class="registry-tab-panel active" id="panel-positions">
+        <div class="registry-toolbar">
+          <div class="registry-toolbar-item">ACTIVE: <span class="registry-toolbar-value" id="positionsCount">--</span></div>
+          <div class="registry-toolbar-item">VALUE: <span class="registry-toolbar-value" id="positionsValue">--</span></div>
+          <div class="registry-toolbar-item">P&L: <span class="registry-toolbar-value" id="positionsPnL">--</span></div>
+        </div>
+        <div class="registry-content">
+          <div class="positions-content" id="positionsContent">
+            <div class="positions-empty">
+              <div class="positions-empty-icon">⊘</div>
+              <div>No positions imported</div>
+              <div style="font-size: 0.65rem; margin-top: 0.5rem;">Use Position Manager to import CSV</div>
+            </div>
+          </div>
+        </div>
       </div>
+      
+      <!-- Fleet Database Panel -->
+      <div class="registry-tab-panel" id="panel-fleet">
+        <div class="registry-toolbar">
+          <div class="registry-toolbar-item">VESSELS: <span class="registry-toolbar-value" id="registryCount">--</span></div>
+          <div class="registry-toolbar-item">SORT: <span class="registry-toolbar-value">SCORE ↓</span></div>
+          <div class="registry-toolbar-item">STATUS: <span class="registry-toolbar-value" style="color: var(--hm-cyan);">ONLINE</span></div>
+        </div>
+        <div class="registry-content">
+          <table class="registry-table">
+            <thead>
+              <tr>
+                <th>TICKER</th>
+                <th>REGIME</th>
+                <th>SCORE</th>
+                <th>PRICE</th>
+                <th>52W POS</th>
+                <th>VOLATILITY</th>
+              </tr>
+            </thead>
+            <tbody id="registryTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Legend Panel -->
+      <div class="registry-tab-panel" id="panel-legend">
+        <div class="legend-content">
+          
+          <div class="legend-section">
+            <div class="legend-section-title">MARKET REGIMES</div>
+            <p style="margin-bottom: 0.75rem; color: #6a9a6a;">
+              Ship classification is derived from price momentum and volatility. No fake archetypes.
+            </p>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <span class="legend-term">UPTREND</span>
+                <div class="legend-def">
+                  Strong positive momentum. 3M return ≥15% or 1Y return ≥40%
+                  <div class="legend-formula">mom3m ≥ 15 || mom1y ≥ 40</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">DOWNTREND</span>
+                <div class="legend-def">
+                  Strong negative momentum. 3M return ≤-15% or 1Y return ≤-40%
+                  <div class="legend-formula">mom3m ≤ -15 || mom1y ≤ -40</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">BREAKOUT</span>
+                <div class="legend-def">
+                  High volatility + trending. 52W range ≥80% of low price + momentum
+                  <div class="legend-formula">volatility ≥ 0.8 && isTrending</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">CHOP</span>
+                <div class="legend-def">
+                  High volatility, no direction. Wide price swings without trend
+                  <div class="legend-formula">volatility ≥ 0.8 && !isTrending</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">RANGE</span>
+                <div class="legend-def">
+                  Default state. Normal volatility, no strong momentum
+                  <div class="legend-formula">fallback when no other regime matches</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-section-title">SCORE (0-100)</div>
+            <p style="margin-bottom: 0.75rem; color: #6a9a6a;">
+              Composite strength score derived from three market factors:
+            </p>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <span class="legend-term">POSITION</span>
+                <div class="legend-def">
+                  Where price sits in 52-week range (0-40 pts)
+                  <div class="legend-formula">rangePosition × 40</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">MOMENTUM</span>
+                <div class="legend-def">
+                  3-month return normalized (0-30 pts)
+                  <div class="legend-formula">(mom3m + 30) / 60 × 30</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">TREND</span>
+                <div class="legend-def">
+                  1-year return normalized (0-30 pts)
+                  <div class="legend-formula">(mom1y + 50) / 350 × 30</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 0.75rem;">
+              <span style="color: var(--hm-cyan);">Score colors:</span>
+              <span class="legend-color-sample" style="background: #00FFFF;"></span> ≥70 (Strong)
+              <span class="legend-color-sample" style="background: #FFE600; margin-left: 0.5rem;"></span> 40-69 (Neutral)
+              <span class="legend-color-sample" style="background: #FF2975; margin-left: 0.5rem;"></span> <40 (Weak)
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-section-title">TELEMETRY BARS</div>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <span class="legend-term">TREND</span>
+                <div class="legend-def">
+                  Price direction indicator (-1 to +1). Derived from moving average alignment.
+                  <div class="legend-formula">bipolar: center = neutral</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">MOMENTUM</span>
+                <div class="legend-def">
+                  Rate of change velocity (-1 to +1). How fast price is moving.
+                  <div class="legend-formula">bipolar: center = neutral</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">VOLATILITY</span>
+                <div class="legend-def">
+                  Price swing magnitude (0-100%). Higher = wider expected moves.
+                  <div class="legend-formula">unipolar: left = calm, right = volatile</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">ACTIVITY</span>
+                <div class="legend-def">
+                  Trading volume relative to average (0-100%). Market engagement level.
+                  <div class="legend-formula">volume / avgVolume normalized</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-section-title">SIGNAL STATES</div>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <span class="legend-term"><span class="legend-color-sample" style="background: #00FFFF;"></span>BULL</span>
+                <div class="legend-def">
+                  Positive MACD crossover. Technical buy signal active.
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term"><span class="legend-color-sample" style="background: #FF2975;"></span>BEAR</span>
+                <div class="legend-def">
+                  Negative MACD crossover. Technical sell signal active.
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term"><span class="legend-color-sample" style="background: #888888;"></span>NEUTRAL</span>
+                <div class="legend-def">
+                  No clear signal. MACD near zero line or consolidating.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-section-title">BEHAVIOR BADGES</div>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <span class="legend-term">THRUST/DRIFT</span>
+                <div class="legend-def">
+                  Engine state from visual.thrust value. >0.5 = THRUST (active), else DRIFT (idle)
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">STABLE/EXTREME</span>
+                <div class="legend-def">
+                  Volatility state. >50% = EXTREME (warning), else STABLE (ok)
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">HULL OK/DAMAGED</span>
+                <div class="legend-def">
+                  Drawdown state from visual.damage. >0.3 = DAMAGED (critical), else OK
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-section-title">52-WEEK RANGE</div>
+            <p style="color: #6a9a6a;">
+              Shows current price position within the 52-week high/low range as a percentage.
+              <br><br>
+              <span class="legend-color-sample" style="background: linear-gradient(90deg, #FF2975, #FFE600, #00FFFF); width: 60px;"></span>
+              Gradient: <span style="color: #FF2975;">Low (0%)</span> → <span style="color: #FFE600;">Mid (50%)</span> → <span style="color: #00FFFF;">High (100%)</span>
+              <br><br>
+              White marker indicates current price position within this range.
+            </p>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-section-title">TIMEFRAME MOOD DOTS</div>
+            <p style="margin-bottom: 0.5rem; color: #6a9a6a;">
+              Four dots showing return performance over different periods:
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <span><span class="legend-color-sample" style="background: #00FFFF; border-radius: 50%;"></span> Bull: return >5%</span>
+              <span><span class="legend-color-sample" style="background: rgba(0, 255, 255, 0.5); border-radius: 50%;"></span> Ok: return 0-5%</span>
+              <span><span class="legend-color-sample" style="background: rgba(136, 136, 136, 0.6); border-radius: 50%;"></span> Flat: return -5% to 0%</span>
+              <span><span class="legend-color-sample" style="background: #FF2975; border-radius: 50%;"></span> Bear: return <-5%</span>
+            </div>
+            <div style="margin-top: 0.5rem; color: #4a7a4a; font-size: 0.65rem;">
+              Periods: 1D (day), 1W (week), 1M (month), 3M (quarter)
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-section-title">DATA SOURCES</div>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <span class="legend-term">stats.json</span>
+                <div class="legend-def">
+                  Historical price data: 52W high/low, returns (1D/1W/1M/3M/1Y), current price
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-term">fleet.json</span>
+                <div class="legend-def">
+                  Telemetry data: trend, momentum, volatility, activity, signalState, visual behaviors
+                </div>
+              </div>
+            </div>
+            <p style="margin-top: 0.75rem; color: #FF2975; font-size: 0.7rem;">
+              ⚠ NO FAKE DATA: All classifications, scores, and metrics are computed from market data.
+              No hardcoded archetypes, tiers, or invented statistics.
+            </p>
+          </div>
+
+        </div>
+      </div>
+      
       <div class="registry-footer">
-        <span>SPACE CAPITAL REGISTRY // FLEET COMMAND SYSTEMS</span>
-        <span><kbd>ESC</kbd> to close · Click row to select vessel</span>
+        <span>SPACE CAPITAL // FLEET COMMAND TERMINAL v3.0</span>
+        <span><kbd>ESC</kbd> to close · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> switch tabs</span>
       </div>
     </div>
   </div>
@@ -4102,8 +4563,101 @@
       const closeBtn = document.getElementById('registryClose');
       const tableBody = document.getElementById('registryTableBody');
       const countEl = document.getElementById('registryCount');
+      const tabs = document.querySelectorAll('.registry-tab');
+      const panels = document.querySelectorAll('.registry-tab-panel');
 
-      function openRegistryTerminal() {
+      // Tab switching
+      function switchTab(tabName) {
+        tabs.forEach(tab => {
+          tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+        panels.forEach(panel => {
+          panel.classList.toggle('active', panel.id === `panel-${tabName}`);
+        });
+      }
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+      });
+
+      // Update positions panel
+      function updatePositionsPanel() {
+        const posContent = document.getElementById('positionsContent');
+        const posCount = document.getElementById('positionsCount');
+        const posValue = document.getElementById('positionsValue');
+        const posPnL = document.getElementById('positionsPnL');
+        
+        const positions = window._fleetPositions || {};
+        const posArray = Object.values(positions);
+        
+        if (posArray.length === 0) {
+          posCount.textContent = '0';
+          posValue.textContent = '$0';
+          posPnL.textContent = '--';
+          return;
+        }
+        
+        // Calculate totals
+        let totalValue = 0;
+        let totalCost = 0;
+        
+        posArray.forEach(pos => {
+          const cost = (pos.entry_cost || 0) * (pos.contracts || 0) * 100;
+          const value = (pos.current_price || pos.stock_price || 0) * (pos.contracts || 0) * 100;
+          totalCost += cost;
+          totalValue += value;
+        });
+        
+        const totalPnL = totalValue - totalCost;
+        const pnlPct = totalCost > 0 ? (totalPnL / totalCost * 100) : 0;
+        
+        posCount.textContent = posArray.length;
+        posValue.textContent = '$' + totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 });
+        posPnL.textContent = `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toLocaleString(undefined, { maximumFractionDigits: 0 })} (${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%)`;
+        posPnL.style.color = totalPnL >= 0 ? 'var(--hm-cyan)' : 'var(--hm-magenta)';
+        
+        // Render positions table
+        posContent.innerHTML = `
+          <table class="registry-table">
+            <thead>
+              <tr>
+                <th>TICKER</th>
+                <th>REGIME</th>
+                <th>CONTRACTS</th>
+                <th>ENTRY</th>
+                <th>CURRENT</th>
+                <th>P&L</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${posArray.map(pos => {
+                const config = window.getTickerConfig?.(pos.ticker, pos) || { regime: 'UNKNOWN', color: '#888' };
+                const cost = (pos.entry_cost || 0) * (pos.contracts || 0) * 100;
+                const value = (pos.current_price || pos.stock_price || 0) * (pos.contracts || 0) * 100;
+                const pnl = value - cost;
+                const pnlP = cost > 0 ? (pnl / cost * 100) : 0;
+                const pnlClass = pnl >= 0 ? 'positive' : 'negative';
+                
+                return `
+                  <tr data-ticker="${pos.ticker}" onclick="selectRegistryShip('${pos.ticker}')">
+                    <td><div class="registry-ticker">${pos.ticker}</div></td>
+                    <td><div class="registry-regime">${config.regime}</div></td>
+                    <td>${pos.contracts || 0}</td>
+                    <td>$${(pos.entry_cost || 0).toFixed(2)}</td>
+                    <td>$${(pos.current_price || pos.stock_price || 0).toFixed(2)}</td>
+                    <td class="${pnlClass}">
+                      ${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}
+                      <span style="opacity: 0.7; font-size: 0.65rem;">(${pnlP >= 0 ? '+' : ''}${pnlP.toFixed(1)}%)</span>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+
+      function openRegistryTerminal(initialTab = 'fleet') {
         const REGISTRY_DATA = generateRegistryData();
         
         // Sort by score descending
@@ -4114,7 +4668,7 @@
         // Update count
         countEl.textContent = tickers.length;
         
-        // Render rows with market-derived data
+        // Render fleet database rows
         tableBody.innerHTML = tickers.map(ticker => {
           const ship = REGISTRY_DATA[ticker];
           const scoreColor = ship.score >= 70 ? '#00FFFF' : ship.score >= 40 ? '#FFE600' : '#FF2975';
@@ -4147,6 +4701,12 @@
           `;
         }).join('');
 
+        // Update positions panel
+        updatePositionsPanel();
+        
+        // Switch to requested tab
+        switchTab(initialTab);
+
         modal.classList.add('open');
         document.body.style.overflow = 'hidden';
       }
@@ -4171,8 +4731,14 @@
         if (e.target === modal) closeRegistryTerminal();
       });
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('open')) {
-          closeRegistryTerminal();
+        if (modal.classList.contains('open')) {
+          if (e.key === 'Escape') {
+            closeRegistryTerminal();
+          }
+          // Number keys to switch tabs
+          if (e.key === '1') switchTab('positions');
+          if (e.key === '2') switchTab('fleet');
+          if (e.key === '3') switchTab('legend');
         }
       });
 
