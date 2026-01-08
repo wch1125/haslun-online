@@ -1,13 +1,14 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * CHART UTILITIES - BULLETPROOF EDITION
+ * CHART UTILITIES - BULLETPROOF EDITION v2
  * ═══════════════════════════════════════════════════════════════════════════
  * 
  * This version completely prevents the oscillation/spiraling bug by:
- * 1. STRICT date-string keyed deduplication (one price per calendar day)
+ * 1. STRICT timestamp-keyed deduplication (one price per minute)
  * 2. Pure index-based X axis (no date parsing for chart positioning)
  * 3. Aggressive validation of all numeric values
  * 4. Simple, predictable output format
+ * 5. Preserves intraday structure (45m data keeps multiple points per day)
  * 
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -16,30 +17,53 @@ const ChartUtils = (function() {
   'use strict';
 
   /**
-   * Normalize date to YYYY-MM-DD string (strips time component)
+   * Normalize timestamp to ISO string rounded to minute
+   * This preserves intraday structure while preventing micro-duplicates
    */
-  function normalizeDate(dateInput) {
+  function normalizeTimestamp(dateInput) {
     if (!dateInput) return null;
     
-    // Already a YYYY-MM-DD string
-    if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
-      return dateInput;
-    }
-    
-    // String with time component
-    if (typeof dateInput === 'string') {
-      const match = dateInput.match(/^(\d{4}-\d{2}-\d{2})/);
-      if (match) return match[1];
-    }
-    
-    // Convert to date and extract YYYY-MM-DD
     try {
-      const d = new Date(dateInput);
+      let d;
+      
+      // Already a Date object
+      if (dateInput instanceof Date) {
+        d = dateInput;
+      }
+      // String input
+      else if (typeof dateInput === 'string') {
+        // Pure YYYY-MM-DD string - add noon time to avoid timezone issues
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+          d = new Date(dateInput + 'T12:00:00');
+        } else {
+          d = new Date(dateInput);
+        }
+      }
+      // Numeric timestamp
+      else if (typeof dateInput === 'number') {
+        d = new Date(dateInput);
+      }
+      else {
+        return null;
+      }
+      
       if (isNaN(d.getTime())) return null;
-      return d.toISOString().split('T')[0];
+      
+      // Round to minute (zero out seconds and milliseconds)
+      d.setSeconds(0, 0);
+      
+      return d.toISOString();
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Extract date string for display (YYYY-MM-DD)
+   */
+  function extractDateForDisplay(isoTimestamp) {
+    if (!isoTimestamp) return '';
+    return isoTimestamp.split('T')[0];
   }
 
   /**
@@ -71,44 +95,44 @@ const ChartUtils = (function() {
     }
 
     // ═══════════════════════════════════════════════════════════════════════
-    // STEP 1: Build a Map keyed by normalized date string
-    // This GUARANTEES one price per day, eliminating duplicates
+    // STEP 1: Build a Map keyed by normalized timestamp (minute-level)
+    // This preserves intraday data while eliminating micro-duplicates
     // ═══════════════════════════════════════════════════════════════════════
     
-    const dateMap = new Map();
+    const timestampMap = new Map();
     
     for (const point of rawData) {
-      // Extract date
-      const dateStr = normalizeDate(point.date || point.time);
-      if (!dateStr) continue;
+      // Extract timestamp
+      const tsKey = normalizeTimestamp(point.date || point.time);
+      if (!tsKey) continue;
       
       // Extract price
       const price = parsePrice(point.close ?? point.price ?? point.y);
       if (price === null) continue;
       
-      // Store (last value wins for same date)
-      dateMap.set(dateStr, { date: dateStr, close: price });
+      // Store (last value wins for same timestamp)
+      timestampMap.set(tsKey, { timestamp: tsKey, close: price });
     }
 
-    if (dateMap.size === 0) {
+    if (timestampMap.size === 0) {
       console.warn('[ChartUtils] No valid data points after processing');
       return emptyResult();
     }
 
     // ═══════════════════════════════════════════════════════════════════════
-    // STEP 2: Sort by date string (lexicographic sort works for YYYY-MM-DD)
+    // STEP 2: Sort by timestamp (ISO strings sort lexicographically correctly)
     // ═══════════════════════════════════════════════════════════════════════
     
-    const sortedDates = Array.from(dateMap.keys()).sort();
+    const sortedTimestamps = Array.from(timestampMap.keys()).sort();
     
     // ═══════════════════════════════════════════════════════════════════════
     // STEP 3: Downsample if needed (simple bucket averaging)
     // ═══════════════════════════════════════════════════════════════════════
     
-    let finalDates = sortedDates;
+    let finalTimestamps = sortedTimestamps;
     
-    if (sortedDates.length > targetPoints) {
-      finalDates = downsampleDates(sortedDates, dateMap, targetPoints);
+    if (sortedTimestamps.length > targetPoints) {
+      finalTimestamps = downsampleTimestamps(sortedTimestamps, timestampMap, targetPoints);
     }
     
     // ═══════════════════════════════════════════════════════════════════════
@@ -118,11 +142,12 @@ const ChartUtils = (function() {
     const prices = [];
     const dateLabels = [];
     
-    for (const dateStr of finalDates) {
-      const point = dateMap.get(dateStr);
+    for (const ts of finalTimestamps) {
+      const point = timestampMap.get(ts);
       if (point) {
         prices.push(point.close);
-        dateLabels.push(dateStr);
+        // Store the display date (YYYY-MM-DD) for tooltips
+        dateLabels.push(extractDateForDisplay(ts));
       }
     }
     
@@ -150,41 +175,49 @@ const ChartUtils = (function() {
   }
 
   /**
-   * Downsample dates using min-max preservation within buckets
+   * Downsample timestamps using min-max preservation within buckets
+   * Works with ISO timestamp strings
    */
-  function downsampleDates(sortedDates, dateMap, targetPoints) {
-    const bucketSize = Math.ceil(sortedDates.length / targetPoints);
+  function downsampleTimestamps(sortedTimestamps, timestampMap, targetPoints) {
+    const bucketSize = Math.ceil(sortedTimestamps.length / targetPoints);
     const result = [];
     
-    for (let i = 0; i < sortedDates.length; i += bucketSize) {
-      const bucket = sortedDates.slice(i, i + bucketSize);
+    for (let i = 0; i < sortedTimestamps.length; i += bucketSize) {
+      const bucket = sortedTimestamps.slice(i, i + bucketSize);
       
       if (bucket.length === 1) {
         result.push(bucket[0]);
       } else {
         // Find min and max price points in bucket
-        let minDate = bucket[0], maxDate = bucket[0];
+        let minTs = bucket[0], maxTs = bucket[0];
         let minPrice = Infinity, maxPrice = -Infinity;
         
-        for (const d of bucket) {
-          const p = dateMap.get(d).close;
-          if (p < minPrice) { minPrice = p; minDate = d; }
-          if (p > maxPrice) { maxPrice = p; maxDate = d; }
+        for (const ts of bucket) {
+          const p = timestampMap.get(ts).close;
+          if (p < minPrice) { minPrice = p; minTs = ts; }
+          if (p > maxPrice) { maxPrice = p; maxTs = ts; }
         }
         
-        // Add in chronological order
-        if (minDate < maxDate) {
-          result.push(minDate, maxDate);
-        } else if (maxDate < minDate) {
-          result.push(maxDate, minDate);
+        // Add in chronological order (ISO strings sort correctly)
+        if (minTs < maxTs) {
+          result.push(minTs, maxTs);
+        } else if (maxTs < minTs) {
+          result.push(maxTs, minTs);
         } else {
-          result.push(minDate);
+          result.push(minTs);
         }
       }
     }
     
     // Ensure still sorted
     return result.sort();
+  }
+
+  /**
+   * Legacy alias for backward compatibility
+   */
+  function downsampleDates(sortedDates, dateMap, targetPoints) {
+    return downsampleTimestamps(sortedDates, dateMap, targetPoints);
   }
 
   /**

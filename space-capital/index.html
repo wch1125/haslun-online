@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPACE CAPITAL</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <!-- SVG favicon - no emoji -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%230A0A0F'/><text x='8' y='44' font-size='32' font-family='monospace' font-weight='bold' fill='%23FF2975'>SC</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
     /* ═══════════════════════════════════════════════════════════════════════════
@@ -438,7 +439,10 @@
       enterBtn.focus();
 
       // ─────────────────────────────────────────────────────────────────────────
-      // FLYING SHIPS BACKGROUND
+      // FLYING SHIPS BACKGROUND (Performance-optimized)
+      // - Respects prefers-reduced-motion
+      // - Caps to 4 ships on mobile
+      // - Uses static PNGs on mobile by default
       // ─────────────────────────────────────────────────────────────────────────
       
       const SHIP_GIFS = [
@@ -453,22 +457,55 @@
         'assets/ships/animated/gifs/GE_idle.gif',
         'assets/ships/animated/gifs/PL_idle.gif'
       ];
+      
+      const SHIP_PNGS = [
+        'assets/ships/static/RKLB.png',
+        'assets/ships/static/LUNR.png',
+        'assets/ships/static/ACHR.png',
+        'assets/ships/static/ASTS.png',
+        'assets/ships/static/JOBY.png',
+        'assets/ships/static/BKSY.png',
+        'assets/ships/static/GME.png',
+        'assets/ships/static/KTOS.png',
+        'assets/ships/static/GE.png',
+        'assets/ships/static/PL.png'
+      ];
 
       const shipsBg = document.getElementById('shipsBg');
       
-      // Create flying ship elements
-      SHIP_GIFS.forEach((src, i) => {
-        const img = document.createElement('img');
-        img.className = 'flying-ship';
-        img.src = src;
-        img.alt = '';
-        img.loading = 'lazy';
-        img.onerror = () => {
-          // Fallback to static image if GIF not found
-          img.src = 'assets/ships/static/Unclaimed-Drone-ship.png';
-        };
-        shipsBg.appendChild(img);
-      });
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      // Check if mobile (< 768px)
+      const isMobile = window.innerWidth < 768;
+      
+      // Disable ships entirely if reduced motion is preferred
+      if (prefersReducedMotion) {
+        console.log('[Landing] Reduced motion preferred, skipping flying ships');
+      } else {
+        // Cap ships on mobile (4), full set on desktop (10)
+        const maxShips = isMobile ? 4 : 10;
+        // Use static PNGs on mobile, GIFs on desktop
+        const usePNGs = isMobile;
+        
+        const shipsToUse = usePNGs ? SHIP_PNGS : SHIP_GIFS;
+        
+        // Create flying ship elements
+        for (let i = 0; i < maxShips; i++) {
+          const img = document.createElement('img');
+          img.className = 'flying-ship';
+          img.src = shipsToUse[i];
+          img.alt = '';
+          img.loading = 'lazy';
+          img.onerror = () => {
+            // Fallback to static drone image if not found
+            img.src = 'assets/ships/static/Unclaimed-Drone-ship.png';
+          };
+          shipsBg.appendChild(img);
+        }
+        
+        console.log(`[Landing] Loaded ${maxShips} ships (${usePNGs ? 'static' : 'animated'})`);
+      }
     })();
   </script>
 </body>

@@ -4,18 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPACE CAPITAL // FLEET COMMAND</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <!-- SVG favicon - no emoji -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%230A0A0F'/><text x='8' y='44' font-size='32' font-family='monospace' font-weight='bold' fill='%23FF2975'>SC</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <!-- Shared theme variables -->
-  <link rel="stylesheet" href="../css/theme.css">
+  <!-- Shared theme variables (cache-bust) -->
+  <link rel="stylesheet" href="../css/theme.css?v=20260108">
   <!-- Canonical CRT App Shell (ONE consistent overlay for all pages) -->
-  <link rel="stylesheet" href="../css/crt-shell.css">
+  <link rel="stylesheet" href="../css/crt-shell.css?v=20260108">
   <!-- UI Overhaul - Pixel discipline, semantic CRT, visual tiers -->
-  <link rel="stylesheet" href="../css/ui-overhaul.css">
+  <link rel="stylesheet" href="../css/ui-overhaul.css?v=20260108">
   <!-- Ship behavior states (thrust, volatility, hull effects) -->
-  <link rel="stylesheet" href="../css/ship-states.css">
+  <link rel="stylesheet" href="../css/ship-states.css?v=20260108">
   <!-- Module viewer overlay -->
-  <link rel="stylesheet" href="../css/module-viewer.css">
+  <link rel="stylesheet" href="../css/module-viewer.css?v=20260108">
   <style>
     /* =========================================================================
        HOTLINE MIAMI AESTHETIC - SPACE CAPITAL
@@ -1571,34 +1572,34 @@
     // Ticker metadata - themes, colors, ship classes
     const TICKER_CONFIG = {
       // Space & Satellites
-      'RKLB': { theme: 'Space', icon: '🚀', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
-      'LUNR': { theme: 'Space', icon: '🌙', color: '#9D4EDD', class: 'EXPLORER', sin: 'FAITH' },
-      'ASTS': { theme: 'Space', icon: '📡', color: '#00FFFF', class: 'CRUISER', sin: 'AMBITION' },
-      'BKSY': { theme: 'Space', icon: '🛰️', color: '#FF69B4', class: 'SCOUT', sin: 'VIGILANCE' },
-      'RDW': { theme: 'Space', icon: '⚙️', color: '#00CCCC', class: 'ENGINEER', sin: 'CRAFT' },
-      'PL': { theme: 'Space', icon: '🌍', color: '#B8986B', class: 'SURVEYOR', sin: 'WISDOM' },
+      'RKLB': { theme: 'Space', icon: 'RK', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
+      'LUNR': { theme: 'Space', icon: 'LN', color: '#9D4EDD', class: 'EXPLORER', sin: 'FAITH' },
+      'ASTS': { theme: 'Space', icon: 'AS', color: '#00FFFF', class: 'CRUISER', sin: 'AMBITION' },
+      'BKSY': { theme: 'Space', icon: 'BK', color: '#FF69B4', class: 'SCOUT', sin: 'VIGILANCE' },
+      'RDW': { theme: 'Space', icon: 'RD', color: '#00CCCC', class: 'ENGINEER', sin: 'CRAFT' },
+      'PL': { theme: 'Space', icon: 'PL', color: '#B8986B', class: 'SURVEYOR', sin: 'WISDOM' },
       
       // Air Mobility / eVTOL
-      'ACHR': { theme: 'Air Mobility', icon: '🛸', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
-      'JOBY': { theme: 'Air Mobility', icon: '🚁', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
-      'EVEX': { theme: 'Air Mobility', icon: '✈️', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' },
+      'ACHR': { theme: 'Air Mobility', icon: 'AC', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
+      'JOBY': { theme: 'Air Mobility', icon: 'JB', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
+      'EVEX': { theme: 'Air Mobility', icon: 'EV', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' },
       
       // Defense & Aerospace
-      'KTOS': { theme: 'Defense', icon: '🎯', color: '#FF4444', class: 'FIGHTER', sin: 'PRECISION' },
-      'LHX': { theme: 'Defense', icon: '🛡️', color: '#4488FF', class: 'SENTINEL', sin: 'DUTY' },
-      'RTX': { theme: 'Defense', icon: '🔧', color: '#888888', class: 'CARRIER', sin: 'POWER' },
-      'GE': { theme: 'Defense', icon: '⚡', color: '#44AAFF', class: 'TITAN', sin: 'LEGACY' },
+      'KTOS': { theme: 'Defense', icon: 'KT', color: '#FF4444', class: 'FIGHTER', sin: 'PRECISION' },
+      'LHX': { theme: 'Defense', icon: 'LX', color: '#4488FF', class: 'SENTINEL', sin: 'DUTY' },
+      'RTX': { theme: 'Defense', icon: 'RX', color: '#888888', class: 'CARRIER', sin: 'POWER' },
+      'GE': { theme: 'Defense', icon: 'GE', color: '#44AAFF', class: 'TITAN', sin: 'LEGACY' },
       
       // Tech & Other
-      'COHR': { theme: 'Tech', icon: '💎', color: '#AA44FF', class: 'PHANTOM', sin: 'CLARITY' },
-      'GME': { theme: 'Meme', icon: '🎮', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
+      'COHR': { theme: 'Tech', icon: 'CH', color: '#AA44FF', class: 'PHANTOM', sin: 'CLARITY' },
+      'GME': { theme: 'Meme', icon: 'GM', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
       
       // Benchmarks
-      'XAR': { theme: 'Benchmark', icon: '📊', color: '#666677', class: 'FLAGSHIP', sin: 'INDEX' },
-      'SPY': { theme: 'Benchmark', icon: '📈', color: '#4466AA', class: 'COMMAND', sin: 'MARKET' }
+      'XAR': { theme: 'Benchmark', icon: 'XR', color: '#666677', class: 'FLAGSHIP', sin: 'INDEX' },
+      'SPY': { theme: 'Benchmark', icon: 'SP', color: '#4466AA', class: 'COMMAND', sin: 'MARKET' }
     };
 
-    const DEFAULT_CONFIG = { theme: 'Other', icon: '📊', color: '#888899', class: 'UNKNOWN', sin: 'MYSTERY' };
+    const DEFAULT_CONFIG = { theme: 'Other', icon: 'XX', color: '#888899', class: 'UNKNOWN', sin: 'MYSTERY' };
 
     // Ship SVG generator based on class type
     function generateShipSVG(shipClass, color) {
@@ -2814,36 +2815,40 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       BUILD: 2026-01-08 v2 — Store coherence + Chart fix + Cache-bust
+       ═══════════════════════════════════════════════════════════════════════ -->
+
   <!-- UI Overhaul Modules -->
   <!-- Core State Store -->
-  <script src="../js/core/store.js"></script>
+  <script src="../js/core/store.js?v=20260108"></script>
   
-  <script src="../js/ui/visual-tiers.js"></script>
-  <script src="../js/ui/telemetry-lockin.js"></script>
+  <script src="../js/ui/visual-tiers.js?v=20260108"></script>
+  <script src="../js/ui/telemetry-lockin.js?v=20260108"></script>
 
   <!-- Chart.js for MACD mini-charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <!-- Chart Utilities - Robust data processing -->
-  <script src="../js/data/chart-utils.js"></script>
+  <script src="../js/data/chart-utils.js?v=20260108"></script>
   
   <!-- Indicator Loader - CSV data access -->
-  <script src="../js/data/indicator-loader.js"></script>
+  <script src="../js/data/indicator-loader.js?v=20260108"></script>
 
   <!-- Ship Behavior Engine - State machine for reactive sprites -->
-  <script src="../js/ships/ship-behavior.js"></script>
+  <script src="../js/ships/ship-behavior.js?v=20260108"></script>
 
   <!-- Player Manager - Pilot profiles -->
-  <script src="../js/data/player-manager.js"></script>
+  <script src="../js/data/player-manager.js?v=20260108"></script>
 
   <!-- Position Manager - P&L and cost basis data -->
-  <script src="../js/data/position-manager.js"></script>
-  <script src="../js/ui/position-manager-ui.js"></script>
+  <script src="../js/data/position-manager.js?v=20260108"></script>
+  <script src="../js/ui/position-manager-ui.js?v=20260108"></script>
 
   <!-- Ship Animator - Telemetry-driven sprite animations -->
-  <script src="../js/ui/ship-animator.js"></script>
+  <script src="../js/ui/ship-animator.js?v=20260108"></script>
 
   <!-- Module Viewer Script -->
-  <script src="../js/ui/module-viewer.js"></script>
+  <script src="../js/ui/module-viewer.js?v=20260108"></script>
 </body>
 </html>

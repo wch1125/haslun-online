@@ -4,15 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPACE CAPITAL // Derivatives Console</title>
+  <!-- SVG favicon - no emoji -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%230A0A0F'/><text x='8' y='44' font-size='32' font-family='monospace' font-weight='bold' fill='%23FF2975'>SC</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
-  <!-- Shared theme variables -->
-  <link rel="stylesheet" href="../css/theme.css">
+  <!-- Shared theme variables (cache-bust) -->
+  <link rel="stylesheet" href="../css/theme.css?v=20260108">
   <!-- Canonical CRT App Shell -->
-  <link rel="stylesheet" href="../css/crt-shell.css">
+  <link rel="stylesheet" href="../css/crt-shell.css?v=20260108">
   <!-- UI Overhaul - Pixel discipline, semantic CRT, visual tiers -->
-  <link rel="stylesheet" href="../css/ui-overhaul.css">
+  <link rel="stylesheet" href="../css/ui-overhaul.css?v=20260108">
   <!-- Ship Brief dialog styles (isolated for modularity) -->
-  <link rel="stylesheet" href="../css/ship-brief.css">
+  <link rel="stylesheet" href="../css/ship-brief.css?v=20260108">
   <style>
     :root {
       --bg-dark: #0a0e14;
@@ -1246,30 +1248,34 @@
     </div>
   </div>
   
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       BUILD: 2026-01-08 v2 — Store coherence + Ship panel + Cache-bust
+       ═══════════════════════════════════════════════════════════════════════ -->
+  
   <!-- Scripts -->
   <!-- Step 8: Progression Architecture (must load early) -->
-  <script src="../js/core/constants.js"></script>
-  <script src="../js/core/bus.js"></script>
-  <script src="../js/core/store.js"></script>
-  <script src="../js/state/upgrades.js"></script>
-  <script src="../js/state/progression.js"></script>
+  <script src="../js/core/constants.js?v=20260108"></script>
+  <script src="../js/core/bus.js?v=20260108"></script>
+  <script src="../js/core/store.js?v=20260108"></script>
+  <script src="../js/state/upgrades.js?v=20260108"></script>
+  <script src="../js/state/progression.js?v=20260108"></script>
   
   <!-- Data modules for Ship Brief dialog -->
-  <script src="../js/data/ticker-profiles.js"></script>
-  <script src="../js/data/ship-data.js"></script>
-  <script src="../js/data/indicator-loader.js"></script>
+  <script src="../js/data/ticker-profiles.js?v=20260108"></script>
+  <script src="../js/data/ship-data.js?v=20260108"></script>
+  <script src="../js/data/indicator-loader.js?v=20260108"></script>
   
   <!-- Unified Ship Brief Dialog -->
-  <script src="../js/ui/shipBrief.js"></script>
+  <script src="../js/ui/shipBrief.js?v=20260108"></script>
   
   <!-- Context Focus (Page-Behind Awareness) -->
-  <script src="../js/ui/contextFocus.js"></script>
+  <script src="../js/ui/contextFocus.js?v=20260108"></script>
   
   <!-- Pixel Icons (emoji replacement) -->
-  <script src="../js/data/pixel-icons.js"></script>
+  <script src="../js/data/pixel-icons.js?v=20260108"></script>
   
   <!-- Mission System -->
-  <script src="../js/mission-system.js"></script>
+  <script src="../js/mission-system.js?v=20260108"></script>
   <script>
     // ═══════════════════════════════════════════════════════════════════
     // MISSION COMMAND UI (Step 2 + Step 3: Fleet Support)
@@ -1374,7 +1380,7 @@
         if (!panel) return;
         
         const ticker = window.Store?.get('activeTicker');
-        const activeShip = window.Store?.get('activeShip');
+        let activeShip = window.Store?.get('activeShip');
         const activeMission = window.Store?.get('activeMission');
         
         if (!ticker) {
@@ -1387,6 +1393,30 @@
           statusEl.textContent = 'IDLE';
           statusEl.classList.remove('active');
           return;
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════
+        // FIX 5: Reconstruct ship data from ticker if activeShip is null
+        // This prevents "phantom empty panel" on page navigation
+        // ═══════════════════════════════════════════════════════════════════
+        if (!activeShip && ticker) {
+          // Try to reconstruct from TickerProfiles
+          const profile = window.TickerProfiles?.[ticker];
+          // Try to reconstruct from ShipData
+          const shipData = window.ShipData?.ships?.find(s => s.ticker === ticker);
+          
+          if (profile || shipData) {
+            activeShip = {
+              ticker: ticker,
+              name: profile?.name || shipData?.name || `Ship ${ticker}`,
+              theme: profile?.theme || shipData?.theme || 'Space',
+              sin: profile?.sin || shipData?.sin || 'MYSTERY',
+              trend: shipData?.trend || 0,
+              volatility: shipData?.volatility || null,
+              change: shipData?.change || 0
+            };
+            console.log('[Derivatives] Reconstructed ship from profiles:', ticker);
+          }
         }
         
         panel.classList.remove('no-ship');

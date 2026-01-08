@@ -269,6 +269,74 @@ const IndicatorLoader = (function() {
     };
   }
   
+  // ═══════════════════════════════════════════════════════════════════════
+  // RESILIENT LOADING — Graceful degradation for lite builds
+  // Returns {ok:false, reason:string} instead of throwing
+  // ═══════════════════════════════════════════════════════════════════════
+  
+  /**
+   * Safely load ticker data - returns {ok:false} on failure instead of throwing
+   * @param {string} ticker 
+   * @returns {Promise<{ok:boolean, data?:object, reason?:string}>}
+   */
+  async function safeLoadTicker(ticker) {
+    try {
+      const data = await loadTicker(ticker);
+      return { ok: true, data };
+    } catch (err) {
+      console.warn(`[IndicatorLoader] Safe load failed for ${ticker}:`, err.message);
+      return { ok: false, reason: err.message || 'Unknown error' };
+    }
+  }
+  
+  /**
+   * Safely get recent bars - returns {ok:false} on failure
+   * @param {string} ticker 
+   * @param {number} n - Number of bars
+   * @returns {Promise<{ok:boolean, bars?:array, reason?:string}>}
+   */
+  async function safeGetRecentBars(ticker, n = 32) {
+    try {
+      const bars = await getRecentBars(ticker, n);
+      return { ok: true, bars };
+    } catch (err) {
+      console.warn(`[IndicatorLoader] Safe bars failed for ${ticker}:`, err.message);
+      return { ok: false, reason: err.message || 'Unknown error' };
+    }
+  }
+  
+  /**
+   * Safely load MACD data for a ticker
+   * @param {string} ticker
+   * @param {number} n - Number of recent bars
+   * @returns {Promise<{ok:boolean, macd?:array, reason?:string}>}
+   */
+  async function safeGetMACD(ticker, n = 32) {
+    try {
+      const result = await safeGetRecentBars(ticker, n);
+      if (!result.ok) {
+        return { ok: false, reason: result.reason || 'Data unavailable' };
+      }
+      
+      // Extract MACD fields
+      const macd = result.bars.map(bar => ({
+        time: bar.time,
+        macd: bar.macd,
+        signal: bar.signalLine,
+        histogram: bar.histogram
+      })).filter(b => b.macd !== null && b.macd !== undefined);
+      
+      if (macd.length === 0) {
+        return { ok: false, reason: 'No MACD data in response' };
+      }
+      
+      return { ok: true, macd };
+    } catch (err) {
+      console.warn(`[IndicatorLoader] Safe MACD failed for ${ticker}:`, err.message);
+      return { ok: false, reason: 'MACD unavailable in lite build' };
+    }
+  }
+  
   // Public API
   return {
     loadManifest,
@@ -277,7 +345,11 @@ const IndicatorLoader = (function() {
     getRecentBars,
     getLatestBar,
     clearCache,
-    getMetadata
+    getMetadata,
+    // Resilient loaders
+    safeLoadTicker,
+    safeGetRecentBars,
+    safeGetMACD
   };
   
 })();
