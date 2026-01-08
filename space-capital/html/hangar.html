@@ -835,23 +835,23 @@
       let loadToken = 0; // Race condition guard
 
       const TICKER_CONFIG = {
-        'RKLB': { theme: 'Space', icon: '🚀', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
-        'LUNR': { theme: 'Space', icon: '🌙', color: '#9D4EDD', class: 'EXPLORER', sin: 'FAITH' },
-        'ASTS': { theme: 'Space', icon: '📡', color: '#00FFFF', class: 'CRUISER', sin: 'AMBITION' },
-        'BKSY': { theme: 'Space', icon: '🛰️', color: '#FF69B4', class: 'SCOUT', sin: 'VIGILANCE' },
-        'RDW': { theme: 'Space', icon: '⚙️', color: '#00CCCC', class: 'ENGINEER', sin: 'CRAFT' },
-        'PL': { theme: 'Space', icon: '🌍', color: '#B8986B', class: 'SURVEYOR', sin: 'WISDOM' },
-        'ACHR': { theme: 'Air Mobility', icon: '🛸', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
-        'JOBY': { theme: 'Air Mobility', icon: '🚁', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
-        'EVEX': { theme: 'Air Mobility', icon: '✈️', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' },
-        'KTOS': { theme: 'Defense', icon: '🎯', color: '#FF4444', class: 'FIGHTER', sin: 'PRECISION' },
-        'LHX': { theme: 'Defense', icon: '🛡️', color: '#4488FF', class: 'SENTINEL', sin: 'DUTY' },
-        'RTX': { theme: 'Defense', icon: '🔧', color: '#888888', class: 'CARRIER', sin: 'POWER' },
-        'GE': { theme: 'Defense', icon: '⚡', color: '#44AAFF', class: 'TITAN', sin: 'LEGACY' },
-        'COHR': { theme: 'Tech', icon: '💎', color: '#AA44FF', class: 'PHANTOM', sin: 'CLARITY' },
-        'GME': { theme: 'Meme', icon: '🎮', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
-        'XAR': { theme: 'Benchmark', icon: '📊', color: '#666677', class: 'FLAGSHIP', sin: 'INDEX' },
-        'SPY': { theme: 'Benchmark', icon: '📈', color: '#4466AA', class: 'COMMAND', sin: 'MARKET' }
+        'RKLB': { theme: 'Space', icon: 'RK', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
+        'LUNR': { theme: 'Space', icon: 'LN', color: '#9D4EDD', class: 'EXPLORER', sin: 'FAITH' },
+        'ASTS': { theme: 'Space', icon: 'AS', color: '#00FFFF', class: 'CRUISER', sin: 'AMBITION' },
+        'BKSY': { theme: 'Space', icon: 'BK', color: '#FF69B4', class: 'SCOUT', sin: 'VIGILANCE' },
+        'RDW': { theme: 'Space', icon: 'RD', color: '#00CCCC', class: 'ENGINEER', sin: 'CRAFT' },
+        'PL': { theme: 'Space', icon: 'PL', color: '#B8986B', class: 'SURVEYOR', sin: 'WISDOM' },
+        'ACHR': { theme: 'Air Mobility', icon: 'AC', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
+        'JOBY': { theme: 'Air Mobility', icon: 'JB', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
+        'EVEX': { theme: 'Air Mobility', icon: 'EV', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' },
+        'KTOS': { theme: 'Defense', icon: 'KT', color: '#FF4444', class: 'FIGHTER', sin: 'PRECISION' },
+        'LHX': { theme: 'Defense', icon: 'LX', color: '#4488FF', class: 'SENTINEL', sin: 'DUTY' },
+        'RTX': { theme: 'Defense', icon: 'RX', color: '#888888', class: 'CARRIER', sin: 'POWER' },
+        'GE': { theme: 'Defense', icon: 'GE', color: '#44AAFF', class: 'TITAN', sin: 'LEGACY' },
+        'COHR': { theme: 'Tech', icon: 'CH', color: '#AA44FF', class: 'PHANTOM', sin: 'CLARITY' },
+        'GME': { theme: 'Meme', icon: 'GM', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
+        'XAR': { theme: 'Benchmark', icon: 'XR', color: '#666677', class: 'FLAGSHIP', sin: 'INDEX' },
+        'SPY': { theme: 'Benchmark', icon: 'SP', color: '#4466AA', class: 'COMMAND', sin: 'MARKET' }
       };
 
       // ═══════════════════════════════════════════════════════════════════════════
@@ -989,18 +989,18 @@
           <!-- Navigation Tabs -->
           <nav class="hangar-tabs">
             <button class="hangar-tab active" data-tab="systems">
-              <span class="tab-icon">📡</span> SYSTEMS
+              <span class="tab-icon">::</span> SYSTEMS
             </button>
             <button class="hangar-tab" data-tab="flightlog">
-              <span class="tab-icon">📋</span> FLIGHT LOG
+              <span class="tab-icon">//</span> FLIGHT LOG
               <span class="tab-badge" id="logCount">0</span>
             </button>
             <button class="hangar-tab" data-tab="loadout">
-              <span class="tab-icon">⚙️</span> LOADOUT
+              <span class="tab-icon">++</span> LOADOUT
               <span class="tab-badge" id="optionsCount">0</span>
             </button>
             <button class="hangar-tab" data-tab="deploy">
-              <span class="tab-icon">🚀</span> DEPLOY
+              <span class="tab-icon">>></span> DEPLOY
             </button>
           </nav>
 

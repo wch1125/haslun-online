@@ -1950,7 +1950,7 @@
           'ESCORT': 'Γ',        // Gamma
           'RECON': '◎',         // Target
           'SIEGE': 'Θ',         // Theta
-          'INTERCEPT': '⚡',    // Speed
+          'INTERCEPT': '»',     // Speed
           'PATROL': '∿'         // Wave
         };
         
@@ -2443,7 +2443,7 @@
             
             html += `
               <div class="fleet-ship ${isLocked ? 'locked' : ''}" data-ticker="${ship.ticker}" onclick="UI.handleShipClick('${ship.ticker}')">
-                ${isLocked ? `<div class="fleet-ship-lock">🔒</div>` : ''}
+                ${isLocked ? `<div class="fleet-ship-lock">[X]</div>` : ''}
                 <div class="fleet-ship-ticker">${ship.ticker}</div>
                 <div class="fleet-ship-name">${ship.name}</div>
                 <div class="fleet-ship-role ${ship.role}">${roleInfo.icon} ${ship.role}</div>

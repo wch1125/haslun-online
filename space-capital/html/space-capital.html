@@ -1618,16 +1618,254 @@
     /* =========================================================================
        RESPONSIVE
        ========================================================================= */
+    /* =========================================================================
+       MOBILE BURGER MENU - Hotline Miami Style
+       "Command terminal - restricted access"
+       ========================================================================= */
+    
+    /* Burger button - hidden on desktop, visible on mobile */
+    .burger-btn {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      border: 2px solid var(--hm-magenta);
+      cursor: pointer;
+      position: relative;
+      z-index: 1001;
+      padding: 0;
+    }
+    
+    .burger-btn:hover {
+      background: rgba(255, 41, 117, 0.1);
+      box-shadow: 0 0 15px rgba(255, 41, 117, 0.4);
+    }
+    
+    .burger-btn:active {
+      transform: scale(0.95);
+    }
+    
+    /* Three-line hamburger icon */
+    .burger-line {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--hm-magenta);
+      transition: all 0.2s steps(4);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .burger-line:nth-child(1) { top: 12px; }
+    .burger-line:nth-child(2) { top: 20px; }
+    .burger-line:nth-child(3) { top: 28px; }
+    
+    /* X transformation when menu is open */
+    .burger-btn.active .burger-line:nth-child(1) {
+      top: 20px;
+      transform: translateX(-50%) rotate(45deg);
+    }
+    
+    .burger-btn.active .burger-line:nth-child(2) {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    
+    .burger-btn.active .burger-line:nth-child(3) {
+      top: 20px;
+      transform: translateX(-50%) rotate(-45deg);
+    }
+    
+    /* Mobile Nav Overlay */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 280px;
+      height: 100vh;
+      background: var(--bg-panel);
+      border-left: 3px solid var(--hm-magenta);
+      z-index: 1000;
+      transition: right 0.3s steps(8);
+      overflow-y: auto;
+      flex-direction: column;
+    }
+    
+    /* VHS damage overlay on mobile nav */
+    .mobile-nav::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(255, 41, 117, 0.02) 2px,
+          rgba(255, 41, 117, 0.02) 4px
+        );
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* Glow effect on left border */
+    .mobile-nav::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -3px;
+      width: 3px;
+      height: 100%;
+      background: var(--hm-magenta);
+      box-shadow: 
+        0 0 20px var(--hm-magenta),
+        0 0 40px rgba(255, 41, 117, 0.5);
+    }
+    
+    .mobile-nav.open {
+      right: 0;
+    }
+    
+    /* Mobile nav header */
+    .mobile-nav-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .mobile-nav-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--hm-cyan);
+      text-transform: uppercase;
+    }
+    
+    /* Mobile nav items */
+    .mobile-nav-items {
+      padding: 0.5rem 0;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .mobile-nav-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem 1.5rem;
+      font-family: var(--font-main);
+      font-size: 1.25rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-dim);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.1s;
+      position: relative;
+    }
+    
+    .mobile-nav-btn::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: transparent;
+      transition: background 0.1s;
+    }
+    
+    .mobile-nav-btn:hover,
+    .mobile-nav-btn:focus {
+      background: rgba(255, 41, 117, 0.1);
+      color: var(--hm-magenta);
+    }
+    
+    .mobile-nav-btn:hover::before,
+    .mobile-nav-btn:focus::before {
+      background: var(--hm-magenta);
+    }
+    
+    /* Status section in mobile nav */
+    .mobile-nav-status {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border-dim);
+      margin-top: auto;
+    }
+    
+    .mobile-nav-status-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      font-size: 0.875rem;
+      color: var(--text-dim);
+    }
+    
+    .mobile-nav-status-value {
+      color: var(--hm-cyan);
+    }
+    
+    /* Backdrop overlay */
+    .mobile-nav-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .mobile-nav-backdrop.visible {
+      display: block;
+      opacity: 1;
+    }
+
     @media (max-width: 768px) {
+      /* Show burger, hide desktop nav items */
+      .burger-btn {
+        display: flex;
+      }
+      
+      .mobile-nav {
+        display: flex;
+      }
+      
       .header {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+      }
+      
+      .header-brand {
+        gap: 0.5rem;
+      }
+      
+      .header-logo {
+        font-size: 1.5rem;
+      }
+      
+      .header-title {
+        font-size: 1.25rem;
+      }
+      
+      .header-subtitle {
+        display: none;
       }
 
+      /* Hide desktop nav elements on mobile */
       .header-status {
-        flex-wrap: wrap;
-        justify-content: center;
+        display: none;
       }
 
       .main-content {
@@ -1640,6 +1878,17 @@
 
       .stats-grid {
         grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .mobile-nav {
+        width: 100%;
+        right: -100%;
+      }
+      
+      .header-title {
+        font-size: 1rem;
       }
     }
 
@@ -1958,7 +2207,7 @@
         </button>
         <button id="openHangarBtn" class="moduleViewer__trigger">HANGAR</button>
         <button id="openDerivativesBtn" class="moduleViewer__trigger">DERIVATIVES</button>
-        <button id="openRegistryBtn" class="moduleViewer__trigger" style="color: var(--hm-cyan);">▤ REGISTRY</button>
+        <button id="openRegistryBtn" class="moduleViewer__trigger" style="color: var(--hm-cyan);">:: REGISTRY</button>
         <button id="openPositionsBtn" class="moduleViewer__trigger">POSITIONS</button>
         <button id="openModulesBtn" class="moduleViewer__trigger">MODULES</button>
         <div class="status-item">
@@ -1974,7 +2223,43 @@
           <span id="last-update" style="color: var(--cyan);">--:--:--</span>
         </div>
       </div>
+      <!-- Mobile Burger Menu Button -->
+      <button class="burger-btn" id="burgerBtn" aria-label="Open navigation menu" aria-expanded="false">
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+      </button>
     </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
+    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
+      <div class="mobile-nav-header">
+        <span class="mobile-nav-title">// COMMAND MENU</span>
+      </div>
+      <div class="mobile-nav-items">
+        <button class="mobile-nav-btn" data-action="pilot">PILOT</button>
+        <button class="mobile-nav-btn" data-action="hangar">HANGAR</button>
+        <button class="mobile-nav-btn" data-action="derivatives">DERIVATIVES</button>
+        <button class="mobile-nav-btn" data-action="registry">REGISTRY</button>
+        <button class="mobile-nav-btn" data-action="positions">POSITIONS</button>
+        <button class="mobile-nav-btn" data-action="modules">MODULES</button>
+      </div>
+      <div class="mobile-nav-status">
+        <div class="mobile-nav-status-item">
+          <span>SYSTEMS</span>
+          <span class="mobile-nav-status-value" id="mobileSystemStatus">ONLINE</span>
+        </div>
+        <div class="mobile-nav-status-item">
+          <span>MARKET</span>
+          <span class="mobile-nav-status-value" id="mobileMarketStatus">CLOSED</span>
+        </div>
+        <div class="mobile-nav-status-item">
+          <span>LAST SYNC</span>
+          <span class="mobile-nav-status-value" id="mobileLastUpdate">--:--:--</span>
+        </div>
+      </div>
+    </nav>
 
     <main class="main-content">
       <!-- Fleet Hangar -->
@@ -2090,6 +2375,95 @@
   </div>
 
   <script>
+    // =========================================================================
+    // MOBILE BURGER MENU - Command Terminal Access
+    // =========================================================================
+    
+    (function initBurgerMenu() {
+      const burgerBtn = document.getElementById('burgerBtn');
+      const mobileNav = document.getElementById('mobileNav');
+      const backdrop = document.getElementById('mobileNavBackdrop');
+      
+      if (!burgerBtn || !mobileNav || !backdrop) return;
+      
+      function openMenu() {
+        burgerBtn.classList.add('active');
+        burgerBtn.setAttribute('aria-expanded', 'true');
+        mobileNav.classList.add('open');
+        backdrop.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+      }
+      
+      function closeMenu() {
+        burgerBtn.classList.remove('active');
+        burgerBtn.setAttribute('aria-expanded', 'false');
+        mobileNav.classList.remove('open');
+        backdrop.classList.remove('visible');
+        document.body.style.overflow = '';
+      }
+      
+      function toggleMenu() {
+        if (mobileNav.classList.contains('open')) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      }
+      
+      // Burger button click
+      burgerBtn.addEventListener('click', toggleMenu);
+      
+      // Backdrop click closes menu
+      backdrop.addEventListener('click', closeMenu);
+      
+      // ESC key closes menu
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileNav.classList.contains('open')) {
+          closeMenu();
+        }
+      });
+      
+      // Mobile nav button actions
+      const actionMap = {
+        'pilot': () => document.getElementById('pilotBtn')?.click(),
+        'hangar': () => document.getElementById('openHangarBtn')?.click(),
+        'derivatives': () => document.getElementById('openDerivativesBtn')?.click(),
+        'registry': () => document.getElementById('openRegistryBtn')?.click(),
+        'positions': () => document.getElementById('openPositionsBtn')?.click(),
+        'modules': () => document.getElementById('openModulesBtn')?.click()
+      };
+      
+      mobileNav.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.dataset.action;
+          if (actionMap[action]) {
+            closeMenu();
+            // Small delay to allow menu close animation
+            setTimeout(() => actionMap[action](), 100);
+          }
+        });
+      });
+      
+      // Sync mobile status with desktop status
+      function syncMobileStatus() {
+        const marketText = document.getElementById('market-status-text');
+        const lastUpdate = document.getElementById('last-update');
+        const mobileMarket = document.getElementById('mobileMarketStatus');
+        const mobileLast = document.getElementById('mobileLastUpdate');
+        
+        if (marketText && mobileMarket) {
+          mobileMarket.textContent = marketText.textContent.replace('MARKET ', '');
+        }
+        if (lastUpdate && mobileLast) {
+          mobileLast.textContent = lastUpdate.textContent;
+        }
+      }
+      
+      // Sync status periodically
+      setInterval(syncMobileStatus, 5000);
+      syncMobileStatus();
+    })();
+
     // =========================================================================
     // DATA & CONFIGURATION
     // =========================================================================
@@ -3336,7 +3710,7 @@
         const response = await fetch(DATA_PATHS.stats);
         if (response.ok) {
           const data = await response.json();
-          console.log('✓ Loaded historical stats:', Object.keys(data.stats || {}).length, 'tickers');
+          console.log('[OK] Loaded historical stats:', Object.keys(data.stats || {}).length, 'tickers');
           return data.stats || {};
         }
       } catch (e) {
@@ -3351,7 +3725,7 @@
         const response = await fetch(DATA_PATHS.fleet);
         if (response.ok) {
           const data = await response.json();
-          console.log('✓ Loaded fleet telemetry:', data.ships?.length, 'ships');
+          console.log('[OK] Loaded fleet telemetry:', data.ships?.length, 'ships');
           return data;
         }
       } catch (e) {
@@ -3366,7 +3740,7 @@
         const response = await fetch(DATA_PATHS.positions);
         if (response.ok) {
           const data = await response.json();
-          console.log('✓ Loaded positions:', data.positions?.length);
+          console.log('[OK] Loaded positions:', data.positions?.length);
           return data;
         }
       } catch (e) {
@@ -3624,7 +3998,7 @@
       <div class="moduleViewer__bar">
         <div class="moduleViewer__title">MODULE VIEWER</div>
         <select id="moduleViewerSelect" class="moduleViewer__select" aria-label="Choose module"></select>
-        <button id="moduleViewerClose" class="moduleViewer__btn moduleViewer__btn--close">✕ CLOSE</button>
+        <button id="moduleViewerClose" class="moduleViewer__btn moduleViewer__btn--close">[X] CLOSE</button>
       </div>
       <iframe id="moduleViewerFrame" class="moduleViewer__frame" title="Module content"></iframe>
     </div>
@@ -3681,11 +4055,11 @@
     <div class="registry-terminal">
       <div class="registry-header">
         <div class="registry-title">
-          <span class="registry-title-icon">▤</span>
+          <span class="registry-title-icon">::</span>
           VESSEL REGISTRY // SPACE CAPITAL FLEET DATABASE
         </div>
         <div class="registry-meta">v2.1.4 // SECTOR ALPHA</div>
-        <button class="registry-close" id="registryClose" title="Close (ESC)">×</button>
+        <button class="registry-close" id="registryClose" title="Close (ESC)">[X]</button>
       </div>
       <div class="registry-toolbar">
         <div class="registry-toolbar-item">VESSELS: <span class="registry-toolbar-value" id="registryCount">--</span></div>
