@@ -505,7 +505,7 @@
       </div>
       <div class="header-nav" style="display: flex; gap: 0.5rem;">
         <button class="back-btn" onclick="window.location.href='space-capital.html'">FLEET</button>
-        <button class="back-btn" onclick="window.location.href='ship-select.html'">HANGAR</button>
+        <button class="back-btn" onclick="navigateBack()">◀ HANGAR</button>
         <button class="back-btn" onclick="window.location.href='derivatives.html'">MISSIONS</button>
       </div>
     </header>
@@ -1272,9 +1272,19 @@
           <div class="no-data-icon" style="font-size: 3rem; color: var(--magenta);">?</div>
           <h2>SHIP NOT FOUND</h2>
           <p>No telemetry data available for this vessel.</p>
-          <button class="back-btn" onclick="history.back()" style="margin-top: 1rem;">← RETURN TO HANGAR</button>
+          <button class="back-btn" onclick="navigateBack()" style="margin-top: 1rem;">← RETURN TO HANGAR</button>
         </div>
       `;
+    }
+
+    // Navigate back to Hangar with current ticker
+    function navigateBack() {
+      const ticker = currentTicker || window.Store?.get('activeTicker');
+      if (ticker) {
+        window.location.href = `hangar.html?ship=${encodeURIComponent(ticker)}`;
+      } else {
+        window.location.href = 'space-capital.html';
+      }
     }
 
     // Start

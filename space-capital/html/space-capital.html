@@ -3250,7 +3250,7 @@
       // Focus ticker from URL parameter (e.g., ?ticker=RKLB from derivatives)
       focusTickerFromUrl();
 
-      // Ship card click → open ship telemetry page
+      // Ship card click → open HANGAR (ship detail hub)
       document.getElementById('fleet-grid').addEventListener('click', (e) => {
         const card = e.target.closest('.ship-card');
         if (!card) return;
@@ -3271,8 +3271,8 @@
           console.log('[Fleet] Committed ticker to Store:', ticker);
         }
 
-        // Navigate to ship telemetry page with this ticker
-        window.location.href = `ship-telemetry.html?ship=${encodeURIComponent(ticker)}`;
+        // Navigate to HANGAR - the ship detail hub
+        window.location.href = `hangar.html?ship=${encodeURIComponent(ticker)}`;
       });
 
       // Position Manager button
