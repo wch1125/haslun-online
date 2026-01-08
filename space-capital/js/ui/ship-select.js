@@ -384,6 +384,12 @@
       const ticker = card.dataset.ticker;
       
       card.addEventListener('click', () => {
+        // CRITICAL: Don't select if this was a swipe gesture
+        if (swipeState.didSwipe) {
+          swipeState.didSwipe = false;
+          return;
+        }
+        
         // Remove selection from others
         container.querySelectorAll('.ship-select-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
@@ -399,6 +405,12 @@
       });
       
       card.addEventListener('dblclick', () => {
+        // CRITICAL: Don't navigate if this was a swipe gesture
+        if (swipeState.didSwipe) {
+          swipeState.didSwipe = false;
+          return;
+        }
+        
         const data = shipData.find(s => s.ticker === ticker);
         // ALWAYS commit to Store first
         commitShipSelection(ticker, data);
@@ -409,6 +421,13 @@
       if (selectBtn) {
         selectBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          
+          // CRITICAL: Don't navigate if this was a swipe gesture
+          if (swipeState.didSwipe) {
+            swipeState.didSwipe = false;
+            return;
+          }
+          
           const data = shipData.find(s => s.ticker === ticker);
           // ALWAYS commit to Store first
           commitShipSelection(ticker, data);
@@ -525,6 +544,7 @@
     startY: 0,
     startTime: 0,
     isDragging: false,
+    didSwipe: false,  // CRITICAL: Prevents click after swipe
     velocity: 0,
     lastX: 0,
     lastTime: 0,
@@ -633,6 +653,7 @@
     swipeState.lastTime = now;
     swipeState.velocity = 0;
     swipeState.isDragging = true;
+    swipeState.didSwipe = false;  // Reset swipe flag on new touch
     
     // Remove transitions during drag for immediate feedback
     swipeState.grid.style.transition = 'none';
@@ -652,6 +673,11 @@
     // If vertical scroll is dominant, don't hijack
     if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5) {
       return;
+    }
+    
+    // Mark as swipe if moved enough (prevents tap-after-swipe)
+    if (Math.abs(deltaX) > 10) {
+      swipeState.didSwipe = true;
     }
     
     // Prevent page scroll during horizontal swipe

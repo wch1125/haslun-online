@@ -4,21 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a0a0f">
-  <title>SPACE CAPITAL \\ HANGAR BAY</title>
+  <title>SPACE CAPITAL // HANGAR BAY</title>
   <!-- SVG favicon - SC mark (consistent across all pages) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%230A0A0F'/><text x='8' y='44' font-size='32' font-family='monospace' font-weight='bold' fill='%23FF2975'>SC</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=VT323&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Shared theme variables (cache-bust) -->
+  <!-- Shared theme variables -->
   <link rel="stylesheet" href="../css/theme.css?v=20260108">
   <!-- Canonical CRT App Shell -->
   <link rel="stylesheet" href="../css/crt-shell.css?v=20260108">
-  <!-- UI Overhaul - Pixel discipline, semantic CRT, visual tiers -->
+  <!-- UI Overhaul -->
   <link rel="stylesheet" href="../css/ui-overhaul.css?v=20260108">
-  <!-- Core styles -->
-  <link rel="stylesheet" href="../css/ship-select.css?v=20260108">
+  <!-- Core styles including dial selector -->
+  <link rel="stylesheet" href="../css/ship-select.css?v=20260108b">
   <!-- Ship behavior states -->
   <link rel="stylesheet" href="../css/ship-states.css?v=20260108">
   
@@ -31,8 +31,7 @@
     }
     
     body {
-      /* Miami chromatic black - NOT green-neutral */
-      /* This allows watercolor pigments to have chromatic headroom */
+      /* Miami chromatic black */
       background: linear-gradient(
         180deg,
         #14000b 0%,
@@ -43,10 +42,10 @@
       overflow-x: hidden;
     }
     
-    /* Parallax layers - atmospheric depth (Miami chromatic) */
+    /* Parallax layers */
     .parallax-layer {
       position: fixed;
-      inset: -10px; /* Slight overflow to prevent edge gaps during movement */
+      inset: -10px;
       pointer-events: none;
       z-index: 0;
     }
@@ -59,28 +58,9 @@
       );
     }
     
-    /* Watercolor wash layer - pigments react with chromatic base */
     .watercolor-layer {
       z-index: 1;
-      opacity: 0.85; /* Let it breathe against the chromatic black */
-    }
-    
-    /* Ensure content layers are above parallax */
-    .loading-state {
-      z-index: 10;
-    }
-    
-    .hangar-nav {
-      z-index: 100;
-    }
-    
-    #ship-select-container {
-      position: relative;
-      z-index: 5;
-    }
-    
-    .sound-toggle {
-      z-index: 100;
+      opacity: 0.85;
     }
     
     /* Loading state */
@@ -104,8 +84,8 @@
     .loading-spinner {
       width: 60px;
       height: 60px;
-      border: 3px solid rgba(0, 255, 255, 0.2);
-      border-top-color: #00FFFF;
+      border: 3px solid rgba(255, 41, 117, 0.2);
+      border-top-color: #FF2975;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -116,10 +96,10 @@
     
     .loading-text {
       margin-top: 1rem;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.8rem;
-      color: rgba(0, 255, 255, 0.7);
-      letter-spacing: 0.1em;
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: rgba(255, 41, 117, 0.8);
+      letter-spacing: 0.15em;
     }
     
     /* Navigation header */
@@ -133,26 +113,37 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 1.5rem;
-      background: rgba(10, 12, 15, 0.95);
-      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+      background: rgba(10, 10, 15, 0.95);
+      border-bottom: 2px solid rgba(255, 41, 117, 0.4);
       z-index: 1000;
       backdrop-filter: blur(8px);
     }
     
+    .hangar-nav::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--hm-magenta);
+      box-shadow: 0 0 15px var(--hm-magenta);
+    }
+    
     .hangar-nav-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.9rem;
+      font-family: 'VT323', monospace;
+      font-size: 1.25rem;
       font-weight: 600;
-      color: #00FFFF;
-      letter-spacing: 0.1em;
+      color: var(--hm-magenta);
+      letter-spacing: 0.15em;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
     
     .hangar-nav-logo::before {
-      content: '◈';
-      font-size: 1.2em;
+      content: '[SC]';
+      color: var(--hm-cyan);
     }
     
     .hangar-nav-links {
@@ -161,56 +152,53 @@
     }
     
     .hangar-nav-link {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
-      color: rgba(200, 255, 220, 0.7);
+      font-family: 'VT323', monospace;
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.6);
       text-decoration: none;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.1em;
       transition: color 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
     }
     
     .hangar-nav-link:hover {
-      color: #00FFFF;
+      color: var(--hm-cyan);
     }
     
     .hangar-nav-link.active {
-      color: #ffb347;
+      color: var(--hm-magenta);
     }
     
     /* Main content area */
-    #ship-select-container {
+    .dial-page {
       padding-top: 50px;
+      min-height: 100vh;
+      position: relative;
+      z-index: 5;
     }
     
-    /* Sound toggle */
-    .sound-toggle {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      background: rgba(10, 12, 15, 0.9);
-      border: 1px solid rgba(0, 255, 255, 0.3);
-      border-radius: 50%;
-      cursor: pointer;
-      z-index: 100;
-      transition: all 0.2s ease;
+    /* Page header */
+    .page-header {
+      text-align: center;
+      padding: 1rem 1.5rem;
+      background: rgba(10, 10, 15, 0.8);
+      border-bottom: 1px solid rgba(255, 41, 117, 0.2);
     }
     
-    .sound-toggle:hover {
-      border-color: #00FFFF;
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    .page-title {
+      font-family: 'VT323', monospace;
+      font-size: 1.5rem;
+      color: var(--hm-magenta);
+      letter-spacing: 0.2em;
+      text-shadow: 0 0 15px rgba(255, 41, 117, 0.5);
+      margin: 0;
     }
     
-    .sound-toggle.muted {
-      opacity: 0.5;
+    .page-subtitle {
+      font-family: 'VT323', monospace;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.3em;
+      margin-top: 0.25rem;
     }
     
     /* CRT scanlines overlay */
@@ -223,21 +211,32 @@
         0deg,
         transparent,
         transparent 2px,
-        rgba(0, 0, 0, 0.1) 2px,
-        rgba(0, 0, 0, 0.1) 4px
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
       );
+    }
+    
+    /* Mobile nav collapse */
+    @media (max-width: 768px) {
+      .hangar-nav-links {
+        gap: 1rem;
+      }
+      
+      .hangar-nav-link {
+        font-size: 0.75rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="app-shell watercolor-ambient">
-    <!-- Layer 0: Base gradient (static) -->
+    <!-- Layer 0: Base gradient -->
     <div class="parallax-layer layer-bg" data-depth="0"></div>
     
-    <!-- Layer 1: Watercolor ambient wash (slow parallax) -->
+    <!-- Layer 1: Watercolor ambient wash -->
     <div class="watercolor-layer parallax-layer" data-depth="0.1"></div>
     
-    <!-- Layer 2: CRT effects (slight parallax) -->
+    <!-- Layer 2: CRT effects -->
     <div class="crt-layer">
       <div class="crt-noise parallax-layer" data-depth="0.15"></div>
     </div>
@@ -251,249 +250,271 @@
         <div class="loading-text">INITIALIZING HANGAR SYSTEMS...</div>
       </div>
   
-  <!-- Navigation -->
-  <nav class="hangar-nav">
-    <div class="hangar-nav-logo">SPACE CAPITAL</div>
-    <div class="hangar-nav-links">
-      <a href="space-capital.html" class="hangar-nav-link">
-        <span></span> FLEET
-      </a>
-      <a href="ship-select.html" class="hangar-nav-link active">
-        <span></span> HANGAR
-      </a>
-      <a href="derivatives.html" class="hangar-nav-link">
-        <span></span> MISSIONS
-      </a>
+      <!-- Navigation -->
+      <nav class="hangar-nav">
+        <div class="hangar-nav-logo">SPACE CAPITAL</div>
+        <div class="hangar-nav-links">
+          <a href="space-capital.html" class="hangar-nav-link">FLEET</a>
+          <a href="ship-select.html" class="hangar-nav-link active">HANGAR</a>
+          <a href="derivatives.html" class="hangar-nav-link">MISSIONS</a>
+        </div>
+      </nav>
+      
+      <!-- Main Page -->
+      <div class="dial-page">
+        <header class="page-header">
+          <h1 class="page-title">// SELECT VESSEL //</h1>
+          <p class="page-subtitle">SWIPE TO BROWSE // TAP TO SELECT</p>
+        </header>
+        
+        <!-- Dial Selector Mount Point -->
+        <div id="dialMount" class="dial-mount"></div>
+        
+        <!-- Action Buttons -->
+        <div class="dial-actions">
+          <button id="enterHangarBtn" class="dial-action-btn primary">ENTER HANGAR</button>
+        </div>
+      </div>
+      
+      <!-- CRT Scanlines -->
+      <div class="scanlines"></div>
     </div>
-  </nav>
-  
-  <!-- Main Container -->
-  <div id="ship-select-container"></div>
-  
-  <!-- Sound Toggle -->
-  <button class="sound-toggle" id="sound-toggle" title="Toggle Sound">
-    🔊
-  </button>
+  </div>
 
-  <!-- Core State (AUTHORITATIVE - must load first) -->
-  <script src="../js/core/store.js"></script>
-  
-  <!-- Watercolor Pigment Engine (ambient lighting) -->
-  <script src="../js/lib/watercolor/watercolor-engine.js"></script>
-  <script src="../js/ui/hangar-watercolor.js"></script>
-  
-  <!-- Data modules -->
-  <script src="../js/data/ship-data.js"></script>
-  <script src="../js/data/ticker-profiles.js"></script>
-  <script src="../js/ships/ship-behavior.js"></script>
-  <script src="../js/ui/ship-select.js"></script>
-  
-  <!-- Audio System (optional) -->
-  <script src="../js/audio/audio-system.js"></script>
+  <!-- Core modules -->
+  <script src="../js/core/store.js?v=20260108"></script>
+  <script src="../js/core/constants.js?v=20260108"></script>
+  <script src="../js/data/ship-data.js?v=20260108"></script>
+  <script src="../js/data/ticker-profiles.js?v=20260108"></script>
+  <script src="../js/ui/dial-selector.js?v=20260108"></script>
   
   <script>
-    // =========================================================================
-    // HANGAR BAY :: Ship Selection Entry Point
-    // =========================================================================
-    
     (function() {
       'use strict';
       
+      // Ship class metadata
+      const SHIP_CLASSES = {
+        RKLB: { class: 'INTERCEPTOR', tier: 'S', color: '#FF2975' },
+        LUNR: { class: 'EXPLORER', tier: 'A', color: '#9D4EDD' },
+        ASTS: { class: 'CRUISER', tier: 'S', color: '#00FFFF' },
+        ACHR: { class: 'STRIKER', tier: 'B', color: '#39FF14' },
+        JOBY: { class: 'TRANSPORT', tier: 'A', color: '#FFE600' },
+        GME: { class: 'BERSERKER', tier: '?', color: '#FF6B35' },
+        BKSY: { class: 'SCOUT', tier: 'B', color: '#FF69B4' },
+        RDW: { class: 'ENGINEER', tier: 'B', color: '#00CCCC' },
+        PL: { class: 'SURVEYOR', tier: 'A', color: '#B8986B' },
+        EVEX: { class: 'PROTOTYPE', tier: 'C', color: '#C45C5C' },
+        KTOS: { class: 'FIGHTER', tier: 'A', color: '#FF4444' },
+        COHR: { class: 'PHANTOM', tier: 'A', color: '#AA44FF' },
+        GE: { class: 'TITAN', tier: 'S', color: '#44AAFF' },
+        LHX: { class: 'SENTINEL', tier: 'A', color: '#4488FF' },
+        RTX: { class: 'CARRIER', tier: 'S', color: '#888888' }
+      };
+      
+      const TIER_COLORS = {
+        'S': '#ffaa33',
+        'A': '#33ff99',
+        'B': '#4ecdc4',
+        'C': '#888888',
+        '?': '#ff6b6b'
+      };
+      
       let statsData = {};
-      let audioEnabled = false;
-      let audioCtx = null;
+      let dial = null;
       
       // ─────────────────────────────────────────────────────────────────────
-      // LOAD STATS DATA
+      // DATA LOADING
       // ─────────────────────────────────────────────────────────────────────
       
       async function loadStatsData() {
         try {
           const response = await fetch('../data/stats.json');
+          if (!response.ok) throw new Error('Stats not found');
           const data = await response.json();
-          return data.stats || {};
-        } catch (e) {
-          console.warn('Failed to load stats:', e);
+          return data.stats || data;
+        } catch (err) {
+          console.warn('[Hangar] Stats unavailable:', err);
           return {};
         }
       }
       
       // ─────────────────────────────────────────────────────────────────────
-      // AUDIO
+      // STAT CALCULATIONS (same as ship-select.js)
       // ─────────────────────────────────────────────────────────────────────
       
-      function initAudio() {
-        if (audioCtx) return;
-        
-        try {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        } catch (e) {
-          console.warn('Web Audio not supported');
-        }
+      function normalizeValue(value, min, max) {
+        if (!Number.isFinite(value)) return 50;
+        const clamped = Math.max(min, Math.min(max, value));
+        return Math.round(((clamped - min) / (max - min)) * 100);
       }
       
-      function playSelectSound() {
-        if (!audioEnabled || !audioCtx) return;
-        
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
-        
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-        
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + 0.2);
-      }
-      
-      function playConfirmSound() {
-        if (!audioEnabled || !audioCtx) return;
-        
-        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-        
-        notes.forEach((freq, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
-          
-          gain.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.08);
-          gain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + i * 0.08 + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.3);
-          
-          osc.start(audioCtx.currentTime + i * 0.08);
-          osc.stop(audioCtx.currentTime + i * 0.08 + 0.3);
-        });
+      function calculateStats(ticker) {
+        const data = statsData[ticker] || {};
+        return {
+          PWR: normalizeValue(data.return_1y || 0, -50, 300),
+          SPD: normalizeValue(data.return_1d || 0, -10, 20),
+          ARM: normalizeValue(data.high_52w ? ((data.current - data.low_52w) / (data.high_52w - data.low_52w)) * 100 : 50, 0, 100),
+          TCH: normalizeValue(data.return_3m || 0, -30, 80)
+        };
       }
       
       // ─────────────────────────────────────────────────────────────────────
-      // SHIP SELECTION HANDLER
+      // CARD RENDERER - Creates the DOM for each dial card
       // ─────────────────────────────────────────────────────────────────────
       
-      function handleShipSelect(ticker, shipData) {
-        playConfirmSound();
+      function renderCard(ticker) {
+        const shipClass = SHIP_CLASSES[ticker] || { class: 'UNKNOWN', tier: 'C', color: '#888' };
+        const tierColor = TIER_COLORS[shipClass.tier] || '#888';
+        const stats = calculateStats(ticker);
+        const shipName = window.SHIP_NAMES?.[ticker]?.name || ticker;
         
-        // ═══════════════════════════════════════════════════════════════════
-        // AUTHORITATIVE STATE UPDATE — Store is the single source of truth
-        // ═══════════════════════════════════════════════════════════════════
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'dial-card';
+        card.dataset.ticker = ticker;
+        
+        card.innerHTML = `
+          <div class="dial-card-scene">
+            <!-- Background grid layer -->
+            <div class="dial-card-layer layer-bg" data-depth="-40" data-parallax="0.08"></div>
+            
+            <!-- Header -->
+            <div class="dial-card-header">
+              <h2 class="dial-card-ticker">${ticker}</h2>
+              <div class="dial-card-class">${shipClass.class}</div>
+              <div class="dial-card-tier" style="--tier-color: ${tierColor}">${shipClass.tier}</div>
+            </div>
+            
+            <!-- Ship sprite area -->
+            <div class="dial-card-ship-area" data-depth="20" data-parallax="0.35">
+              <img class="dial-card-ship"
+                   src="../assets/ships/animated/gifs/${ticker}_idle.gif"
+                   alt="${ticker}"
+                   onerror="this.src='../assets/ships/static/Unclaimed-Drone-ship.png'" />
+            </div>
+            
+            <!-- Telemetry stats -->
+            <div class="dial-card-telemetry" data-depth="30" data-parallax="0.5">
+              <div class="dial-card-stat">
+                <span class="dial-card-stat-label">PWR</span>
+                <div class="dial-card-stat-bar">
+                  <div class="dial-card-stat-fill" style="width: ${stats.PWR}%; --stat-color: #ff6b6b;"></div>
+                </div>
+                <span class="dial-card-stat-value">${stats.PWR}</span>
+              </div>
+              <div class="dial-card-stat">
+                <span class="dial-card-stat-label">SPD</span>
+                <div class="dial-card-stat-bar">
+                  <div class="dial-card-stat-fill" style="width: ${stats.SPD}%; --stat-color: #4ecdc4;"></div>
+                </div>
+                <span class="dial-card-stat-value">${stats.SPD}</span>
+              </div>
+              <div class="dial-card-stat">
+                <span class="dial-card-stat-label">ARM</span>
+                <div class="dial-card-stat-bar">
+                  <div class="dial-card-stat-fill" style="width: ${stats.ARM}%; --stat-color: #45b7d1;"></div>
+                </div>
+                <span class="dial-card-stat-value">${stats.ARM}</span>
+              </div>
+              <div class="dial-card-stat">
+                <span class="dial-card-stat-label">TCH</span>
+                <div class="dial-card-stat-bar">
+                  <div class="dial-card-stat-fill" style="width: ${stats.TCH}%; --stat-color: #dda0dd;"></div>
+                </div>
+                <span class="dial-card-stat-value">${stats.TCH}</span>
+              </div>
+            </div>
+            
+            <!-- Glass overlay -->
+            <div class="dial-card-glass" data-depth="50" data-parallax="0.7"></div>
+          </div>
+        `;
+        
+        return card;
+      }
+      
+      // ─────────────────────────────────────────────────────────────────────
+      // NAVIGATION HANDLER - Only fires on explicit select
+      // ─────────────────────────────────────────────────────────────────────
+      
+      function navigateToHangar(ticker) {
+        // Commit to Store
         if (window.Store) {
           Store.set({
             activeTicker: ticker,
-            activeShip: shipData,
-            activeMission: null  // Clear mission when switching ships
+            activeMission: null
           });
           console.log('[Hangar] Ship committed to Store:', ticker);
-        } else {
-          console.warn('[Hangar] Store not available, falling back to localStorage');
-          localStorage.setItem('parallax_selected_ship', ticker);
-          localStorage.setItem('parallax_selected_ship_data', JSON.stringify(shipData));
         }
         
-        // Visual feedback
-        const card = document.querySelector(`.ship-select-card[data-ticker="${ticker}"]`);
-        if (card) {
-          card.classList.add('launching');
-          
-          // Create launch animation overlay
-          const overlay = document.createElement('div');
-          overlay.className = 'launch-overlay';
-          overlay.innerHTML = `
-            <div class="launch-content">
-              <div class="launch-ship">${ticker}</div>
-              <div class="launch-text">LAUNCHING...</div>
-              <div class="launch-bar"><div class="launch-bar-fill"></div></div>
-            </div>
-          `;
-          document.body.appendChild(overlay);
-          
-          // Animate and redirect
-          setTimeout(() => {
-            overlay.classList.add('active');
-          }, 50);
-          
-          setTimeout(() => {
-            window.location.href = `ship-telemetry.html?ship=${ticker}`;
-          }, 1500);
-        } else {
-          // Fallback: just redirect
-          window.location.href = `ship-telemetry.html?ship=${ticker}`;
-        }
+        // Navigate
+        window.location.href = `hangar.html?ship=${ticker}`;
       }
       
       // ─────────────────────────────────────────────────────────────────────
-      // INIT
+      // INITIALIZATION
       // ─────────────────────────────────────────────────────────────────────
       
       async function init() {
         // Load data
         statsData = await loadStatsData();
         
-        // Make stats data globally available
-        window.statsData = statsData;
+        // Get available tickers
+        const tickers = Object.keys(window.SHIP_SPRITES || SHIP_CLASSES);
         
-        // Initialize watercolor ambient lighting
+        if (tickers.length === 0) {
+          console.error('[Hangar] No ships available');
+          return;
+        }
+        
+        // Get previously selected ticker
+        const selectedTicker = window.Store?.get('activeTicker') || 
+                              localStorage.getItem('parallax_selected_ship') ||
+                              tickers[0];
+        
+        // Initialize watercolor
         if (window.HangarWatercolor) {
           HangarWatercolor.setupPage('hangar');
         }
         
         // Hide loading
-        const loading = document.getElementById('loading');
-        loading.classList.add('hidden');
+        document.getElementById('loading').classList.add('hidden');
         
-        // Render ship selection
-        const container = document.getElementById('ship-select-container');
+        // Create dial selector
+        const mount = document.getElementById('dialMount');
         
-        if (window.ShipSelect) {
-          // Get currently selected ticker from Store (authoritative)
-          const selectedTicker = window.Store ? Store.get('activeTicker') : 
-                                 localStorage.getItem('parallax_selected_ship');
+        dial = window.DialSelector.create({
+          mount: mount,
+          items: tickers,
+          renderCard: renderCard,
+          windowSize: 7,
           
-          ShipSelect.renderShipSelectScreen(container, statsData, {
-            onSelect: handleShipSelect,
-            selectedTicker: selectedTicker
-          });
+          onActiveChange: (ticker) => {
+            // Update Store with current focus (but don't navigate)
+            if (window.Store) {
+              Store.set({ activeTicker: ticker });
+            }
+            console.log('[Dial] Active:', ticker);
+          },
           
-          // Initialize mobile swipe mode (if viewport is mobile)
-          // This transforms vertical scroll into horizontal swipe on mobile
-          ShipSelect.initSwipeMode(container, selectedTicker);
-          
-          // Add click sounds to cards
-          container.querySelectorAll('.ship-select-card').forEach(card => {
-            card.addEventListener('click', () => {
-              playSelectSound();
-            });
-          });
-        } else {
-          container.innerHTML = `
-            <div style="text-align:center;padding:4rem;color:#ff6b6b;">
-              <p>Ship Select module failed to load.</p>
-              <a href="space-capital.html" style="color:#00FFFF;">Return to Command</a>
-            </div>
-          `;
-        }
-        
-        // Sound toggle
-        const soundToggle = document.getElementById('sound-toggle');
-        soundToggle.addEventListener('click', () => {
-          initAudio();
-          audioEnabled = !audioEnabled;
-          soundToggle.textContent = audioEnabled ? '🔊' : '🔇';
-          soundToggle.classList.toggle('muted', !audioEnabled);
-          
-          if (audioEnabled) {
-            playSelectSound();
+          onSelect: (ticker) => {
+            // User tapped center card - navigate
+            navigateToHangar(ticker);
           }
         });
+        
+        // Set initial position to selected ticker
+        if (selectedTicker && tickers.includes(selectedTicker)) {
+          dial.setActiveTicker(selectedTicker);
+        }
+        
+        // Enter Hangar button
+        document.getElementById('enterHangarBtn').addEventListener('click', () => {
+          const ticker = dial.getActiveTicker();
+          navigateToHangar(ticker);
+        });
+        
+        console.log('[Hangar] Dial selector initialized with', tickers.length, 'ships');
       }
       
       // Start
@@ -505,92 +526,5 @@
       
     })();
   </script>
-  
-  <!-- Launch overlay styles -->
-  <style>
-    .ship-select-card.launching {
-      animation: cardLaunch 1s ease-out forwards;
-    }
-    
-    @keyframes cardLaunch {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(0.8) translateY(-50px); opacity: 0; }
-    }
-    
-    .launch-overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(10, 12, 15, 0);
-      z-index: 10000;
-      transition: background 0.5s ease;
-    }
-    
-    .launch-overlay.active {
-      background: rgba(10, 12, 15, 0.98);
-    }
-    
-    .launch-content {
-      text-align: center;
-      opacity: 0;
-      transform: scale(0.8);
-      transition: all 0.5s ease;
-    }
-    
-    .launch-overlay.active .launch-content {
-      opacity: 1;
-      transform: scale(1);
-    }
-    
-    .launch-ship {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 3rem;
-      font-weight: 700;
-      color: #00FFFF;
-      text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
-      margin-bottom: 1rem;
-    }
-    
-    .launch-text {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 1rem;
-      color: rgba(200, 255, 220, 0.8);
-      letter-spacing: 0.3em;
-      margin-bottom: 1.5rem;
-      animation: blink 0.5s ease-in-out infinite;
-    }
-    
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    
-    .launch-bar {
-      width: 200px;
-      height: 4px;
-      background: rgba(0, 255, 255, 0.2);
-      border-radius: 2px;
-      overflow: hidden;
-      margin: 0 auto;
-    }
-    
-    .launch-bar-fill {
-      height: 100%;
-      width: 0;
-      background: #00FFFF;
-      border-radius: 2px;
-      animation: launchFill 1.2s ease-out forwards;
-    }
-    
-    @keyframes launchFill {
-      0% { width: 0; }
-      100% { width: 100%; }
-    }
-  </style>
-    </div><!-- /.ui-layer -->
-  </div><!-- /.app-shell -->
 </body>
 </html>

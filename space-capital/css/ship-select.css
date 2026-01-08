@@ -1100,3 +1100,365 @@
 .ship-select-card:nth-child(13) { animation-delay: 0.65s; }
 .ship-select-card:nth-child(14) { animation-delay: 0.7s; }
 .ship-select-card:nth-child(15) { animation-delay: 0.75s; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DIAL SELECTOR - Weighted wheel ship selection
+   Physics-based carousel with inertia, friction, and snap
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Dial container - full viewport on mobile */
+.dial-mount {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 100px);
+  height: calc(100dvh - 100px);
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+  outline: none;
+}
+
+.dial-mount:active {
+  cursor: grabbing;
+}
+
+/* The virtual ring that holds cards */
+.dial-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 1px;
+  height: 1px;
+}
+
+/* Individual dial cards */
+.dial-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  width: min(88vw, 360px);
+  min-height: 480px;
+  padding: 0;
+  border: 2px solid rgba(255, 41, 117, 0.3);
+  background: rgba(12, 12, 18, 0.95);
+  cursor: grab;
+  touch-action: pan-y;
+  will-change: transform, opacity;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dial-card:active {
+  cursor: grabbing;
+}
+
+/* Active (center) card styling */
+.dial-card.is-active {
+  border-color: var(--hm-cyan, #00FFFF);
+  box-shadow: 
+    0 0 30px rgba(0, 255, 255, 0.25),
+    0 0 60px rgba(0, 255, 255, 0.1),
+    inset 0 0 30px rgba(0, 255, 255, 0.05);
+}
+
+/* 3D scene container inside card */
+.dial-card-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  transform-style: preserve-3d;
+  perspective: 900px;
+  overflow: hidden;
+}
+
+/* Parallax layers - depth via data-depth attribute */
+.dial-card-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Background grid layer */
+.dial-card-layer.layer-bg {
+  background: 
+    linear-gradient(90deg, rgba(255, 41, 117, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(255, 41, 117, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.4;
+}
+
+/* Card header section */
+.dial-card-header {
+  position: relative;
+  z-index: 10;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 41, 117, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dial-card-ticker {
+  font-family: 'VT323', 'Orbitron', monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--hm-magenta, #FF2975);
+  text-shadow: 0 0 15px rgba(255, 41, 117, 0.6);
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.dial-card-class {
+  font-family: 'VT323', monospace;
+  font-size: 0.875rem;
+  color: var(--hm-cyan, #00FFFF);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+.dial-card-tier {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'VT323', monospace;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--tier-color, #888);
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--tier-color, #888);
+  text-shadow: 0 0 10px var(--tier-color);
+}
+
+/* Ship sprite area */
+.dial-card-ship-area {
+  position: relative;
+  z-index: 20;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  min-height: 200px;
+}
+
+.dial-card-ship {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 20px rgba(255, 41, 117, 0.5));
+  pointer-events: none;
+}
+
+/* Telemetry/stats section */
+.dial-card-telemetry {
+  position: relative;
+  z-index: 10;
+  padding: 1rem 1.25rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(255, 41, 117, 0.15);
+}
+
+.dial-card-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.dial-card-stat:last-child {
+  margin-bottom: 0;
+}
+
+.dial-card-stat-label {
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.1em;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.dial-card-stat-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dial-card-stat-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--stat-color, var(--hm-magenta));
+  transition: width 0.3s ease;
+}
+
+.dial-card-stat-value {
+  font-family: 'VT323', monospace;
+  font-size: 0.875rem;
+  color: var(--hm-cyan);
+  width: 32px;
+  text-align: right;
+}
+
+/* Glass overlay layer */
+.dial-card-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Action buttons below dial */
+.dial-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.5rem 2rem;
+  background: linear-gradient(transparent, rgba(10, 10, 15, 0.95));
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  z-index: 100;
+}
+
+.dial-action-btn {
+  font-family: 'VT323', monospace;
+  font-size: 1.25rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 1rem 2.5rem;
+  border: 2px solid var(--hm-magenta);
+  background: transparent;
+  color: var(--hm-magenta);
+  cursor: pointer;
+  transition: all 0.15s steps(4);
+  position: relative;
+  overflow: hidden;
+}
+
+.dial-action-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--hm-magenta);
+  transform: translateX(-101%);
+  transition: transform 0.15s steps(4);
+  z-index: -1;
+}
+
+.dial-action-btn:hover {
+  color: var(--bg-void, #0a0a0f);
+  box-shadow: 0 0 25px rgba(255, 41, 117, 0.5);
+}
+
+.dial-action-btn:hover::before {
+  transform: translateX(0);
+}
+
+.dial-action-btn:active {
+  transform: scale(0.97);
+}
+
+.dial-action-btn.primary {
+  background: var(--hm-magenta);
+  color: var(--bg-void, #0a0a0f);
+}
+
+.dial-action-btn.primary:hover {
+  box-shadow: 0 0 30px rgba(255, 41, 117, 0.7);
+}
+
+/* Active ship indicator */
+.dial-indicator {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(10, 10, 15, 0.9);
+  border: 1px solid rgba(255, 41, 117, 0.3);
+  z-index: 90;
+}
+
+.dial-indicator-dot {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 41, 117, 0.3);
+  transition: all 0.2s;
+}
+
+.dial-indicator-dot.active {
+  background: var(--hm-cyan);
+  box-shadow: 0 0 8px var(--hm-cyan);
+}
+
+/* Keyboard focus indicator */
+.dial-mount:focus-visible {
+  outline: 2px solid var(--hm-cyan);
+  outline-offset: 4px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .dial-card {
+    transition: none;
+  }
+  .dial-card-stat-fill {
+    transition: none;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .dial-card {
+    width: 92vw;
+    min-height: 420px;
+  }
+  
+  .dial-card-ship {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .dial-card-ticker {
+    font-size: 1.75rem;
+  }
+}
+
+/* Desktop: dial takes less space, shows more context */
+@media (min-width: 769px) {
+  .dial-mount {
+    height: 600px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .dial-card {
+    width: 340px;
+    min-height: 500px;
+  }
+}
