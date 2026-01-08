@@ -9,8 +9,14 @@
   <link rel="stylesheet" href="../css/crt-shell.css?v=20260108">
   <link rel="stylesheet" href="../css/ui-overhaul.css?v=20260108">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Core -->
   <script src="../js/core/store.js?v=20260108"></script>
   <script src="../js/core/constants.js?v=20260108"></script>
+  <!-- Data Pipeline (required for trades/positions) -->
+  <script src="../js/data/player-manager.js?v=20260108"></script>
+  <script src="../js/data/position-manager.js?v=20260108"></script>
+  <script src="../js/data/positions-store.js?v=20260108"></script>
+  <script src="../js/data/load-trades.js?v=20260108"></script>
   <style>
     :root {
       --hm-magenta: rgb(255, 41, 117);
@@ -741,19 +747,22 @@
       // ═══════════════════════════════════════════════════════════════════════════
       
       function init() {
-        // Get ticker from Store or URL
-        if (window.Store) {
-          currentTicker = Store.get('activeTicker');
-        }
+        // URL has priority (deep links must work)
+        const params = new URLSearchParams(window.location.search);
+        const urlTicker = params.get('ship')?.toUpperCase() || params.get('ticker')?.toUpperCase();
+        
+        // Fallback to Store only if URL not provided
+        const storeTicker = window.Store ? Store.get('activeTicker') : null;
+        
+        currentTicker = urlTicker || storeTicker;
 
-        if (!currentTicker) {
-          const params = new URLSearchParams(window.location.search);
-          currentTicker = params.get('ship')?.toUpperCase() || params.get('ticker')?.toUpperCase();
-        }
-
+        // Sync to Store
         if (currentTicker && window.Store) {
           Store.set({ activeTicker: currentTicker });
         }
+
+        // Update back button to preserve ticker focus
+        updateBackButton();
 
         if (currentTicker && SHIP_CONFIG[currentTicker]) {
           renderShipHangar();
@@ -767,6 +776,7 @@
           Store.subscribeKey('activeTicker', (newTicker) => {
             if (newTicker !== currentTicker) {
               currentTicker = newTicker;
+              updateBackButton();
               if (currentTicker && SHIP_CONFIG[currentTicker]) {
                 renderShipHangar();
                 loadShipData();
@@ -775,6 +785,13 @@
               }
             }
           });
+        }
+      }
+
+      function updateBackButton() {
+        const backBtn = document.querySelector('.back-btn');
+        if (backBtn && currentTicker) {
+          backBtn.href = `space-capital.html?ticker=${currentTicker}`;
         }
       }
 
@@ -898,8 +915,12 @@
                      alt="${currentTicker}"
                      onerror="this.src='../assets/ships/animated/gifs/${currentTicker}_idle.gif'">
               </div>
-              <div class="deploy-status">▸ SHIP READY FOR DEPLOYMENT</div>
-              <button class="deploy-btn" onclick="deployToArena()">LAUNCH TO ARENA</button>
+              <div class="deploy-status" style="color: var(--hm-yellow);">▸ ARENA SYSTEMS INITIALIZING...</div>
+              <button class="deploy-btn" style="opacity: 0.5; cursor: not-allowed;" disabled title="Arena coming soon">ARENA COMING SOON</button>
+              <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-dim);">
+                Battle Arena is under construction.<br>
+                Check back soon to deploy ${currentTicker} in combat.
+              </div>
             </div>
           </div>
         `;
@@ -1028,26 +1049,26 @@
         const countBadge = document.getElementById('logCount');
         if (!entriesEl) return;
 
-        // Try to get from PositionManager (localStorage)
         let trades = [];
-        
+
         try {
-          const stored = localStorage.getItem('sc_trades');
-          if (stored) {
-            const allTrades = JSON.parse(stored);
-            trades = allTrades.filter(t => 
-              t.ticker === currentTicker || 
-              t.symbol?.includes(currentTicker) ||
-              t.underlyingSymbol === currentTicker
-            );
-          }
+          // Use TradeLoader with PlayerManager for profile-aware data
+          const profile = window.PlayerManager?.getActive?.() || { type: 'guest' };
+          const allTrades = await (window.TradeLoader?.loadTradeConfirms?.(profile) || Promise.resolve([]));
+
+          // Filter to current ticker
+          trades = allTrades.filter(t =>
+            t.ticker === currentTicker ||
+            t.underlyingSymbol === currentTicker ||
+            (t.symbol && t.symbol.split(' ')[0] === currentTicker)
+          );
         } catch (e) {
-          console.warn('[Hangar] Could not load trades:', e);
+          console.warn('[Hangar] Could not load trade history:', e);
         }
 
         if (countBadge) countBadge.textContent = trades.length;
 
-        if (trades.length === 0) {
+        if (!trades.length) {
           entriesEl.innerHTML = `
             <div class="no-trades-message">
               No trade history for ${currentTicker}.<br>
@@ -1061,8 +1082,8 @@
         trades.sort((a, b) => new Date(b.dateTime || b.date) - new Date(a.dateTime || a.date));
 
         entriesEl.innerHTML = trades.slice(0, 50).map(t => {
-          const isOption = t.assetType === 'Option' || t.symbol?.includes(' ');
-          const isBuy = t.action?.includes('BUY') || t.qty > 0;
+          const isOption = t.assetType === 'Option';
+          const isBuy = (t.action || '').toUpperCase().includes('BUY') || (t.qty || 0) > 0;
           const type = isOption ? 'option' : (isBuy ? 'buy' : 'sell');
           const pnl = t.realizedPNL || 0;
 
@@ -1071,44 +1092,33 @@
               <span class="log-date">${formatDate(t.dateTime || t.date)}</span>
               <span class="log-action ${type}">${t.action || (isBuy ? 'BUY' : 'SELL')}</span>
               <span class="log-details">${t.description || t.symbol || currentTicker} × ${Math.abs(t.qty || t.quantity || 1)}</span>
-              <span class="log-pnl ${pnl >= 0 ? 'positive' : 'negative'}">${pnl !== 0 ? (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2) : '---'}</span>
+              <span class="log-pnl ${pnl >= 0 ? 'positive' : 'negative'}">${pnl ? (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2) : '---'}</span>
             </div>
           `;
         }).join('');
       }
 
-      async function loadOptionsPositions() {
+      function loadOptionsPositions() {
         const summaryEl = document.getElementById('loadoutSummary');
         const listEl = document.getElementById('optionsList');
         const countBadge = document.getElementById('optionsCount');
         if (!summaryEl || !listEl) return;
 
-        // Try to get from PositionManager
-        let options = [];
+        // Ensure PositionManager loaded its profile-aware storage
+        window.PositionManager?.load?.();
 
-        try {
-          const stored = localStorage.getItem('sc_positions');
-          if (stored) {
-            const allPositions = JSON.parse(stored);
-            options = allPositions.filter(p => 
-              p.assetType === 'Option' && 
-              (p.ticker === currentTicker || p.underlyingSymbol === currentTicker)
-            );
-          }
-        } catch (e) {
-          console.warn('[Hangar] Could not load options:', e);
-        }
+        const pos = window.PositionManager?.get?.(currentTicker) || null;
+        const contracts = pos?.contracts || []; // from IBKR parse
 
-        if (countBadge) countBadge.textContent = options.length;
+        if (countBadge) countBadge.textContent = contracts.length;
 
-        // Summary stats
-        const totalValue = options.reduce((sum, o) => sum + (o.marketValue || 0), 0);
-        const callCount = options.filter(o => o.putCall === 'CALL').length;
-        const putCount = options.filter(o => o.putCall === 'PUT').length;
+        const totalValue = pos?.optionsValue || 0;
+        const callCount = contracts.filter(c => (c.symbol || '').includes(' C')).length;
+        const putCount = contracts.filter(c => (c.symbol || '').includes(' P')).length;
 
         summaryEl.innerHTML = `
           <div class="loadout-stat">
-            <div class="loadout-stat-value">${options.length}</div>
+            <div class="loadout-stat-value">${contracts.length}</div>
             <div class="loadout-stat-label">CONTRACTS</div>
           </div>
           <div class="loadout-stat">
@@ -1117,11 +1127,11 @@
           </div>
           <div class="loadout-stat">
             <div class="loadout-stat-value">$${Math.abs(totalValue).toFixed(0)}</div>
-            <div class="loadout-stat-label">TOTAL VALUE</div>
+            <div class="loadout-stat-label">OPTIONS VALUE</div>
           </div>
         `;
 
-        if (options.length === 0) {
+        if (!contracts.length) {
           listEl.innerHTML = `
             <div class="no-trades-message">
               No options positions for ${currentTicker}.
@@ -1130,14 +1140,23 @@
           return;
         }
 
-        listEl.innerHTML = options.map(o => `
-          <div class="option-row">
-            <span class="option-type ${(o.putCall || 'CALL').toLowerCase()}">${o.putCall || '?'}</span>
-            <span class="option-strike">$${o.strikePrice?.toFixed(0) || '?'}</span>
-            <span class="option-expiry">${o.expirationDate || 'No Expiry'}</span>
-            <span class="option-value">$${Math.abs(o.marketValue || 0).toFixed(0)}</span>
-          </div>
-        `).join('');
+        listEl.innerHTML = contracts.map(c => {
+          // contract.symbol example: "ACHR 22AUG25 10 C"
+          const parts = (c.symbol || '').split(' ');
+          const strike = parts[2] || '?';
+          const expiry = parts[1] || '---';
+          const type = (parts[3] || '?').toUpperCase() === 'P' ? 'put' : 'call';
+          const value = c.value || 0;
+
+          return `
+            <div class="option-row">
+              <span class="option-type ${type}">${type.toUpperCase()}</span>
+              <span class="option-strike">$${strike}</span>
+              <span class="option-expiry">${expiry}</span>
+              <span class="option-value">$${Math.abs(value).toFixed(0)}</span>
+            </div>
+          `;
+        }).join('');
       }
 
       function formatDate(dateStr) {
