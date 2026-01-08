@@ -463,6 +463,10 @@
             selectedTicker: selectedTicker
           });
           
+          // Initialize mobile swipe mode (if viewport is mobile)
+          // This transforms vertical scroll into horizontal swipe on mobile
+          ShipSelect.initSwipeMode(container, selectedTicker);
+          
           // Add click sounds to cards
           container.querySelectorAll('.ship-select-card').forEach(card => {
             card.addEventListener('click', () => {

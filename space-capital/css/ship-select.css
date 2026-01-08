@@ -795,6 +795,186 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   MOBILE FULL-SCREEN SWIPE MODE
+   Ship cards fill viewport, horizontal swipe to navigate
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* Enable swipe mode */
+  .ship-select-screen.swipe-mode {
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+  
+  .ship-select-screen.swipe-mode .ship-select-header {
+    position: fixed;
+    top: 50px; /* Below nav */
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10, 12, 15, 0.95);
+    backdrop-filter: blur(8px);
+    margin-bottom: 0;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--ss-border);
+  }
+  
+  .ship-select-screen.swipe-mode .ship-select-legend {
+    display: none; /* Hide legend in swipe mode - too cramped */
+  }
+  
+  .ship-select-screen.swipe-mode .ship-select-footer {
+    display: none;
+  }
+  
+  /* Ship deck container - horizontal scroll snap */
+  .ship-select-screen.swipe-mode .ship-select-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: max-content;
+    height: calc(100vh - 110px);
+    height: calc(100dvh - 110px);
+    margin-top: 110px; /* Header + nav offset */
+    padding: 0;
+    gap: 0;
+    overflow: visible;
+    touch-action: pan-y pinch-zoom; /* Allow vertical scroll but we handle horizontal */
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+  
+  /* Full-screen ship cards */
+  .ship-select-screen.swipe-mode .ship-select-card {
+    flex: 0 0 100vw;
+    width: 100vw;
+    height: 100%;
+    min-height: auto;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+    animation: none; /* Disable stagger animation in swipe mode */
+  }
+  
+  /* Larger sprite in full-screen mode */
+  .ship-select-screen.swipe-mode .ship-card-visual {
+    flex: 0 0 auto;
+    min-height: 180px;
+    padding: 1.5rem 0;
+  }
+  
+  .ship-select-screen.swipe-mode .ship-card-sprite-container {
+    width: 140px;
+    height: 140px;
+  }
+  
+  /* Stats expand in full-screen */
+  .ship-select-screen.swipe-mode .ship-card-stats {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .ship-select-screen.swipe-mode .ship-stat-row {
+    padding: 0.25rem 0;
+  }
+  
+  .ship-select-screen.swipe-mode .ship-stat-bar-container {
+    height: 10px;
+  }
+  
+  /* Select button anchored at bottom */
+  .ship-select-screen.swipe-mode .ship-select-btn {
+    margin-top: auto;
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Swipe indicator dots */
+  .swipe-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 200;
+    padding: 8px 16px;
+    background: rgba(10, 12, 15, 0.8);
+    border-radius: 20px;
+    border: 1px solid var(--ss-border);
+  }
+  
+  .swipe-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(51, 255, 153, 0.3);
+    transition: all 0.2s ease;
+  }
+  
+  .swipe-dot.active {
+    background: var(--ss-accent);
+    box-shadow: 0 0 8px var(--ss-glow);
+    transform: scale(1.2);
+  }
+  
+  .swipe-dot.selected {
+    background: var(--ss-amber);
+    box-shadow: 0 0 8px rgba(255, 179, 71, 0.6);
+  }
+  
+  /* Swipe hint on first load */
+  .swipe-hint {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background: rgba(10, 12, 15, 0.95);
+    border: 1px solid var(--ss-accent);
+    border-radius: 8px;
+    z-index: 300;
+    animation: swipeHintFade 3s ease forwards;
+    pointer-events: none;
+  }
+  
+  .swipe-hint-arrow {
+    font-size: 1.5rem;
+    animation: swipeHintPulse 1s ease-in-out infinite;
+  }
+  
+  .swipe-hint-text {
+    font-size: 0.8rem;
+    color: var(--ss-text);
+    letter-spacing: 0.05em;
+  }
+  
+  @keyframes swipeHintPulse {
+    0%, 100% { transform: translateX(0); opacity: 1; }
+    50% { transform: translateX(8px); opacity: 0.6; }
+  }
+  
+  @keyframes swipeHintFade {
+    0%, 70% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    ANIMATIONS
    ───────────────────────────────────────────────────────────────────────────── */
 

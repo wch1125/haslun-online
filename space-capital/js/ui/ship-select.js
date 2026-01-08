@@ -508,6 +508,289 @@
   }
 
   // ─────────────────────────────────────────────────────────────────────────
+  // MOBILE SWIPE MODE
+  // Full-screen cards with horizontal touch navigation
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const SWIPE_THRESHOLD = 50; // Minimum swipe distance to trigger navigation
+  const MOBILE_BREAKPOINT = 768;
+  
+  let swipeState = {
+    enabled: false,
+    currentIndex: 0,
+    startX: 0,
+    startY: 0,
+    isDragging: false,
+    grid: null,
+    cards: [],
+    indicator: null,
+    selectedTicker: null
+  };
+
+  function isMobileViewport() {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+  }
+
+  function initSwipeMode(container, selectedTicker) {
+    if (!isMobileViewport()) return;
+    
+    const screen = container.querySelector('.ship-select-screen');
+    const grid = container.querySelector('.ship-select-grid');
+    const cards = container.querySelectorAll('.ship-select-card');
+    
+    if (!screen || !grid || cards.length === 0) return;
+    
+    // Enable swipe mode
+    screen.classList.add('swipe-mode');
+    swipeState.enabled = true;
+    swipeState.grid = grid;
+    swipeState.cards = [...cards];
+    swipeState.selectedTicker = selectedTicker;
+    
+    // Find initial index (selected ship or first)
+    if (selectedTicker) {
+      const selectedIndex = swipeState.cards.findIndex(c => c.dataset.ticker === selectedTicker);
+      if (selectedIndex >= 0) {
+        swipeState.currentIndex = selectedIndex;
+      }
+    }
+    
+    // Set initial position
+    updateSwipePosition(false);
+    
+    // Create indicator dots
+    createSwipeIndicator(container);
+    
+    // Show swipe hint on first visit
+    showSwipeHint(container);
+    
+    // Attach touch handlers
+    grid.addEventListener('touchstart', handleTouchStart, { passive: true });
+    grid.addEventListener('touchmove', handleTouchMove, { passive: false });
+    grid.addEventListener('touchend', handleTouchEnd, { passive: true });
+    
+    // Handle resize
+    window.addEventListener('resize', handleResize);
+    
+    console.log('[ShipSelect] Swipe mode enabled with', cards.length, 'ships');
+  }
+
+  function handleTouchStart(e) {
+    if (!swipeState.enabled) return;
+    
+    swipeState.startX = e.touches[0].clientX;
+    swipeState.startY = e.touches[0].clientY;
+    swipeState.isDragging = true;
+    
+    // Remove transition during drag for immediate feedback
+    swipeState.grid.style.transition = 'none';
+  }
+
+  function handleTouchMove(e) {
+    if (!swipeState.enabled || !swipeState.isDragging) return;
+    
+    const deltaX = e.touches[0].clientX - swipeState.startX;
+    const deltaY = e.touches[0].clientY - swipeState.startY;
+    
+    // If vertical scroll is dominant, don't hijack
+    if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5) {
+      return;
+    }
+    
+    // Prevent page scroll during horizontal swipe
+    if (Math.abs(deltaX) > 10) {
+      e.preventDefault();
+    }
+    
+    // Calculate drag position with resistance at edges
+    const baseOffset = -swipeState.currentIndex * window.innerWidth;
+    let resistance = 1;
+    
+    // Add resistance at boundaries
+    if ((swipeState.currentIndex === 0 && deltaX > 0) || 
+        (swipeState.currentIndex === swipeState.cards.length - 1 && deltaX < 0)) {
+      resistance = 0.3;
+    }
+    
+    const dragOffset = baseOffset + (deltaX * resistance);
+    swipeState.grid.style.transform = `translateX(${dragOffset}px)`;
+  }
+
+  function handleTouchEnd(e) {
+    if (!swipeState.enabled || !swipeState.isDragging) return;
+    
+    swipeState.isDragging = false;
+    
+    const deltaX = e.changedTouches[0].clientX - swipeState.startX;
+    
+    // Re-enable transition
+    swipeState.grid.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)';
+    
+    // Check if swipe was significant enough
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
+      // Snap back to current position
+      updateSwipePosition(true);
+      return;
+    }
+    
+    // Navigate
+    if (deltaX < 0 && swipeState.currentIndex < swipeState.cards.length - 1) {
+      // Swipe left - next ship
+      swipeState.currentIndex++;
+    } else if (deltaX > 0 && swipeState.currentIndex > 0) {
+      // Swipe right - previous ship
+      swipeState.currentIndex--;
+    }
+    
+    updateSwipePosition(true);
+    updateSwipeIndicator();
+    
+    // Trigger special animation on visible ship
+    triggerShipHighlight(swipeState.currentIndex);
+  }
+
+  function updateSwipePosition(animate = true) {
+    if (!swipeState.grid) return;
+    
+    if (!animate) {
+      swipeState.grid.style.transition = 'none';
+    }
+    
+    const offset = -swipeState.currentIndex * window.innerWidth;
+    swipeState.grid.style.transform = `translateX(${offset}px)`;
+    
+    if (!animate) {
+      // Force reflow then restore transition
+      swipeState.grid.offsetHeight;
+      swipeState.grid.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)';
+    }
+  }
+
+  function createSwipeIndicator(container) {
+    // Remove existing
+    const existing = container.querySelector('.swipe-indicator');
+    if (existing) existing.remove();
+    
+    const indicator = document.createElement('div');
+    indicator.className = 'swipe-indicator';
+    
+    swipeState.cards.forEach((card, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'swipe-dot';
+      if (i === swipeState.currentIndex) dot.classList.add('active');
+      if (card.dataset.ticker === swipeState.selectedTicker) dot.classList.add('selected');
+      
+      // Tap to navigate
+      dot.addEventListener('click', () => {
+        swipeState.currentIndex = i;
+        updateSwipePosition(true);
+        updateSwipeIndicator();
+        triggerShipHighlight(i);
+      });
+      
+      indicator.appendChild(dot);
+    });
+    
+    container.appendChild(indicator);
+    swipeState.indicator = indicator;
+  }
+
+  function updateSwipeIndicator() {
+    if (!swipeState.indicator) return;
+    
+    const dots = swipeState.indicator.querySelectorAll('.swipe-dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === swipeState.currentIndex);
+    });
+  }
+
+  function triggerShipHighlight(index) {
+    const card = swipeState.cards[index];
+    if (!card) return;
+    
+    const sprite = card.querySelector('.ship-card-sprite');
+    if (!sprite) return;
+    
+    const ticker = card.dataset.ticker;
+    
+    // Brief special animation
+    sprite.src = getShipGif(ticker, 'special');
+    setTimeout(() => {
+      sprite.src = getShipGif(ticker, 'idle');
+    }, 1500);
+  }
+
+  function showSwipeHint(container) {
+    // Only show once per session
+    if (sessionStorage.getItem('swipeHintShown')) return;
+    sessionStorage.setItem('swipeHintShown', 'true');
+    
+    const hint = document.createElement('div');
+    hint.className = 'swipe-hint';
+    hint.innerHTML = `
+      <span class="swipe-hint-arrow">◀</span>
+      <span class="swipe-hint-text">SWIPE TO BROWSE FLEET</span>
+      <span class="swipe-hint-arrow">▶</span>
+    `;
+    
+    container.appendChild(hint);
+    
+    // Auto-remove after animation
+    setTimeout(() => hint.remove(), 3500);
+  }
+
+  function handleResize() {
+    const wasMobile = swipeState.enabled;
+    const isMobile = isMobileViewport();
+    
+    if (wasMobile && !isMobile) {
+      // Switched to desktop - disable swipe mode
+      disableSwipeMode();
+    } else if (!wasMobile && isMobile) {
+      // Would need to re-render to enable - handled by page refresh
+    } else if (isMobile && swipeState.enabled) {
+      // Still mobile - just update position
+      updateSwipePosition(false);
+    }
+  }
+
+  function disableSwipeMode() {
+    if (!swipeState.grid) return;
+    
+    const screen = swipeState.grid.closest('.ship-select-screen');
+    if (screen) screen.classList.remove('swipe-mode');
+    
+    swipeState.grid.style.transform = '';
+    swipeState.grid.style.transition = '';
+    
+    if (swipeState.indicator) {
+      swipeState.indicator.remove();
+      swipeState.indicator = null;
+    }
+    
+    swipeState.enabled = false;
+    console.log('[ShipSelect] Swipe mode disabled');
+  }
+
+  function goToShip(index) {
+    if (!swipeState.enabled) return;
+    if (index < 0 || index >= swipeState.cards.length) return;
+    
+    swipeState.currentIndex = index;
+    updateSwipePosition(true);
+    updateSwipeIndicator();
+  }
+
+  function getCurrentShipIndex() {
+    return swipeState.currentIndex;
+  }
+
+  function getCurrentShipTicker() {
+    if (!swipeState.enabled || !swipeState.cards[swipeState.currentIndex]) return null;
+    return swipeState.cards[swipeState.currentIndex].dataset.ticker;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
   // EXPORT
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -521,6 +804,14 @@
     // Store integration
     commitShipSelection,
     getActiveTicker,
+    
+    // Mobile swipe mode
+    initSwipeMode,
+    disableSwipeMode,
+    goToShip,
+    getCurrentShipIndex,
+    getCurrentShipTicker,
+    isMobileViewport,
     
     // Config
     STAT_CONFIG,

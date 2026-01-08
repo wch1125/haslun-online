@@ -7,11 +7,35 @@
  * - Guest = read-only pilot with canonical CSV
  * - Uploaded CSVs override, never merge
  * - Same parsing path for both
+ * 
+ * Architecture principles (per ChatGPT review 2026-01-08):
+ * - Store NORMALIZED SCALARS, derive language at render time
+ * - Dossiers are CACHED, not recomputed per render
+ * - Instability is DERIVED from variance/options/clustering
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 const TradeLoader = (function() {
   'use strict';
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // DOSSIER CACHE - Never rebuild per render
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  const dossierCache = new Map();
+  const expiryCache = new Map();
+  let lastTradeHash = null;
+
+  function computeTradeHash(trades) {
+    if (!trades || trades.length === 0) return 'empty';
+    return `${trades.length}-${trades[0]?.dateTime || ''}-${trades[trades.length - 1]?.dateTime || ''}`;
+  }
+
+  function invalidateCache() {
+    dossierCache.clear();
+    expiryCache.clear();
+    lastTradeHash = null;
+  }
 
   // ─────────────────────────────────────────────────────────────────────────
   // MAIN ENTRY POINT
@@ -23,6 +47,9 @@ const TradeLoader = (function() {
    * @returns {Promise<Array>} Parsed trade records
    */
   async function loadTradeConfirms(userProfile) {
+    // Invalidate cache on new load
+    invalidateCache();
+    
     if (userProfile.type === 'guest') {
       console.log('[TradeLoader] Loading Guest pilot canonical data...');
       return loadCSV('../data/guest/trade-confirms.csv');
@@ -211,9 +238,28 @@ const TradeLoader = (function() {
   // ─────────────────────────────────────────────────────────────────────────
   // SUMMARY COMPUTATION - Per-ship dossiers
   // "The richness is the point"
+  // 
+  // ARCHITECTURE: Store NORMALIZED SCALARS, derive language at render time
   // ─────────────────────────────────────────────────────────────────────────
 
   function buildTradeSummary(trades) {
+    // Check cache first
+    const hash = computeTradeHash(trades);
+    if (hash === lastTradeHash && dossierCache.size > 0) {
+      console.log('[TradeLoader] Using cached dossiers');
+      return {
+        byTicker: Object.fromEntries(dossierCache),
+        tickers: [...dossierCache.keys()],
+        tickerCount: dossierCache.size,
+        totalTrades: trades.length,
+        stockTrades: trades.filter(t => !t.isOption).length,
+        optionTrades: trades.filter(t => t.isOption).length,
+        totalPNL: [...dossierCache.values()].reduce((sum, d) => sum + d.totalPNL, 0),
+        optionExpiries: [...expiryCache.values()].flat().sort((a, b) => (a.expiry || '').localeCompare(b.expiry || '')),
+        hasOptionsHistory: trades.some(t => t.isOption)
+      };
+    }
+
     const byTicker = {};
     const optionExpiries = [];
     
@@ -242,8 +288,8 @@ const TradeLoader = (function() {
           uniqueDays: new Set(),
           optionExpiries: [],
           strikes: new Set(),
-          // Derived personality traits
-          personality: null
+          // NORMALIZED METRICS (scalars only, no semantic labels)
+          metrics: null
         };
       }
       
@@ -283,12 +329,22 @@ const TradeLoader = (function() {
       }
     }
 
-    // Derive personality for each ticker
+    // Derive NORMALIZED METRICS for each ticker (scalars only)
     for (const ticker of Object.keys(byTicker)) {
-      byTicker[ticker].uniqueDays = byTicker[ticker].uniqueDays.size;
-      byTicker[ticker].strikes = [...byTicker[ticker].strikes].sort((a, b) => a - b);
-      byTicker[ticker].personality = deriveShipPersonality(byTicker[ticker]);
+      const bucket = byTicker[ticker];
+      bucket.uniqueDays = bucket.uniqueDays.size;
+      bucket.strikes = [...bucket.strikes].sort((a, b) => a - b);
+      bucket.metrics = deriveShipMetrics(bucket);
+      
+      // Cache the dossier
+      dossierCache.set(ticker, bucket);
+      
+      // Cache expiries grouped by ticker
+      expiryCache.set(ticker, groupExpiries(trades, ticker));
     }
+
+    // Update hash
+    lastTradeHash = hash;
 
     // Sort option expiries by date
     optionExpiries.sort((a, b) => (a.expiry || '').localeCompare(b.expiry || ''));
@@ -297,61 +353,198 @@ const TradeLoader = (function() {
     const tickers = Object.keys(byTicker);
     const totalPNL = tickers.reduce((sum, t) => sum + byTicker[t].totalPNL, 0);
     const totalTrades = trades.length;
-    const optionTrades = trades.filter(t => t.isOption).length;
-    const stockTrades = trades.filter(t => !t.isOption).length;
+    const optionTradesCount = trades.filter(t => t.isOption).length;
+    const stockTradesCount = trades.filter(t => !t.isOption).length;
 
     return {
       byTicker,
       tickers,
       tickerCount: tickers.length,
       totalTrades,
-      stockTrades,
-      optionTrades,
+      stockTrades: stockTradesCount,
+      optionTrades: optionTradesCount,
       totalPNL,
       optionExpiries,
-      hasOptionsHistory: optionTrades > 0
+      hasOptionsHistory: optionTradesCount > 0
     };
   }
 
   /**
-   * Derive ship personality from trade history
-   * "Some ships feel older or more damaged (high trade count, long history)"
+   * Derive NORMALIZED SHIP METRICS from trade history
+   * 
+   * Returns SCALARS ONLY - semantic labels are derived at render time
+   * This keeps the data model clean and future-proof for:
+   * - Animation intensity
+   * - Watercolor glazes
+   * - Combat modifiers
    */
-  function deriveShipPersonality(tickerData) {
-    const { tradeCount, totalPNL, optionCount, stockCount, uniqueDays, exerciseCount, expiryCount } = tickerData;
+  function deriveShipMetrics(tickerData) {
+    const { 
+      tradeCount, totalPNL, totalAmount, optionCount, stockCount, 
+      uniqueDays, exerciseCount, expiryCount, trades 
+    } = tickerData;
     
-    // Age: how long the pilot has been trading this ship
-    const age = uniqueDays > 100 ? 'veteran' : uniqueDays > 30 ? 'seasoned' : uniqueDays > 7 ? 'familiar' : 'new';
+    // Core metrics (all normalized 0-1 or raw values)
+    const pnlRatio = totalAmount > 0 ? totalPNL / totalAmount : 0;
+    const optionRatio = (optionCount + stockCount) > 0 
+      ? optionCount / (optionCount + stockCount) 
+      : 0;
+    const tradesPerDay = uniqueDays > 0 ? tradeCount / uniqueDays : 0;
+    const expiryDensity = optionCount > 0 ? expiryCount / optionCount : 0;
     
-    // Damage: based on losses and expired options
-    const damageScore = Math.min(1, (Math.abs(Math.min(0, totalPNL)) / 5000) + (expiryCount * 0.05));
-    const damage = damageScore > 0.6 ? 'scarred' : damageScore > 0.3 ? 'worn' : damageScore > 0.1 ? 'scratched' : 'clean';
+    // PNL variance (for instability calculation)
+    const pnlValues = trades.map(t => t.realizedPNL).filter(p => p !== 0);
+    const avgPNL = pnlValues.length > 0 
+      ? pnlValues.reduce((a, b) => a + b, 0) / pnlValues.length 
+      : 0;
+    const pnlVariance = pnlValues.length > 0
+      ? pnlValues.reduce((sum, p) => sum + Math.pow(p - avgPNL, 2), 0) / pnlValues.length
+      : 0;
+    const pnlStdDev = Math.sqrt(pnlVariance);
+    const normalizedVariance = avgPNL !== 0 ? Math.min(1, Math.abs(pnlStdDev / avgPNL)) : 0;
     
-    // Complexity: options vs stock ratio
-    const optionsRatio = optionCount / (stockCount + optionCount || 1);
-    const complexity = optionsRatio > 0.5 ? 'complex' : optionsRatio > 0.2 ? 'mixed' : 'simple';
-    
-    // Activity: trades per unique day
-    const activityRate = tradeCount / (uniqueDays || 1);
-    const activity = activityRate > 5 ? 'hyperactive' : activityRate > 2 ? 'active' : activityRate > 0.5 ? 'moderate' : 'calm';
-    
-    // Conviction: based on trade volume and consistency
-    const conviction = totalPNL > 1000 ? 'confident' : totalPNL > 0 ? 'hopeful' : totalPNL > -1000 ? 'cautious' : 'desperate';
+    // Trade clustering (how "bursty" is trading activity)
+    const tradeDates = [...new Set(trades.map(t => t.date))].sort();
+    let clusterScore = 0;
+    if (tradeDates.length > 1) {
+      const dateGaps = [];
+      for (let i = 1; i < tradeDates.length; i++) {
+        const gap = (new Date(tradeDates[i]) - new Date(tradeDates[i-1])) / (1000 * 60 * 60 * 24);
+        dateGaps.push(gap);
+      }
+      const avgGap = dateGaps.reduce((a, b) => a + b, 0) / dateGaps.length;
+      const gapVariance = dateGaps.reduce((sum, g) => sum + Math.pow(g - avgGap, 2), 0) / dateGaps.length;
+      clusterScore = Math.min(1, Math.sqrt(gapVariance) / 30); // Normalize against 30-day spread
+    }
+
+    // INSTABILITY: Derived from variance + options + clustering (NOT declared)
+    const instability = Math.min(1, 
+      normalizedVariance * 0.4 + 
+      optionRatio * 0.3 + 
+      clusterScore * 0.3
+    );
+
+    // Damage score (normalized 0-1)
+    const damageScore = Math.min(1, 
+      (Math.abs(Math.min(0, totalPNL)) / 5000) + (expiryCount * 0.05)
+    );
 
     return {
-      age,
-      damage,
+      // Raw counts (for display)
+      tradeDays: uniqueDays,
+      tradeCount,
+      optionCount,
+      stockCount,
+      expiryCount,
+      exerciseCount,
+      
+      // Normalized ratios (0-1 scale)
+      pnlRatio,
+      optionRatio,
+      tradesPerDay,
+      expiryDensity,
+      normalizedVariance,
+      clusterScore,
+      
+      // Derived behavioral modifiers (all 0-1)
+      instability,
       damageScore,
-      complexity,
-      activity,
-      activityRate,
-      conviction,
-      optionsRatio,
-      // Visual modifiers
       hullIntegrity: 1 - damageScore,
       wearLevel: Math.min(1, uniqueDays / 100),
-      engineStress: Math.min(1, activityRate / 5)
+      engineStress: Math.min(1, tradesPerDay / 5),
+      
+      // Raw values for display
+      totalPNL,
+      avgPNL
     };
+  }
+
+  /**
+   * PRESENTATION MAPPER - Derive semantic labels from metrics AT RENDER TIME
+   * Call this in UI code, NOT in data pipeline
+   */
+  function describeShip(metrics) {
+    if (!metrics) return { age: 'unknown', damage: 'unknown', activity: 'unknown', conviction: 'unknown' };
+    
+    const { tradeDays, damageScore, tradesPerDay, totalPNL, optionRatio } = metrics;
+    
+    return {
+      age: tradeDays > 100 ? 'veteran' 
+         : tradeDays > 30 ? 'seasoned' 
+         : tradeDays > 7 ? 'familiar' 
+         : 'green',
+         
+      damage: damageScore > 0.6 ? 'scarred' 
+            : damageScore > 0.3 ? 'worn' 
+            : damageScore > 0.1 ? 'scratched' 
+            : 'clean',
+            
+      activity: tradesPerDay > 5 ? 'hyperactive' 
+              : tradesPerDay > 2 ? 'active' 
+              : tradesPerDay > 0.5 ? 'measured' 
+              : 'calm',
+              
+      conviction: totalPNL > 1000 ? 'confident' 
+                : totalPNL > 0 ? 'hopeful' 
+                : totalPNL > -1000 ? 'cautious' 
+                : 'desperate',
+                
+      complexity: optionRatio > 0.5 ? 'complex' 
+                : optionRatio > 0.2 ? 'mixed' 
+                : 'simple'
+    };
+  }
+
+  /**
+   * Group option expiries by date (for haunting/ghost effects)
+   * Powers: looming expiry effects, derivatives missions, time-based distortions
+   */
+  function groupExpiries(trades, ticker) {
+    const expiries = {};
+    
+    trades
+      .filter(t => t.ticker === ticker && t.isOption && t.expiry)
+      .forEach(t => {
+        if (!expiries[t.expiry]) {
+          expiries[t.expiry] = {
+            expiry: t.expiry,
+            count: 0,
+            strikes: new Set(),
+            types: new Set(),
+            totalValue: 0
+          };
+        }
+        expiries[t.expiry].count++;
+        if (t.strike) expiries[t.expiry].strikes.add(t.strike);
+        if (t.optionType) expiries[t.expiry].types.add(t.optionType);
+        expiries[t.expiry].totalValue += Math.abs(t.amount);
+      });
+    
+    // Convert to array sorted by expiry date
+    return Object.values(expiries)
+      .map(e => ({
+        ...e,
+        strikes: [...e.strikes].sort((a, b) => a - b),
+        types: [...e.types]
+      }))
+      .sort((a, b) => a.expiry.localeCompare(b.expiry));
+  }
+
+  /**
+   * Get looming expiries (upcoming within N days)
+   * Used for haunting visual effects
+   */
+  function getLoomingExpiries(ticker, daysAhead = 30) {
+    const cached = expiryCache.get(ticker);
+    if (!cached) return [];
+    
+    const now = new Date();
+    const cutoff = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
+    
+    return cached.filter(e => {
+      const expDate = new Date(e.expiry);
+      return expDate >= now && expDate <= cutoff;
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -504,6 +697,12 @@ const TradeLoader = (function() {
     getShipDossier,
     hasOptionsHistory,
     getShipExpiries,
+    
+    // NEW: Metrics-first API (2026-01-08 refactor)
+    describeShip,         // UI presentation mapper - call at render time
+    groupExpiries,        // Expiries by date for a ticker
+    getLoomingExpiries,   // Upcoming expiries for haunting effects
+    invalidateCache,      // Force cache refresh
     
     // Expose for testing
     parseCSVLine,
