@@ -17,11 +17,19 @@
   <link rel="stylesheet" href="../css/ship-brief.css?v=20260108">
   <style>
     :root {
-      --bg-dark: #0a0e14;
-      --bg-card: #0d1218;
-      --bg-card-hover: #111820;
+      /* Miami chromatic palette */
+      --bg-dark: #0a0011;
+      --bg-void-warm: #14000b;
+      --bg-void-mid: #0a0011;
+      --bg-void-deep: #050008;
+      --bg-card: #12081a;
+      --bg-card-hover: #1a0c24;
+      
+      /* Hotline Miami neons */
       --phosphor: #33ff99;
       --phosphor-dim: rgba(51, 255, 153, 0.3);
+      --magenta: #ff2975;
+      --magenta-dim: rgba(255, 41, 117, 0.3);
       --amber: #ffaa33;
       --amber-dim: rgba(255, 170, 51, 0.3);
       --red: #ff4444;
@@ -29,19 +37,41 @@
       --cyan: #00d4ff;
       --text: #c8d4e0;
       --text-dim: #6a7a8a;
-      --border: rgba(51, 255, 153, 0.15);
+      --border: rgba(255, 41, 117, 0.2);
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
       font-family: 'IBM Plex Mono', monospace;
-      background: 
-        radial-gradient(ellipse at center, transparent 0%, transparent 60%, rgba(0,0,0,0.35) 100%),
-        var(--bg-dark);
+      background: linear-gradient(
+        180deg,
+        var(--bg-void-warm) 0%,
+        var(--bg-void-mid) 45%,
+        var(--bg-void-deep) 100%
+      );
       color: var(--text);
       min-height: 100vh;
       line-height: 1.5;
+    }
+    
+    /* Layer structure - Miami chromatic integration */
+    .layer-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: linear-gradient(
+        180deg,
+        var(--bg-void-warm) 0%,
+        var(--bg-void-mid) 45%,
+        var(--bg-void-deep) 100%
+      );
+    }
+    
+    .ui-layer {
+      position: relative;
+      z-index: 5;
     }
     
     /* CRT Scanlines Overlay */
@@ -1199,7 +1229,19 @@
 </head>
 <body>
   <div class="app-shell watercolor-ambient">
-    <div class="crt-noise"></div>
+    <!-- Layer 0: Base gradient (static - Miami chromatic) -->
+    <div class="layer-bg"></div>
+    
+    <!-- Layer 1: Watercolor ambient wash -->
+    <div class="watercolor-layer"></div>
+    
+    <!-- Layer 2: CRT effects -->
+    <div class="crt-layer">
+      <div class="crt-noise"></div>
+    </div>
+    
+    <!-- Layer 3: UI Content -->
+    <div class="ui-layer">
 
   <!-- Navigation -->
   <nav class="page-nav">
@@ -2690,6 +2732,7 @@
       }
     });
   </script>
+    </div><!-- /.ui-layer -->
   </div><!-- /.app-shell -->
 </body>
 </html>

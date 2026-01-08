@@ -41,13 +41,25 @@
   --purple-dim: rgba(157, 78, 221, 0.3);
 
   /* ═══════════════════════════════════════════════════════════════════════
-     BACKGROUNDS - Deep Purple-Black
+     BACKGROUNDS - Miami Chromatic Black (magenta-tinged dark)
+     This allows watercolor pigments to have chromatic headroom
      ═══════════════════════════════════════════════════════════════════════ */
   --bg-void: #0A0A0F;
+  --bg-void-warm: #14000b;      /* Miami chromatic - top */
+  --bg-void-mid: #0a0011;       /* Miami chromatic - middle */
+  --bg-void-deep: #050008;      /* Miami chromatic - bottom */
   --bg-panel: #12121A;
   --bg-surface: #1A1A24;
   --bg-elevated: #22222E;
   --bg-card: #181820;
+  
+  /* Miami chromatic gradient (use on body/app-shell) */
+  --bg-miami-gradient: linear-gradient(
+    180deg,
+    var(--bg-void-warm) 0%,
+    var(--bg-void-mid) 45%,
+    var(--bg-void-deep) 100%
+  );
 
   /* ═══════════════════════════════════════════════════════════════════════
      TEXT HIERARCHY

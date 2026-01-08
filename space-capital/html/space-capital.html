@@ -64,7 +64,9 @@
     html, body { margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
     
     body {
-      background: var(--bg-void);
+      /* Miami chromatic black - NOT green-neutral */
+      /* This gives watercolor pigments chromatic headroom to react */
+      background: var(--bg-miami-gradient, linear-gradient(180deg, #14000b 0%, #0a0011 45%, #050008 100%));
       color: var(--text-primary);
       font-family: var(--font-main);
       font-size: 16px;
@@ -72,7 +74,7 @@
       position: relative;
     }
     
-    /* Parallax layers - atmospheric depth */
+    /* Parallax layers - atmospheric depth (Miami chromatic) */
     .parallax-layer {
       position: fixed;
       inset: -10px; /* Slight overflow to prevent edge gaps during movement */
@@ -83,28 +85,21 @@
     .layer-bg {
       background: radial-gradient(
         ellipse at center,
-        rgba(11, 15, 20, 0.3) 0%,
-        rgba(5, 7, 10, 0.8) 70%
+        rgba(20, 0, 11, 0.3) 0%,
+        rgba(5, 0, 8, 0.8) 70%
       );
     }
     
-    .layer-wash {
-      background: radial-gradient(
-        ellipse at 30% 40%,
-        rgba(245, 184, 48, 0.02) 0%,  /* Indian Yellow tint */
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse at 70% 60%,
-        rgba(56, 72, 88, 0.03) 0%,    /* Payne's Grey tint */
-        transparent 40%
-      );
+    /* Watercolor wash layer - sits above base, below CRT */
+    .watercolor-layer {
+      z-index: 1;
+      opacity: 0.85;
     }
     
     /* Ensure content is above parallax layers */
     .app {
       position: relative;
-      z-index: 1;
+      z-index: 5;
     }
 
     /* =========================================================================
@@ -1474,16 +1469,21 @@
   </style>
 </head>
 <body>
-  <!-- CRT App Shell - Single canonical overlay + Watercolor ambient -->
+  <!-- CRT App Shell - Miami Chromatic + Watercolor layers -->
   <div class="app-shell watercolor-ambient">
-    <!-- Parallax Layer 0: Base (static) -->
+    <!-- Layer 0: Base gradient (static) -->
     <div class="parallax-layer layer-bg" data-depth="0"></div>
     
-    <!-- Parallax Layer 1: Ambient wash (slow) -->
-    <div class="parallax-layer layer-wash" data-depth="0.1"></div>
+    <!-- Layer 1: Watercolor ambient wash (slow parallax) -->
+    <div class="watercolor-layer parallax-layer" data-depth="0.1"></div>
     
-    <!-- CRT noise (slight parallax for depth) -->
-    <div class="crt-noise parallax-layer" data-depth="0.15"></div>
+    <!-- Layer 2: CRT effects (slight parallax) -->
+    <div class="crt-layer">
+      <div class="crt-noise parallax-layer" data-depth="0.15"></div>
+    </div>
+    
+    <!-- Layer 3: UI Content -->
+    <div class="ui-layer">
 
   <!-- Loading handled by TelemetryLockIn module -->
   <!-- Lock-in screen is created dynamically by js/ui/telemetry-lockin.js -->
@@ -2845,6 +2845,7 @@
     init();
   </script>
   
+    </div><!-- /.ui-layer -->
   </div><!-- /.app-shell -->
 
   <!-- ═══════════════════════════════════════════════════════════════════════

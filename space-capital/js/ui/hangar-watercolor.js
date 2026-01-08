@@ -36,9 +36,10 @@ const HangarWatercolor = (function() {
     maxAmbientOpacity: 0.12,
     maxPatinaOpacity: 0.08,
     
-    // Base colors
-    hangarBase: '#0B0F14',      // Dark space background (center)
-    hangarEdge: '#05070A',      // Darker edge for vignette
+    // Base colors - Miami Chromatic Black (allows pigments to show)
+    hangarBase: '#14000b',      // Warm magenta-tinged dark (top)
+    hangarMid: '#0a0011',       // Deep purple-black (middle)
+    hangarEdge: '#050008',      // Near-black with purple (bottom/edge)
     paperWhite: '#FCFAF5',      // Watercolor paper
     
     // Pigment limits (prevent mud)
@@ -493,7 +494,8 @@ const HangarWatercolor = (function() {
   }
 
   /**
-   * Inject CSS for ship patina overlays with blend-mode fallbacks
+   * Inject CSS for watercolor system with proper layer structure
+   * Layer order: Base gradient → Watercolor → CRT → UI
    */
   function injectPatinaStyles() {
     if (document.getElementById('watercolor-patina-styles')) return;
@@ -501,24 +503,109 @@ const HangarWatercolor = (function() {
     const style = document.createElement('style');
     style.id = 'watercolor-patina-styles';
     style.textContent = `
-      /* Watercolor Patina System v2 */
+      /* ═══════════════════════════════════════════════════════════════════
+         WATERCOLOR PATINA SYSTEM v2 - Miami Chromatic Integration
+         Layer order: Base → Watercolor → CRT → UI
+         ═══════════════════════════════════════════════════════════════════ */
+      
       :root {
         --hangar-ambient: ${CONFIG.hangarBase};
         --hangar-ambient-opacity: ${CONFIG.maxAmbientOpacity};
         --ship-patina: transparent;
         --ship-patina-opacity: ${CONFIG.maxPatinaOpacity};
+        
+        /* Miami chromatic gradient */
+        --bg-miami-gradient: linear-gradient(
+          180deg,
+          ${CONFIG.hangarBase} 0%,
+          ${CONFIG.hangarMid} 45%,
+          ${CONFIG.hangarEdge} 100%
+        );
       }
       
-      /* Hangar ambient wash - subtle radial gradient with vignette */
+      /* ─────────────────────────────────────────────────────────────────────
+         BASE LAYER - Miami Chromatic Black
+         This replaces the neutral green-black and gives pigments headroom
+         ───────────────────────────────────────────────────────────────────── */
       .watercolor-ambient {
+        background: var(--bg-miami-gradient) !important;
+      }
+      
+      /* ─────────────────────────────────────────────────────────────────────
+         WATERCOLOR LAYER - Sits above base, below CRT
+         Dedicated layer prevents CRT from crushing pigment color
+         ───────────────────────────────────────────────────────────────────── */
+      .watercolor-layer {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        background: radial-gradient(
+          ellipse at 40% 30%,
+          var(--hangar-ambient) 0%,
+          transparent 60%
+        );
+        opacity: 0.85; /* High enough to be visible against chromatic black */
+        mix-blend-mode: screen;
+      }
+      
+      /* ─────────────────────────────────────────────────────────────────────
+         CRT LAYER - Above watercolor, preserves chromatic warmth
+         ───────────────────────────────────────────────────────────────────── */
+      .crt-layer {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 2;
+      }
+      
+      /* ─────────────────────────────────────────────────────────────────────
+         UI LAYER - All Space Capital content
+         ───────────────────────────────────────────────────────────────────── */
+      .ui-layer {
+        position: relative;
+        z-index: 3;
+      }
+      
+      /* ─────────────────────────────────────────────────────────────────────
+         PARALLAX LAYERS - Atmospheric depth
+         ───────────────────────────────────────────────────────────────────── */
+      .parallax-layer {
+        position: fixed;
+        inset: -10px;
+        pointer-events: none;
+      }
+      
+      .layer-bg {
+        z-index: 0;
         background: radial-gradient(
           ellipse at center,
-          var(--hangar-ambient),
-          ${CONFIG.hangarEdge} 70%
-        ) !important;
+          rgba(20, 0, 11, 0.4) 0%,
+          rgba(5, 0, 8, 0.9) 70%
+        );
       }
       
-      /* Ship patina overlay - multiply blend */
+      .layer-wash {
+        z-index: 1;
+        background: radial-gradient(
+          ellipse at 30% 40%,
+          rgba(200, 160, 80, 0.04) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          ellipse at 70% 60%,
+          rgba(157, 78, 221, 0.03) 0%,
+          transparent 40%
+        );
+      }
+      
+      /* ─────────────────────────────────────────────────────────────────────
+         SHIP PATINA - Multiply blend overlay
+         ───────────────────────────────────────────────────────────────────── */
+      .ship-patina-enabled {
+        position: relative;
+      }
+      
       .ship-patina-enabled::after {
         content: '';
         position: absolute;
@@ -544,21 +631,25 @@ const HangarWatercolor = (function() {
         opacity: calc(var(--ship-patina-opacity) * 1.5);
       }
       
-      /* Parallax layer base - no animations on patina layer */
+      /* ─────────────────────────────────────────────────────────────────────
+         PARALLAX DATA-DEPTH LAYERS
+         ───────────────────────────────────────────────────────────────────── */
       [data-depth] {
         will-change: transform;
         transition: none;
       }
       
-      /* Reduced motion - disable all parallax transforms */
+      /* ─────────────────────────────────────────────────────────────────────
+         REDUCED MOTION - Accessibility
+         ───────────────────────────────────────────────────────────────────── */
       @media (prefers-reduced-motion: reduce) {
         [data-depth] {
           transform: none !important;
           will-change: auto;
         }
         
-        .watercolor-ambient {
-          /* Static ambient only, no dynamic updates */
+        .watercolor-layer {
+          opacity: calc(var(--hangar-ambient-opacity) * 0.7);
         }
       }
     `;
