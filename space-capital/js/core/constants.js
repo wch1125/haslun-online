@@ -148,4 +148,25 @@ Object.freeze(window.SPACE_CAPITAL.CONSTANTS.MISSIONS);
 Object.freeze(window.SPACE_CAPITAL.CONSTANTS.FEATURES);
 Object.freeze(window.SPACE_CAPITAL.CONSTANTS.DATA);
 
-console.log('📐 SPACE CAPITAL constants loaded');
+// ═══════════════════════════════════════════════════════════════════
+// DEBUG LOGGING UTILITY
+// Set window.__SC_DEBUG__ = true in console to enable verbose logging
+// ═══════════════════════════════════════════════════════════════════
+window.SPACE_CAPITAL.DEBUG = window.__SC_DEBUG__ || window.SPACE_CAPITAL.CONSTANTS.FEATURES.DEBUG_MODE;
+
+window.SPACE_CAPITAL.log = function(...args) {
+  if (window.SPACE_CAPITAL.DEBUG) console.log(...args);
+};
+
+window.SPACE_CAPITAL.warn = function(...args) {
+  if (window.SPACE_CAPITAL.DEBUG) console.warn(...args);
+};
+
+// Shorthand
+window.scLog = window.SPACE_CAPITAL.log;
+window.scWarn = window.SPACE_CAPITAL.warn;
+
+// Only log load confirmation in debug mode
+if (window.SPACE_CAPITAL.DEBUG) {
+  console.log('📐 SPACE CAPITAL constants loaded (debug mode)');
+}

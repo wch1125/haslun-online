@@ -1166,15 +1166,16 @@
       }
 
       // ═══════════════════════════════════════════════════════════════════════════
-      // DEPLOY TO ARENA
+      // DEPLOY TO ARENA (placeholder - Arena not yet implemented)
       // ═══════════════════════════════════════════════════════════════════════════
       
       window.deployToArena = function() {
+        // Arena is coming soon - button is disabled but function exists for future use
         if (window.Store) {
           Store.set({ activeTicker: currentTicker, arenaShip: currentTicker });
         }
-        // Navigate to arena (update path when arena page exists)
-        window.location.href = `space-capital.html?view=arena&ship=${currentTicker}`;
+        // TODO: Navigate to arena.html when it exists
+        console.log('[Hangar] Arena deployment queued for:', currentTicker);
       };
 
       // Initialize

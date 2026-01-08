@@ -479,9 +479,12 @@
       // Check if mobile (< 768px)
       const isMobile = window.innerWidth < 768;
       
+      // Debug logging (set window.__SC_DEBUG__ = true in console to enable)
+      const DEBUG = window.__SC_DEBUG__;
+      
       // Disable ships entirely if reduced motion is preferred
       if (prefersReducedMotion) {
-        console.log('[Landing] Reduced motion preferred, skipping flying ships');
+        if (DEBUG) console.log('[Landing] Reduced motion preferred, skipping flying ships');
       } else {
         // Cap ships on mobile (4), full set on desktop (10)
         const maxShips = isMobile ? 4 : 10;
@@ -504,7 +507,7 @@
           shipsBg.appendChild(img);
         }
         
-        console.log(`[Landing] Loaded ${maxShips} ships (${usePNGs ? 'static' : 'animated'})`);
+        if (DEBUG) console.log(`[Landing] Loaded ${maxShips} ships (${usePNGs ? 'static' : 'animated'})`);
       }
     })();
   </script>
