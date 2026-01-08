@@ -7,23 +7,45 @@
   'use strict';
 
   // ─────────────────────────────────────────────────────────────────────────
+  // STORE INTEGRATION - Single source of truth
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  function getStore() {
+    return window.Store || null;
+  }
+
+  function commitShipSelection(ticker, shipData) {
+    const store = getStore();
+    if (store) {
+      store.set({
+        activeTicker: ticker,
+        activeShip: shipData || null,
+        activeMission: null  // Clear mission when switching ships
+      });
+      console.log('[ShipSelect] Committed to Store:', ticker);
+    }
+  }
+
+  function getActiveTicker() {
+    const store = getStore();
+    return store ? store.get('activeTicker') : null;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
   // STAT MAPPING: Financial indicators → Ship stats (0-100 scale)
   // ─────────────────────────────────────────────────────────────────────────
   
   const STAT_CONFIG = {
     POWER: {
-      label: 'POWER',
-      icon: '⚡',
+      label: 'PWR',
       description: 'Long-term momentum (1Y return)',
       source: 'return_1y',
-      // Expected range for normalization
       min: -50,
       max: 300,
       color: '#ff6b6b'
     },
     SPEED: {
-      label: 'SPEED',
-      icon: '🚀',
+      label: 'SPD',
       description: 'Immediate velocity (1D return)',
       source: 'return_1d',
       min: -10,
@@ -31,17 +53,15 @@
       color: '#4ecdc4'
     },
     ARMOR: {
-      label: 'ARMOR',
-      icon: '🛡️',
+      label: 'ARM',
       description: 'Stability (proximity to 52W high)',
-      source: 'armor_calc', // Special calculation
+      source: 'armor_calc',
       min: 0,
       max: 100,
       color: '#45b7d1'
     },
     RANGE: {
-      label: 'RANGE',
-      icon: '📡',
+      label: 'RNG',
       description: 'Operational reach (6M return)',
       source: 'return_6m',
       min: -50,
@@ -49,8 +69,7 @@
       color: '#96ceb4'
     },
     TECH: {
-      label: 'TECH',
-      icon: '⚙️',
+      label: 'TCH',
       description: 'Recent capability (3M return)',
       source: 'return_3m',
       min: -30,
@@ -58,10 +77,9 @@
       color: '#dda0dd'
     },
     LUCK: {
-      label: 'LUCK',
-      icon: '🎲',
+      label: 'LCK',
       description: 'Volatility factor (1W swing)',
-      source: 'luck_calc', // Special calculation
+      source: 'luck_calc',
       min: 0,
       max: 100,
       color: '#ffeaa7'
@@ -179,7 +197,6 @@
     return `
       <div class="ship-stat-row" data-stat="${stat.label}">
         <div class="ship-stat-label">
-          <span class="ship-stat-icon">${stat.icon}</span>
           <span class="ship-stat-name">${stat.label}</span>
         </div>
         <div class="ship-stat-bar-container">
@@ -286,20 +303,18 @@
       <div class="ship-select-screen">
         <div class="ship-select-header">
           <div class="ship-select-title">
-            <span class="title-icon">🚀</span>
-            <span class="title-text">CHOOSE YOUR SHIP</span>
-            <span class="title-icon">🚀</span>
+            <span class="title-text">// SELECT VESSEL //</span>
           </div>
-          <div class="ship-select-subtitle">Fleet Command Interface // Pilot Registration</div>
+          <div class="ship-select-subtitle">Fleet Command Interface</div>
         </div>
         
         <div class="ship-select-legend">
-          <div class="legend-item"><span class="legend-icon">⚡</span> POWER: 1Y Return</div>
-          <div class="legend-item"><span class="legend-icon">🚀</span> SPEED: 1D Return</div>
-          <div class="legend-item"><span class="legend-icon">🛡️</span> ARMOR: 52W Position</div>
-          <div class="legend-item"><span class="legend-icon">📡</span> RANGE: 6M Return</div>
-          <div class="legend-item"><span class="legend-icon">⚙️</span> TECH: 3M Return</div>
-          <div class="legend-item"><span class="legend-icon">🎲</span> LUCK: Volatility</div>
+          <div class="legend-item"><span class="legend-label">PWR</span> 1Y Return</div>
+          <div class="legend-item"><span class="legend-label">SPD</span> 1D Return</div>
+          <div class="legend-item"><span class="legend-label">ARM</span> 52W Position</div>
+          <div class="legend-item"><span class="legend-label">RNG</span> 6M Return</div>
+          <div class="legend-item"><span class="legend-label">TCH</span> 3M Return</div>
+          <div class="legend-item"><span class="legend-label">LCK</span> Volatility</div>
         </div>
         
         <div class="ship-select-grid">
@@ -384,14 +399,20 @@
       });
       
       card.addEventListener('dblclick', () => {
-        onSelect(ticker, shipData.find(s => s.ticker === ticker));
+        const data = shipData.find(s => s.ticker === ticker);
+        // ALWAYS commit to Store first
+        commitShipSelection(ticker, data);
+        onSelect(ticker, data);
       });
       
       const selectBtn = card.querySelector('.ship-select-btn');
       if (selectBtn) {
         selectBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          onSelect(ticker, shipData.find(s => s.ticker === ticker));
+          const data = shipData.find(s => s.ticker === ticker);
+          // ALWAYS commit to Store first
+          commitShipSelection(ticker, data);
+          onSelect(ticker, data);
         });
       }
     });
@@ -491,12 +512,21 @@
   // ─────────────────────────────────────────────────────────────────────────
 
   window.ShipSelect = {
+    // Core functions
     calculateShipStats,
     renderShipSelectScreen,
     renderCompactShipCard,
     showShipSelectModal,
+    
+    // Store integration
+    commitShipSelection,
+    getActiveTicker,
+    
+    // Config
     STAT_CONFIG,
     SHIP_CLASSES,
+    
+    // Utilities
     getShipGif,
     getShipStatic
   };

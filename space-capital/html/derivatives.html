@@ -381,6 +381,150 @@
     .page-path .path-sep { opacity: 0.5; }
     .page-path .path-leaf { opacity: 0.85; }
     
+    /* ═══════════════════════════════════════════════════════════════════
+       ACTIVE SHIP PANEL — Shows currently selected ship from Store
+       Read-only display reinforcing ship ownership context
+       ═══════════════════════════════════════════════════════════════════ */
+    .active-ship-panel {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, 
+        rgba(51, 255, 153, 0.08) 0%, 
+        rgba(13, 18, 24, 0.95) 30%,
+        rgba(13, 18, 24, 0.95) 100%
+      );
+      border: 1px solid var(--phosphor-dim);
+      border-left: 3px solid var(--phosphor);
+      border-radius: 4px;
+      box-shadow: 
+        0 0 15px rgba(51, 255, 153, 0.1),
+        inset 0 0 30px rgba(51, 255, 153, 0.03);
+    }
+    
+    .active-ship-panel.no-ship {
+      border-left-color: var(--amber);
+      background: linear-gradient(90deg, 
+        rgba(255, 170, 51, 0.08) 0%, 
+        rgba(13, 18, 24, 0.95) 30%
+      );
+    }
+    
+    .asp-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(51, 255, 153, 0.1);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'VT323', monospace;
+      font-size: 1.5rem;
+      color: var(--phosphor);
+      overflow: hidden;
+    }
+    
+    .asp-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    
+    .asp-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .asp-ticker {
+      font-family: 'VT323', monospace;
+      font-size: 1.3rem;
+      color: var(--phosphor);
+      text-shadow: 0 0 10px var(--phosphor-dim);
+      letter-spacing: 0.1em;
+    }
+    
+    .asp-name {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+    
+    .asp-stats {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .asp-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    
+    .asp-stat-label {
+      font-size: 0.55rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    
+    .asp-stat-value {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    
+    .asp-stat-value.positive { color: var(--phosphor); }
+    .asp-stat-value.negative { color: var(--red); }
+    .asp-stat-value.asp-status { color: var(--amber); }
+    .asp-stat-value.asp-status.active { color: var(--phosphor); }
+    
+    .asp-change-btn {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+    }
+    
+    .asp-change-btn:hover {
+      background: rgba(51, 255, 153, 0.1);
+      border-color: var(--phosphor-dim);
+      color: var(--phosphor);
+    }
+    
+    @media (max-width: 768px) {
+      .active-ship-panel {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+      
+      .asp-stats {
+        width: 100%;
+        justify-content: space-around;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--border);
+      }
+      
+      .asp-change-btn {
+        width: 100%;
+        text-align: center;
+        margin-top: 0.5rem;
+      }
+    }
+    
     .container { max-width: 1600px; margin: 0 auto; padding: 1.5rem; }
     
     /* ═══════════════════════════════════════════════════════════════════
@@ -914,6 +1058,33 @@
       <button class="back-btn" onclick="returnToDashboard()">‹ DASHBOARD</button>
     </header>
     
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ACTIVE SHIP PANEL — Read-only display of currently selected ship
+         Shows ship from Store, reinforces ownership context
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="active-ship-panel" id="active-ship-panel">
+      <div class="asp-icon" id="asp-ship-icon"></div>
+      <div class="asp-info">
+        <div class="asp-ticker" id="asp-ticker">NO SHIP SELECTED</div>
+        <div class="asp-name" id="asp-name">Return to Hangar to select a ship</div>
+      </div>
+      <div class="asp-stats" id="asp-stats">
+        <div class="asp-stat">
+          <span class="asp-stat-label">TREND</span>
+          <span class="asp-stat-value" id="asp-trend">--</span>
+        </div>
+        <div class="asp-stat">
+          <span class="asp-stat-label">VOL</span>
+          <span class="asp-stat-value" id="asp-vol">--</span>
+        </div>
+        <div class="asp-stat">
+          <span class="asp-stat-label">STATUS</span>
+          <span class="asp-stat-value asp-status" id="asp-status">IDLE</span>
+        </div>
+      </div>
+      <a href="ship-select.html" class="asp-change-btn">CHANGE SHIP</a>
+    </div>
+    
     <!-- Controls -->
     <div class="controls">
       <div class="control-group">
@@ -1142,9 +1313,43 @@
         this.tickerSelect.addEventListener('change', () => this.onTickerChange());
         this.computeBtn.addEventListener('click', () => this.computeEnvironment());
         
-        // Read ticker from URL params (Step 2.2)
-        const params = new URLSearchParams(window.location.search);
-        this.preselectedTicker = params.get('ticker')?.toUpperCase() || null;
+        // Priority: 1) Store (authoritative), 2) URL params
+        let preselected = null;
+        
+        // Check Store first
+        if (window.Store) {
+          preselected = Store.get('activeTicker');
+          console.log('[Derivatives] Got ticker from Store:', preselected);
+        }
+        
+        // Fallback to URL params
+        if (!preselected) {
+          const params = new URLSearchParams(window.location.search);
+          preselected = params.get('ticker')?.toUpperCase() || null;
+          console.log('[Derivatives] Got ticker from URL:', preselected);
+          
+          // Sync to Store
+          if (preselected && window.Store) {
+            Store.set({ activeTicker: preselected });
+          }
+        }
+        
+        this.preselectedTicker = preselected;
+        
+        // Subscribe to Store changes
+        if (window.Store) {
+          Store.subscribeKey('activeTicker', (newTicker) => {
+            if (newTicker && newTicker !== this.currentTicker) {
+              this.preselectedTicker = newTicker;
+              this.tickerSelect.value = newTicker;
+              this.onTickerChange();
+              this.updateActiveShipPanel(); // Update ship display
+            }
+          });
+        }
+        
+        // Initialize Active Ship Panel
+        this.updateActiveShipPanel();
         
         this.loadTickers();
         this.renderActiveMissions();
@@ -1152,6 +1357,86 @@
         
         // Start update loop
         this.updateInterval = setInterval(() => this.updateLoop(), 500);
+      },
+      
+      // ═══════════════════════════════════════════════════════════════════
+      // ACTIVE SHIP PANEL — Display currently selected ship from Store
+      // ═══════════════════════════════════════════════════════════════════
+      updateActiveShipPanel() {
+        const panel = document.getElementById('active-ship-panel');
+        const iconEl = document.getElementById('asp-ship-icon');
+        const tickerEl = document.getElementById('asp-ticker');
+        const nameEl = document.getElementById('asp-name');
+        const trendEl = document.getElementById('asp-trend');
+        const volEl = document.getElementById('asp-vol');
+        const statusEl = document.getElementById('asp-status');
+        
+        if (!panel) return;
+        
+        const ticker = window.Store?.get('activeTicker');
+        const activeShip = window.Store?.get('activeShip');
+        const activeMission = window.Store?.get('activeMission');
+        
+        if (!ticker) {
+          panel.classList.add('no-ship');
+          iconEl.innerHTML = '?';
+          tickerEl.textContent = 'NO SHIP SELECTED';
+          nameEl.textContent = 'Return to Hangar to select a ship';
+          trendEl.textContent = '--';
+          volEl.textContent = '--';
+          statusEl.textContent = 'IDLE';
+          statusEl.classList.remove('active');
+          return;
+        }
+        
+        panel.classList.remove('no-ship');
+        
+        // Get ship icon (try animated GIF first)
+        const gifPath = `../assets/ships/animated/gifs/${ticker}_flight.gif`;
+        const staticPath = `../assets/ships/static/${ticker}.png`;
+        
+        iconEl.innerHTML = `<img src="${gifPath}" alt="${ticker}" 
+          onerror="this.onerror=null; this.src='${staticPath}'; this.onerror=function(){this.parentElement.textContent='${ticker.charAt(0)}';}">`;
+        
+        // Ticker display
+        tickerEl.textContent = ticker;
+        
+        // Ship name from ship data or profiles
+        const shipName = activeShip?.name || 
+                         window.TickerProfiles?.[ticker]?.name || 
+                         `Ship ${ticker}`;
+        nameEl.textContent = shipName;
+        
+        // Stats from current environment or ship data
+        if (this.currentEnv && this.currentTicker === ticker) {
+          const trend = this.currentEnv.momentum?.trend || 0;
+          trendEl.textContent = trend > 0 ? `+${(trend * 100).toFixed(1)}%` : `${(trend * 100).toFixed(1)}%`;
+          trendEl.className = 'asp-stat-value ' + (trend > 0 ? 'positive' : trend < 0 ? 'negative' : '');
+          
+          const vol = this.currentEnv.volatility?.level || '--';
+          volEl.textContent = typeof vol === 'number' ? `${(vol * 100).toFixed(0)}%` : vol;
+        } else if (activeShip) {
+          // Use data from activeShip if available
+          const trend = activeShip.trend || activeShip.change || 0;
+          trendEl.textContent = trend > 0 ? `+${trend.toFixed(1)}%` : `${trend.toFixed(1)}%`;
+          trendEl.className = 'asp-stat-value ' + (trend > 0 ? 'positive' : trend < 0 ? 'negative' : '');
+          
+          volEl.textContent = activeShip.volatility ? `${(activeShip.volatility * 100).toFixed(0)}%` : '--';
+        } else {
+          trendEl.textContent = '--';
+          trendEl.className = 'asp-stat-value';
+          volEl.textContent = '--';
+        }
+        
+        // Mission status
+        const missionForTicker = MissionSystem?.getActiveMissionForTicker?.(ticker);
+        if (activeMission || missionForTicker) {
+          statusEl.textContent = 'ON MISSION';
+          statusEl.classList.add('active');
+        } else {
+          statusEl.textContent = 'READY';
+          statusEl.classList.remove('active');
+        }
       },
       
       setStatus(text, type = 'ready') {
@@ -1239,6 +1524,9 @@
           
           this.renderEnvironment(env);
           this.renderMissionCards(recommendations);
+          
+          // Update Active Ship Panel with new environment data
+          this.updateActiveShipPanel();
           
           this.setStatus(`Analysis complete: ${this.currentTicker}`, 'ready');
           this.setMeta(`${env.barsUsed} bars • Latest: ${new Date(env.latestBar.time).toLocaleString()}`);

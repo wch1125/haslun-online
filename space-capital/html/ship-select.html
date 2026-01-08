@@ -196,13 +196,13 @@
     <div class="hangar-nav-logo">SPACE CAPITAL</div>
     <div class="hangar-nav-links">
       <a href="space-capital.html" class="hangar-nav-link">
-        <span>📊</span> FLEET
+        <span></span> FLEET
       </a>
       <a href="ship-select.html" class="hangar-nav-link active">
-        <span>🚀</span> HANGAR
+        <span></span> HANGAR
       </a>
       <a href="derivatives.html" class="hangar-nav-link">
-        <span>🎯</span> MISSIONS
+        <span></span> MISSIONS
       </a>
     </div>
   </nav>
@@ -215,6 +215,9 @@
     🔊
   </button>
 
+  <!-- Core State (AUTHORITATIVE - must load first) -->
+  <script src="../js/core/store.js"></script>
+  
   <!-- Data modules -->
   <script src="../js/data/ship-data.js"></script>
   <script src="../js/data/ticker-profiles.js"></script>
@@ -316,9 +319,21 @@
       function handleShipSelect(ticker, shipData) {
         playConfirmSound();
         
-        // Store selection in localStorage
-        localStorage.setItem('parallax_selected_ship', ticker);
-        localStorage.setItem('parallax_selected_ship_data', JSON.stringify(shipData));
+        // ═══════════════════════════════════════════════════════════════════
+        // AUTHORITATIVE STATE UPDATE — Store is the single source of truth
+        // ═══════════════════════════════════════════════════════════════════
+        if (window.Store) {
+          Store.set({
+            activeTicker: ticker,
+            activeShip: shipData,
+            activeMission: null  // Clear mission when switching ships
+          });
+          console.log('[Hangar] Ship committed to Store:', ticker);
+        } else {
+          console.warn('[Hangar] Store not available, falling back to localStorage');
+          localStorage.setItem('parallax_selected_ship', ticker);
+          localStorage.setItem('parallax_selected_ship_data', JSON.stringify(shipData));
+        }
         
         // Visual feedback
         const card = document.querySelector(`.ship-select-card[data-ticker="${ticker}"]`);
@@ -370,9 +385,13 @@
         const container = document.getElementById('ship-select-container');
         
         if (window.ShipSelect) {
+          // Get currently selected ticker from Store (authoritative)
+          const selectedTicker = window.Store ? Store.get('activeTicker') : 
+                                 localStorage.getItem('parallax_selected_ship');
+          
           ShipSelect.renderShipSelectScreen(container, statsData, {
             onSelect: handleShipSelect,
-            selectedTicker: localStorage.getItem('parallax_selected_ship')
+            selectedTicker: selectedTicker
           });
           
           // Add click sounds to cards

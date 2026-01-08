@@ -12,6 +12,9 @@
   <link rel="stylesheet" href="../css/ship-states.css">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Core State -->
+  <script src="../js/core/store.js"></script>
   <style>
     :root {
       --magenta: #FF2975;
@@ -398,9 +401,9 @@
         </div>
       </div>
       <div class="header-nav" style="display: flex; gap: 0.5rem;">
-        <button class="back-btn" onclick="window.location.href='space-capital.html'">📊 FLEET</button>
-        <button class="back-btn" onclick="window.location.href='ship-select.html'">🚀 HANGAR</button>
-        <button class="back-btn" onclick="window.location.href='derivatives.html'">🎯 MISSIONS</button>
+        <button class="back-btn" onclick="window.location.href='space-capital.html'">FLEET</button>
+        <button class="back-btn" onclick="window.location.href='ship-select.html'">HANGAR</button>
+        <button class="back-btn" onclick="window.location.href='derivatives.html'">MISSIONS</button>
       </div>
     </header>
 
@@ -420,7 +423,7 @@
         </div>
 
         <div class="position-section" id="positionSection" style="display: none;">
-          <div class="position-title">📊 POSITION DATA</div>
+          <div class="position-title">// POSITION DATA</div>
           <div class="stats-grid" id="positionStats">
             <!-- Populated by JS -->
           </div>
@@ -499,9 +502,29 @@
     // ─────────────────────────────────────────────────────────────────────────
 
     async function init() {
-      // Get ticker from URL
-      const params = new URLSearchParams(window.location.search);
-      currentTicker = params.get('ship')?.toUpperCase() || params.get('ticker')?.toUpperCase();
+      // Priority: 1) Store, 2) URL params
+      // This ensures state coherence across the app
+      let ticker = null;
+      
+      // Try Store first (authoritative source)
+      if (window.Store) {
+        ticker = Store.get('activeTicker');
+        console.log('[Telemetry] Got ticker from Store:', ticker);
+      }
+      
+      // Fallback to URL params
+      if (!ticker) {
+        const params = new URLSearchParams(window.location.search);
+        ticker = params.get('ship')?.toUpperCase() || params.get('ticker')?.toUpperCase();
+        console.log('[Telemetry] Got ticker from URL:', ticker);
+        
+        // Sync to Store if we got it from URL
+        if (ticker && window.Store) {
+          Store.set({ activeTicker: ticker });
+        }
+      }
+      
+      currentTicker = ticker;
 
       if (!currentTicker || !TICKER_CONFIG[currentTicker]) {
         showNoData();
@@ -511,7 +534,7 @@
       const config = TICKER_CONFIG[currentTicker];
       
       // Update header
-      document.getElementById('shipTitle').textContent = `${config.icon} ${currentTicker}`;
+      document.getElementById('shipTitle').textContent = currentTicker;
       document.getElementById('shipClass').textContent = `${config.class} CLASS // ${config.theme.toUpperCase()}`;
       document.title = `${currentTicker} TELEMETRY | SPACE CAPITAL`;
 
@@ -531,6 +554,16 @@
 
       // Setup chart controls
       setupChartControls();
+      
+      // Subscribe to Store changes for live updates
+      if (window.Store) {
+        Store.subscribeKey('activeTicker', (newTicker) => {
+          if (newTicker && newTicker !== currentTicker) {
+            // Reload the page with new ticker
+            window.location.href = `ship-telemetry.html?ship=${newTicker}`;
+          }
+        });
+      }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -558,25 +591,60 @@
 
     async function loadTelemetryData(ticker) {
       try {
-        // Try to load from fleet.json
+        // Try to load from fleet.json first (has position data)
         const fleetRes = await fetch('../data/telemetry/fleet.json');
         if (fleetRes.ok) {
           const fleetData = await fleetRes.json();
           const position = fleetData.positions?.find(p => p.ticker === ticker);
           if (position) {
             telemetryData = position;
+            console.log('[Telemetry] Loaded from fleet.json:', ticker);
             return;
           }
         }
 
-        // Try to load individual timeseries
+        // Try to load individual timeseries and extract current price
         const tsRes = await fetch(`../data/timeseries/${ticker.toLowerCase()}.json`);
         if (tsRes.ok) {
-          telemetryData = await tsRes.json();
-          return;
+          const tsData = await tsRes.json();
+          
+          // Extract price data from timeseries
+          const prices = tsData.prices || tsData;
+          if (Array.isArray(prices) && prices.length > 0) {
+            // Sort by date to get latest
+            const sorted = [...prices].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const latest = sorted[0];
+            const previous = sorted[1] || sorted[0];
+            
+            const currentPrice = parseFloat(latest.close || latest.price) || 0;
+            const previousPrice = parseFloat(previous.close || previous.price) || currentPrice;
+            const changePct = previousPrice > 0 ? ((currentPrice - previousPrice) / previousPrice * 100) : 0;
+            
+            telemetryData = {
+              ticker,
+              current_price: currentPrice,
+              stock_price: currentPrice,
+              chgPct: changePct,
+              volatility: 0.5,
+              trend: changePct > 0 ? 0.5 : -0.5,
+              momentum: changePct > 0 ? 0.3 : -0.3,
+              activity: 0.5,
+              signalState: changePct > 2 ? 'bull' : changePct < -2 ? 'bear' : 'neutral',
+              visual: {
+                glow: 0.5,
+                thrust: Math.abs(changePct) / 10,
+                damage: 0
+              },
+              // Store raw prices for chart
+              _priceHistory: prices
+            };
+            console.log('[Telemetry] Loaded from timeseries:', ticker, 'price:', currentPrice);
+            return;
+          }
         }
 
         // Generate mock data if nothing found
+        console.log('[Telemetry] Using mock data for:', ticker);
         telemetryData = generateMockTelemetry(ticker);
       } catch (e) {
         console.warn('[Telemetry] Failed to load data:', e);
@@ -1089,7 +1157,7 @@
     function showNoData() {
       document.querySelector('.main-grid').innerHTML = `
         <div class="panel no-data" style="grid-column: 1 / -1;">
-          <div class="no-data-icon">🚀</div>
+          <div class="no-data-icon" style="font-size: 3rem; color: var(--magenta);">?</div>
           <h2>SHIP NOT FOUND</h2>
           <p>No telemetry data available for this vessel.</p>
           <button class="back-btn" onclick="history.back()" style="margin-top: 1rem;">← RETURN TO HANGAR</button>

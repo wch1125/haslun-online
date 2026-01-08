@@ -278,9 +278,100 @@
         transition-duration: 0.01ms !important;
       }
     }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       FLYING SHIPS BACKGROUND
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .ships-bg {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .flying-ship {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      image-rendering: pixelated;
+      opacity: 0.15;
+      filter: brightness(0.7) saturate(0.5);
+      animation: fly-up linear infinite;
+    }
+
+    @keyframes fly-up {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.15;
+      }
+      90% {
+        opacity: 0.15;
+      }
+      100% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 0;
+      }
+    }
+
+    /* Stagger the ships */
+    .flying-ship:nth-child(1) { left: 5%; animation-duration: 12s; animation-delay: 0s; width: 24px; height: 24px; }
+    .flying-ship:nth-child(2) { left: 15%; animation-duration: 18s; animation-delay: 2s; width: 28px; height: 28px; }
+    .flying-ship:nth-child(3) { left: 25%; animation-duration: 15s; animation-delay: 5s; width: 20px; height: 20px; }
+    .flying-ship:nth-child(4) { left: 35%; animation-duration: 20s; animation-delay: 1s; width: 32px; height: 32px; }
+    .flying-ship:nth-child(5) { left: 45%; animation-duration: 14s; animation-delay: 8s; width: 22px; height: 22px; }
+    .flying-ship:nth-child(6) { left: 55%; animation-duration: 16s; animation-delay: 3s; width: 26px; height: 26px; }
+    .flying-ship:nth-child(7) { left: 65%; animation-duration: 19s; animation-delay: 6s; width: 30px; height: 30px; }
+    .flying-ship:nth-child(8) { left: 75%; animation-duration: 13s; animation-delay: 4s; width: 24px; height: 24px; }
+    .flying-ship:nth-child(9) { left: 85%; animation-duration: 17s; animation-delay: 7s; width: 28px; height: 28px; }
+    .flying-ship:nth-child(10) { left: 95%; animation-duration: 21s; animation-delay: 9s; width: 20px; height: 20px; }
+
+    /* Slight horizontal drift */
+    .flying-ship:nth-child(odd) {
+      animation-name: fly-up-drift-left;
+    }
+
+    @keyframes fly-up-drift-left {
+      0% {
+        transform: translateY(100vh) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.15; }
+      90% { opacity: 0.15; }
+      100% {
+        transform: translateY(-100px) translateX(-30px) rotate(-5deg);
+        opacity: 0;
+      }
+    }
+
+    .flying-ship:nth-child(even) {
+      animation-name: fly-up-drift-right;
+    }
+
+    @keyframes fly-up-drift-right {
+      0% {
+        transform: translateY(100vh) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.15; }
+      90% { opacity: 0.15; }
+      100% {
+        transform: translateY(-100px) translateX(30px) rotate(5deg);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Flying ships background -->
+  <div class="ships-bg" id="shipsBg">
+    <!-- Ships will be injected by JS -->
+  </div>
+
   <!-- Corner brackets -->
   <div class="corner corner-tl"></div>
   <div class="corner corner-tr"></div>
@@ -345,6 +436,39 @@
 
       // Focus the button for keyboard users
       enterBtn.focus();
+
+      // ─────────────────────────────────────────────────────────────────────────
+      // FLYING SHIPS BACKGROUND
+      // ─────────────────────────────────────────────────────────────────────────
+      
+      const SHIP_GIFS = [
+        'assets/ships/animated/gifs/RKLB_idle.gif',
+        'assets/ships/animated/gifs/LUNR_idle.gif',
+        'assets/ships/animated/gifs/ACHR_idle.gif',
+        'assets/ships/animated/gifs/ASTS_idle.gif',
+        'assets/ships/animated/gifs/JOBY_idle.gif',
+        'assets/ships/animated/gifs/BKSY_idle.gif',
+        'assets/ships/animated/gifs/GME_idle.gif',
+        'assets/ships/animated/gifs/KTOS_idle.gif',
+        'assets/ships/animated/gifs/GE_idle.gif',
+        'assets/ships/animated/gifs/PL_idle.gif'
+      ];
+
+      const shipsBg = document.getElementById('shipsBg');
+      
+      // Create flying ship elements
+      SHIP_GIFS.forEach((src, i) => {
+        const img = document.createElement('img');
+        img.className = 'flying-ship';
+        img.src = src;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.onerror = () => {
+          // Fallback to static image if GIF not found
+          img.src = 'assets/ships/static/Unclaimed-Drone-ship.png';
+        };
+        shipsBg.appendChild(img);
+      });
     })();
   </script>
 </body>
