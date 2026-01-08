@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * HANGAR WATERCOLOR SYSTEM v2
+ * HANGAR WATERCOLOR SYSTEM v2.1
  * ═══════════════════════════════════════════════════════════════════════════
  * 
  * Integrates the Watercolor Engine with Space Capital's telemetry system
@@ -8,7 +8,14 @@
  * 
  * Philosophy: "Let the market leave pigment residue in the hangar."
  * 
- * v2 Changes (ChatGPT review):
+ * v2.1 Changes (ChatGPT optimization review):
+ *   - Removed mix-blend-mode: screen from watercolor layer (OLED/GPU fix)
+ *   - Added position: absolute fallback on touch devices (iOS Safari fix)
+ *   - Improved parallax detection with pointer:coarse media query
+ *   - Changed parallax init from timeout to DOM-presence check
+ *   - Added mobile opacity reduction (70% on <768px)
+ * 
+ * v2 Changes:
  *   - Pigment clamping (max 2 to prevent mud)
  *   - Update debouncing (1200ms cooldown)
  *   - Reduced motion support (freeze after first render)
@@ -358,9 +365,22 @@ const HangarWatercolor = (function() {
    * Only runs on non-touch devices with motion enabled
    */
   function initParallax() {
-    // Skip on touch devices or reduced motion
-    if (reducedMotion || 'ontouchstart' in window) {
-      console.log('[HangarWatercolor] Parallax disabled (touch/reduced motion)');
+    // Skip on reduced motion
+    if (reducedMotion) {
+      console.log('[HangarWatercolor] Parallax disabled (reduced motion)');
+      return;
+    }
+    
+    // Skip on touch/mobile devices - use pointer:coarse for reliable detection
+    // This is more accurate than 'ontouchstart' which can be true on touchscreen laptops
+    if (window.matchMedia('(pointer: coarse)').matches) {
+      console.log('[HangarWatercolor] Parallax disabled (touch device)');
+      return;
+    }
+    
+    // Fallback touch detection for older browsers
+    if ('ontouchstart' in window) {
+      console.log('[HangarWatercolor] Parallax disabled (touch fallback)');
       return;
     }
     
@@ -486,8 +506,10 @@ const HangarWatercolor = (function() {
     
     // Initialize parallax (only on hangar and fleet, not during active UI)
     if (pageName === 'hangar' || pageName === 'fleet') {
-      // Delay slightly to ensure DOM is ready
-      setTimeout(initParallax, 100);
+      // Gate on actual layer presence instead of timeout (more deterministic)
+      if (document.querySelector('[data-depth]')) {
+        initParallax();
+      }
     }
     
     console.log('[HangarWatercolor] Page setup complete:', pageName);
@@ -534,6 +556,11 @@ const HangarWatercolor = (function() {
       /* ─────────────────────────────────────────────────────────────────────
          WATERCOLOR LAYER - Sits above base, below CRT
          Dedicated layer prevents CRT from crushing pigment color
+         
+         NOTE: Using normal blend mode instead of screen to:
+         - Prevent highlight blowout on OLED/mobile
+         - Avoid expensive GPU compositing on Android
+         - Let the chromatic base do the heavy lifting
          ───────────────────────────────────────────────────────────────────── */
       .watercolor-layer {
         position: fixed;
@@ -545,8 +572,8 @@ const HangarWatercolor = (function() {
           var(--hangar-ambient) 0%,
           transparent 60%
         );
-        opacity: 0.85; /* High enough to be visible against chromatic black */
-        mix-blend-mode: screen;
+        opacity: var(--hangar-ambient-opacity); /* ~0.12, let base carry the color */
+        mix-blend-mode: normal;
       }
       
       /* ─────────────────────────────────────────────────────────────────────
@@ -574,6 +601,29 @@ const HangarWatercolor = (function() {
         position: fixed;
         inset: -10px;
         pointer-events: none;
+      }
+      
+      /* ─────────────────────────────────────────────────────────────────────
+         TOUCH DEVICE FIXES - iOS Safari fixed-position repaint quirks
+         Downgrade to absolute positioning on touch devices to avoid
+         GPU thrash and jitter during scroll
+         ───────────────────────────────────────────────────────────────────── */
+      @media (pointer: coarse) {
+        .watercolor-layer,
+        .crt-layer,
+        .parallax-layer {
+          position: absolute;
+        }
+      }
+      
+      /* ─────────────────────────────────────────────────────────────────────
+         MOBILE OPACITY REDUCTION
+         On small screens, same opacity feels heavier due to less negative space
+         ───────────────────────────────────────────────────────────────────── */
+      @media (max-width: 768px) {
+        .watercolor-layer {
+          opacity: calc(var(--hangar-ambient-opacity) * 0.7);
+        }
       }
       
       .layer-bg {

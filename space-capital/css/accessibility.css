@@ -697,3 +697,42 @@ input[type="range"]:focus::-webkit-slider-thumb {
   background: var(--phosphor-glow);
   color: var(--text-bright);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOUCH TARGET IMPROVEMENTS
+   Increase padding on primary action buttons for tablet touch targets
+   Minimum recommended: 44x44px
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (pointer: coarse) {
+  /* Primary action buttons - ensure minimum 44px touch targets */
+  .ship-select-btn,
+  .ship-brief-btn,
+  .ship-brief-btn.primary,
+  .btn-primary,
+  .action-btn,
+  .enter-btn,
+  [data-action="launch"],
+  [data-action="select"],
+  [data-action="analyze"],
+  [data-action="deploy"] {
+    min-height: 44px;
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+  }
+  
+  /* Navigation buttons */
+  .nav-btn,
+  .tab-btn,
+  .mobile-nav-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Card action areas */
+  .ship-card-clickable,
+  .fleet-card,
+  [role="button"] {
+    min-height: 48px;
+  }
+}
