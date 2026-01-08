@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="../css/crt-shell.css?v=20260108">
   <link rel="stylesheet" href="../css/ui-overhaul.css?v=20260108">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Core -->
   <script src="../js/core/store.js?v=20260108"></script>
   <script src="../js/core/constants.js?v=20260108"></script>
@@ -17,6 +19,9 @@
   <script src="../js/data/position-manager.js?v=20260108"></script>
   <script src="../js/data/positions-store.js?v=20260108"></script>
   <script src="../js/data/load-trades.js?v=20260108"></script>
+  <!-- Ship Behavior & Chart Utils (for embedded telemetry) -->
+  <script src="../js/ships/ship-behavior.js?v=20260108"></script>
+  <script src="../js/data/chart-utils.js?v=20260108"></script>
   <style>
     :root {
       --hm-magenta: rgb(255, 41, 117);
@@ -688,6 +693,87 @@
         height: 120px;
       }
     }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       EMBEDDED TELEMETRY STYLES
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .telemetry-embed { margin-top: 1.25rem; }
+    .telemetry-grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; }
+
+    .telemetry-panel {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255, 41, 117, 0.2);
+      padding: 1rem;
+    }
+
+    .chart-controls { display:flex; gap:.5rem; margin-bottom:.75rem; flex-wrap:wrap; }
+    .chart-btn {
+      padding: .4rem .8rem;
+      background: transparent;
+      border: 1px solid rgba(255, 41, 117, 0.35);
+      color: var(--text-dim);
+      font-family: 'VT323', monospace;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chart-btn:hover {
+      border-color: var(--hm-cyan);
+      color: var(--hm-cyan);
+    }
+    .chart-btn.active {
+      border-color: var(--hm-cyan);
+      color: var(--hm-cyan);
+      background: rgba(0,255,255,0.08);
+    }
+
+    .chart-container { height: 340px; position:relative; }
+    .chart-container canvas { width:100% !important; height:100% !important; }
+
+    .behavior-state-grid { display:grid; grid-template-columns: 1fr 1fr; gap:.75rem; }
+    .behavior-state-item { 
+      background: rgba(0,0,0,0.25); 
+      padding:.75rem; 
+      border-left:3px solid var(--border-dim); 
+    }
+    .behavior-state-item.positive { border-left-color: var(--hm-cyan); }
+    .behavior-state-item.negative { border-left-color: var(--hm-magenta); }
+    .behavior-state-item.warning { border-left-color: var(--hm-yellow); }
+    .behavior-state-item.neutral { border-left-color: var(--hm-cyan); }
+    .behavior-state-item.extreme { border-left-color: var(--hm-magenta); }
+
+    .behavior-state-label { font-size:.7rem; color: var(--text-dim); letter-spacing:.1em; margin-bottom:.25rem; }
+    .behavior-state-value { font-size: 1rem; font-weight: 700; }
+    .behavior-state-value.positive { color: var(--hm-cyan); }
+    .behavior-state-value.negative { color: var(--hm-magenta); }
+    .behavior-state-value.warning { color: var(--hm-yellow); }
+    .behavior-state-value.neutral { color: var(--hm-cyan); }
+    .behavior-state-value.extreme { color: var(--hm-magenta); }
+    .behavior-state-desc { font-size:.7rem; color: var(--text-dim); margin-top:.25rem; }
+
+    .telemetry-bars { display: grid; gap: 0.5rem; }
+    .telemetry-row { display:grid; grid-template-columns: 1fr auto; gap:.5rem; padding:.5rem; background: rgba(0,0,0,0.2); }
+    .telemetry-label { font-size: .8rem; color: var(--text-dim); }
+    .telemetry-bar { width: 120px; height: 8px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-dim); }
+    .telemetry-bar-fill { height:100%; transition: width 0.3s; }
+    .telemetry-bar-fill.green { background: var(--hm-cyan); }
+    .telemetry-bar-fill.yellow { background: var(--hm-yellow); }
+    .telemetry-bar-fill.red { background: var(--hm-magenta); }
+    .telemetry-bar-fill.cyan { background: var(--hm-cyan); }
+    .telemetry-bar-fill.momentum-pos { background: linear-gradient(90deg, var(--hm-cyan), #00CCCC); }
+    .telemetry-bar-fill.momentum-neg { background: linear-gradient(90deg, var(--hm-magenta), #CC1F5C); }
+    .telemetry-bar-fill.trend-pos { background: linear-gradient(90deg, var(--hm-cyan), #00DDDD); }
+    .telemetry-bar-fill.trend-neg { background: linear-gradient(90deg, var(--hm-magenta), #CC1F5C); }
+    .telemetry-bar-fill.volatility { background: linear-gradient(90deg, var(--hm-yellow), #CCBB00); }
+    .telemetry-bar-fill.activity { background: linear-gradient(90deg, var(--hm-cyan), #00BBBB); }
+    .telemetry-bar-fill.thrust { background: linear-gradient(90deg, var(--hm-cyan), #00DDDD); }
+    .telemetry-bar-fill.damage { background: linear-gradient(90deg, var(--hm-magenta), #FF0040); }
+    .telemetry-bar-fill.glow { background: linear-gradient(90deg, var(--hm-cyan), #44DDFF); }
+
+    @media (max-width: 900px) {
+      .telemetry-grid-2 { grid-template-columns:1fr; }
+      .chart-container { height: 280px; }
+    }
   </style>
 </head>
 <body>
@@ -741,6 +827,30 @@
       let currentTab = 'systems';
       let shipData = null;
       let tradeHistory = [];
+      let telemetryData = null;
+      let priceChart = null;
+      let lastChartRange = '1M';
+      let lastChartTicker = null;
+
+      const TICKER_CONFIG = {
+        'RKLB': { theme: 'Space', icon: '🚀', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
+        'LUNR': { theme: 'Space', icon: '🌙', color: '#9D4EDD', class: 'EXPLORER', sin: 'FAITH' },
+        'ASTS': { theme: 'Space', icon: '📡', color: '#00FFFF', class: 'CRUISER', sin: 'AMBITION' },
+        'BKSY': { theme: 'Space', icon: '🛰️', color: '#FF69B4', class: 'SCOUT', sin: 'VIGILANCE' },
+        'RDW': { theme: 'Space', icon: '⚙️', color: '#00CCCC', class: 'ENGINEER', sin: 'CRAFT' },
+        'PL': { theme: 'Space', icon: '🌍', color: '#B8986B', class: 'SURVEYOR', sin: 'WISDOM' },
+        'ACHR': { theme: 'Air Mobility', icon: '🛸', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
+        'JOBY': { theme: 'Air Mobility', icon: '🚁', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
+        'EVEX': { theme: 'Air Mobility', icon: '✈️', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' },
+        'KTOS': { theme: 'Defense', icon: '🎯', color: '#FF4444', class: 'FIGHTER', sin: 'PRECISION' },
+        'LHX': { theme: 'Defense', icon: '🛡️', color: '#4488FF', class: 'SENTINEL', sin: 'DUTY' },
+        'RTX': { theme: 'Defense', icon: '🔧', color: '#888888', class: 'CARRIER', sin: 'POWER' },
+        'GE': { theme: 'Defense', icon: '⚡', color: '#44AAFF', class: 'TITAN', sin: 'LEGACY' },
+        'COHR': { theme: 'Tech', icon: '💎', color: '#AA44FF', class: 'PHANTOM', sin: 'CLARITY' },
+        'GME': { theme: 'Meme', icon: '🎮', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
+        'XAR': { theme: 'Benchmark', icon: '📊', color: '#666677', class: 'FLAGSHIP', sin: 'INDEX' },
+        'SPY': { theme: 'Benchmark', icon: '📈', color: '#4466AA', class: 'COMMAND', sin: 'MARKET' }
+      };
 
       // ═══════════════════════════════════════════════════════════════════════════
       // INITIALIZATION
@@ -767,6 +877,10 @@
         if (currentTicker && SHIP_CONFIG[currentTicker]) {
           renderShipHangar();
           loadShipData();
+          
+          // Support tab= URL param for deep linking
+          const tab = params.get('tab');
+          if (tab) switchTab(tab);
         } else {
           renderNoShipState();
         }
@@ -882,9 +996,34 @@
             <div class="systems-preview" id="systemsPreview">
               <!-- Populated by JS -->
             </div>
-            <a href="ship-telemetry.html?ship=${currentTicker}" class="full-telemetry-link">
-              FULL TELEMETRY READOUT →
-            </a>
+
+            <div class="telemetry-embed">
+              <div class="telemetry-grid-2">
+                <!-- Chart -->
+                <div class="telemetry-panel">
+                  <div class="tab-header" style="margin-top: 0;">// PRICE HISTORY</div>
+                  <div class="chart-controls">
+                    <button class="chart-btn active" data-range="1M">1M</button>
+                    <button class="chart-btn" data-range="3M">3M</button>
+                    <button class="chart-btn" data-range="6M">6M</button>
+                    <button class="chart-btn" data-range="1Y">1Y</button>
+                    <button class="chart-btn" data-range="ALL">ALL</button>
+                  </div>
+                  <div class="chart-container">
+                    <canvas id="priceChart"></canvas>
+                  </div>
+                </div>
+
+                <!-- Behavior + telemetry -->
+                <div class="telemetry-panel">
+                  <div class="tab-header" style="margin-top: 0;">// BEHAVIOR STATE</div>
+                  <div class="behavior-state-grid" id="behaviorStateGrid"></div>
+
+                  <div class="tab-header" style="margin-top: 1.25rem;">// TELEMETRY DATA</div>
+                  <div class="telemetry-bars" id="telemetryGrid"></div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="tab-content" id="tab-flightlog">
@@ -951,15 +1090,23 @@
       
       async function loadShipData() {
         try {
-          // Load fleet data
-          const fleetRes = await fetch('../data/fleet.json');
+          // Load fleet data - use telemetry/fleet.json for full telemetry data
+          const fleetRes = await fetch('../data/telemetry/fleet.json');
           if (fleetRes.ok) {
             const fleetData = await fleetRes.json();
-            const position = fleetData.positions?.find(p => p.ticker === currentTicker);
+            // fleet.json uses 'ships' array, not 'positions'
+            const ships = fleetData.ships || fleetData.positions || [];
+            const position = ships.find(p => p.ticker === currentTicker);
             if (position) {
               shipData = position;
+              telemetryData = position; // Store for telemetry rendering
               updateQuickStats(position);
               updateSystemsPreview(position);
+              // Render embedded telemetry
+              renderBehaviorState();
+              renderTelemetryBars();
+              initChart();
+              setupChartControls();
             }
           }
         } catch (e) {
@@ -975,7 +1122,7 @@
 
       function updateQuickStats(position) {
         const price = position.current || position.price || 0;
-        const change = position.return_1d || 0;
+        const change = position.return_1d ?? position.chgPct ?? 0;
         const high52 = position.high_52w || price;
         const low52 = position.low_52w || price;
 
@@ -1012,11 +1159,16 @@
         const preview = document.getElementById('systemsPreview');
         if (!preview) return;
 
+        // Handle both legacy position format and telemetry format
+        const return1y = position.return_1y;
+        const return1d = position.return_1d ?? position.chgPct;
+        const return6m = position.return_6m;
+
         const gauges = [
-          { label: 'POWER (1Y RETURN)', value: normalizeReturn(position.return_1y), raw: position.return_1y },
-          { label: 'VELOCITY (1D RETURN)', value: normalizeReturn(position.return_1d, -10, 20), raw: position.return_1d },
+          { label: 'POWER (1Y RETURN)', value: normalizeReturn(return1y), raw: return1y },
+          { label: 'VELOCITY (1D RETURN)', value: normalizeReturn(return1d, -10, 20), raw: return1d },
           { label: 'ARMOR (VS 52W HIGH)', value: calculateArmor(position), raw: null },
-          { label: 'RANGE (6M RETURN)', value: normalizeReturn(position.return_6m, -50, 200), raw: position.return_6m }
+          { label: 'RANGE (6M RETURN)', value: normalizeReturn(return6m, -50, 200), raw: return6m }
         ];
 
         preview.innerHTML = gauges.map(g => `
@@ -1025,7 +1177,7 @@
             <div class="system-gauge-bar">
               <div class="system-gauge-fill" style="width: ${g.value}%"></div>
             </div>
-            <div class="system-gauge-value">${g.raw !== null ? (g.raw >= 0 ? '+' : '') + g.raw.toFixed(1) + '%' : g.value + '%'}</div>
+            <div class="system-gauge-value">${g.raw != null && Number.isFinite(g.raw) ? (g.raw >= 0 ? '+' : '') + g.raw.toFixed(1) + '%' : g.value + '%'}</div>
           </div>
         `).join('');
       }
@@ -1037,11 +1189,362 @@
       }
 
       function calculateArmor(position) {
-        const current = position.current || 0;
+        const current = position.current || position.price || 0;
         const high52 = position.high_52w || current;
         const low52 = position.low_52w || current;
         if (high52 === low52) return 50;
         return Math.round(((current - low52) / (high52 - low52)) * 100);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // TELEMETRY RENDERING - Embedded from ship-telemetry.html
+      // ═══════════════════════════════════════════════════════════════════════════
+
+      function renderBehaviorState() {
+        const grid = document.getElementById('behaviorStateGrid');
+        if (!grid || !telemetryData) return;
+
+        const change = telemetryData.chgPct || 0;
+        const volatility = telemetryData.volatility || 0.5;
+        const damage = telemetryData.visual?.damage || 0;
+        const hull = Math.max(0, 100 - damage * 100);
+
+        // Determine thrust state
+        let thrustState, thrustClass, thrustDesc;
+        if (change >= 5) {
+          thrustState = 'Strong Positive';
+          thrustClass = 'positive';
+          thrustDesc = 'Full thrust forward, intense engine glow';
+        } else if (change >= 0) {
+          thrustState = 'Positive';
+          thrustClass = 'positive';
+          thrustDesc = 'Gentle thrust, moderate glow';
+        } else if (change >= -5) {
+          thrustState = 'Negative';
+          thrustClass = 'warning';
+          thrustDesc = 'Backward drift, dimmer engines';
+        } else {
+          thrustState = 'Failing';
+          thrustClass = 'negative';
+          thrustDesc = 'Flickering, heavy backward drift';
+        }
+
+        // Determine stability state
+        let stabilityState, stabilityClass, stabilityDesc;
+        if (volatility < 0.1) {
+          stabilityState = 'Stable';
+          stabilityClass = 'neutral';
+          stabilityDesc = 'Minimal volatility effects';
+        } else if (volatility < 0.2) {
+          stabilityState = 'Elevated';
+          stabilityClass = 'warning';
+          stabilityDesc = 'Subtle vibration';
+        } else if (volatility < 0.35) {
+          stabilityState = 'High';
+          stabilityClass = 'warning';
+          stabilityDesc = 'Noticeable shake';
+        } else {
+          stabilityState = 'Extreme';
+          stabilityClass = 'extreme';
+          stabilityDesc = 'Violent shaking';
+        }
+
+        // Determine hull state
+        let hullState, hullClass, hullDesc;
+        if (hull >= 80) {
+          hullState = 'Optimal';
+          hullClass = 'positive';
+          hullDesc = 'Clean, no effects';
+        } else if (hull >= 50) {
+          hullState = 'Stressed';
+          hullClass = 'warning';
+          hullDesc = 'Warning amber tint';
+        } else if (hull >= 25) {
+          hullState = 'Critical';
+          hullClass = 'negative';
+          hullDesc = 'Red tint, damage pulse';
+        } else {
+          hullState = 'Failing';
+          hullClass = 'negative';
+          hullDesc = 'Flashing, critical state';
+        }
+
+        // Determine mood based on combined factors
+        let moodState, moodClass, moodDesc;
+        const moodScore = (change > 0 ? 1 : 0) + (volatility < 0.2 ? 1 : 0) + (hull > 50 ? 1 : 0);
+        if (moodScore >= 3) {
+          moodState = 'Confident';
+          moodClass = 'positive';
+          moodDesc = 'Aggressive forward stance';
+        } else if (moodScore >= 2) {
+          moodState = 'Alert';
+          moodClass = 'neutral';
+          moodDesc = 'Scanning, ready state';
+        } else if (moodScore >= 1) {
+          moodState = 'Cautious';
+          moodClass = 'warning';
+          moodDesc = 'Defensive positioning';
+        } else {
+          moodState = 'Distressed';
+          moodClass = 'negative';
+          moodDesc = 'Erratic movement';
+        }
+
+        grid.innerHTML = `
+          <div class="behavior-state-item ${thrustClass}">
+            <div class="behavior-state-label">THRUST</div>
+            <div class="behavior-state-value ${thrustClass}">${thrustState}</div>
+            <div class="behavior-state-desc">${thrustDesc}</div>
+          </div>
+          <div class="behavior-state-item ${stabilityClass}">
+            <div class="behavior-state-label">STABILITY</div>
+            <div class="behavior-state-value ${stabilityClass}">${stabilityState}</div>
+            <div class="behavior-state-desc">${stabilityDesc}</div>
+          </div>
+          <div class="behavior-state-item ${hullClass}">
+            <div class="behavior-state-label">HULL</div>
+            <div class="behavior-state-value ${hullClass}">${hullState}</div>
+            <div class="behavior-state-desc">${hullDesc}</div>
+          </div>
+          <div class="behavior-state-item ${moodClass}">
+            <div class="behavior-state-label">MOOD</div>
+            <div class="behavior-state-value ${moodClass}">${moodState}</div>
+            <div class="behavior-state-desc">${moodDesc}</div>
+          </div>
+        `;
+      }
+
+      function renderTelemetryBars() {
+        const grid = document.getElementById('telemetryGrid');
+        if (!grid || !telemetryData) return;
+
+        const metrics = [
+          { label: 'VOLATILITY', value: telemetryData.volatility || 0.5, color: 'volatility' },
+          { label: 'MOMENTUM', value: ((telemetryData.momentum || 0) + 1) / 2, color: (telemetryData.momentum || 0) > 0 ? 'momentum-pos' : 'momentum-neg' },
+          { label: 'TREND', value: ((telemetryData.trend || 0) + 1) / 2, color: (telemetryData.trend || 0) > 0 ? 'trend-pos' : 'trend-neg' },
+          { label: 'ACTIVITY', value: telemetryData.activity || 0.5, color: 'activity' },
+          { label: 'THRUST', value: telemetryData.visual?.thrust || 0.5, color: 'thrust' },
+          { label: 'DAMAGE', value: telemetryData.visual?.damage || 0, color: 'damage' },
+          { label: 'GLOW', value: telemetryData.visual?.glow || 0.5, color: 'glow' }
+        ];
+
+        grid.innerHTML = metrics.map(m => `
+          <div class="telemetry-row">
+            <span class="telemetry-label">${m.label}</span>
+            <div class="telemetry-bar">
+              <div class="telemetry-bar-fill ${m.color}" style="width: ${Math.min(100, m.value * 100)}%"></div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // PRICE CHART
+      // ═══════════════════════════════════════════════════════════════════════════
+
+      async function initChart() {
+        const canvas = document.getElementById('priceChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const config = TICKER_CONFIG[currentTicker] || { color: '#FF2975' };
+
+        // Load and process chart data
+        let rawData = await loadRawChartData('1M');
+        lastChartRange = '1M';
+        lastChartTicker = currentTicker;
+
+        // Prepare data with validation
+        const chartData = window.ChartUtils 
+          ? ChartUtils.prepareChartData(rawData, { targetPoints: 150, useIndexBasedX: true })
+          : fallbackPrepareData(rawData);
+
+        // Bail if no valid data
+        if (!chartData.prices || chartData.prices.length === 0) {
+          console.warn('[Hangar Chart] No valid data to render');
+          return;
+        }
+
+        // Create chart
+        const chartConfig = window.ChartUtils
+          ? ChartUtils.createChartConfig(chartData, { color: config.color, label: currentTicker, fillOpacity: 0.1 })
+          : createFallbackConfig(chartData, config);
+
+        priceChart = new Chart(ctx, chartConfig);
+      }
+
+      async function loadRawChartData(range) {
+        try {
+          const res = await fetch(`../data/timeseries/${currentTicker.toLowerCase()}.json`);
+          if (res.ok) {
+            const data = await res.json();
+            const now = new Date();
+            const ranges = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': 9999 };
+            const days = ranges[range] || 30;
+            const cutoff = new Date(now - days * 24 * 60 * 60 * 1000);
+            
+            const rawArray = data.prices || data;
+            return rawArray
+              .filter(p => new Date(p.date) >= cutoff)
+              .map(p => ({
+                date: p.date,
+                close: parseFloat(p.close || p.price),
+                time: new Date(p.date).getTime()
+              }))
+              .filter(p => isFinite(p.close));
+          }
+        } catch (e) {
+          console.warn('[Hangar Chart] Failed to load timeseries:', e);
+        }
+        return generateMockChartData(range);
+      }
+
+      function fallbackPrepareData(rawData) {
+        const cleaned = rawData
+          .filter(d => d && d.date && isFinite(parseFloat(d.close)))
+          .map(d => ({ ...d, close: parseFloat(d.close) }));
+        
+        const seen = new Set();
+        const deduped = cleaned.filter(d => {
+          if (seen.has(d.date)) return false;
+          seen.add(d.date);
+          return true;
+        });
+        
+        deduped.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        const prices = deduped.map(p => p.close);
+        const minP = Math.min(...prices);
+        const maxP = Math.max(...prices);
+        const pad = (maxP - minP) * 0.05 || 1;
+        
+        return {
+          labels: deduped.map(p => new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+          prices: prices,
+          dateLabels: deduped.map(p => p.date),
+          domain: { min: minP - pad, max: maxP + pad }
+        };
+      }
+
+      function createFallbackConfig(chartData, config) {
+        return {
+          type: 'line',
+          data: {
+            labels: chartData.labels,
+            datasets: [{
+              label: currentTicker,
+              data: chartData.prices,
+              borderColor: config.color,
+              backgroundColor: config.color + '1A',
+              fill: 'origin',
+              tension: 0.1,
+              pointRadius: 0,
+              borderWidth: 2,
+              spanGaps: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#12121A',
+                borderColor: config.color,
+                borderWidth: 1,
+                titleFont: { family: 'VT323' },
+                bodyFont: { family: 'VT323' },
+                callbacks: {
+                  label: (ctx) => {
+                    const val = ctx.parsed.y;
+                    return isFinite(val) ? `$${val.toFixed(2)}` : 'N/A';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { color: '#333344' },
+                ticks: { color: '#888899', font: { family: 'VT323' }, maxTicksLimit: 8 }
+              },
+              y: {
+                min: chartData.domain.min,
+                max: chartData.domain.max,
+                grid: { color: '#333344' },
+                ticks: { 
+                  color: '#888899', 
+                  font: { family: 'VT323' },
+                  callback: (value) => isFinite(value) ? '$' + value.toFixed(2) : ''
+                }
+              }
+            },
+            animation: { duration: 300 }
+          }
+        };
+      }
+
+      function generateMockChartData(range) {
+        const days = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, 'ALL': 500 }[range] || 30;
+        const basePrice = telemetryData?.price || 30;
+        const data = [];
+        
+        let price = basePrice;
+        const drift = (Math.random() - 0.5) * 0.001;
+        const volatilityFactor = basePrice * 0.02;
+        
+        for (let i = days; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          
+          const randomShock = (Math.random() - 0.5) * 2 * volatilityFactor;
+          const meanReversion = (basePrice - price) * 0.02;
+          
+          price = price + randomShock + meanReversion + drift * basePrice;
+          price = Math.max(basePrice * 0.5, Math.min(basePrice * 1.5, price));
+          
+          data.push({
+            date: date.toISOString().split('T')[0],
+            close: price,
+            time: date.getTime()
+          });
+        }
+        return data;
+      }
+
+      function setupChartControls() {
+        document.querySelectorAll('.chart-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const range = btn.dataset.range;
+            
+            if (range === lastChartRange && currentTicker === lastChartTicker) {
+              return;
+            }
+            
+            document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const rawData = await loadRawChartData(range);
+            lastChartRange = range;
+            lastChartTicker = currentTicker;
+            
+            const chartData = window.ChartUtils 
+              ? ChartUtils.prepareChartData(rawData, { targetPoints: 150, useIndexBasedX: true })
+              : fallbackPrepareData(rawData);
+            
+            if (!chartData.prices || chartData.prices.length === 0 || !priceChart) return;
+            
+            const displayLabels = chartData.dateLabels 
+              ? chartData.dateLabels.map(l => window.ChartUtils ? ChartUtils.formatDate(l) : new Date(l).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
+              : chartData.labels;
+            
+            priceChart.data.labels = displayLabels;
+            priceChart.data.datasets[0].data = chartData.prices;
+            priceChart.options.scales.y.min = chartData.domain.min;
+            priceChart.options.scales.y.max = chartData.domain.max;
+            priceChart.update('none');
+          });
+        });
       }
 
       async function loadTradeHistory() {
