@@ -2699,20 +2699,24 @@
       }
       
       const price = position.stock_price || position.current || 0;
-      const high52 = position.high_52w || price * 1.2;
-      const low52 = position.low_52w || price * 0.8;
-      const range52 = high52 - low52;
       
-      // Position in 52-week range (0-1)
-      const rangePosition = range52 > 0 ? (price - low52) / range52 : 0.5;
+      // NO FAKE FALLBACKS: Only use real 52W data if available
+      const history = position.history || {};
+      const hasReal52W = history.high_52w != null && history.low_52w != null;
+      const high52 = hasReal52W ? history.high_52w : null;
+      const low52 = hasReal52W ? history.low_52w : null;
+      const range52 = hasReal52W ? (high52 - low52) : 0;
       
-      // Volatility proxy: 52-week range as % of low
-      const volatilityProxy = low52 > 0 ? range52 / low52 : 0.5;
-      const isHighVol = volatilityProxy >= 0.8;
+      // Position in 52-week range (0-1), default to 0.5 if no real data
+      const rangePosition = (hasReal52W && range52 > 0) ? (price - low52) / range52 : 0.5;
       
-      // Get momentum from position data
-      const mom1y = position.return_1y || 0;
-      const mom3m = position.return_3m || 0;
+      // Volatility proxy: 52-week range as % of low (only if real data)
+      const volatilityProxy = (hasReal52W && low52 > 0) ? range52 / low52 : 0.5;
+      const isHighVol = hasReal52W && volatilityProxy >= 0.8;
+      
+      // Get momentum from position data (history returns are real if available)
+      const mom1y = history.return_1y ?? position.return_1y ?? 0;
+      const mom3m = history.return_3m ?? position.return_3m ?? 0;
       const trend = position.trend || 0;
       const momentum = position.momentum || 0;
       
@@ -3262,6 +3266,59 @@
       });
     }
 
+    // ═══════════════════════════════════════════════════════════════════
+    // ERROR STATE - No fake data, show clear error instead
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function renderErrorState(message) {
+      const grid = document.getElementById('fleet-grid');
+      grid.innerHTML = `
+        <div class="error-state" style="
+          grid-column: 1 / -1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 4rem 2rem;
+          text-align: center;
+        ">
+          <div style="
+            font-family: 'VT323', monospace;
+            font-size: 3rem;
+            color: var(--hm-magenta);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px var(--hm-magenta);
+          ">⚠ TELEMETRY OFFLINE</div>
+          <div style="
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: #6a8a6a;
+            max-width: 400px;
+            line-height: 1.6;
+          ">${message || 'Market data unavailable'}</div>
+          <div style="
+            margin-top: 1.5rem;
+            font-family: 'VT323', monospace;
+            font-size: 0.9rem;
+            color: #4a6a4a;
+          ">
+            Required: <span style="color: var(--hm-cyan);">data/telemetry/fleet.json</span><br>
+            Optional: <span style="color: var(--hm-cyan);">data/stats.json</span>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('ship-count').textContent = '0';
+      
+      // Clear HUD
+      const countEl = document.getElementById('hud-count');
+      const valueEl = document.getElementById('hud-value');
+      const pnlEl = document.getElementById('hud-pnl');
+      if (countEl) countEl.textContent = '--';
+      if (valueEl) valueEl.textContent = '--';
+      if (pnlEl) pnlEl.textContent = '--';
+    }
+
     function renderFleet(positions) {
       // Store for re-render on position changes
       window._lastFleetData = positions;
@@ -3791,6 +3848,17 @@
 
     function renderCatalysts(catalysts) {
       const list = document.getElementById('catalyst-list');
+      
+      // Handle empty/missing catalysts (we removed fake catalysts)
+      if (!catalysts || catalysts.length === 0) {
+        list.innerHTML = `
+          <div class="catalyst-item" style="opacity: 0.5; justify-content: center;">
+            <span style="color: #4a6a4a; font-size: 0.7rem;">No catalyst data available</span>
+          </div>
+        `;
+        return;
+      }
+      
       list.innerHTML = catalysts.slice(0, 5).map(cat => {
         const config = getTickerConfig(cat.ticker, cat);
         return `
@@ -3909,7 +3977,7 @@
           return data;
         }
       } catch (e) {
-        console.log('Fleet telemetry not found, using fallback');
+        console.warn('[WARN] Fleet telemetry load failed:', e.message);
       }
       return null;
     }
@@ -3929,7 +3997,12 @@
       return null;
     }
 
-    // Main data loader - fleet.json is primary, positions optional
+    // ═══════════════════════════════════════════════════════════════════
+    // NO FAKE DATA POLICY: Show error state if data missing
+    // All values must come from market data files
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Main data loader - fleet.json is REQUIRED, positions optional
     async function loadData() {
       const [fleet, positions, stats] = await Promise.all([
         loadFleetTelemetry(),
@@ -3937,92 +4010,77 @@
         loadStats()
       ]);
 
-      // If we have fleet telemetry, use it as the base
-      if (fleet?.ships) {
-        const positionMap = {};
-        if (positions?.positions) {
-          positions.positions.forEach(p => { positionMap[p.ticker] = p; });
-        }
-
-        // Merge fleet telemetry with any position data AND historical stats
-        const enrichedShips = fleet.ships.map(ship => {
-          const pos = positionMap[ship.ticker] || {};
-          const hist = stats[ship.ticker] || {};
-          
-          return {
-            ticker: ship.ticker,
-            // Telemetry data
-            stock_price: ship.price,
-            chgPct: ship.chgPct,
-            trend: ship.trend,
-            momentum: ship.momentum,
-            volatility: ship.volatility,
-            activity: ship.activity,
-            signalState: ship.signalState,
-            visual: ship.visual,
-            // Position data (if available)
-            structure: pos.structure || 'Equity',
-            long_strike: pos.long_strike || null,
-            short_strike: pos.short_strike || null,
-            expiry: pos.expiry || null,
-            entry_cost: pos.entry_cost || 0,
-            current_price: pos.current_price || ship.price,
-            delta: pos.delta || ship.trend,
-            contracts: pos.contracts || 0,
-            // Historical stats (for journey visualization)
-            history: {
-              high_52w: hist.high_52w || ship.price * 1.2,
-              low_52w: hist.low_52w || ship.price * 0.8,
-              return_1d: hist.return_1d || ship.chgPct || 0,
-              return_1w: hist.return_1w || 0,
-              return_1m: hist.return_1m || 0,
-              return_3m: hist.return_3m || 0,
-              return_6m: hist.return_6m || 0,
-              return_1y: hist.return_1y || 0,
-              daily_count: hist.daily_count || 0
-            }
-          };
-        });
-
+      // HARD REQUIREMENT: fleet.json must be available
+      if (!fleet?.ships || fleet.ships.length === 0) {
+        console.error('[FATAL] No fleet telemetry available - cannot render');
         return {
-          positions: enrichedShips,
-          catalysts: positions?.catalysts || FALLBACK_DATA.catalysts,
-          asOf: fleet.asOf
+          positions: [],
+          catalysts: [],
+          error: 'NO_DATA',
+          errorMessage: 'Fleet telemetry unavailable. Please ensure data/telemetry/fleet.json exists.'
         };
       }
 
-      // Fallback to embedded data
-      console.log('Using embedded fallback data');
-      return FALLBACK_DATA;
+      const positionMap = {};
+      if (positions?.positions) {
+        positions.positions.forEach(p => { positionMap[p.ticker] = p; });
+      }
+
+      // Merge fleet telemetry with position data AND historical stats
+      // NO FAKE FALLBACKS: If data is missing, use null/0, don't invent values
+      const enrichedShips = fleet.ships.map(ship => {
+        const pos = positionMap[ship.ticker] || {};
+        const hist = stats[ship.ticker] || {};
+        
+        // Only use real data - no invented 52W ranges
+        const hasRealHistory = hist.high_52w != null && hist.low_52w != null;
+        
+        return {
+          ticker: ship.ticker,
+          // Telemetry data (from fleet.json)
+          stock_price: ship.price,
+          chgPct: ship.chgPct,
+          trend: ship.trend,
+          momentum: ship.momentum,
+          volatility: ship.volatility,
+          activity: ship.activity,
+          signalState: ship.signalState,
+          visual: ship.visual,
+          // Position data (if available from positions.json)
+          structure: pos.structure || 'Equity',
+          long_strike: pos.long_strike || null,
+          short_strike: pos.short_strike || null,
+          expiry: pos.expiry || null,
+          entry_cost: pos.entry_cost || 0,
+          current_price: pos.current_price || ship.price,
+          delta: pos.delta || null,
+          contracts: pos.contracts || 0,
+          // Historical stats (from stats.json) - NO FAKE FALLBACKS
+          history: hasRealHistory ? {
+            high_52w: hist.high_52w,
+            low_52w: hist.low_52w,
+            current: hist.current,
+            return_1d: hist.return_1d ?? 0,
+            return_1w: hist.return_1w ?? 0,
+            return_1m: hist.return_1m ?? 0,
+            return_3m: hist.return_3m ?? 0,
+            return_6m: hist.return_6m ?? 0,
+            return_1y: hist.return_1y ?? 0,
+            daily_count: hist.daily_count ?? 0
+          } : null // Explicitly null if no real history
+        };
+      });
+
+      return {
+        positions: enrichedShips,
+        catalysts: [], // REMOVED: Catalysts were manually curated, not market-derived
+        asOf: fleet.asOf
+      };
     }
 
-    // Embedded fallback data (works without any external files)
-    const FALLBACK_DATA = {
-      "positions": [
-        { "ticker": "RKLB", "structure": "Naked LEAP", "long_strike": 75, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 24.14, "current_price": 24.14, "delta": 0.68, "contracts": 1, "stock_price": 75.99, "entry_stock": 75.99, "trend": 0.6, "momentum": 0.4, "volatility": 0.5, "activity": 0.7, "signalState": "bull", "visual": { "glow": 0.7, "jitter": 0.1, "thrust": 0.5, "damage": 0 }, "history": { "high_52w": 77.46, "low_52w": 16.30, "return_1d": 2.16, "return_1w": -6.5, "return_1m": 74.66, "return_3m": 43.23, "return_1y": 177.9, "daily_count": 1281 } },
-        { "ticker": "LUNR", "structure": "Naked LEAP", "long_strike": 17.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 6.69, "current_price": 6.69, "delta": 0.7, "contracts": 1, "stock_price": 17.88, "entry_stock": 17.88, "trend": 0.3, "momentum": 0.2, "volatility": 0.7, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.2, "thrust": 0.3, "damage": 0.1 }, "history": { "high_52w": 23.49, "low_52w": 6.62, "return_1d": 5.32, "return_1w": 2.03, "return_1m": 81.87, "return_3m": 54.79, "return_1y": -6.48, "daily_count": 920 } },
-        { "ticker": "ASTS", "structure": "Bull Spread", "long_strike": 80, "short_strike": 120, "expiry": "2027-01-15", "entry_cost": 20.0, "current_price": 20.0, "delta": 0.42, "contracts": 1, "stock_price": 83.47, "entry_stock": 83.47, "trend": 0.5, "momentum": 0.3, "volatility": 0.6, "activity": 0.6, "signalState": "bull", "visual": { "glow": 0.6, "jitter": 0.15, "thrust": 0.4, "damage": 0 }, "history": { "high_52w": 96.58, "low_52w": 17.88, "return_1d": 15.08, "return_1w": 5.14, "return_1m": 45.6, "return_3m": 25.69, "return_1y": 279.86, "daily_count": 267 } },
-        { "ticker": "ACHR", "structure": "Naked LEAP", "long_strike": 7.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 3.0, "current_price": 3.0, "delta": 0.72, "contracts": 1, "stock_price": 8.13, "entry_stock": 8.13, "trend": 0.7, "momentum": 0.5, "volatility": 0.4, "activity": 0.8, "signalState": "bull", "visual": { "glow": 0.8, "jitter": 0.1, "thrust": 0.6, "damage": 0 }, "history": { "high_52w": 13.48, "low_52w": 6.14, "return_1d": 4.64, "return_1w": -4.19, "return_1m": 3.33, "return_3m": -22.06, "return_1y": -23.98, "daily_count": 801 } },
-        { "ticker": "JOBY", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.43, "contracts": 1, "stock_price": 14.36, "entry_stock": 14.36, "trend": 0.4, "momentum": 0.2, "volatility": 0.5, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.15, "thrust": 0.35, "damage": 0.05 }, "history": { "high_52w": 19.98, "low_52w": 5.34, "return_1d": 4.97, "return_1w": -3.33, "return_1m": 1.21, "return_3m": -18.98, "return_1y": 63.18, "daily_count": 374 } },
-        { "ticker": "GME", "structure": "Bull Spread", "long_strike": 20, "short_strike": 35, "expiry": "2027-01-15", "entry_cost": 4.5, "current_price": 4.5, "delta": 0.6, "contracts": 1, "stock_price": 20.62, "entry_stock": 20.62, "trend": -0.1, "momentum": -0.2, "volatility": 0.9, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.3, "thrust": 0.2, "damage": 0.2 }, "history": { "high_52w": 34.87, "low_52w": 20.04, "return_1d": 2.85, "return_1w": -4.01, "return_1m": -9.8, "return_3m": -24.14, "return_1y": -35.47, "daily_count": 265 } },
-        { "ticker": "BKSY", "structure": "Naked LEAP", "long_strike": 20, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 7.56, "current_price": 7.56, "delta": 0.7, "contracts": 1, "stock_price": 20.82, "entry_stock": 20.82, "trend": 0.3, "momentum": 0.1, "volatility": 0.5, "activity": 0.4, "signalState": "neutral", "visual": { "glow": 0.45, "jitter": 0.12, "thrust": 0.25, "damage": 0.1 }, "history": { "high_52w": 31.58, "low_52w": 6.62, "return_1d": 10.14, "return_1w": -1.64, "return_1m": 22.3, "return_3m": -14.73, "return_1y": 87.67, "daily_count": 267 } },
-        { "ticker": "RDW", "structure": "Bull Spread", "long_strike": 12.5, "short_strike": 20, "expiry": "2027-01-15", "entry_cost": 3.5, "current_price": 3.5, "delta": 0.55, "contracts": 1, "stock_price": 9.07, "entry_stock": 9.07, "trend": 0.2, "momentum": 0.1, "volatility": 0.4, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.4, "jitter": 0.1, "thrust": 0.2, "damage": 0.15 }, "history": { "high_52w": 25.88, "low_52w": 5.08, "return_1d": 19.99, "return_1w": 15.28, "return_1m": 71.05, "return_3m": -12.56, "return_1y": -48.98, "daily_count": 266 } },
-        { "ticker": "PL", "structure": "Bull Spread", "long_strike": 4, "short_strike": 6, "expiry": "2027-01-15", "entry_cost": 0.65, "current_price": 0.65, "delta": 0.43, "contracts": 1, "stock_price": 20.4, "entry_stock": 20.4, "trend": -0.2, "momentum": -0.1, "volatility": 0.6, "activity": 0.2, "signalState": "bear", "visual": { "glow": 0.3, "jitter": 0.2, "thrust": 0.1, "damage": 0.3 }, "history": { "high_52w": 20.8, "low_52w": 2.95, "return_1d": 3.34, "return_1w": 0.23, "return_1m": 72.55, "return_3m": 36.7, "return_1y": 382.35, "daily_count": 267 } },
-        { "ticker": "EVEX", "structure": "Bull Spread", "long_strike": 7.5, "short_strike": 12.5, "expiry": "2027-01-15", "entry_cost": 2.0, "current_price": 2.0, "delta": 0.45, "contracts": 1, "stock_price": 4.18, "entry_stock": 4.18, "trend": 0.1, "momentum": 0.0, "volatility": 0.5, "activity": 0.3, "signalState": "neutral", "visual": { "glow": 0.35, "jitter": 0.15, "thrust": 0.15, "damage": 0.2 }, "history": { "high_52w": 7.5, "low_52w": 3.08, "return_1d": 3.11, "return_1w": -6.44, "return_1m": -9.75, "return_3m": -0.9, "return_1y": -24.15, "daily_count": 380 } }
-      ],
-      "catalysts": [
-        { "date": "2026-02-15", "ticker": "LUNR", "event": "IM-2 Lunar Mission", "impact": "HIGH", "status": "UPCOMING" },
-        { "date": "2026-Q1", "ticker": "ACHR", "event": "FAA Certification", "impact": "HIGH", "status": "UPCOMING" },
-        { "date": "2026-Q1", "ticker": "JOBY", "event": "FAA Certification", "impact": "HIGH", "status": "UPCOMING" },
-        { "date": "2026-Q2", "ticker": "ASTS", "event": "Commercial Launch", "impact": "HIGH", "status": "UPCOMING" },
-        { "date": "2026-Q2", "ticker": "RKLB", "event": "Neutron Update", "impact": "MEDIUM", "status": "UPCOMING" },
-        { "date": "2026-03-31", "ticker": "GME", "event": "Q4 Earnings", "impact": "MEDIUM", "status": "UPCOMING" }
-      ]
-    };
-
-    // =========================================================================
+    // ═══════════════════════════════════════════════════════════════════
     // INITIALIZATION
-    // =========================================================================
+    // ═══════════════════════════════════════════════════════════════════
 
     async function init() {
       // Initialize watercolor ambient lighting
@@ -4036,13 +4094,20 @@
           onDataReady: async () => {
             // Load and render data during lock-in
             const data = await loadData();
+            
+            // Handle error state - show message instead of fake data
+            if (data.error) {
+              renderErrorState(data.errorMessage);
+              return;
+            }
+            
             renderFleet(data.positions);
             renderThemes(data.positions);
             renderCatalysts(data.catalysts);
             renderStats(data);
             
             // Apply semantic state based on overall portfolio
-            if (window.VisualTiers) {
+            if (window.VisualTiers && data.positions.length > 0) {
               const avgTrend = data.positions.reduce((sum, p) => sum + (p.trend || 0), 0) / data.positions.length;
               const avgVolatility = data.positions.reduce((sum, p) => sum + (p.volatility || 0), 0) / data.positions.length;
               const tiers = VisualTiers.telemetryToTiers({
@@ -4063,6 +4128,13 @@
       } else {
         // Fallback: just load data directly
         const data = await loadData();
+        
+        // Handle error state
+        if (data.error) {
+          renderErrorState(data.errorMessage);
+          return;
+        }
+        
         renderFleet(data.positions);
         renderThemes(data.positions);
         renderCatalysts(data.catalysts);
@@ -4534,12 +4606,17 @@
         Object.entries(positions).forEach(([ticker, pos]) => {
           const config = window.getTickerConfig?.(ticker, pos) || { regime: 'UNKNOWN', score: 0, color: '#888' };
           
-          // Calculate market-derived stats
+          // Calculate market-derived stats - NO FAKE FALLBACKS
           const price = pos.stock_price || pos.current || 0;
-          const high52 = pos.high_52w || pos.history?.high_52w || price * 1.2;
-          const low52 = pos.low_52w || pos.history?.low_52w || price * 0.8;
-          const range52 = high52 - low52;
-          const rangePos = range52 > 0 ? Math.round(((price - low52) / range52) * 100) : 50;
+          const history = pos.history || {};
+          const hasReal52W = history.high_52w != null && history.low_52w != null;
+          
+          // Only calculate range position if we have real 52W data
+          let rangePos = null;
+          if (hasReal52W) {
+            const range52 = history.high_52w - history.low_52w;
+            rangePos = range52 > 0 ? Math.round(((price - history.low_52w) / range52) * 100) : 50;
+          }
           
           const chgPct = pos.chgPct || pos.return_1d || 0;
           const volatility = pos.volatility || 0.5;
@@ -4548,7 +4625,7 @@
           registry[ticker] = {
             regime: config.regime,
             score: config.score,
-            rangePos: rangePos,
+            rangePos: rangePos, // null if no real 52W data
             chgPct: chgPct,
             volatility: Math.round(volatility * 100),
             momentum: Math.round((momentum + 1) * 50), // -1 to 1 → 0 to 100
@@ -4690,7 +4767,7 @@
                 <div class="registry-chg ${chgClass}">${ship.chgPct >= 0 ? '+' : ''}${ship.chgPct.toFixed(1)}%</div>
               </td>
               <td>
-                <div class="registry-metric">${ship.rangePos}%</div>
+                <div class="registry-metric">${ship.rangePos != null ? ship.rangePos + '%' : '--'}</div>
                 <div class="registry-label">52W</div>
               </td>
               <td>
