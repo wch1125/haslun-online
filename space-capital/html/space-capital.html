@@ -2469,55 +2469,125 @@
     // =========================================================================
     
     // Ticker metadata - themes, colors, ship classes
-    const TICKER_CONFIG = {
-      // Space & Satellites
-      'RKLB': { theme: 'Space', icon: 'RK', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
-      'LUNR': { theme: 'Space', icon: 'LN', color: '#9D4EDD', class: 'EXPLORER', sin: 'FAITH' },
-      'ASTS': { theme: 'Space', icon: 'AS', color: '#00FFFF', class: 'CRUISER', sin: 'AMBITION' },
-      'BKSY': { theme: 'Space', icon: 'BK', color: '#FF69B4', class: 'SCOUT', sin: 'VIGILANCE' },
-      'RDW': { theme: 'Space', icon: 'RD', color: '#00CCCC', class: 'ENGINEER', sin: 'CRAFT' },
-      'PL': { theme: 'Space', icon: 'PL', color: '#B8986B', class: 'SURVEYOR', sin: 'WISDOM' },
+    // ═══════════════════════════════════════════════════════════════════
+    // MARKET-DERIVED CLASSIFICATION (no fake archetypes)
+    // All labels derived from actual market data
+    // ═══════════════════════════════════════════════════════════════════
+    
+    /**
+     * Derives ticker config ONLY from market data
+     * @param {string} ticker
+     * @param {object} position - position object with market data
+     * @returns {object} { regime, score, color, icon }
+     */
+    function deriveTickerConfig(ticker, position) {
+      if (!position) {
+        return { regime: 'UNKNOWN', score: 0, color: '#888899', icon: ticker.slice(0, 2) };
+      }
       
-      // Air Mobility / eVTOL
-      'ACHR': { theme: 'Air Mobility', icon: 'AC', color: '#39FF14', class: 'STRIKER', sin: 'VISION' },
-      'JOBY': { theme: 'Air Mobility', icon: 'JB', color: '#FFE600', class: 'TRANSPORT', sin: 'PATIENCE' },
-      'EVEX': { theme: 'Air Mobility', icon: 'EV', color: '#C45C5C', class: 'PROTOTYPE', sin: 'HOPE' },
+      const price = position.stock_price || position.current || 0;
+      const high52 = position.high_52w || price * 1.2;
+      const low52 = position.low_52w || price * 0.8;
+      const range52 = high52 - low52;
       
-      // Defense & Aerospace
-      'KTOS': { theme: 'Defense', icon: 'KT', color: '#FF4444', class: 'FIGHTER', sin: 'PRECISION' },
-      'LHX': { theme: 'Defense', icon: 'LX', color: '#4488FF', class: 'SENTINEL', sin: 'DUTY' },
-      'RTX': { theme: 'Defense', icon: 'RX', color: '#888888', class: 'CARRIER', sin: 'POWER' },
-      'GE': { theme: 'Defense', icon: 'GE', color: '#44AAFF', class: 'TITAN', sin: 'LEGACY' },
+      // Position in 52-week range (0-1)
+      const rangePosition = range52 > 0 ? (price - low52) / range52 : 0.5;
       
-      // Tech & Other
-      'COHR': { theme: 'Tech', icon: 'CH', color: '#AA44FF', class: 'PHANTOM', sin: 'CLARITY' },
-      'GME': { theme: 'Meme', icon: 'GM', color: '#FF6B35', class: 'BERSERKER', sin: 'RAGE' },
+      // Volatility proxy: 52-week range as % of low
+      const volatilityProxy = low52 > 0 ? range52 / low52 : 0.5;
+      const isHighVol = volatilityProxy >= 0.8;
       
-      // Benchmarks
-      'XAR': { theme: 'Benchmark', icon: 'XR', color: '#666677', class: 'FLAGSHIP', sin: 'INDEX' },
-      'SPY': { theme: 'Benchmark', icon: 'SP', color: '#4466AA', class: 'COMMAND', sin: 'MARKET' }
-    };
+      // Get momentum from position data
+      const mom1y = position.return_1y || 0;
+      const mom3m = position.return_3m || 0;
+      const trend = position.trend || 0;
+      const momentum = position.momentum || 0;
+      
+      // Trend detection
+      const isStrongUp = mom3m >= 15 || mom1y >= 40 || trend > 0.3;
+      const isStrongDown = mom3m <= -15 || mom1y <= -40 || trend < -0.3;
+      const isTrending = Math.abs(mom3m) >= 15 || Math.abs(mom1y) >= 30 || Math.abs(trend) > 0.2;
+      
+      // Derive regime label (market state, not fake archetype)
+      let regime = 'RANGE';
+      if (isTrending && isStrongUp) regime = 'UPTREND';
+      else if (isTrending && isStrongDown) regime = 'DOWNTREND';
+      else if (isHighVol && isTrending) regime = 'BREAKOUT';
+      else if (isHighVol && !isTrending) regime = 'CHOP';
+      
+      // Overall score (0-100) from multiple factors
+      const positionScore = rangePosition * 40;
+      const momentumScore = Math.min(30, Math.max(0, (mom3m + 30) / 60 * 30));
+      const trendScore = Math.min(30, Math.max(0, (mom1y + 50) / 350 * 30));
+      const score = Math.round(positionScore + momentumScore + trendScore);
+      
+      // Color derived from signal state
+      const signalState = position.signalState || 'neutral';
+      const signalColors = {
+        bull: '#00FFFF',
+        bear: '#FF2975',
+        neutral: '#888888'
+      };
+      const color = signalColors[signalState] || '#FF2975';
+      
+      return {
+        regime,
+        score,
+        color,
+        icon: ticker.slice(0, 2),
+        rangePosition,
+        volatilityProxy
+      };
+    }
+    
+    // Legacy compatibility: generate config on the fly
+    // This replaces the old hardcoded TICKER_CONFIG
+    function getTickerConfig(ticker, position) {
+      const derived = deriveTickerConfig(ticker, position);
+      return {
+        theme: derived.regime, // Use regime as theme
+        icon: derived.icon,
+        color: derived.color,
+        class: derived.regime, // Use regime instead of fake archetype
+        sin: null // Removed - was fake
+      };
+    }
 
-    const DEFAULT_CONFIG = { theme: 'Other', icon: 'XX', color: '#888899', class: 'UNKNOWN', sin: 'MYSTERY' };
+    const DEFAULT_CONFIG = { theme: 'UNKNOWN', icon: 'XX', color: '#888899', class: 'UNKNOWN', sin: null };
 
-    // Ship SVG generator based on class type
-    function generateShipSVG(shipClass, color) {
+    // Ship SVG generator based on regime (market state)
+    function generateShipSVG(regime, color) {
+      // All ships use same base design, color indicates state
+      // Previously had different shapes per "class" - now unified
       const ships = {
-        'INTERCEPTOR': `
+        'UPTREND': `
           <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M32 4L40 20L48 28L48 44L40 48L32 60L24 48L16 44L16 28L24 20L32 4Z" fill="${color}" fill-opacity="0.3"/>
             <path d="M32 4L40 20L48 28L48 44L40 48L32 60L24 48L16 44L16 28L24 20L32 4Z" stroke="${color}" stroke-width="2"/>
             <path d="M32 16L36 24L40 28V36L36 38L32 44L28 38L24 36V28L28 24L32 16Z" fill="${color}"/>
             <circle cx="32" cy="28" r="4" fill="#000" stroke="${color}"/>
           </svg>`,
-        'EXPLORER': `
+        'DOWNTREND': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 4L40 20L48 28L48 44L40 48L32 60L24 48L16 44L16 28L24 20L32 4Z" fill="${color}" fill-opacity="0.3"/>
+            <path d="M32 4L40 20L48 28L48 44L40 48L32 60L24 48L16 44L16 28L24 20L32 4Z" stroke="${color}" stroke-width="2"/>
+            <path d="M32 16L36 24L40 28V36L36 38L32 44L28 38L24 36V28L28 24L32 16Z" fill="${color}"/>
+            <circle cx="32" cy="28" r="4" fill="#000" stroke="${color}"/>
+          </svg>`,
+        'BREAKOUT': `
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 8L44 24L52 32L44 40L32 56L20 40L12 32L20 24L32 8Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <path d="M32 16L40 28L40 36L32 48L24 36L24 28L32 16Z" fill="${color}"/>
+            <circle cx="32" cy="32" r="5" fill="#000" stroke="${color}" stroke-width="2"/>
+          </svg>`,
+        'CHOP': `
           <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <ellipse cx="32" cy="32" rx="24" ry="12" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
             <ellipse cx="32" cy="32" rx="16" ry="8" fill="${color}"/>
             <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
             <path d="M32 8V20M32 44V56" stroke="${color}" stroke-width="2"/>
           </svg>`,
-        'CRUISER': `
+        'RANGE': `
           <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="20" y="12" width="24" height="40" rx="4" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
             <rect x="24" y="16" width="16" height="12" fill="${color}"/>
@@ -2525,116 +2595,14 @@
             <rect x="44" y="24" width="8" height="20" fill="${color}" fill-opacity="0.5" stroke="${color}"/>
             <circle cx="32" cy="40" r="4" fill="#000" stroke="${color}"/>
           </svg>`,
-        'STRIKER': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32 8L44 24L52 32L44 40L32 56L20 40L12 32L20 24L32 8Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <path d="M32 16L40 28L32 40L24 28L32 16Z" fill="${color}"/>
-            <circle cx="32" cy="28" r="4" fill="#000" stroke="${color}"/>
-          </svg>`,
-        'TRANSPORT': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="16" y="16" width="32" height="32" rx="2" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <rect x="20" y="20" width="24" height="16" fill="${color}"/>
-            <rect x="24" y="40" width="6" height="8" fill="${color}"/>
-            <rect x="34" y="40" width="6" height="8" fill="${color}"/>
-            <circle cx="32" cy="28" r="4" fill="#000" stroke="${color}"/>
-          </svg>`,
-        'BERSERKER': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32 4L48 20V44L32 60L16 44V20L32 4Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <path d="M32 12L44 24V40L32 52L20 40V24L32 12Z" fill="${color}"/>
-            <path d="M24 28L32 20L40 28L32 36L24 28Z" fill="#000" stroke="${color}"/>
-            <path d="M8 32H16M48 32H56" stroke="${color}" stroke-width="3"/>
-          </svg>`,
-        'SCOUT': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="20" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <circle cx="32" cy="32" r="12" fill="${color}"/>
-            <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
-            <path d="M32 8V16M32 48V56M8 32H16M48 32H56" stroke="${color}" stroke-width="2"/>
-          </svg>`,
-        'ENGINEER': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="16" y="12" width="32" height="40" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <rect x="20" y="16" width="8" height="8" fill="${color}"/>
-            <rect x="36" y="16" width="8" height="8" fill="${color}"/>
-            <rect x="20" y="28" width="24" height="4" fill="${color}"/>
-            <rect x="20" y="36" width="24" height="4" fill="${color}"/>
-            <rect x="20" y="44" width="24" height="4" fill="${color}"/>
-          </svg>`,
-        'SURVEYOR': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32 8L56 32L32 56L8 32L32 8Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <path d="M32 16L48 32L32 48L16 32L32 16Z" fill="${color}"/>
-            <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
-          </svg>`,
-        'PROTOTYPE': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32 4L40 16L52 20L56 32L52 44L40 48L32 60L24 48L12 44L8 32L12 20L24 16L32 4Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <circle cx="32" cy="32" r="12" fill="${color}"/>
-            <circle cx="32" cy="32" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
-          </svg>`,
-        'FIGHTER': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32 4L36 16L48 12L52 24L56 32L52 40L48 52L36 48L32 60L28 48L16 52L12 40L8 32L12 24L16 12L28 16L32 4Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <path d="M32 16L40 24V40L32 48L24 40V24L32 16Z" fill="${color}"/>
-            <circle cx="32" cy="32" r="4" fill="#000" stroke="${color}"/>
-            <path d="M20 20L12 12M44 20L52 12M20 44L12 52M44 44L52 52" stroke="${color}" stroke-width="2"/>
-          </svg>`,
-        'SENTINEL': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32 8L52 20V44L32 56L12 44V20L32 8Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <path d="M32 16L44 24V40L32 48L20 40V24L32 16Z" fill="${color}"/>
-            <rect x="28" y="24" width="8" height="16" fill="#000" stroke="${color}"/>
-            <circle cx="32" cy="32" r="3" fill="${color}"/>
-          </svg>`,
-        'CARRIER': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="12" y="20" width="40" height="24" rx="2" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <rect x="16" y="24" width="32" height="16" fill="${color}"/>
-            <rect x="20" y="28" width="6" height="8" fill="#000"/>
-            <rect x="29" y="28" width="6" height="8" fill="#000"/>
-            <rect x="38" y="28" width="6" height="8" fill="#000"/>
-            <path d="M32 12V20M32 44V52" stroke="${color}" stroke-width="2"/>
-          </svg>`,
-        'TITAN': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="16" y="8" width="32" height="48" rx="4" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <rect x="20" y="12" width="24" height="20" fill="${color}"/>
-            <circle cx="32" cy="22" r="6" fill="#000" stroke="${color}" stroke-width="2"/>
-            <rect x="8" y="20" width="8" height="24" fill="${color}" fill-opacity="0.5" stroke="${color}"/>
-            <rect x="48" y="20" width="8" height="24" fill="${color}" fill-opacity="0.5" stroke="${color}"/>
-            <rect x="24" y="40" width="16" height="12" fill="${color}"/>
-          </svg>`,
-        'PHANTOM': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32 4L44 16L56 28L52 40L44 52L32 60L20 52L12 40L8 28L20 16L32 4Z" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="1" stroke-dasharray="4 2"/>
-            <path d="M32 16L40 24L44 32L40 40L32 48L24 40L20 32L24 24L32 16Z" fill="${color}" fill-opacity="0.5"/>
-            <circle cx="32" cy="32" r="6" fill="${color}"/>
-            <circle cx="32" cy="32" r="3" fill="#000"/>
-          </svg>`,
-        'FLAGSHIP': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32 4L48 16L56 32L48 48L32 60L16 48L8 32L16 16L32 4Z" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <path d="M32 12L44 20L48 32L44 44L32 52L20 44L16 32L20 20L32 12Z" fill="${color}"/>
-            <path d="M32 20L40 28L40 36L32 44L24 36L24 28L32 20Z" fill="#000" stroke="${color}"/>
-            <circle cx="32" cy="32" r="4" fill="${color}"/>
-          </svg>`,
-        'COMMAND': `
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="24" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>
-            <circle cx="32" cy="32" r="16" fill="${color}" fill-opacity="0.4" stroke="${color}" stroke-width="2"/>
-            <circle cx="32" cy="32" r="8" fill="${color}"/>
-            <circle cx="32" cy="32" r="4" fill="#000" stroke="${color}"/>
-            <path d="M32 4V12M32 52V60M4 32H12M52 32H60" stroke="${color}" stroke-width="2"/>
-          </svg>`,
         'UNKNOWN': `
           <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="16" y="16" width="32" height="32" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
-            <text x="32" y="38" text-anchor="middle" fill="${color}" font-size="16" font-family="monospace">?</text>
+            <rect x="16" y="16" width="32" height="32" rx="4" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>
+            <circle cx="32" cy="32" r="8" fill="${color}"/>
+            <circle cx="32" cy="32" r="4" fill="#000" stroke="${color}"/>
           </svg>`
       };
-      return ships[shipClass] || ships['UNKNOWN'];
+      return ships[regime] || ships['UNKNOWN'];
     }
 
     // Calculate strike position as percentage
@@ -2736,7 +2704,8 @@
     }
 
     function renderShipCard(position) {
-      const config = TICKER_CONFIG[position.ticker] || DEFAULT_CONFIG;
+      // Get market-derived config (no fake archetypes)
+      const config = getTickerConfig(position.ticker, position);
       
       // Position-based P&L (only if we have a position)
       const hasPosition = position.contracts > 0 && position.entry_cost > 0;
@@ -3093,8 +3062,8 @@
       updateFleetPowerHUD();
       updateFleetComms();
       
-      // Filter to only show tickers that have ship profiles configured
-      const configuredPositions = positions.filter(pos => TICKER_CONFIG[pos.ticker]);
+      // All tickers now get market-derived config (no hardcoded whitelist)
+      const configuredPositions = positions;
       
       // Store positions for the animator to access
       window._fleetPositions = {};
@@ -3104,12 +3073,6 @@
       });
 
       document.getElementById('ship-count').textContent = configuredPositions.length;
-      
-      // Show notice if some positions were filtered out
-      const filteredCount = positions.length - configuredPositions.length;
-      if (filteredCount > 0) {
-        console.log(`[SpaceCapital] ${filteredCount} tickers hidden (no ship profile configured)`);
-      }
       
       // Hydrate animated sprites and behavior controllers after DOM update
       function hydrateSprites() {
@@ -3145,13 +3108,14 @@
             if (!pos) return;
 
             // Get ship class from TICKER_CONFIG
-            const cfg = (window.TICKER_CONFIG && window.TICKER_CONFIG[ticker]) || {};
+            // Get market-derived config
+            const cfg = getTickerConfig(ticker, pos);
             
             // Create behavior controller once per image
             if (!img._behaviorController) {
               img._behaviorController = ShipBehavior.create(img, {
                 ticker,
-                shipClass: cfg.class || 'Ship'
+                shipClass: cfg.class || 'RANGE' // regime as class
               });
             }
 
@@ -3576,22 +3540,25 @@
       // Theme abbreviations (no emojis)
       const THEME_ABBR = {
         'Space': 'SPC',
-        'Air Mobility': 'AIR',
-        'Defense': 'DEF',
-        'Tech': 'TCH',
-        'Meme': 'MEM',
-        'Benchmark': 'BNC'
+        // Regime abbreviations (derived from market state, not fake themes)
+        'UPTREND': 'UP',
+        'DOWNTREND': 'DN',
+        'BREAKOUT': 'BRK',
+        'CHOP': 'CHP',
+        'RANGE': 'RNG',
+        'UNKNOWN': 'UNK'
       };
 
       positions.forEach(pos => {
-        const config = TICKER_CONFIG[pos.ticker] || DEFAULT_CONFIG;
+        const config = getTickerConfig(pos.ticker, pos);
         const value = pos.entry_cost * pos.contracts * 100;
+        const regime = config.theme || 'UNKNOWN'; // theme is now regime
         
-        if (!themes[config.theme]) {
-          themes[config.theme] = { abbr: THEME_ABBR[config.theme] || config.theme.slice(0,3).toUpperCase(), value: 0 };
+        if (!themes[regime]) {
+          themes[regime] = { abbr: THEME_ABBR[regime] || regime.slice(0,3).toUpperCase(), value: 0 };
         }
-        themes[config.theme].value += value;
-        maxValue = Math.max(maxValue, themes[config.theme].value);
+        themes[regime].value += value;
+        maxValue = Math.max(maxValue, themes[regime].value);
       });
 
       const grid = document.getElementById('theme-grid');
@@ -3612,7 +3579,7 @@
     function renderCatalysts(catalysts) {
       const list = document.getElementById('catalyst-list');
       list.innerHTML = catalysts.slice(0, 5).map(cat => {
-        const config = TICKER_CONFIG[cat.ticker] || DEFAULT_CONFIG;
+        const config = getTickerConfig(cat.ticker, cat);
         return `
           <div class="catalyst-item ${cat.impact === 'HIGH' ? 'high-impact' : ''}">
             <div class="catalyst-date">${cat.date}</div>
@@ -4093,27 +4060,43 @@
 
   <script>
     // ═══════════════════════════════════════════════════════════════════════════
-    // REGISTRY TERMINAL - Bloomberg-style ship reference sheet
+    // REGISTRY TERMINAL - Market-derived fleet reference sheet
+    // No fake data - all values computed from market data
     // ═══════════════════════════════════════════════════════════════════════════
     
     (function() {
-      const REGISTRY_DATA = {
-        ACHR: { name: 'MIDNIGHT', designation: 'AAM-004', class: 'EVTOL', tier: 'B', specialty: 'Air Taxi', tagline: 'Precision carrier class. Silent approach, swift arrival.' },
-        ASTS: { name: 'BLUEBIRD', designation: 'COM-003', class: 'RELAY', tier: 'S', specialty: 'Comms', tagline: 'Communication relay hub. The signal never sleeps.' },
-        BKSY: { name: 'BLACKSKY', designation: 'RCN-006', class: 'RECON', tier: 'B', specialty: 'Intel', tagline: 'Eyes in the dark. Nothing escapes detection.' },
-        COHR: { name: 'PRISM', designation: 'OPT-018', class: 'REFLECTOR', tier: 'A', specialty: 'Optics', tagline: 'Optical specialist. Light is the weapon.' },
-        EVEX: { name: 'HORIZON', designation: 'AAM-009', class: 'TRANSPORT', tier: 'C', specialty: 'Cargo', tagline: 'Troop transport. Delivering the payload.' },
-        GE: { name: 'SPECTRE', designation: 'IND-019', class: 'BOMBER', tier: 'S', specialty: 'Aerospace', tagline: 'Heavy strike platform. Overwhelming force on call.' },
-        GME: { name: 'DIAMOND', designation: 'MEM-010', class: 'DREADNOUGHT', tier: '?', specialty: 'Chaos', tagline: 'Wildcard interceptor. Expect the unexpected.' },
-        JOBY: { name: 'SKYWARD', designation: 'EVT-005', class: 'EVTOL', tier: 'A', specialty: 'Air Mobility', tagline: 'Light assault craft. Speed is survival.' },
-        KTOS: { name: 'KRATOS', designation: 'DEF-012', class: 'FIGHTER', tier: 'A', specialty: 'Defense', tagline: 'Combat superiority fighter. Dominance through firepower.' },
-        LHX: { name: 'HELIX', designation: 'AAM-020', class: 'DRONE', tier: 'A', specialty: 'Electronics', tagline: 'Surveillance drone. Invisible. Omnipresent.' },
-        LUNR: { name: 'ODYSSEY', designation: 'LNR-002', class: 'LANDER', tier: 'A', specialty: 'Lunar Ops', tagline: 'Lunar surface specialist. First boots, lasting impact.' },
-        PL: { name: 'PLANET', designation: 'SAT-008', class: 'SCOUT', tier: 'A', specialty: 'Imaging', tagline: 'Long-range scout. Charting the unknown.' },
-        RDW: { name: 'REDWIRE', designation: 'INF-007', class: 'HAULER', tier: 'B', specialty: 'Infrastructure', tagline: 'Logistics hauler. Supply line lifeline.' },
-        RKLB: { name: 'ELECTRON', designation: 'FSC-001', class: 'FLAGSHIP', tier: 'S', specialty: 'Command', tagline: 'Spearhead command ship. Victory follows in its wake.' },
-        RTX: { name: 'RAYTHEON', designation: 'DEF-021', class: 'OFFICER', tier: 'S', specialty: 'Defense Prime', tagline: 'Officer command vessel. Strategic precision.' }
-      };
+      // Generate registry data from market positions
+      function generateRegistryData() {
+        const positions = window._fleetPositions || {};
+        const registry = {};
+        
+        Object.entries(positions).forEach(([ticker, pos]) => {
+          const config = window.getTickerConfig?.(ticker, pos) || { regime: 'UNKNOWN', score: 0, color: '#888' };
+          
+          // Calculate market-derived stats
+          const price = pos.stock_price || pos.current || 0;
+          const high52 = pos.high_52w || pos.history?.high_52w || price * 1.2;
+          const low52 = pos.low_52w || pos.history?.low_52w || price * 0.8;
+          const range52 = high52 - low52;
+          const rangePos = range52 > 0 ? Math.round(((price - low52) / range52) * 100) : 50;
+          
+          const chgPct = pos.chgPct || pos.return_1d || 0;
+          const volatility = pos.volatility || 0.5;
+          const momentum = pos.momentum || 0;
+          
+          registry[ticker] = {
+            regime: config.regime,
+            score: config.score,
+            rangePos: rangePos,
+            chgPct: chgPct,
+            volatility: Math.round(volatility * 100),
+            momentum: Math.round((momentum + 1) * 50), // -1 to 1 → 0 to 100
+            price: price
+          };
+        });
+        
+        return registry;
+      }
 
       const modal = document.getElementById('registryModal');
       const closeBtn = document.getElementById('registryClose');
@@ -4121,35 +4104,44 @@
       const countEl = document.getElementById('registryCount');
 
       function openRegistryTerminal() {
-        // Sort alphabetically by ticker
-        const tickers = Object.keys(REGISTRY_DATA).sort();
+        const REGISTRY_DATA = generateRegistryData();
+        
+        // Sort by score descending
+        const tickers = Object.keys(REGISTRY_DATA).sort((a, b) => 
+          (REGISTRY_DATA[b].score || 0) - (REGISTRY_DATA[a].score || 0)
+        );
         
         // Update count
         countEl.textContent = tickers.length;
         
-        // Render rows
+        // Render rows with market-derived data
         tableBody.innerHTML = tickers.map(ticker => {
           const ship = REGISTRY_DATA[ticker];
+          const scoreColor = ship.score >= 70 ? '#00FFFF' : ship.score >= 40 ? '#FFE600' : '#FF2975';
+          const chgClass = ship.chgPct >= 0 ? 'positive' : 'negative';
+          
           return `
             <tr data-ticker="${ticker}" onclick="selectRegistryShip('${ticker}')">
               <td>
                 <div class="registry-ticker">${ticker}</div>
               </td>
               <td>
-                <div class="registry-name">${ship.name}</div>
-                <div class="registry-designation">${ship.designation}</div>
+                <div class="registry-regime">${ship.regime}</div>
               </td>
               <td>
-                <span class="registry-tier tier-${ship.tier}">${ship.tier}</span>
+                <span class="registry-score" style="color: ${scoreColor}; border-color: ${scoreColor};">${ship.score}</span>
               </td>
               <td>
-                <div class="registry-class">${ship.class}</div>
+                <div class="registry-price">$${ship.price.toFixed(2)}</div>
+                <div class="registry-chg ${chgClass}">${ship.chgPct >= 0 ? '+' : ''}${ship.chgPct.toFixed(1)}%</div>
               </td>
               <td>
-                <div class="registry-specialty">${ship.specialty}</div>
+                <div class="registry-metric">${ship.rangePos}%</div>
+                <div class="registry-label">52W</div>
               </td>
               <td>
-                <div class="registry-tagline">${ship.tagline}</div>
+                <div class="registry-metric">${ship.volatility}%</div>
+                <div class="registry-label">VOL</div>
               </td>
             </tr>
           `;

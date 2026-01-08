@@ -119,8 +119,8 @@
       background: rgba(0, 0, 0, 0.4);
     }
     
-    .tier-badge {
-      width: 24px;
+    .score-badge {
+      min-width: 28px;
       height: 24px;
       display: flex;
       align-items: center;
@@ -128,10 +128,11 @@
       font-family: 'VT323', monospace;
       font-size: 0.875rem;
       font-weight: bold;
-      color: var(--tier-color, #888);
+      color: var(--score-color, #888);
       background: rgba(0, 0, 0, 0.6);
-      border: 2px solid var(--tier-color, #888);
-      text-shadow: 0 0 8px var(--tier-color);
+      border: 2px solid var(--score-color, #888);
+      text-shadow: 0 0 8px var(--score-color);
+      padding: 0 0.25rem;
     }
     
     .ship-pnl {
@@ -647,32 +648,12 @@
     (function() {
       'use strict';
       
-      // Ship class metadata
-      const SHIP_CLASSES = {
-        RKLB: { class: 'INTERCEPTOR', tier: 'S', color: '#FF2975' },
-        LUNR: { class: 'EXPLORER', tier: 'A', color: '#9D4EDD' },
-        ASTS: { class: 'CRUISER', tier: 'S', color: '#00FFFF' },
-        ACHR: { class: 'STRIKER', tier: 'B', color: '#39FF14' },
-        JOBY: { class: 'TRANSPORT', tier: 'A', color: '#FFE600' },
-        GME: { class: 'BERSERKER', tier: '?', color: '#FF6B35' },
-        BKSY: { class: 'SCOUT', tier: 'B', color: '#FF69B4' },
-        RDW: { class: 'ENGINEER', tier: 'B', color: '#00CCCC' },
-        PL: { class: 'SURVEYOR', tier: 'A', color: '#B8986B' },
-        EVEX: { class: 'PROTOTYPE', tier: 'C', color: '#C45C5C' },
-        KTOS: { class: 'FIGHTER', tier: 'A', color: '#FF4444' },
-        COHR: { class: 'PHANTOM', tier: 'A', color: '#AA44FF' },
-        GE: { class: 'TITAN', tier: 'S', color: '#44AAFF' },
-        LHX: { class: 'SENTINEL', tier: 'A', color: '#4488FF' },
-        RTX: { class: 'CARRIER', tier: 'S', color: '#888888' }
-      };
+      // ═══════════════════════════════════════════════════════════════════
+      // NO FAKE STATS - All data derived from market only
+      // ═══════════════════════════════════════════════════════════════════
       
-      const TIER_COLORS = {
-        'S': '#ffaa33',
-        'A': '#33ff99',
-        'B': '#4ecdc4',
-        'C': '#888888',
-        '?': '#ff6b6b'
-      };
+      // Color palette for ships (can be derived from volatility/momentum later)
+      const DEFAULT_COLOR = '#FF2975';
       
       let statsData = {};
       let fleetData = {};
@@ -712,36 +693,80 @@
       }
       
       // ─────────────────────────────────────────────────────────────────────
-      // STAT CALCULATIONS (same as ship-select.js)
+      // MARKET-DERIVED CLASSIFICATION (no fake archetypes)
       // ─────────────────────────────────────────────────────────────────────
       
-      function normalizeValue(value, min, max) {
-        if (!Number.isFinite(value)) return 50;
-        const clamped = Math.max(min, Math.min(max, value));
-        return Math.round(((clamped - min) / (max - min)) * 100);
-      }
-      
-      function calculateStats(ticker) {
-        const data = statsData[ticker] || {};
-        return {
-          PWR: normalizeValue(data.return_1y || 0, -50, 300),
-          SPD: normalizeValue(data.return_1d || 0, -10, 20),
-          ARM: normalizeValue(data.high_52w ? ((data.current - data.low_52w) / (data.high_52w - data.low_52w)) * 100 : 50, 0, 100),
-          TCH: normalizeValue(data.return_3m || 0, -30, 80)
+      /**
+       * Derives ship classification ONLY from market data
+       * Returns: { regime, score, color }
+       * - regime: UPTREND | DOWNTREND | BREAKOUT | CHOP | RANGE (derived from price action)
+       * - score: 0-100 overall strength score
+       * - color: derived from signal state
+       */
+      function deriveShipClass(ticker, stats, fleet) {
+        const s = stats || {};
+        const f = fleet || {};
+        
+        // Market-derived metrics
+        const price = s.current || f.price || 0;
+        const high52 = s.high_52w || price * 1.2;
+        const low52 = s.low_52w || price * 0.8;
+        const range52 = high52 - low52;
+        
+        // Position in 52-week range (0-1)
+        const rangePosition = range52 > 0 ? (price - low52) / range52 : 0.5;
+        
+        // Volatility proxy: 52-week range as % of low
+        const volatilityProxy = low52 > 0 ? range52 / low52 : 0.5;
+        const isHighVol = volatilityProxy >= 0.8; // 80%+ range = high volatility
+        
+        // Momentum from returns
+        const mom1y = s.return_1y || 0;
+        const mom3m = s.return_3m || 0;
+        const mom1m = s.return_1m || 0;
+        
+        // Trend detection
+        const isStrongUp = mom3m >= 15 || mom1y >= 40;
+        const isStrongDown = mom3m <= -15 || mom1y <= -40;
+        const isTrending = Math.abs(mom3m) >= 15 || Math.abs(mom1y) >= 30;
+        
+        // Derive regime label (not fake archetype - describes market state)
+        let regime = 'RANGE';
+        if (isTrending && isStrongUp) regime = 'UPTREND';
+        else if (isTrending && isStrongDown) regime = 'DOWNTREND';
+        else if (isHighVol && isTrending) regime = 'BREAKOUT';
+        else if (isHighVol && !isTrending) regime = 'CHOP';
+        
+        // Overall score (0-100) derived from multiple factors
+        // Higher = stronger position + momentum
+        const positionScore = rangePosition * 40;  // 0-40 from range position
+        const momentumScore = Math.min(30, Math.max(0, (mom3m + 30) / 60 * 30)); // 0-30 from 3m momentum
+        const trendScore = Math.min(30, Math.max(0, (mom1y + 50) / 350 * 30)); // 0-30 from 1y momentum
+        const score = Math.round(positionScore + momentumScore + trendScore);
+        
+        // Color derived from signal state (bull/bear/neutral from fleet data)
+        const signalState = f.signalState || 'neutral';
+        const signalColors = {
+          bull: '#00FFFF',   // Cyan for bullish
+          bear: '#FF2975',   // Magenta for bearish
+          neutral: '#888888' // Gray for neutral
         };
+        const color = signalColors[signalState] || DEFAULT_COLOR;
+        
+        return { regime, score, color, rangePosition, volatilityProxy };
       }
       
       // ─────────────────────────────────────────────────────────────────────
-      // CARD RENDERER - Creates the DOM for each dial card
+      // CARD RENDERER - Uses only market-derived data
       // ─────────────────────────────────────────────────────────────────────
       
       function renderCard(ticker) {
-        const shipClass = SHIP_CLASSES[ticker] || { class: 'UNKNOWN', tier: 'C', color: '#888' };
-        const tierColor = TIER_COLORS[shipClass.tier] || '#888';
-        
-        // Merge stats and fleet data into position-like object
+        // Get market data
         const stats = statsData[ticker] || {};
         const fleet = fleetData[ticker] || {};
+        
+        // Derive classification from market data (no fake archetypes)
+        const derived = deriveShipClass(ticker, stats, fleet);
         
         // Extract all data points
         const price = stats.current || fleet.price || 0;
@@ -793,21 +818,25 @@
         const glowIntensity = Math.max(0.3, visual.glow || 0.5);
         const thrustLength = 20 + (visual.thrust * 30);
         
+        // Score badge color (derived from score)
+        const scoreColor = derived.score >= 70 ? '#00FFFF' : 
+                          derived.score >= 40 ? '#FFE600' : '#FF2975';
+        
         const card = document.createElement('button');
         card.type = 'button';
         card.className = `dial-card ship-card ${pnlClass}`;
         card.dataset.ticker = ticker;
-        card.style.cssText = `--ship-glow: ${glowIntensity}; --ship-color: ${shipClass.color}; --signal-color: ${signalColor};`;
+        card.style.cssText = `--ship-glow: ${glowIntensity}; --ship-color: ${derived.color}; --signal-color: ${signalColor};`;
         
         card.innerHTML = `
           <!-- Header -->
           <div class="ship-header">
             <div class="ship-callsign">
-              <span class="ship-ticker" style="color: ${shipClass.color}; text-shadow: 0 0 ${10 * glowIntensity}px ${shipClass.color};">${ticker}</span>
-              <span class="ship-class">${shipClass.class}</span>
+              <span class="ship-ticker" style="color: ${derived.color}; text-shadow: 0 0 ${10 * glowIntensity}px ${derived.color};">${ticker}</span>
+              <span class="ship-class">${derived.regime}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <div class="tier-badge" style="--tier-color: ${tierColor}">${shipClass.tier}</div>
+              <div class="score-badge" style="--score-color: ${scoreColor}">${derived.score}</div>
               <div class="ship-pnl ${pnlClass}">
                 ${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(1)}%
               </div>
@@ -934,8 +963,9 @@
         statsData = stats;
         fleetData = fleet;
         
-        // Get available tickers
-        const tickers = Object.keys(window.SHIP_SPRITES || SHIP_CLASSES);
+        // Get available tickers from actual data (not hardcoded list)
+        // Priority: SHIP_SPRITES (assets), fleetData (telemetry), statsData (market)
+        const tickers = Object.keys(window.SHIP_SPRITES || fleetData || statsData);
         
         if (tickers.length === 0) {
           console.error('[Hangar] No ships available');
