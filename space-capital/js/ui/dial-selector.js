@@ -150,13 +150,15 @@
         }
         node.style.display = '';
 
-        // Calculate visual position
-        // Center card at delta=0, others spread horizontally
-        const spreadX = delta * 320;  // Horizontal spacing
-        const spreadY = Math.abs(delta) * 40;  // Cards further from center drop down
+        // Arc-based positioning using sin/cos for smooth curve
+        const angleOffset = delta * (Math.PI / 6); // Spread cards in an arc
+        const radius = 480;
+        
+        const spreadX = Math.sin(angleOffset) * radius;
+        const spreadY = (1 - Math.cos(angleOffset)) * 100;
         
         // Scale: center is 1.0, edges are smaller
-        const scale = 1 - Math.abs(delta) * 0.15;
+        const scale = 1 - Math.abs(delta) * 0.12;
         
         // Opacity: center is full, edges fade
         const opacity = 1 - Math.abs(delta) * 0.25;
@@ -164,7 +166,7 @@
         // Z-index: center on top
         node.style.zIndex = 100 - Math.abs(delta);
 
-        // Apply transforms (GPU-accelerated)
+        // Apply transforms - CSS centers the card, we just offset
         node.style.transform = `translate3d(${spreadX}px, ${spreadY}px, 0) scale(${scale})`;
         node.style.opacity = opacity;
 
