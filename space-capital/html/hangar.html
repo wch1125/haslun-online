@@ -68,7 +68,8 @@
         rgba(0, 0, 0, 0.05) 2px, rgba(0, 0, 0, 0.05) 4px
       );
       pointer-events: none;
-      z-index: 9999;
+      z-index: 5;
+      opacity: 0.6;
     }
 
     /* ═══════════════════════════════════════════════════════════════════════════
@@ -324,7 +325,7 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .system-gauge {
@@ -698,7 +699,7 @@
        EMBEDDED TELEMETRY STYLES
        ═══════════════════════════════════════════════════════════════════════════ */
     
-    .telemetry-embed { margin-top: 1.25rem; }
+    .telemetry-embed { margin-top: 0.75rem; }
     .telemetry-grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; }
 
     .telemetry-panel {
@@ -831,6 +832,7 @@
       let priceChart = null;
       let lastChartRange = '1M';
       let lastChartTicker = null;
+      let loadToken = 0; // Race condition guard
 
       const TICKER_CONFIG = {
         'RKLB': { theme: 'Space', icon: '🚀', color: '#FF2975', class: 'INTERCEPTOR', sin: 'OBSESSION' },
@@ -1087,13 +1089,27 @@
       // ═══════════════════════════════════════════════════════════════════════════
       // DATA LOADING
       // ═══════════════════════════════════════════════════════════════════════════
+
+      // Helper formatters - guard against NaN/undefined
+      function fmtMoney(x, digits = 2) {
+        return Number.isFinite(x) ? `$${x.toFixed(digits)}` : '---';
+      }
+      function fmtPct(x, digits = 2) {
+        return Number.isFinite(x) ? `${x >= 0 ? '+' : ''}${x.toFixed(digits)}%` : '---';
+      }
       
       async function loadShipData() {
+        const token = ++loadToken; // Race condition guard
+
         try {
           // Load fleet data - use telemetry/fleet.json for full telemetry data
           const fleetRes = await fetch('../data/telemetry/fleet.json');
+          if (token !== loadToken) return; // Abort stale response
+          
           if (fleetRes.ok) {
             const fleetData = await fleetRes.json();
+            if (token !== loadToken) return; // Check again after JSON parse
+            
             // fleet.json uses 'ships' array, not 'positions'
             const ships = fleetData.ships || fleetData.positions || [];
             const position = ships.find(p => p.ticker === currentTicker);
@@ -1113,38 +1129,41 @@
           console.warn('[Hangar] Could not load fleet data:', e);
         }
 
-        // Load trade history
-        loadTradeHistory();
+        // Load trade history with token guard
+        await loadTradeHistory(token);
+        if (token !== loadToken) return;
 
         // Load options positions
         loadOptionsPositions();
       }
 
       function updateQuickStats(position) {
-        const price = position.current || position.price || 0;
-        const change = position.return_1d ?? position.chgPct ?? 0;
-        const high52 = position.high_52w || price;
-        const low52 = position.low_52w || price;
+        const price = Number(position.current ?? position.price);
+        const change = Number(position.return_1d ?? position.chgPct);
+        const high52 = Number(position.high_52w);
+        const low52 = Number(position.low_52w);
 
-        document.getElementById('statPrice').textContent = `$${price.toFixed(2)}`;
+        document.getElementById('statPrice').textContent = fmtMoney(price);
         
         const change24El = document.getElementById('stat24h');
-        change24El.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-        change24El.className = `quick-stat-value ${change >= 0 ? 'positive' : 'negative'}`;
+        change24El.textContent = fmtPct(change);
+        change24El.className = `quick-stat-value ${
+          Number.isFinite(change) ? (change >= 0 ? 'positive' : 'negative') : ''
+        }`;
 
-        document.getElementById('stat52High').textContent = `$${high52.toFixed(2)}`;
-        document.getElementById('stat52Low').textContent = `$${low52.toFixed(2)}`;
+        document.getElementById('stat52High').textContent = fmtMoney(high52);
+        document.getElementById('stat52Low').textContent = fmtMoney(low52);
 
         // Check for position data from PositionsStore
         if (window.PositionsStore) {
           const posData = PositionsStore.getPositionChip(currentTicker);
           if (posData?.hasPosition) {
-            document.getElementById('statPosition').textContent = `$${posData.totalValue.toFixed(0)}`;
+            document.getElementById('statPosition').textContent = fmtMoney(posData.totalValue, 0);
             
             const pnlEl = document.getElementById('statPnl');
-            const pnl = posData.totalPnl || 0;
-            pnlEl.textContent = `${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}`;
-            pnlEl.className = `quick-stat-value ${pnl >= 0 ? 'positive' : 'negative'}`;
+            const pnl = Number(posData.totalPnl);
+            pnlEl.textContent = Number.isFinite(pnl) ? `${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}` : '---';
+            pnlEl.className = `quick-stat-value ${Number.isFinite(pnl) ? (pnl >= 0 ? 'positive' : 'negative') : ''}`;
           } else {
             document.getElementById('statPosition').textContent = 'NO POS';
             document.getElementById('statPnl').textContent = '---';
@@ -1346,6 +1365,12 @@
         const canvas = document.getElementById('priceChart');
         if (!canvas) return;
         
+        // Destroy previous chart instance to prevent memory leaks
+        if (priceChart) {
+          try { priceChart.destroy(); } catch (e) {}
+          priceChart = null;
+        }
+        
         const ctx = canvas.getContext('2d');
         const config = TICKER_CONFIG[currentTicker] || { color: '#FF2975' };
 
@@ -1517,7 +1542,8 @@
           btn.addEventListener('click', async () => {
             const range = btn.dataset.range;
             
-            if (range === lastChartRange && currentTicker === lastChartTicker) {
+            // Only skip if same range already selected
+            if (range === lastChartRange) {
               return;
             }
             
@@ -1525,14 +1551,15 @@
             btn.classList.add('active');
             
             const rawData = await loadRawChartData(range);
-            lastChartRange = range;
-            lastChartTicker = currentTicker;
             
             const chartData = window.ChartUtils 
               ? ChartUtils.prepareChartData(rawData, { targetPoints: 150, useIndexBasedX: true })
               : fallbackPrepareData(rawData);
             
             if (!chartData.prices || chartData.prices.length === 0 || !priceChart) return;
+            
+            // Only update lastChartRange after successful data load
+            lastChartRange = range;
             
             const displayLabels = chartData.dateLabels 
               ? chartData.dateLabels.map(l => window.ChartUtils ? ChartUtils.formatDate(l) : new Date(l).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
@@ -1547,7 +1574,7 @@
         });
       }
 
-      async function loadTradeHistory() {
+      async function loadTradeHistory(token) {
         const entriesEl = document.getElementById('flightLogEntries');
         const countBadge = document.getElementById('logCount');
         if (!entriesEl) return;
@@ -1558,6 +1585,9 @@
           // Use TradeLoader with PlayerManager for profile-aware data
           const profile = window.PlayerManager?.getActive?.() || { type: 'guest' };
           const allTrades = await (window.TradeLoader?.loadTradeConfirms?.(profile) || Promise.resolve([]));
+          
+          // Abort if stale response
+          if (token !== undefined && token !== loadToken) return;
 
           // Filter to current ticker
           trades = allTrades.filter(t =>
