@@ -582,7 +582,10 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // RENDER CACHE - Aligned quantization
+  // RENDER CACHE - Stores ImageBitmap (not canvas elements)
+  // ChatGPT fix: Canvas elements can only exist in one DOM location.
+  // Caching canvases causes "teleportation" bugs when rendering same 
+  // ship in multiple places. ImageBitmap can be drawn to any canvas.
   // ═══════════════════════════════════════════════════════════════════
 
   class RenderCache {
@@ -607,16 +610,32 @@
       return this.cache.get(`${ticker}:${size}:${this._hashTelemetry(telemetry)}`);
     }
 
-    set(ticker, size, telemetry, canvas) {
+    async set(ticker, size, telemetry, canvas) {
       if (!CONFIG.enableCache) return;
       const key = `${ticker}:${size}:${this._hashTelemetry(telemetry)}`;
       if (this.cache.size >= this.maxSize) {
-        this.cache.delete(this.cache.keys().next().value);
+        // Evict oldest entry
+        const oldestKey = this.cache.keys().next().value;
+        const oldBitmap = this.cache.get(oldestKey);
+        if (oldBitmap && oldBitmap.close) oldBitmap.close(); // Release ImageBitmap memory
+        this.cache.delete(oldestKey);
       }
-      this.cache.set(key, canvas);
+      // Store ImageBitmap instead of canvas element
+      try {
+        const bitmap = await createImageBitmap(canvas);
+        this.cache.set(key, bitmap);
+      } catch (e) {
+        console.warn('RenderCache: Failed to create ImageBitmap', e);
+      }
     }
 
-    clear() { this.cache.clear(); }
+    clear() { 
+      // Release all ImageBitmap resources
+      this.cache.forEach(bitmap => {
+        if (bitmap && bitmap.close) bitmap.close();
+      });
+      this.cache.clear(); 
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -637,18 +656,38 @@
     }
 
     renderShip(ticker, telemetry = {}, size = CONFIG.baseSize, targetCanvas = null) {
-      if (!targetCanvas) {
-        const cached = this.cache.get(ticker, size, telemetry);
-        if (cached) return cached;
-      }
-
+      // If targetCanvas provided, always render fresh (no cache lookup for direct renders)
+      // Cache is only used for creating new canvas elements
+      
       const seed = this.getSeed(ticker);
       const blueprintName = chooseBlueprint(ticker, telemetry, seed);
       const palette = this.paletteGenerator.generate(ticker, telemetry);
       const renderer = new ShipRenderer(size);
-      const canvas = renderer.render(blueprintName, palette, telemetry, seed, 0, targetCanvas);
-
-      if (!targetCanvas) this.cache.set(ticker, size, telemetry, canvas);
+      
+      if (targetCanvas) {
+        // Render directly to target canvas
+        renderer.render(blueprintName, palette, telemetry, seed, 0, targetCanvas);
+        return targetCanvas;
+      }
+      
+      // Check cache for ImageBitmap
+      const cachedBitmap = this.cache.get(ticker, size, telemetry);
+      if (cachedBitmap) {
+        // Create new canvas and draw cached bitmap to it
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(cachedBitmap, 0, 0);
+        return canvas;
+      }
+      
+      // Render to new canvas
+      const canvas = renderer.render(blueprintName, palette, telemetry, seed, 0, null);
+      
+      // Cache asynchronously (don't block return)
+      this.cache.set(ticker, size, telemetry, canvas);
+      
       return canvas;
     }
 

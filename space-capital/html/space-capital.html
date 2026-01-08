@@ -3046,8 +3046,21 @@
       }
       
       const price = position.stock_price || position.current || 0;
-      const high52 = position.high_52w || price * 1.2;
-      const low52 = position.low_52w || price * 0.8;
+      const high52 = position.high_52w || position.history?.high_52w;
+      const low52 = position.low_52w || position.history?.low_52w;
+      
+      // If 52w data is missing, we can't compute range - fail gracefully
+      if (!high52 || !low52 || high52 <= low52) {
+        return { 
+          regime: 'UNKNOWN', 
+          score: 0, 
+          color: '#888899', 
+          icon: ticker.slice(0, 2),
+          rangePosition: null,
+          volatilityProxy: null
+        };
+      }
+      
       const range52 = high52 - low52;
       
       // Position in 52-week range (0-1)
@@ -4317,15 +4330,16 @@
             delta: pos.delta || ship.trend,
             contracts: pos.contracts || 0,
             // Historical stats (for journey visualization)
+            // NO FAKE DATA: if stats are missing, use null (not price * 1.2/0.8)
             history: {
-              high_52w: hist.high_52w || ship.price * 1.2,
-              low_52w: hist.low_52w || ship.price * 0.8,
+              high_52w: hist.high_52w || null,
+              low_52w: hist.low_52w || null,
               return_1d: hist.return_1d || ship.chgPct || 0,
-              return_1w: hist.return_1w || 0,
-              return_1m: hist.return_1m || 0,
-              return_3m: hist.return_3m || 0,
-              return_6m: hist.return_6m || 0,
-              return_1y: hist.return_1y || 0,
+              return_1w: hist.return_1w || null,
+              return_1m: hist.return_1m || null,
+              return_3m: hist.return_3m || null,
+              return_6m: hist.return_6m || null,
+              return_1y: hist.return_1y || null,
               daily_count: hist.daily_count || 0
             }
           };
@@ -4333,18 +4347,26 @@
 
         return {
           positions: enrichedShips,
-          catalysts: positions?.catalysts || FALLBACK_DATA.catalysts,
+          catalysts: positions?.catalysts || [], // Empty array if no catalysts - no fake data
           asOf: fleet.asOf
         };
       }
 
-      // Fallback to embedded data
-      console.log('Using embedded fallback data');
-      return FALLBACK_DATA;
+      // FAIL CLOSED: If fleet data is missing, throw error instead of using fake fallback
+      console.error('Fleet data missing: cannot render without market-derived inputs');
+      throw new Error('FLEET_DATA_MISSING: Cannot render dashboard without fleet.json. Check data/telemetry/fleet.json exists.');
     }
 
-    // Embedded fallback data (works without any external files)
-    const FALLBACK_DATA = {
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DEV_MODE FALLBACK - Only enabled for local development
+    // In production, this should never be used - fail closed instead
+    // ═══════════════════════════════════════════════════════════════════════════
+    const DEV_MODE = false; // Set to true ONLY for local testing without data files
+    
+    // Embedded fallback data - GATED BEHIND DEV_MODE
+    // WARNING: Contains market-derived data from a specific snapshot date
+    // This is NOT fake data, but it IS stale data - use only for development
+    const FALLBACK_DATA = DEV_MODE ? {
       "positions": [
         { "ticker": "RKLB", "structure": "Naked LEAP", "long_strike": 75, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 24.14, "current_price": 24.14, "delta": 0.68, "contracts": 1, "stock_price": 75.99, "entry_stock": 75.99, "trend": 0.6, "momentum": 0.4, "volatility": 0.5, "activity": 0.7, "signalState": "bull", "visual": { "glow": 0.7, "jitter": 0.1, "thrust": 0.5, "damage": 0 }, "history": { "high_52w": 77.46, "low_52w": 16.30, "return_1d": 2.16, "return_1w": -6.5, "return_1m": 74.66, "return_3m": 43.23, "return_1y": 177.9, "daily_count": 1281 } },
         { "ticker": "LUNR", "structure": "Naked LEAP", "long_strike": 17.5, "short_strike": null, "expiry": "2027-01-15", "entry_cost": 6.69, "current_price": 6.69, "delta": 0.7, "contracts": 1, "stock_price": 17.88, "entry_stock": 17.88, "trend": 0.3, "momentum": 0.2, "volatility": 0.7, "activity": 0.5, "signalState": "neutral", "visual": { "glow": 0.5, "jitter": 0.2, "thrust": 0.3, "damage": 0.1 }, "history": { "high_52w": 23.49, "low_52w": 6.62, "return_1d": 5.32, "return_1w": 2.03, "return_1m": 81.87, "return_3m": 54.79, "return_1y": -6.48, "daily_count": 920 } },
@@ -4365,7 +4387,7 @@
         { "date": "2026-Q2", "ticker": "RKLB", "event": "Neutron Update", "impact": "MEDIUM", "status": "UPCOMING" },
         { "date": "2026-03-31", "ticker": "GME", "event": "Q4 Earnings", "impact": "MEDIUM", "status": "UPCOMING" }
       ]
-    };
+    } : null; // DEV_MODE is false, so FALLBACK_DATA is null
 
     // =========================================================================
     // INITIALIZATION
@@ -4994,12 +5016,17 @@
         Object.entries(positions).forEach(([ticker, pos]) => {
           const config = window.getTickerConfig?.(ticker, pos) || { regime: 'UNKNOWN', score: 0, color: '#888' };
           
-          // Calculate market-derived stats
+          // Calculate market-derived stats - NO FAKE DATA
           const price = pos.stock_price || pos.current || 0;
-          const high52 = pos.high_52w || pos.history?.high_52w || price * 1.2;
-          const low52 = pos.low_52w || pos.history?.low_52w || price * 0.8;
-          const range52 = high52 - low52;
-          const rangePos = range52 > 0 ? Math.round(((price - low52) / range52) * 100) : 50;
+          const high52 = pos.high_52w || pos.history?.high_52w;
+          const low52 = pos.low_52w || pos.history?.low_52w;
+          
+          // Range position: only compute if we have real 52w data
+          let rangePos = null;
+          if (high52 && low52 && high52 > low52) {
+            const range52 = high52 - low52;
+            rangePos = Math.round(((price - low52) / range52) * 100);
+          }
           
           const chgPct = pos.chgPct || pos.return_1d || 0;
           const volatility = pos.volatility || 0.5;
@@ -5008,7 +5035,7 @@
           registry[ticker] = {
             regime: config.regime,
             score: config.score,
-            rangePos: rangePos,
+            rangePos: rangePos, // null if no 52w data
             chgPct: chgPct,
             volatility: Math.round(volatility * 100),
             momentum: Math.round((momentum + 1) * 50), // -1 to 1 → 0 to 100
@@ -5403,7 +5430,7 @@
 
   <!-- Procedural Ship Engine -->
   <script src="../js/render/seed.js"></script>
-  <script src="../js/lib/watercolor/watercolor-engine.js"></script>
+  <!-- watercolor-engine.js already loaded at line 4543 - DO NOT DUPLICATE -->
   <script src="../js/render/pixel-ship-engine.js"></script>
 </body>
 </html>
