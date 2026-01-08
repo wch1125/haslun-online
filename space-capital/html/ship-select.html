@@ -42,6 +42,352 @@
       overflow-x: hidden;
     }
     
+    /* ═══════════════════════════════════════════════════════════════════
+       SHIP CARD STYLES (from space-capital.html)
+       ═══════════════════════════════════════════════════════════════════ */
+    
+    .ship-card {
+      background: rgba(10, 10, 15, 0.95);
+      border: 2px solid var(--hm-magenta, #FF2975);
+      padding: 0.75rem;
+      position: relative;
+      cursor: pointer;
+      clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .ship-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 41, 117, 0.08) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .ship-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 3px),
+        repeating-linear-gradient(90deg, rgba(255, 41, 117, 0.01), rgba(255, 41, 117, 0.01) 1px, transparent 1px, transparent 4px);
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      z-index: 10;
+    }
+    
+    .ship-card.is-active {
+      border-color: var(--hm-cyan, #00FFFF);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), inset 0 0 20px rgba(0, 255, 255, 0.1);
+    }
+    
+    /* Ship Header */
+    .ship-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .ship-callsign {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .ship-ticker {
+      font-family: 'VT323', monospace;
+      font-size: 1.25rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      color: var(--hm-magenta, #FF2975);
+      text-shadow: 0 0 10px var(--hm-magenta);
+    }
+    
+    .ship-class {
+      font-family: 'VT323', monospace;
+      font-size: 0.625rem;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      padding: 0.2rem 0.4rem;
+      border: 1px solid rgba(255, 41, 117, 0.3);
+      background: rgba(0, 0, 0, 0.4);
+    }
+    
+    .tier-badge {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'VT323', monospace;
+      font-size: 0.875rem;
+      font-weight: bold;
+      color: var(--tier-color, #888);
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid var(--tier-color, #888);
+      text-shadow: 0 0 8px var(--tier-color);
+    }
+    
+    .ship-pnl {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+    }
+    
+    .ship-pnl.positive { color: var(--hm-cyan, #00FFFF); text-shadow: 0 0 10px var(--hm-cyan); }
+    .ship-pnl.negative { color: var(--hm-magenta, #FF2975); text-shadow: 0 0 10px var(--hm-magenta); }
+    
+    /* Ship Display */
+    .ship-display {
+      height: 100px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 41, 117, 0.2);
+      overflow: hidden;
+    }
+    
+    .ship-display::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        linear-gradient(90deg, transparent 49%, rgba(255, 41, 117, 0.1) 49%, rgba(255, 41, 117, 0.1) 51%, transparent 51%),
+        linear-gradient(0deg, transparent 49%, rgba(255, 41, 117, 0.1) 49%, rgba(255, 41, 117, 0.1) 51%, transparent 51%);
+      background-size: 20px 20px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .signal-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      z-index: 5;
+    }
+    
+    .ship-sprite-wrap {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .ship-sprite-img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 0 10px var(--ship-color, #FF2975));
+    }
+    
+    .engine-glow {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      z-index: 3;
+    }
+    
+    .timeframe-dots {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 5;
+    }
+    
+    .timeframe-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(136, 136, 136, 0.5);
+    }
+    
+    .timeframe-dot.mood-bull { background: var(--hm-cyan, #00FFFF); box-shadow: 0 0 6px var(--hm-cyan); }
+    .timeframe-dot.mood-ok { background: rgba(0, 255, 255, 0.5); }
+    .timeframe-dot.mood-flat { background: rgba(136, 136, 136, 0.6); }
+    .timeframe-dot.mood-bear { background: var(--hm-magenta, #FF2975); box-shadow: 0 0 6px var(--hm-magenta); }
+    
+    /* Behavior Badges */
+    .behavior-badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.375rem;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .behavior-badge {
+      font-family: 'VT323', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.4rem;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      color: rgba(0, 255, 255, 0.7);
+      background: rgba(0, 0, 0, 0.4);
+    }
+    
+    .behavior-badge.active { border-color: var(--hm-cyan); color: var(--hm-cyan); box-shadow: 0 0 6px rgba(0, 255, 255, 0.3); }
+    .behavior-badge.idle { border-color: rgba(136, 136, 136, 0.4); color: rgba(136, 136, 136, 0.7); }
+    .behavior-badge.warning { border-color: rgba(255, 230, 0, 0.6); color: rgba(255, 230, 0, 0.9); }
+    .behavior-badge.critical { border-color: var(--hm-magenta); color: var(--hm-magenta); }
+    .behavior-badge.ok { border-color: rgba(0, 255, 255, 0.4); color: rgba(0, 255, 255, 0.8); }
+    
+    /* Telemetry Bars */
+    .telemetry-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .telem-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .telem-bar-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.5rem;
+      color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 0.1em;
+      width: 60px;
+      text-align: right;
+    }
+    
+    .telem-bar {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .telem-bar-center {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .telem-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    
+    .telem-bar-fill.trend { background: linear-gradient(90deg, var(--hm-magenta) 0%, var(--hm-cyan) 100%); }
+    .telem-bar-fill.momentum { background: linear-gradient(90deg, var(--hm-magenta) 0%, var(--hm-cyan) 100%); }
+    .telem-bar-fill.volatility { background: linear-gradient(90deg, var(--hm-cyan) 0%, rgba(255, 230, 0, 0.9) 50%, var(--hm-magenta) 100%); }
+    
+    /* Journey Range (52W) */
+    .journey-range {
+      position: relative;
+      z-index: 2;
+      padding: 0.25rem 0;
+    }
+    
+    .journey-range-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.2rem;
+    }
+    
+    .journey-range-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.5rem;
+      color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 0.1em;
+    }
+    
+    .journey-range-pct {
+      font-family: 'VT323', monospace;
+      font-size: 0.625rem;
+      color: var(--hm-cyan, #00FFFF);
+    }
+    
+    .journey-range-bar {
+      height: 6px;
+      background: linear-gradient(90deg, var(--hm-magenta) 0%, rgba(255, 230, 0, 0.8) 50%, var(--hm-cyan) 100%);
+      position: relative;
+      margin-bottom: 0.2rem;
+    }
+    
+    .journey-range-marker {
+      position: absolute;
+      top: -2px;
+      width: 3px;
+      height: 10px;
+      background: white;
+      transform: translateX(-50%);
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+    }
+    
+    .journey-range-labels {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .journey-range-value {
+      font-family: 'VT323', monospace;
+      font-size: 0.5rem;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    /* Ship Telemetry Footer */
+    .ship-telemetry {
+      display: flex;
+      justify-content: space-around;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba(255, 41, 117, 0.2);
+      position: relative;
+      z-index: 2;
+    }
+    
+    .telemetry-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+    }
+    
+    .telemetry-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.4375rem;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.1em;
+    }
+    
+    .telemetry-value {
+      font-family: 'VT323', monospace;
+      font-size: 0.75rem;
+      color: var(--hm-cyan, #00FFFF);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════
+       END SHIP CARD STYLES
+       ═══════════════════════════════════════════════════════════════════ */
+    
     /* Parallax layers */
     .parallax-layer {
       position: fixed;
@@ -392,68 +738,165 @@
       function renderCard(ticker) {
         const shipClass = SHIP_CLASSES[ticker] || { class: 'UNKNOWN', tier: 'C', color: '#888' };
         const tierColor = TIER_COLORS[shipClass.tier] || '#888';
-        const stats = calculateStats(ticker);
-        const shipName = window.SHIP_NAMES?.[ticker]?.name || ticker;
+        
+        // Merge stats and fleet data into position-like object
+        const stats = statsData[ticker] || {};
+        const fleet = fleetData[ticker] || {};
+        
+        // Extract all data points
+        const price = stats.current || fleet.price || 0;
+        const chgPct = fleet.chgPct ?? stats.return_1d ?? 0;
+        const pnlClass = chgPct >= 0 ? 'positive' : 'negative';
+        
+        // Telemetry
+        const trend = fleet.trend ?? 0;
+        const momentum = fleet.momentum ?? 0;
+        const volatility = fleet.volatility ?? 0.5;
+        const activity = fleet.activity ?? 0.5;
+        const signalState = fleet.signalState || 'neutral';
+        const visual = fleet.visual || { glow: 0.5, thrust: 0.3, damage: 0 };
+        
+        // 52-week range
+        const high52w = stats.high_52w || price * 1.2;
+        const low52w = stats.low_52w || price * 0.8;
+        const range52w = high52w - low52w;
+        const position52w = range52w > 0 ? ((price - low52w) / range52w * 100) : 50;
+        const clampedPosition = Math.max(0, Math.min(100, position52w));
+        
+        // Historical returns
+        const return_1d = stats.return_1d ?? 0;
+        const return_1w = stats.return_1w ?? 0;
+        const return_1m = stats.return_1m ?? 0;
+        const return_3m = stats.return_3m ?? 0;
+        
+        // Behavior badges
+        const thrustState = visual.thrust > 0.5 ? 'THRUST' : 'DRIFT';
+        const thrustClass = visual.thrust > 0.5 ? 'active' : 'idle';
+        const stabilityState = volatility > 0.5 ? 'EXTREME' : 'STABLE';
+        const stabilityClass = volatility > 0.5 ? 'warning' : 'ok';
+        const hullState = visual.damage > 0.3 ? 'DAMAGED' : 'HULL OK';
+        const hullClass = visual.damage > 0.3 ? 'critical' : 'ok';
+        
+        // Signal colors
+        const signalColors = { bull: '#00FFFF', bear: '#FF2975', neutral: '#666' };
+        const signalColor = signalColors[signalState] || signalColors.neutral;
+        
+        // Mood class helper
+        const getMood = (val) => {
+          if (val > 5) return 'mood-bull';
+          if (val > 0) return 'mood-ok';
+          if (val > -5) return 'mood-flat';
+          return 'mood-bear';
+        };
+        
+        // Glow intensity
+        const glowIntensity = Math.max(0.3, visual.glow || 0.5);
+        const thrustLength = 20 + (visual.thrust * 30);
         
         const card = document.createElement('button');
         card.type = 'button';
-        card.className = 'dial-card';
+        card.className = `dial-card ship-card ${pnlClass}`;
         card.dataset.ticker = ticker;
+        card.style.cssText = `--ship-glow: ${glowIntensity}; --ship-color: ${shipClass.color}; --signal-color: ${signalColor};`;
         
         card.innerHTML = `
-          <div class="dial-card-scene">
-            <!-- Background grid layer -->
-            <div class="dial-card-layer layer-bg" data-depth="-40" data-parallax="0.08"></div>
-            
-            <!-- Header -->
-            <div class="dial-card-header">
-              <h2 class="dial-card-ticker">${ticker}</h2>
-              <div class="dial-card-class">${shipClass.class}</div>
-              <div class="dial-card-tier" style="--tier-color: ${tierColor}">${shipClass.tier}</div>
+          <!-- Header -->
+          <div class="ship-header">
+            <div class="ship-callsign">
+              <span class="ship-ticker" style="color: ${shipClass.color}; text-shadow: 0 0 ${10 * glowIntensity}px ${shipClass.color};">${ticker}</span>
+              <span class="ship-class">${shipClass.class}</span>
             </div>
-            
-            <!-- Ship sprite area -->
-            <div class="dial-card-ship-area" data-depth="20" data-parallax="0.35">
-              <img class="dial-card-ship"
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div class="tier-badge" style="--tier-color: ${tierColor}">${shipClass.tier}</div>
+              <div class="ship-pnl ${pnlClass}">
+                ${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(1)}%
+              </div>
+            </div>
+          </div>
+          
+          <!-- Ship Display -->
+          <div class="ship-display">
+            <div class="signal-indicator" style="background: ${signalColor}; box-shadow: 0 0 10px ${signalColor};"></div>
+            <div class="ship-sprite-wrap">
+              <img class="ship-sprite-img" 
                    src="../assets/ships/animated/gifs/${ticker}_idle.gif"
                    alt="${ticker}"
                    onerror="this.src='../assets/ships/static/Unclaimed-Drone-ship.png'" />
             </div>
-            
-            <!-- Telemetry stats -->
-            <div class="dial-card-telemetry" data-depth="30" data-parallax="0.5">
-              <div class="dial-card-stat">
-                <span class="dial-card-stat-label">PWR</span>
-                <div class="dial-card-stat-bar">
-                  <div class="dial-card-stat-fill" style="width: ${stats.PWR}%; --stat-color: #ff6b6b;"></div>
-                </div>
-                <span class="dial-card-stat-value">${stats.PWR}</span>
-              </div>
-              <div class="dial-card-stat">
-                <span class="dial-card-stat-label">SPD</span>
-                <div class="dial-card-stat-bar">
-                  <div class="dial-card-stat-fill" style="width: ${stats.SPD}%; --stat-color: #4ecdc4;"></div>
-                </div>
-                <span class="dial-card-stat-value">${stats.SPD}</span>
-              </div>
-              <div class="dial-card-stat">
-                <span class="dial-card-stat-label">ARM</span>
-                <div class="dial-card-stat-bar">
-                  <div class="dial-card-stat-fill" style="width: ${stats.ARM}%; --stat-color: #45b7d1;"></div>
-                </div>
-                <span class="dial-card-stat-value">${stats.ARM}</span>
-              </div>
-              <div class="dial-card-stat">
-                <span class="dial-card-stat-label">TCH</span>
-                <div class="dial-card-stat-bar">
-                  <div class="dial-card-stat-fill" style="width: ${stats.TCH}%; --stat-color: #dda0dd;"></div>
-                </div>
-                <span class="dial-card-stat-value">${stats.TCH}</span>
+            <div class="engine-glow" style="
+              background: linear-gradient(to bottom, ${shipClass.color}, transparent);
+              height: ${thrustLength}px;
+              opacity: ${0.4 + activity * 0.6};
+            "></div>
+            <!-- Timeframe dots -->
+            <div class="timeframe-dots">
+              <div class="timeframe-dot ${getMood(return_1d)}" title="1D"></div>
+              <div class="timeframe-dot ${getMood(return_1w)}" title="1W"></div>
+              <div class="timeframe-dot ${getMood(return_1m)}" title="1M"></div>
+              <div class="timeframe-dot ${getMood(return_3m)}" title="3M"></div>
+            </div>
+          </div>
+
+          <!-- Behavior Badges -->
+          <div class="behavior-badges">
+            <span class="behavior-badge ${thrustClass}">${thrustState}</span>
+            <span class="behavior-badge ${stabilityClass}">${stabilityState}</span>
+            <span class="behavior-badge ${hullClass}">${hullState}</span>
+          </div>
+
+          <!-- Telemetry Bars -->
+          <div class="telemetry-bars">
+            <div class="telem-bar-row">
+              <span class="telem-bar-label">TREND</span>
+              <div class="telem-bar">
+                <div class="telem-bar-fill trend" style="width: ${50 + trend * 50}%;"></div>
+                <div class="telem-bar-center"></div>
               </div>
             </div>
-            
-            <!-- Glass overlay -->
-            <div class="dial-card-glass" data-depth="50" data-parallax="0.7"></div>
+            <div class="telem-bar-row">
+              <span class="telem-bar-label">MOMENTUM</span>
+              <div class="telem-bar">
+                <div class="telem-bar-fill momentum" style="width: ${50 + momentum * 50}%;"></div>
+                <div class="telem-bar-center"></div>
+              </div>
+            </div>
+            <div class="telem-bar-row">
+              <span class="telem-bar-label">VOLATILITY</span>
+              <div class="telem-bar">
+                <div class="telem-bar-fill volatility" style="width: ${volatility * 100}%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 52W Range -->
+          <div class="journey-range">
+            <div class="journey-range-header">
+              <span class="journey-range-label">52W RANGE</span>
+              <span class="journey-range-pct">${clampedPosition.toFixed(0)}%</span>
+            </div>
+            <div class="journey-range-bar">
+              <div class="journey-range-marker" style="left: ${clampedPosition}%;"></div>
+            </div>
+            <div class="journey-range-labels">
+              <span class="journey-range-value">$${low52w.toFixed(2)}</span>
+              <span class="journey-range-value">$${high52w.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <!-- Footer Telemetry -->
+          <div class="ship-telemetry">
+            <div class="telemetry-item">
+              <div class="telemetry-label">PRICE</div>
+              <div class="telemetry-value">$${price.toFixed(2)}</div>
+            </div>
+            <div class="telemetry-item">
+              <div class="telemetry-label">SIGNAL</div>
+              <div class="telemetry-value" style="color: ${signalColor};">${signalState.toUpperCase()}</div>
+            </div>
+            <div class="telemetry-item">
+              <div class="telemetry-label">ACTIVITY</div>
+              <div class="telemetry-value">${(activity * 100).toFixed(0)}%</div>
+            </div>
           </div>
         `;
         
