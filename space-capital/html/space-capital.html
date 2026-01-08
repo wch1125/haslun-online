@@ -1439,8 +1439,8 @@
   </style>
 </head>
 <body>
-  <!-- CRT App Shell - Single canonical overlay -->
-  <div class="app-shell">
+  <!-- CRT App Shell - Single canonical overlay + Watercolor ambient -->
+  <div class="app-shell watercolor-ambient">
     <div class="crt-noise"></div>
 
   <!-- Loading handled by TelemetryLockIn module -->
@@ -2667,6 +2667,11 @@
     // =========================================================================
 
     async function init() {
+      // Initialize watercolor ambient lighting
+      if (window.HangarWatercolor) {
+        HangarWatercolor.setupPage('fleet');
+      }
+      
       // Use new Telemetry Lock-In transition if available
       if (window.TelemetryLockIn) {
         await TelemetryLockIn.run({
@@ -2822,6 +2827,10 @@
   <!-- UI Overhaul Modules -->
   <!-- Core State Store -->
   <script src="../js/core/store.js?v=20260108"></script>
+  
+  <!-- Watercolor Pigment Engine (ambient lighting) -->
+  <script src="../js/lib/watercolor/watercolor-engine.js?v=20260108"></script>
+  <script src="../js/ui/hangar-watercolor.js?v=20260108"></script>
   
   <script src="../js/ui/visual-tiers.js?v=20260108"></script>
   <script src="../js/ui/telemetry-lockin.js?v=20260108"></script>

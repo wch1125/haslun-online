@@ -1198,7 +1198,7 @@
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <div class="app-shell watercolor-ambient">
     <div class="crt-noise"></div>
 
   <!-- Navigation -->
@@ -1450,6 +1450,10 @@
   <script src="../js/state/upgrades.js?v=20260108"></script>
   <script src="../js/state/progression.js?v=20260108"></script>
   
+  <!-- Watercolor Pigment Engine (ambient lighting) -->
+  <script src="../js/lib/watercolor/watercolor-engine.js?v=20260108"></script>
+  <script src="../js/ui/hangar-watercolor.js?v=20260108"></script>
+  
   <!-- Data modules for Ship Brief dialog -->
   <script src="../js/data/ticker-profiles.js?v=20260108"></script>
   <script src="../js/data/ship-data.js?v=20260108"></script>
@@ -1499,6 +1503,11 @@
       assignSlotIndex: null,
       
       init() {
+        // Initialize watercolor ambient lighting (cooler, analytical tones)
+        if (window.HangarWatercolor) {
+          HangarWatercolor.setupPage('derivatives');
+        }
+        
         this.tickerSelect = document.getElementById('ticker-select');
         this.computeBtn = document.getElementById('compute-btn');
         this.speedSelect = document.getElementById('speed-select');
@@ -1747,6 +1756,12 @@
           
           this.renderEnvironment(env);
           this.renderMissionCards(recommendations);
+          
+          // Update watercolor ambient based on market conditions
+          if (window.HangarWatercolor) {
+            const ambient = HangarWatercolor.computeAmbientFromEnv(env);
+            HangarWatercolor.applyAmbient(ambient);
+          }
           
           // Update Active Ship Panel with new environment data
           this.updateActiveShipPanel();

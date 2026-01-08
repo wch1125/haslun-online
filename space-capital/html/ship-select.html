@@ -183,7 +183,7 @@
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <div class="app-shell watercolor-ambient">
     <div class="crt-noise"></div>
   
   <!-- Loading State -->
@@ -218,6 +218,10 @@
 
   <!-- Core State (AUTHORITATIVE - must load first) -->
   <script src="../js/core/store.js"></script>
+  
+  <!-- Watercolor Pigment Engine (ambient lighting) -->
+  <script src="../js/lib/watercolor/watercolor-engine.js"></script>
+  <script src="../js/ui/hangar-watercolor.js"></script>
   
   <!-- Data modules -->
   <script src="../js/data/ship-data.js"></script>
@@ -377,6 +381,11 @@
         
         // Make stats data globally available
         window.statsData = statsData;
+        
+        // Initialize watercolor ambient lighting
+        if (window.HangarWatercolor) {
+          HangarWatercolor.setupPage('hangar');
+        }
         
         // Hide loading
         const loading = document.getElementById('loading');

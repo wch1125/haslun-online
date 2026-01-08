@@ -1,0 +1,269 @@
+{
+  "source": "Schmincke AKADEMIE Aquarell",
+  "extracted": "2025-01-07",
+  "license": "Educational use - pigment data from publicly available Schmincke documentation",
+  
+  "pigments": [
+    {
+      "id": "111",
+      "name": "Deckweiß",
+      "nameEn": "Opaque White",
+      "hex": "#F5F5F0",
+      "rgb": [245, 245, 240],
+      "pigmentCodes": ["PW6"],
+      "transparency": "opaque",
+      "family": "white"
+    },
+    {
+      "id": "222",
+      "name": "Hellgelb zitron",
+      "nameEn": "Lemon Yellow",
+      "hex": "#F7E855",
+      "rgb": [247, 232, 85],
+      "pigmentCodes": ["PY3"],
+      "transparency": "semi-transparent",
+      "family": "yellow"
+    },
+    {
+      "id": "224",
+      "name": "Kadmiumgelbton",
+      "nameEn": "Cadmium Yellow",
+      "hex": "#F5D328",
+      "rgb": [245, 211, 40],
+      "pigmentCodes": ["PY151"],
+      "transparency": "semi-transparent",
+      "family": "yellow"
+    },
+    {
+      "id": "225",
+      "name": "Indischgelb",
+      "nameEn": "Indian Yellow",
+      "hex": "#F5B830",
+      "rgb": [245, 184, 48],
+      "pigmentCodes": ["PY110", "PY154"],
+      "transparency": "transparent",
+      "family": "yellow"
+    },
+    {
+      "id": "226",
+      "name": "Neapelgelb",
+      "nameEn": "Naples Yellow",
+      "hex": "#F5D8A0",
+      "rgb": [245, 216, 160],
+      "pigmentCodes": ["PW6", "PR242", "PY42"],
+      "transparency": "opaque",
+      "family": "yellow"
+    },
+    {
+      "id": "330",
+      "name": "Orange",
+      "nameEn": "Orange",
+      "hex": "#F58025",
+      "rgb": [245, 128, 37],
+      "pigmentCodes": ["PO71"],
+      "transparency": "semi-transparent",
+      "family": "orange"
+    },
+    {
+      "id": "332",
+      "name": "Kadmiumrotton",
+      "nameEn": "Cadmium Red",
+      "hex": "#E54530",
+      "rgb": [229, 69, 48],
+      "pigmentCodes": ["PR255"],
+      "transparency": "opaque",
+      "family": "red"
+    },
+    {
+      "id": "333",
+      "name": "Karmin",
+      "nameEn": "Carmine",
+      "hex": "#C42045",
+      "rgb": [196, 32, 69],
+      "pigmentCodes": ["PV19"],
+      "transparency": "semi-opaque",
+      "family": "red"
+    },
+    {
+      "id": "336",
+      "name": "Magenta",
+      "nameEn": "Magenta",
+      "hex": "#C43070",
+      "rgb": [196, 48, 112],
+      "pigmentCodes": ["PV42"],
+      "transparency": "semi-transparent",
+      "family": "red"
+    },
+    {
+      "id": "440",
+      "name": "Violett",
+      "nameEn": "Violet",
+      "hex": "#7A5090",
+      "rgb": [122, 80, 144],
+      "pigmentCodes": ["PV55"],
+      "transparency": "semi-transparent",
+      "family": "violet"
+    },
+    {
+      "id": "442",
+      "name": "Indigo",
+      "nameEn": "Indigo",
+      "hex": "#304060",
+      "rgb": [48, 64, 96],
+      "pigmentCodes": ["PB15:1", "PB66"],
+      "transparency": "opaque",
+      "family": "blue"
+    },
+    {
+      "id": "443",
+      "name": "Ultramarin",
+      "nameEn": "Ultramarine",
+      "hex": "#2850A0",
+      "rgb": [40, 80, 160],
+      "pigmentCodes": ["PB29"],
+      "transparency": "semi-transparent",
+      "family": "blue"
+    },
+    {
+      "id": "445",
+      "name": "Preußischblau",
+      "nameEn": "Prussian Blue",
+      "hex": "#1A3050",
+      "rgb": [26, 48, 80],
+      "pigmentCodes": ["PB27"],
+      "transparency": "semi-opaque",
+      "family": "blue"
+    },
+    {
+      "id": "448",
+      "name": "Cyan",
+      "nameEn": "Cyan",
+      "hex": "#0088B0",
+      "rgb": [0, 136, 176],
+      "pigmentCodes": ["PB15:3"],
+      "transparency": "semi-transparent",
+      "family": "blue"
+    },
+    {
+      "id": "551",
+      "name": "Brillantgrün",
+      "nameEn": "Brilliant Green",
+      "hex": "#00A070",
+      "rgb": [0, 160, 112],
+      "pigmentCodes": ["PG7"],
+      "transparency": "semi-transparent",
+      "family": "green"
+    },
+    {
+      "id": "552",
+      "name": "Maigrün",
+      "nameEn": "May Green",
+      "hex": "#70C040",
+      "rgb": [112, 192, 64],
+      "pigmentCodes": ["PY151", "PG7"],
+      "transparency": "semi-transparent",
+      "family": "green"
+    },
+    {
+      "id": "553",
+      "name": "Permanentgrün",
+      "nameEn": "Permanent Green",
+      "hex": "#408050",
+      "rgb": [64, 128, 80],
+      "pigmentCodes": ["PO62", "PG7"],
+      "transparency": "semi-opaque",
+      "family": "green"
+    },
+    {
+      "id": "554",
+      "name": "Oliv Gelbgrün",
+      "nameEn": "Olive Green",
+      "hex": "#687830",
+      "rgb": [104, 120, 48],
+      "pigmentCodes": ["PO62", "PG36"],
+      "transparency": "semi-opaque",
+      "family": "green"
+    },
+    {
+      "id": "660",
+      "name": "Lichter Ocker",
+      "nameEn": "Yellow Ochre",
+      "hex": "#C8A050",
+      "rgb": [200, 160, 80],
+      "pigmentCodes": ["PY42"],
+      "transparency": "semi-opaque",
+      "family": "earth"
+    },
+    {
+      "id": "664",
+      "name": "Umbra gebrannt",
+      "nameEn": "Burnt Umber",
+      "hex": "#604030",
+      "rgb": [96, 64, 48],
+      "pigmentCodes": ["PBr7"],
+      "transparency": "semi-opaque",
+      "family": "earth"
+    },
+    {
+      "id": "665",
+      "name": "Sepia",
+      "nameEn": "Sepia",
+      "hex": "#483828",
+      "rgb": [72, 56, 40],
+      "pigmentCodes": ["PB15:1", "PBr7", "PBk6"],
+      "transparency": "semi-opaque",
+      "family": "earth"
+    },
+    {
+      "id": "666",
+      "name": "Englischrot",
+      "nameEn": "English Red",
+      "hex": "#A04030",
+      "rgb": [160, 64, 48],
+      "pigmentCodes": ["PR101"],
+      "transparency": "opaque",
+      "family": "earth"
+    },
+    {
+      "id": "770",
+      "name": "Paynesgrau",
+      "nameEn": "Payne's Grey",
+      "hex": "#384858",
+      "rgb": [56, 72, 88],
+      "pigmentCodes": ["PR101", "PBk7", "PB29"],
+      "transparency": "semi-opaque",
+      "family": "neutral"
+    },
+    {
+      "id": "782",
+      "name": "Schwarz",
+      "nameEn": "Black",
+      "hex": "#202020",
+      "rgb": [32, 32, 32],
+      "pigmentCodes": ["PBk6"],
+      "transparency": "opaque",
+      "family": "neutral"
+    }
+  ],
+  
+  "transparencyValues": {
+    "transparent": 0.45,
+    "semi-transparent": 0.55,
+    "semi-opaque": 0.70,
+    "opaque": 0.85
+  },
+  
+  "paperWhite": "#FCFAF5",
+  
+  "families": [
+    "white",
+    "yellow", 
+    "orange",
+    "red",
+    "violet",
+    "blue",
+    "green",
+    "earth",
+    "neutral"
+  ]
+}
