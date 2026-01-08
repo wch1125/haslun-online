@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HASLUN.ONLINE — ARCADE</title>
   <meta name="description" content="Haslun.online — a small arcade of weird, beautiful web toys.">
-  <!-- BUILD: 2026-01-08 — Transition fix (WARP → LOCKING IN) -->
+  <!-- BUILD: 2026-01-08 v3 — Single-game focus, reorganized layout -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
@@ -234,7 +234,7 @@
 
     .grid{
       display:grid;
-      grid-template-columns: 1.3fr .7fr;
+      grid-template-columns: 1.4fr .6fr;
       gap:0;
     }
 
@@ -242,6 +242,7 @@
       body{ overflow:auto; }
       .wrap{ height:auto; }
       .grid{ grid-template-columns: 1fr; }
+      .side{ border-top: 2px solid var(--hot); }
     }
 
     /* Main cabinet */
@@ -249,6 +250,10 @@
       padding:28px;
       border-right:2px solid var(--hot);
       position:relative;
+    }
+
+    @media (max-width: 880px){
+      .cabinet{ border-right: none; }
     }
 
     .cabinet-label{
@@ -264,7 +269,7 @@
     }
 
     .game-title{
-      font-size:28px;
+      font-size:32px;
       letter-spacing:.12em;
       text-transform:uppercase;
       color: var(--cyan);
@@ -295,6 +300,7 @@
       display:flex;
       gap:12px;
       flex-wrap:wrap;
+      margin-bottom: 20px;
     }
 
     .btn{
@@ -339,14 +345,41 @@
       box-shadow: 0 0 40px rgba(0,255,200,.4);
     }
 
+    /* Feature tags under buttons */
+    .feature-tags{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .feature-tag{
+      padding: 4px 10px;
+      font-size: 11px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      border: 1px solid var(--muted);
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .feature-tag.active{
+      border-color: var(--lime);
+      color: var(--lime);
+    }
+
+    .feature-tag.wip{
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
     /* Side panel */
     .side{
-      padding:28px;
+      padding:24px;
       background: rgba(0,0,0,.3);
     }
 
     .section{
-      margin-bottom:24px;
+      margin-bottom:20px;
     }
 
     .section:last-child{
@@ -354,16 +387,16 @@
     }
 
     .section-title{
-      font-size:14px;
+      font-size:13px;
       letter-spacing:.2em;
       text-transform:uppercase;
       color: var(--hot);
-      margin-bottom:12px;
-      padding-bottom:8px;
+      margin-bottom:10px;
+      padding-bottom:6px;
       border-bottom:1px solid rgba(255,0,102,.3);
     }
 
-    .list-item{
+    .module-item{
       display:flex;
       justify-content:space-between;
       align-items:center;
@@ -372,47 +405,117 @@
       border:1px solid transparent;
       color: var(--text);
       text-decoration:none;
-      font-size:16px;
+      font-size:15px;
       letter-spacing:.08em;
       transition: all 0.1s ease;
     }
 
-    .list-item:hover{
+    .module-item:hover{
       border-color: var(--hot);
       background: rgba(255,0,102,.1);
       transform: translateX(4px);
     }
 
-    .list-item small{
-      font-size:12px;
+    .module-item .module-icon{
+      font-size: 14px;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
+
+    .module-item small{
+      font-size:11px;
       color: var(--muted);
-      letter-spacing:.15em;
+      letter-spacing:.12em;
       text-transform:uppercase;
     }
 
-    .list-item.wip small{
+    .module-item.active small{
+      color: var(--lime);
+    }
+
+    .module-item.wip{
+      opacity: 0.6;
+    }
+
+    .module-item.wip small{
       color: var(--orange);
+    }
+
+    /* Intel/stats block */
+    .intel-block{
+      padding: 12px;
+      background: rgba(255,0,102,.05);
+      border: 1px solid rgba(255,0,102,.2);
+      margin-top: 8px;
+    }
+
+    .intel-row{
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,0,102,.1);
+    }
+
+    .intel-row:last-child{
+      border-bottom: none;
+    }
+
+    .intel-row .label{
+      color: var(--muted);
+      letter-spacing: .1em;
+    }
+
+    .intel-row .value{
+      color: var(--cyan);
+      letter-spacing: .05em;
+    }
+
+    .intel-row .value.hot{
+      color: var(--hot);
     }
 
     /* Footer */
     .footer{
-      padding:12px 28px;
+      padding:14px 28px;
       border-top:2px solid var(--hot);
       display:flex;
       justify-content:space-between;
+      align-items: center;
       font-size:12px;
-      letter-spacing:.15em;
+      letter-spacing:.12em;
       text-transform:uppercase;
       color: var(--muted);
       background: rgba(255,0,102,.05);
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    .footer span:first-child{
+    .footer-links{
+      display: flex;
+      gap: 16px;
+    }
+
+    .footer-links a{
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover{
+      color: var(--cyan);
+    }
+
+    .footer-status{
       color: var(--lime);
     }
 
+    .footer-version{
+      color: var(--muted);
+    }
+
     /* ═══════════════════════════════════════════════════════════════════════
-       TRANSITION OVERLAY — CRT Boot / Lock-in style (replaces WARP tunnel)
+       TRANSITION OVERLAY — CRT Boot / Lock-in style
        ═══════════════════════════════════════════════════════════════════════ */
     #transition{
       position:fixed;
@@ -430,7 +533,7 @@
       pointer-events:auto;
     }
 
-    /* CRT scanline noise (replaces conic warp tunnel) */
+    /* CRT scanline noise */
     .transition-noise{
       position:absolute;
       inset:0;
@@ -446,7 +549,6 @@
       opacity:0.9;
     }
 
-    /* Subtle CRT flicker on the noise */
     #transition.active .transition-noise{
       animation: transition-flicker 0.15s steps(2) infinite;
     }
@@ -456,7 +558,6 @@
       50%{ opacity: 0.7; }
     }
 
-    /* Flash on exit */
     .transition-flash{
       position:absolute;
       inset:0;
@@ -474,7 +575,6 @@
       100%{ opacity:0; }
     }
 
-    /* System status text (bottom-left, with blinking cursor) */
     .transition-text{
       position:absolute;
       left:28px;
@@ -497,7 +597,6 @@
       to{ opacity:1; transform: translateY(0); }
     }
 
-    /* Blinking cursor after text */
     .transition-text::after{
       content:" ▮";
       animation: cursor-blink 0.6s steps(2) infinite;
@@ -507,7 +606,6 @@
       50%{ opacity:0; }
     }
 
-    /* Corner brackets (matching Space Capital aesthetic) */
     .transition-corner{
       position: absolute;
       width: 24px;
@@ -554,26 +652,7 @@
     .deco-cross.bl{ bottom:20px; left:20px; }
     .deco-cross.br{ bottom:20px; right:20px; }
 
-    /* Kill count decoration */
-    .kill-marks{
-      position:absolute;
-      bottom:28px; left:28px;
-      display:flex;
-      gap:6px;
-      opacity:0.4;
-    }
-
-    .kill-mark{
-      width:3px; height:16px;
-      background: var(--hot);
-    }
-
-    .kill-mark:nth-child(5n){
-      transform: rotate(-30deg);
-      margin-left:4px;
-    }
-
-    /* Reduced motion: skip animation entirely */
+    /* Reduced motion */
     @media (prefers-reduced-motion: reduce) {
       #transition,
       #transition.active {
@@ -612,71 +691,85 @@
 
       <div class="grid">
         <div class="cabinet">
-          <div class="cabinet-label">CABINET 01</div>
+          <div class="cabinet-label">NOW PLAYING</div>
           <div class="game-title">SPACE CAPITAL</div>
           <div class="game-sub">Fleet Command Dashboard · Live Telemetry</div>
           <div class="game-desc">
             A trading cockpit dressed as a retro space sim. Real market data drives ship personality. Your fleet remembers everything.
           </div>
           <div class="btn-row">
-            <!-- Cache-busted links to ensure latest build -->
-            <a class="btn btn-primary transition-trigger" href="./space-capital/?v=20260108" data-message="LOCKING IN">▶ LAUNCH</a>
-            <a class="btn btn-secondary transition-trigger" href="./space-capital/?v=20260108#hangar" data-message="OPENING HANGAR">◇ HANGAR</a>
+            <a class="btn btn-primary transition-trigger" href="./space-capital/?v=20260108" data-message="ENTERING FLEET">▶ LAUNCH</a>
           </div>
-
-          <div class="kill-marks">
-            <div class="kill-mark"></div>
-            <div class="kill-mark"></div>
-            <div class="kill-mark"></div>
-            <div class="kill-mark"></div>
-            <div class="kill-mark"></div>
-            <div class="kill-mark"></div>
-            <div class="kill-mark"></div>
+          <div class="feature-tags">
+            <span class="feature-tag active">Fleet Command</span>
+            <span class="feature-tag active">Hangar</span>
+            <span class="feature-tag active">Ship Telemetry</span>
+            <span class="feature-tag active">Missions</span>
+            <span class="feature-tag wip">Battle Arena</span>
+            <span class="feature-tag wip">Paint Bay</span>
           </div>
         </div>
 
         <div class="side">
           <div class="section">
-            <div class="section-title">× UPCOMING</div>
-            <a class="list-item wip transition-trigger" href="./space-capital/?v=20260108#battle" data-message="MODULE OFFLINE">
-              <span>Battle Arena</span>
-              <small>WIP</small>
+            <div class="section-title">◈ MODULES</div>
+            <a class="module-item active transition-trigger" href="./space-capital/?v=20260108" data-message="ENTERING FLEET">
+              <span><span class="module-icon">▸</span>Fleet Command</span>
+              <small>LIVE</small>
             </a>
-            <a class="list-item wip transition-trigger" href="./space-capital/?v=20260108#garage" data-message="MODULE OFFLINE">
-              <span>Telemetry Lab</span>
-              <small>WIP</small>
+            <a class="module-item active transition-trigger" href="./space-capital/?v=20260108#hangar" data-message="OPENING HANGAR">
+              <span><span class="module-icon">◇</span>Hangar Bay</span>
+              <small>LIVE</small>
             </a>
-            <a class="list-item wip transition-trigger" href="./space-capital/?v=20260108#garage" data-message="MODULE OFFLINE">
-              <span>Paint Bay</span>
+            <a class="module-item active transition-trigger" href="./space-capital/html/derivatives.html?v=20260108" data-message="LOADING MISSIONS">
+              <span><span class="module-icon">◎</span>Missions</span>
+              <small>LIVE</small>
+            </a>
+            <a class="module-item wip transition-trigger" href="./space-capital/?v=20260108#battle" data-message="MODULE OFFLINE">
+              <span><span class="module-icon">※</span>Battle Arena</span>
               <small>WIP</small>
             </a>
           </div>
 
           <div class="section">
-            <div class="section-title">◁ EXIT TO</div>
-            <a class="list-item" href="https://haslun.me">
-              <span>Haslun.me</span>
-              <small>HUB</small>
-            </a>
-            <a class="list-item" href="https://haslun.studio">
-              <span>Haslun.studio</span>
-              <small>ART</small>
-            </a>
+            <div class="section-title">◈ INTEL</div>
+            <div class="intel-block">
+              <div class="intel-row">
+                <span class="label">BUILD</span>
+                <span class="value">2026.01.08</span>
+              </div>
+              <div class="intel-row">
+                <span class="label">FLEET SIZE</span>
+                <span class="value">12 SHIPS</span>
+              </div>
+              <div class="intel-row">
+                <span class="label">DATA SOURCE</span>
+                <span class="value">LIVE MARKET</span>
+              </div>
+              <div class="intel-row">
+                <span class="label">STATUS</span>
+                <span class="value hot">ALPHA</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="footer">
-        <span>SYS: GREENLINE</span>
-        <span>v0.2 — ARCADE SHELL</span>
+        <span class="footer-status">SYS: GREENLINE</span>
+        <div class="footer-links">
+          <a href="https://haslun.me">HASLUN.ME</a>
+          <a href="https://haslun.studio">HASLUN.STUDIO</a>
+        </div>
+        <span class="footer-version">v0.3 — ARCADE SHELL</span>
       </div>
     </section>
   </div>
 
-  <!-- Transition overlay (CRT boot style, replaces WARP tunnel) -->
+  <!-- Transition overlay -->
   <div id="transition">
     <div class="transition-noise"></div>
-    <div class="transition-text">LOCKING IN</div>
+    <div class="transition-text">ENTERING FLEET</div>
     <div class="transition-flash"></div>
     <div class="transition-corner tl"></div>
     <div class="transition-corner tr"></div>
@@ -690,8 +783,6 @@
       
       const transitionEl = document.getElementById('transition');
       const transitionText = transitionEl.querySelector('.transition-text');
-      
-      // Check for reduced motion preference
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       
       document.querySelectorAll('.transition-trigger').forEach(link => {
@@ -699,20 +790,14 @@
           e.preventDefault();
           const target = link.href;
           
-          // If user prefers reduced motion, skip transition entirely
           if (prefersReducedMotion) {
             window.location.href = target;
             return;
           }
           
-          // Dynamic message based on destination (from data attribute)
-          const message = link.dataset.message || 'LOCKING IN';
+          const message = link.dataset.message || 'ENTERING FLEET';
           transitionText.textContent = message;
-          
-          // Activate transition
           transitionEl.classList.add('active');
-          
-          // Navigate after short delay (350ms instead of 800ms)
           setTimeout(() => window.location.href = target, 350);
         });
       });
