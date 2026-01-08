@@ -17,6 +17,8 @@
   <link rel="stylesheet" href="../css/ship-states.css?v=20260108">
   <!-- Module viewer overlay -->
   <link rel="stylesheet" href="../css/module-viewer.css?v=20260108">
+  <!-- Fleet command styles (position chips, fleet HUD) -->
+  <link rel="stylesheet" href="../css/fleet-command.css?v=20260108">
   <style>
     /* =========================================================================
        HOTLINE MIAMI AESTHETIC - SPACE CAPITAL
@@ -1718,6 +1720,35 @@
             <span id="ship-count">0</span> VESSELS DEPLOYED
           </div>
         </div>
+        
+        <!-- Fleet Power HUD - Positions Overview -->
+        <div class="fleet-power-hud empty" id="fleet-power-hud">
+          <div class="fleet-power-stat">
+            <span class="fleet-power-label">EXPOSURE</span>
+            <span class="fleet-power-value" id="hud-exposure">--</span>
+          </div>
+          <div class="fleet-power-stat">
+            <span class="fleet-power-label">OPTIONS</span>
+            <span class="fleet-power-value neutral" id="hud-options-ratio">--</span>
+          </div>
+          <div class="fleet-power-stat">
+            <span class="fleet-power-label">TOP 3</span>
+            <div class="fleet-concentration" id="hud-concentration">
+              <span class="fleet-concentration-item">--</span>
+            </div>
+          </div>
+          <div class="fleet-power-stat">
+            <span class="fleet-power-label">P&L</span>
+            <span class="fleet-power-value" id="hud-pnl">--</span>
+          </div>
+        </div>
+        
+        <!-- Fleet Comms - Risk alerts -->
+        <div class="fleet-comms" id="fleet-comms" style="display: none;">
+          <div class="fleet-comms-header">// COMMS</div>
+          <div id="fleet-comms-lines"></div>
+        </div>
+        
         <div class="panel-body">
           <div class="fleet-grid" id="fleet-grid">
             <!-- Ships rendered here -->
@@ -1977,6 +2008,14 @@
       const prefix = amount >= 0 ? '$' : '-$';
       return prefix + Math.abs(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
+    
+    // Format compact value for position chips (e.g., 11645 -> "11.6k")
+    function formatCompactValue(amount) {
+      const abs = Math.abs(amount);
+      if (abs >= 1000000) return (amount / 1000000).toFixed(1) + 'M';
+      if (abs >= 1000) return (amount / 1000).toFixed(1) + 'k';
+      return amount.toFixed(0);
+    }
 
     // =========================================================================
     // RENDERING
@@ -2071,13 +2110,29 @@
       // Use daily change if no position P&L
       const displayPct = hasPosition ? pnlPct : position.chgPct;
       const pnlClass = displayPct >= 0 ? 'positive' : 'negative';
+      
+      // ═══════════════════════════════════════════════════════════════════
+      // POSITION INTEGRATION - Get ownership data from PositionsStore
+      // ═══════════════════════════════════════════════════════════════════
+      const posChip = window.PositionsStore?.getPositionChip(position.ticker);
+      const fleetStats = window.PositionsStore?.getFleetStats() || { hasPositions: false };
+      const isOwned = posChip?.hasPosition || false;
+      const visualWeight = window.PositionsStore?.getVisualWeight(position.ticker) || 0.5;
+      const riskMetrics = window.PositionsStore?.getRiskMetrics(position.ticker) || { concentration: 0, optionRatio: 0, riskLevel: 'none' };
+      
+      // Ownership state classes
+      // Only apply ghost state if user has imported positions (otherwise all ships look normal)
+      const ownershipClass = fleetStats.hasPositions 
+        ? (isOwned ? 'owned' : 'ghost')
+        : '';  // No ownership styling if no positions imported
+      const highValueClass = isOwned && posChip.totalValue > 10000 ? 'high-value' : '';
 
       // Strike visualization (only for options)
       const hasStrikes = position.long_strike != null;
       const strikePos = hasStrikes ? calculateStrikePosition(position.stock_price, position.long_strike) : 50;
       const shortStrikePos = position.short_strike ? calculateStrikePosition(position.stock_price, position.short_strike) : null;
 
-      // Telemetry-driven visuals
+      // Telemetry-driven visuals (weighted by ownership)
       const visual = position.visual || { glow: 0.5, jitter: 0.1, thrust: 0.3, damage: 0 };
       const trend = position.trend ?? 0;
       const momentum = position.momentum ?? 0;
@@ -2085,8 +2140,10 @@
       const activity = position.activity ?? 0.5;
       const signalState = position.signalState || 'neutral';
 
-      const glowIntensity = Math.max(0.3, visual.glow);
-      const thrustLength = 20 + (visual.thrust * 30);
+      // Apply visual weight to glow intensity
+      const baseGlow = Math.max(0.3, visual.glow);
+      const glowIntensity = baseGlow * visualWeight * 1.5;
+      const thrustLength = 20 + (visual.thrust * 30 * visualWeight);
       const damageOpacity = visual.damage * 0.5;
 
       const signalColors = {
@@ -2097,12 +2154,48 @@
       const signalColor = signalColors[signalState] || signalColors.neutral;
 
       const card = document.createElement('div');
-      card.className = `ship-card ${pnlClass}`;
-      card.style.cssText = `--ship-glow: ${glowIntensity}; --ship-color: ${config.color}; --signal-color: ${signalColor};`;
+      card.className = `ship-card ${pnlClass} ${ownershipClass} ${highValueClass}`.trim();
+      card.style.cssText = `--ship-glow: ${glowIntensity}; --ship-color: ${config.color}; --signal-color: ${signalColor}; --ownership-weight: ${visualWeight};`;
       
       if (volatility > 0.6) card.classList.add('high-volatility');
       
+      // ═══════════════════════════════════════════════════════════════════
+      // POSITION CHIP HTML - Only show if owned
+      // ═══════════════════════════════════════════════════════════════════
+      const positionChipHtml = isOwned ? `
+        <div class="position-chip owned">
+          <span class="position-chip-label">POS</span>
+          <span class="position-chip-value">$${formatCompactValue(posChip.totalValue)}</span>
+          ${posChip.hasOptions ? `<span class="position-chip-options">${posChip.optionCount}</span>` : ''}
+          <div class="position-chip-bar">
+            <div class="position-chip-bar-stock" style="width: ${posChip.totalValue > 0 ? (posChip.stockValue / posChip.totalValue * 100) : 0}%"></div>
+            <div class="position-chip-bar-options" style="width: ${posChip.totalValue > 0 ? (posChip.optionsValue / posChip.totalValue * 100) : 0}%"></div>
+          </div>
+        </div>
+      ` : '';
+      
+      // ═══════════════════════════════════════════════════════════════════
+      // POSITION METERS HTML - Exposure and risk indicators
+      // ═══════════════════════════════════════════════════════════════════
+      const positionMetersHtml = isOwned ? `
+        <div class="position-meters">
+          <div class="position-meter">
+            <span class="position-meter-label">EXPOSURE</span>
+            <div class="position-meter-bar">
+              <div class="position-meter-fill exposure" style="width: ${Math.min(100, riskMetrics.concentration * 200)}%"></div>
+            </div>
+          </div>
+          <div class="position-meter">
+            <span class="position-meter-label">RISK</span>
+            <div class="position-meter-bar">
+              <div class="position-meter-fill risk ${riskMetrics.riskLevel === 'high' ? 'high' : ''}" style="width: ${Math.min(100, (riskMetrics.concentration + riskMetrics.optionRatio) * 100)}%"></div>
+            </div>
+          </div>
+        </div>
+      ` : '';
+      
       card.innerHTML = `
+        ${positionChipHtml}
         <div class="ship-header">
           <div class="ship-callsign">
             <span class="ship-ticker" style="color: ${config.color}; text-shadow: 0 0 ${10 * glowIntensity}px ${config.color};">${position.ticker}</span>
@@ -2210,14 +2303,153 @@
             <div class="telemetry-value">${hasPosition ? formatCurrency(value) : (activity * 100).toFixed(0) + '%'}</div>
           </div>
         </div>
+        
+        ${positionMetersHtml}
       `;
 
       return card;
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // FLEET POWER HUD - Real-time exposure overview from PositionsStore
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function updateFleetPowerHUD() {
+      const hud = document.getElementById('fleet-power-hud');
+      if (!hud || !window.PositionsStore) return;
+      
+      const stats = PositionsStore.getFleetStats();
+      const concentration = PositionsStore.getConcentration(3);
+      
+      // Update HUD class based on whether positions exist
+      if (stats.hasPositions) {
+        hud.classList.remove('empty');
+      } else {
+        hud.classList.add('empty');
+      }
+      
+      // Update exposure
+      const exposureEl = document.getElementById('hud-exposure');
+      if (exposureEl) {
+        exposureEl.textContent = stats.totalExposure > 0 
+          ? '$' + formatCompactValue(stats.totalExposure)
+          : '--';
+      }
+      
+      // Update options ratio
+      const optionsEl = document.getElementById('hud-options-ratio');
+      if (optionsEl) {
+        const pct = stats.optionsRatio * 100;
+        optionsEl.textContent = stats.hasPositions 
+          ? pct.toFixed(0) + '%'
+          : '--';
+        optionsEl.className = 'fleet-power-value ' + (pct > 50 ? '' : 'neutral');
+      }
+      
+      // Update concentration (top 3)
+      const concEl = document.getElementById('hud-concentration');
+      if (concEl) {
+        if (concentration.length > 0) {
+          concEl.innerHTML = concentration.map(c => 
+            `<span class="fleet-concentration-item">
+              <span class="ticker">${c.ticker}</span>
+              <span class="percent">${c.percent.toFixed(0)}%</span>
+            </span>`
+          ).join('');
+        } else {
+          concEl.innerHTML = '<span class="fleet-concentration-item">--</span>';
+        }
+      }
+      
+      // Update P&L
+      const pnlEl = document.getElementById('hud-pnl');
+      if (pnlEl) {
+        if (stats.hasPositions && stats.totalPnL !== 0) {
+          const sign = stats.totalPnL >= 0 ? '+' : '';
+          pnlEl.textContent = sign + '$' + formatCompactValue(Math.abs(stats.totalPnL));
+          pnlEl.className = 'fleet-power-value ' + (stats.totalPnL >= 0 ? 'positive' : 'negative');
+        } else {
+          pnlEl.textContent = '--';
+          pnlEl.className = 'fleet-power-value';
+        }
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // FLEET COMMS - Diegetic risk alerts
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function updateFleetComms() {
+      const comms = document.getElementById('fleet-comms');
+      const lines = document.getElementById('fleet-comms-lines');
+      if (!comms || !lines || !window.PositionsStore) return;
+      
+      const stats = PositionsStore.getFleetStats();
+      const concentration = PositionsStore.getConcentration(1);
+      const alerts = [];
+      
+      // Check concentration
+      if (concentration.length > 0 && concentration[0].percent > 30) {
+        alerts.push({
+          level: concentration[0].percent > 50 ? 'critical' : 'warning',
+          text: `CONCENTRATION: <span class="${concentration[0].percent > 50 ? 'critical' : 'highlight'}">${concentration[0].percent.toFixed(0)}%</span> in <span class="highlight">${concentration[0].ticker}</span>`
+        });
+      }
+      
+      // Check options ratio
+      if (stats.optionsRatio > 0.5) {
+        alerts.push({
+          level: stats.optionsRatio > 0.7 ? 'critical' : 'warning',
+          text: `OPTIONS HEAVY: <span class="${stats.optionsRatio > 0.7 ? 'critical' : 'highlight'}">${(stats.optionsRatio * 100).toFixed(0)}%</span> derivatives exposure`
+        });
+      }
+      
+      // Check total exposure (arbitrary thresholds for demo)
+      if (stats.totalExposure > 50000) {
+        alerts.push({
+          level: 'warning',
+          text: `HIGH EXPOSURE: <span class="highlight">$${formatCompactValue(stats.totalExposure)}</span> total position size`
+        });
+      }
+      
+      // Show/hide comms panel
+      if (alerts.length > 0) {
+        comms.style.display = 'block';
+        lines.innerHTML = alerts.map(a => `
+          <div class="fleet-comm-line">
+            <div class="fleet-comm-icon ${a.level}"></div>
+            <span class="fleet-comm-text">${a.text}</span>
+          </div>
+        `).join('');
+      } else {
+        comms.style.display = 'none';
+      }
+    }
+
+    // Listen for position changes to update HUD
+    if (window.PositionsStore) {
+      PositionsStore.onChange(() => {
+        updateFleetPowerHUD();
+        updateFleetComms();
+        // Re-render fleet to update ownership states
+        if (window._lastFleetData) {
+          renderFleet(window._lastFleetData);
+        }
+      });
+    }
+
     function renderFleet(positions) {
+      // Store for re-render on position changes
+      window._lastFleetData = positions;
+      
       const grid = document.getElementById('fleet-grid');
       grid.innerHTML = '';
+      
+      // ═══════════════════════════════════════════════════════════════════
+      // UPDATE FLEET POWER HUD - Read from PositionsStore
+      // ═══════════════════════════════════════════════════════════════════
+      updateFleetPowerHUD();
+      updateFleetComms();
       
       // Filter to only show tickers that have ship profiles configured
       const configuredPositions = positions.filter(pos => TICKER_CONFIG[pos.ticker]);
@@ -3161,6 +3393,9 @@
   <!-- Position Manager - P&L and cost basis data -->
   <script src="../js/data/position-manager.js?v=20260108"></script>
   <script src="../js/ui/position-manager-ui.js?v=20260108"></script>
+
+  <!-- Positions Store - Fleet-wide position integration -->
+  <script src="../js/data/positions-store.js?v=20260108"></script>
 
   <!-- Ship Animator - Telemetry-driven sprite animations -->
   <script src="../js/ui/ship-animator.js?v=20260108"></script>

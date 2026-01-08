@@ -849,3 +849,476 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FLEET POWER HUD — Top-level exposure summary
+   "Fleet ops" feel, not "dashboard"
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fleet-power-hud {
+  display: flex;
+  align-items: stretch;
+  gap: 1px;
+  background: rgba(255, 41, 117, 0.1);
+  border: 1px solid rgba(255, 41, 117, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  font-family: 'VT323', monospace;
+}
+
+.fleet-power-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 0.75rem;
+  background: rgba(10, 10, 15, 0.9);
+  min-width: 0;
+}
+
+.fleet-power-stat:not(:last-child) {
+  border-right: 1px solid rgba(255, 41, 117, 0.15);
+}
+
+.fleet-power-label {
+  font-size: 0.55rem;
+  color: rgba(255, 41, 117, 0.7);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fleet-power-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #FF2975;
+  text-shadow: 0 0 10px rgba(255, 41, 117, 0.5);
+  margin-top: 0.15rem;
+  white-space: nowrap;
+}
+
+.fleet-power-value.neutral {
+  color: #00FFFF;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.fleet-power-value.positive {
+  color: #00FFFF;
+}
+
+.fleet-power-value.negative {
+  color: #FF2975;
+}
+
+/* Concentration breakdown inside HUD */
+.fleet-concentration {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.fleet-concentration-item {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+.fleet-concentration-item .ticker {
+  color: #FF2975;
+}
+
+.fleet-concentration-item .percent {
+  color: rgba(0, 255, 255, 0.8);
+}
+
+/* Empty state */
+.fleet-power-hud.empty {
+  opacity: 0.5;
+  border-color: rgba(100, 100, 100, 0.3);
+  background: rgba(100, 100, 100, 0.1);
+}
+
+.fleet-power-hud.empty .fleet-power-label {
+  color: rgba(100, 100, 100, 0.7);
+}
+
+.fleet-power-hud.empty .fleet-power-value {
+  color: #666;
+  text-shadow: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   POSITION CHIP — Ownership indicator on ship cards
+   ═══════════════════════════════════════════════════════════════════ */
+
+.position-chip {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(10, 10, 15, 0.95);
+  border: 1px solid rgba(255, 41, 117, 0.4);
+  border-radius: 2px;
+  font-family: 'VT323', monospace;
+  font-size: 0.7rem;
+  z-index: 10;
+}
+
+.position-chip.owned {
+  border-color: rgba(255, 41, 117, 0.6);
+  box-shadow: 0 0 8px rgba(255, 41, 117, 0.2);
+}
+
+.position-chip.ghost {
+  opacity: 0.4;
+  border-color: rgba(100, 100, 100, 0.3);
+}
+
+.position-chip-label {
+  color: rgba(255, 41, 117, 0.8);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+}
+
+.position-chip-value {
+  color: #FF2975;
+  font-weight: 600;
+}
+
+.position-chip-options {
+  color: #00FFFF;
+  font-size: 0.6rem;
+}
+
+.position-chip-options::before {
+  content: 'Δ';
+  margin-right: 0.15rem;
+  opacity: 0.7;
+}
+
+/* Exposure bar inside chip */
+.position-chip-bar {
+  width: 30px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-left: 0.25rem;
+}
+
+.position-chip-bar-stock {
+  height: 100%;
+  background: #FF2975;
+  float: left;
+}
+
+.position-chip-bar-options {
+  height: 100%;
+  background: #00FFFF;
+  float: left;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHIP CARD OWNERSHIP STATES — Visual "wake up" system
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Owned ships - stronger presence */
+.ship-card.owned {
+  --ownership-glow: 1;
+  border-color: rgba(255, 41, 117, 0.4);
+}
+
+.ship-card.owned .ship-sprite-img {
+  filter: drop-shadow(0 0 12px rgba(255, 41, 117, 0.6));
+}
+
+.ship-card.owned .macd-backdrop {
+  opacity: 0.9;
+}
+
+.ship-card.owned .engine-glow {
+  opacity: 0.8;
+}
+
+/* Ghost ships - dimmed, noisy, less presence */
+.ship-card.ghost {
+  --ownership-glow: 0.3;
+  opacity: 0.6;
+  border-color: rgba(100, 100, 100, 0.2);
+}
+
+.ship-card.ghost .ship-sprite-img {
+  filter: 
+    grayscale(0.5) 
+    brightness(0.7)
+    drop-shadow(0 0 4px rgba(100, 100, 100, 0.3));
+}
+
+.ship-card.ghost .macd-backdrop {
+  opacity: 0.3;
+  filter: grayscale(0.7);
+}
+
+.ship-card.ghost .engine-glow {
+  opacity: 0.2;
+}
+
+.ship-card.ghost .ship-ticker {
+  color: #666 !important;
+  text-shadow: none !important;
+}
+
+.ship-card.ghost .ship-pnl {
+  opacity: 0.5;
+}
+
+/* Scanline noise overlay for ghost ships */
+.ship-card.ghost::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  animation: ghost-scanline 0.5s steps(2) infinite;
+  opacity: 0.5;
+}
+
+@keyframes ghost-scanline {
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 0 1px; }
+}
+
+/* High-value positions get extra glow */
+.ship-card.owned.high-value {
+  box-shadow: 
+    0 0 20px rgba(255, 41, 117, 0.15),
+    inset 0 0 30px rgba(255, 41, 117, 0.03);
+}
+
+.ship-card.owned.high-value .ship-sprite-img {
+  filter: drop-shadow(0 0 15px rgba(255, 41, 117, 0.8));
+  animation: high-value-pulse 3s ease-in-out infinite;
+}
+
+@keyframes high-value-pulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 15px rgba(255, 41, 117, 0.8)); 
+  }
+  50% { 
+    filter: drop-shadow(0 0 25px rgba(255, 41, 117, 1)); 
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   EXPOSURE & RISK METERS — Bottom strip on ship cards
+   ═══════════════════════════════════════════════════════════════════ */
+
+.position-meters {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 41, 117, 0.1);
+}
+
+.position-meter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.position-meter-label {
+  font-size: 0.5rem;
+  color: rgba(255, 41, 117, 0.6);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.position-meter-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.position-meter-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 0.3s ease;
+}
+
+.position-meter-fill.exposure {
+  background: linear-gradient(90deg, #FF2975, #FF69B4);
+}
+
+.position-meter-fill.risk {
+  background: linear-gradient(90deg, #00FFFF, #FFE600);
+}
+
+.position-meter-fill.risk.high {
+  background: linear-gradient(90deg, #FFE600, #FF2975);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMMS ALERTS — Diegetic risk warnings
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fleet-comms {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(10, 10, 15, 0.8);
+  border: 1px solid rgba(255, 179, 71, 0.2);
+  border-radius: 2px;
+}
+
+.fleet-comms-header {
+  font-size: 0.55rem;
+  color: rgba(255, 179, 71, 0.7);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.fleet-comm-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem;
+}
+
+.fleet-comm-icon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFB347;
+  box-shadow: 0 0 6px #FFB347;
+  animation: comm-pulse 1.5s ease-in-out infinite;
+}
+
+.fleet-comm-icon.critical {
+  background: #FF2975;
+  box-shadow: 0 0 6px #FF2975;
+}
+
+.fleet-comm-text {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.fleet-comm-text .highlight {
+  color: #FFB347;
+  font-weight: 600;
+}
+
+.fleet-comm-text .critical {
+  color: #FF2975;
+}
+
+@keyframes comm-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE - Fleet Power HUD
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .fleet-power-hud {
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  
+  .fleet-power-stat {
+    flex: 1 1 50%;
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(255, 41, 117, 0.1);
+  }
+  
+  .fleet-power-stat:nth-child(odd) {
+    border-right: 1px solid rgba(255, 41, 117, 0.1);
+  }
+  
+  .fleet-power-stat:nth-child(n+3) {
+    border-bottom: none;
+  }
+  
+  .fleet-power-value {
+    font-size: 0.9rem;
+  }
+  
+  .fleet-concentration {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    justify-content: center;
+  }
+  
+  .fleet-concentration-item {
+    font-size: 0.55rem;
+  }
+  
+  .position-chip {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.6rem;
+  }
+  
+  .position-chip-bar {
+    width: 25px;
+  }
+  
+  .position-meters {
+    gap: 0.5rem;
+  }
+  
+  .position-meter-label {
+    font-size: 0.45rem;
+  }
+  
+  .fleet-comms {
+    padding: 0.5rem;
+  }
+  
+  .fleet-comm-line {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .fleet-power-hud {
+    margin-bottom: 0.75rem;
+  }
+  
+  .fleet-power-stat {
+    padding: 0.4rem;
+  }
+  
+  .fleet-power-label {
+    font-size: 0.5rem;
+  }
+  
+  .fleet-power-value {
+    font-size: 0.8rem;
+  }
+  
+  .position-chip {
+    top: 0.3rem;
+    right: 0.3rem;
+    padding: 0.15rem 0.3rem;
+    font-size: 0.55rem;
+  }
+}
