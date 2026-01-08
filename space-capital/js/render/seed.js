@@ -1,19 +1,12 @@
 /**
  * Seed Utilities for Deterministic Ship Generation
- * 
- * Provides stable hashing and seeded pseudo-random number generation
- * so that the same ticker always produces the same ship.
+ * Provides stable hashing and seeded PRNG so same ticker = same ship
  */
 
 (function(global) {
   'use strict';
 
-  /**
-   * FNV-1a 32-bit hash
-   * Fast, good distribution, deterministic
-   * @param {string} str - Input string
-   * @returns {number} - Unsigned 32-bit integer
-   */
+  // FNV-1a 32-bit hash - fast, good distribution, deterministic
   function hash32(str) {
     let h = 0x811c9dc5;
     for (let i = 0; i < str.length; i++) {
@@ -23,12 +16,7 @@
     return h >>> 0;
   }
 
-  /**
-   * Mulberry32 PRNG
-   * Fast, good quality, seedable
-   * @param {number} seed - 32-bit seed value
-   * @returns {function} - Returns random float 0-1 on each call
-   */
+  // Mulberry32 PRNG - fast, seedable, good quality
   function mulberry32(seed) {
     let a = seed >>> 0;
     return function rand() {
@@ -40,61 +28,28 @@
     };
   }
 
-  /**
-   * Get letter index (A=0, B=1, ... Z=25)
-   * Non-letters return 0
-   * @param {string} ch - Single character
-   * @returns {number} - 0-25
-   */
+  // Letter index (A=0, B=1, ... Z=25)
   function letterIndex(ch) {
     const c = (ch || 'A').toUpperCase().charCodeAt(0);
     if (c < 65 || c > 90) return 0;
     return c - 65;
   }
 
-  /**
-   * Generate a canonical seed for a ticker
-   * @param {string} ticker - Stock ticker (e.g., 'RKLB')
-   * @param {string|null} userId - Optional user ID for per-user uniqueness
-   * @returns {number} - Deterministic seed
-   */
+  // Canonical seed for ticker (optionally per-user)
   function getTickerSeed(ticker, userId = null) {
     const key = userId ? `${userId}:${ticker}` : ticker;
     return hash32(key);
   }
 
-  /**
-   * Create a block-specific PRNG for deterministic rendering
-   * Combines ticker seed with frame and block indices
-   * @param {number} tickerSeed - Base seed from ticker
-   * @param {number} frameIndex - Animation frame (0 for static)
-   * @param {number} blockIndex - Which block being rendered
-   * @returns {function} - Seeded random function
-   */
+  // Block-specific PRNG for deterministic rendering
   function getBlockRng(tickerSeed, frameIndex = 0, blockIndex = 0) {
-    // Golden ratio hash mixing
     const mixedSeed = tickerSeed ^ (frameIndex * 0x9E3779B9) ^ (blockIndex * 0x517CC1B7);
     return mulberry32(mixedSeed);
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  // EXPORTS
-  // ═══════════════════════════════════════════════════════════════════
-
-  const SeedUtils = {
-    hash32,
-    mulberry32,
-    letterIndex,
-    getTickerSeed,
-    getBlockRng
-  };
-
-  // Browser global
-  global.SeedUtils = SeedUtils;
-
-  // Module export
+  global.SeedUtils = { hash32, mulberry32, letterIndex, getTickerSeed, getBlockRng };
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = SeedUtils;
+    module.exports = global.SeedUtils;
   }
 
 })(typeof window !== 'undefined' ? window : global);
