@@ -1,22 +1,24 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * HANGAR WATERCOLOR SYSTEM
+ * HANGAR WATERCOLOR SYSTEM v2
  * ═══════════════════════════════════════════════════════════════════════════
  * 
  * Integrates the Watercolor Engine with Space Capital's telemetry system
- * to create ambient lighting and ship patina effects.
+ * to create ambient lighting, ship patina effects, and micro-parallax depth.
  * 
  * Philosophy: "Let the market leave pigment residue in the hangar."
  * 
- * This is a thin wrapper that:
- *   - Prevents misuse (opacity caps, no text colors)
- *   - Maps telemetry → pigments
- *   - Provides page-specific color memory
+ * v2 Changes (ChatGPT review):
+ *   - Pigment clamping (max 2 to prevent mud)
+ *   - Update debouncing (1200ms cooldown)
+ *   - Reduced motion support (freeze after first render)
+ *   - Blend-mode fallbacks for older browsers
+ *   - Micro-parallax system (≤6px, mouse-based, inertial)
  * 
  * SAFE ZONES:
  *   ✓ Hangar ambient lighting
  *   ✓ Ship patina overlays (≤8% opacity)
- *   ✓ Mission Command mood
+ *   ✓ Micro-parallax (≤6px movement)
  *   ✗ Never: UI text, status indicators, critical contrast
  * 
  * ═══════════════════════════════════════════════════════════════════════════
@@ -35,8 +37,19 @@ const HangarWatercolor = (function() {
     maxPatinaOpacity: 0.08,
     
     // Base colors
-    hangarBase: '#0B0F14',      // Dark space background
+    hangarBase: '#0B0F14',      // Dark space background (center)
+    hangarEdge: '#05070A',      // Darker edge for vignette
     paperWhite: '#FCFAF5',      // Watercolor paper
+    
+    // Pigment limits (prevent mud)
+    maxPigments: 2,
+    updateCooldownMs: 1200,     // Debounce rapid updates
+    
+    // Parallax settings
+    parallax: {
+      maxOffset: 6,             // Never exceed ±6px
+      easing: 0.08,             // Smooth inertial feel
+    },
     
     // Page-specific pigment recipes
     pageRecipes: {
@@ -48,6 +61,16 @@ const HangarWatercolor = (function() {
       'battle': ['Carmine', 'Sepia'],                      // Danger, aged
     },
     
+    // Mission doctrine pigment biases
+    missionDoctrines: {
+      'DEEP_STRIKE': ['Carmine', "Payne's Grey"],          // High contrast, bruised
+      'ESCORT': ['Yellow Ochre', 'Burnt Umber'],           // Neutral earths
+      'RECON': ['Cyan', "Payne's Grey"],                   // Technical clarity
+      'SIEGE': ['Sepia', 'Burnt Umber'],                   // Patience, weathered
+      'INTERCEPT': ['Orange', 'Indian Yellow'],            // Swift, warm
+      'PATROL': ['Permanent Green', 'Yellow Ochre'],       // Steady, natural
+    },
+    
     // Sin-based patina (connects to ship psychology)
     sinPatinas: {
       'OBSESSION': ['Indian Yellow', 'Orange'],            // Burning focus
@@ -57,6 +80,18 @@ const HangarWatercolor = (function() {
       'MYSTERY': ["Payne's Grey", 'Violet'],               // Unknown
       'DEFIANCE': ['Magenta', 'Carmine'],                  // Rebellion
       'RESILIENCE': ['Burnt Umber', 'Yellow Ochre'],       // Endurance
+    },
+    
+    // Pigment priority for clamping (higher = more important)
+    pigmentPriority: {
+      "Payne's Grey": 10,
+      'Prussian Blue': 9,
+      'Burnt Umber': 8,
+      'Indian Yellow': 7,
+      'Yellow Ochre': 6,
+      'Sepia': 5,
+      'Cyan': 4,
+      'Carmine': 3,
     }
   };
 
@@ -68,6 +103,16 @@ const HangarWatercolor = (function() {
   let initialized = false;
   let currentAmbient = null;
   let currentPatina = null;
+  let lastUpdateTime = 0;
+  let reducedMotion = false;
+  let frozenAfterFirstRender = false;
+  
+  // Parallax state
+  let parallaxEnabled = false;
+  let parallaxLayers = [];
+  let targetX = 0, targetY = 0;
+  let currentX = 0, currentY = 0;
+  let parallaxRAF = null;
 
   // ─────────────────────────────────────────────────────────────────────────
   // INITIALIZATION
@@ -82,9 +127,50 @@ const HangarWatercolor = (function() {
     }
     
     engine = new WatercolorEngine();
+    
+    // Check reduced motion preference
+    reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
     initialized = true;
-    console.log('[HangarWatercolor] Initialized with', engine.getAllPigments().length, 'pigments');
+    console.log('[HangarWatercolor] Initialized with', engine.getAllPigments().length, 'pigments', 
+                reducedMotion ? '(reduced motion)' : '');
     return true;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // DEBOUNCING & CLAMPING
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  /**
+   * Check if update is allowed (debounce)
+   */
+  function canUpdate() {
+    // If reduced motion, freeze after first render
+    if (reducedMotion && frozenAfterFirstRender) {
+      return false;
+    }
+    
+    const now = Date.now();
+    if (now - lastUpdateTime < CONFIG.updateCooldownMs) {
+      return false;
+    }
+    lastUpdateTime = now;
+    return true;
+  }
+  
+  /**
+   * Clamp pigment array to max count, sorted by priority
+   */
+  function clampPigments(pigmentNames) {
+    // Sort by priority (higher first)
+    const sorted = [...pigmentNames].sort((a, b) => {
+      const pa = CONFIG.pigmentPriority[a] || 0;
+      const pb = CONFIG.pigmentPriority[b] || 0;
+      return pb - pa;
+    });
+    
+    // Take top N
+    return sorted.slice(0, CONFIG.maxPigments);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -98,6 +184,11 @@ const HangarWatercolor = (function() {
    */
   function computeAmbientFromEnv(env) {
     if (!init()) return CONFIG.hangarBase;
+    
+    // Debounce check (skip if too soon, unless first render)
+    if (!canUpdate() && currentAmbient) {
+      return currentAmbient;
+    }
     
     const pigments = [];
     
@@ -130,7 +221,10 @@ const HangarWatercolor = (function() {
       pigments.push("Payne's Grey");
     }
     
-    return computeAmbient(pigments);
+    // Clamp to prevent mud
+    const clamped = clampPigments(pigments);
+    
+    return computeAmbient(clamped);
   }
 
   /**
@@ -141,8 +235,11 @@ const HangarWatercolor = (function() {
   function computeAmbient(pigmentNames) {
     if (!init()) return CONFIG.hangarBase;
     
+    // Clamp pigments
+    const clamped = clampPigments(pigmentNames);
+    
     // Filter to glazing pigments only (transparent/semi-transparent)
-    const pigments = pigmentNames
+    const pigments = clamped
       .map(name => engine.findPigment(name))
       .filter(p => p && p.transparency !== 'opaque');
     
@@ -156,6 +253,9 @@ const HangarWatercolor = (function() {
     // Blend back toward base to cap opacity
     currentAmbient = engine.lerp(CONFIG.hangarBase, glazed, CONFIG.maxAmbientOpacity * 8);
     
+    // Mark as rendered for reduced motion freeze
+    frozenAfterFirstRender = true;
+    
     return currentAmbient;
   }
 
@@ -166,6 +266,16 @@ const HangarWatercolor = (function() {
    */
   function getPageAmbient(pageName) {
     const recipe = CONFIG.pageRecipes[pageName] || CONFIG.pageRecipes['fleet'];
+    return computeAmbient(recipe);
+  }
+  
+  /**
+   * Get mission doctrine ambient bias
+   * @param {string} missionType - Mission type (DEEP_STRIKE, ESCORT, etc.)
+   * @returns {string} Ambient color hex
+   */
+  function getMissionDoctrineAmbient(missionType) {
+    const recipe = CONFIG.missionDoctrines[missionType] || CONFIG.pageRecipes['missions'];
     return computeAmbient(recipe);
   }
 
@@ -210,7 +320,10 @@ const HangarWatercolor = (function() {
       pigments.push('Yellow Ochre');  // Default gentle patina
     }
     
-    return computePatina(pigments);
+    // Clamp to prevent mud
+    const clamped = clampPigments(pigments);
+    
+    return computePatina(clamped);
   }
 
   /**
@@ -221,7 +334,9 @@ const HangarWatercolor = (function() {
   function computePatina(pigmentNames) {
     if (!init()) return null;
     
-    const pigments = pigmentNames
+    const clamped = clampPigments(pigmentNames);
+    
+    const pigments = clamped
       .map(name => engine.findPigment(name))
       .filter(Boolean);
     
@@ -231,6 +346,91 @@ const HangarWatercolor = (function() {
     currentPatina = engine.glazeMultiple(pigments, CONFIG.paperWhite);
     
     return currentPatina;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // MICRO-PARALLAX SYSTEM
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  /**
+   * Initialize parallax on layers with data-depth attribute
+   * Only runs on non-touch devices with motion enabled
+   */
+  function initParallax() {
+    // Skip on touch devices or reduced motion
+    if (reducedMotion || 'ontouchstart' in window) {
+      console.log('[HangarWatercolor] Parallax disabled (touch/reduced motion)');
+      return;
+    }
+    
+    parallaxLayers = document.querySelectorAll('[data-depth]');
+    if (parallaxLayers.length === 0) return;
+    
+    parallaxEnabled = true;
+    
+    // Mouse move listener (throttled via RAF)
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
+    
+    // Start animation loop
+    parallaxLoop();
+    
+    console.log('[HangarWatercolor] Parallax enabled on', parallaxLayers.length, 'layers');
+  }
+  
+  /**
+   * Handle mouse movement - update targets
+   */
+  function handleMouseMove(e) {
+    if (!parallaxEnabled) return;
+    
+    // Normalize to -0.5 to 0.5
+    targetX = (e.clientX / window.innerWidth - 0.5);
+    targetY = (e.clientY / window.innerHeight - 0.5);
+  }
+  
+  /**
+   * Parallax animation loop - smooth easing
+   */
+  function parallaxLoop() {
+    if (!parallaxEnabled) return;
+    
+    // Ease toward target (inertial feel)
+    currentX += (targetX - currentX) * CONFIG.parallax.easing;
+    currentY += (targetY - currentY) * CONFIG.parallax.easing;
+    
+    // Apply to layers
+    parallaxLayers.forEach(layer => {
+      const depth = parseFloat(layer.dataset.depth) || 0;
+      const maxOff = CONFIG.parallax.maxOffset;
+      
+      const x = currentX * depth * maxOff * 2;
+      const y = currentY * depth * maxOff * 2;
+      
+      // Clamp to max offset
+      const clampedX = Math.max(-maxOff, Math.min(maxOff, x));
+      const clampedY = Math.max(-maxOff, Math.min(maxOff, y));
+      
+      layer.style.transform = `translate(${clampedX}px, ${clampedY}px)`;
+    });
+    
+    parallaxRAF = requestAnimationFrame(parallaxLoop);
+  }
+  
+  /**
+   * Stop parallax system
+   */
+  function stopParallax() {
+    parallaxEnabled = false;
+    if (parallaxRAF) {
+      cancelAnimationFrame(parallaxRAF);
+      parallaxRAF = null;
+    }
+    document.removeEventListener('mousemove', handleMouseMove);
+    
+    // Reset transforms
+    parallaxLayers.forEach(layer => {
+      layer.style.transform = '';
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -266,7 +466,7 @@ const HangarWatercolor = (function() {
   }
 
   /**
-   * Full page setup - applies ambient and prepares patina system
+   * Full page setup - applies ambient, parallax, and prepares patina system
    * @param {string} pageName - Page identifier
    * @param {Object} env - Optional environment stats
    */
@@ -283,11 +483,17 @@ const HangarWatercolor = (function() {
     // Add CSS for patina overlays if not already present
     injectPatinaStyles();
     
+    // Initialize parallax (only on hangar and fleet, not during active UI)
+    if (pageName === 'hangar' || pageName === 'fleet') {
+      // Delay slightly to ensure DOM is ready
+      setTimeout(initParallax, 100);
+    }
+    
     console.log('[HangarWatercolor] Page setup complete:', pageName);
   }
 
   /**
-   * Inject CSS for ship patina overlays
+   * Inject CSS for ship patina overlays with blend-mode fallbacks
    */
   function injectPatinaStyles() {
     if (document.getElementById('watercolor-patina-styles')) return;
@@ -295,7 +501,7 @@ const HangarWatercolor = (function() {
     const style = document.createElement('style');
     style.id = 'watercolor-patina-styles';
     style.textContent = `
-      /* Watercolor Patina System */
+      /* Watercolor Patina System v2 */
       :root {
         --hangar-ambient: ${CONFIG.hangarBase};
         --hangar-ambient-opacity: ${CONFIG.maxAmbientOpacity};
@@ -303,12 +509,12 @@ const HangarWatercolor = (function() {
         --ship-patina-opacity: ${CONFIG.maxPatinaOpacity};
       }
       
-      /* Hangar ambient wash - subtle radial gradient */
+      /* Hangar ambient wash - subtle radial gradient with vignette */
       .watercolor-ambient {
         background: radial-gradient(
           ellipse at center,
           var(--hangar-ambient),
-          ${CONFIG.hangarBase} 70%
+          ${CONFIG.hangarEdge} 70%
         ) !important;
       }
       
@@ -324,10 +530,36 @@ const HangarWatercolor = (function() {
         border-radius: inherit;
       }
       
+      /* Fallback for browsers without mix-blend-mode support */
+      @supports not (mix-blend-mode: multiply) {
+        .ship-patina-enabled::after {
+          opacity: 0.04;
+          background-blend-mode: normal;
+        }
+      }
+      
       /* Softer patina variant */
       .ship-patina-soft::after {
         mix-blend-mode: soft-light;
         opacity: calc(var(--ship-patina-opacity) * 1.5);
+      }
+      
+      /* Parallax layer base - no animations on patina layer */
+      [data-depth] {
+        will-change: transform;
+        transition: none;
+      }
+      
+      /* Reduced motion - disable all parallax transforms */
+      @media (prefers-reduced-motion: reduce) {
+        [data-depth] {
+          transform: none !important;
+          will-change: auto;
+        }
+        
+        .watercolor-ambient {
+          /* Static ambient only, no dynamic updates */
+        }
       }
     `;
     
@@ -357,8 +589,23 @@ const HangarWatercolor = (function() {
       initialized,
       currentAmbient,
       currentPatina,
+      reducedMotion,
+      frozenAfterFirstRender,
+      parallaxEnabled,
+      parallaxLayerCount: parallaxLayers.length,
       config: CONFIG
     };
+  }
+  
+  /**
+   * Force reset (for debugging/testing)
+   */
+  function reset() {
+    stopParallax();
+    currentAmbient = null;
+    currentPatina = null;
+    lastUpdateTime = 0;
+    frozenAfterFirstRender = false;
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -373,6 +620,7 @@ const HangarWatercolor = (function() {
     computeAmbient,
     computeAmbientFromEnv,
     getPageAmbient,
+    getMissionDoctrineAmbient,
     applyAmbient,
     
     // Patina
@@ -384,9 +632,14 @@ const HangarWatercolor = (function() {
     // Page setup
     setupPage,
     
+    // Parallax
+    initParallax,
+    stopParallax,
+    
     // Utilities
     getDilutionGradient,
     getState,
+    reset,
     
     // Constants (read-only)
     get CONFIG() { return { ...CONFIG }; }

@@ -36,6 +36,44 @@
       overflow-x: hidden;
     }
     
+    /* Parallax layers - atmospheric depth */
+    .parallax-layer {
+      position: fixed;
+      inset: -10px; /* Slight overflow to prevent edge gaps during movement */
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .layer-bg {
+      background: radial-gradient(
+        ellipse at center,
+        rgba(11, 15, 20, 0.3) 0%,
+        rgba(5, 7, 10, 0.8) 70%
+      );
+    }
+    
+    .layer-wash {
+      background: radial-gradient(
+        ellipse at 30% 40%,
+        rgba(200, 160, 80, 0.03) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at 70% 60%,
+        rgba(96, 64, 48, 0.02) 0%,
+        transparent 40%
+      );
+    }
+    
+    /* Ensure content is above parallax layers */
+    .hangar-nav,
+    #ship-select-container,
+    .loading-state,
+    .sound-toggle {
+      position: relative;
+      z-index: 1;
+    }
+    
     /* Loading state */
     .loading-state {
       position: fixed;
@@ -184,7 +222,14 @@
 </head>
 <body>
   <div class="app-shell watercolor-ambient">
-    <div class="crt-noise"></div>
+    <!-- Parallax Layer 0: Base (static) -->
+    <div class="parallax-layer layer-bg" data-depth="0"></div>
+    
+    <!-- Parallax Layer 1: Ambient wash (slow) -->
+    <div class="parallax-layer layer-wash" data-depth="0.1"></div>
+    
+    <!-- CRT noise (slight parallax for depth) -->
+    <div class="crt-noise parallax-layer" data-depth="0.15"></div>
   
   <!-- Loading State -->
   <div class="loading-state" id="loading">
