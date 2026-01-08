@@ -1652,6 +1652,273 @@
       }
       .vhs-noise, .scanlines { display: none; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       REGISTRY TERMINAL - Bloomberg-style ship reference sheet
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .registry-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(4px);
+      animation: registryFadeIn 0.2s ease;
+    }
+
+    .registry-modal.open {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes registryFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .registry-terminal {
+      width: 95%;
+      max-width: 1000px;
+      max-height: 85vh;
+      background: #0a0e0a;
+      border: 2px solid var(--hm-cyan);
+      box-shadow: 
+        0 0 40px rgba(0, 255, 255, 0.2),
+        inset 0 0 60px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      font-family: 'IBM Plex Mono', 'VT323', monospace;
+      position: relative;
+    }
+
+    .registry-terminal::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 255, 0.02) 2px,
+        rgba(0, 255, 255, 0.02) 4px
+      );
+      pointer-events: none;
+    }
+
+    .registry-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(90deg, #001a1a, #0a1a0a);
+      border-bottom: 1px solid var(--hm-cyan);
+    }
+
+    .registry-title {
+      font-size: 0.9rem;
+      color: var(--hm-cyan);
+      letter-spacing: 0.15em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .registry-title-icon {
+      font-size: 1.1rem;
+    }
+
+    .registry-meta {
+      font-size: 0.7rem;
+      color: #4a7a4a;
+      letter-spacing: 0.1em;
+    }
+
+    .registry-close {
+      font-family: inherit;
+      font-size: 1.2rem;
+      color: var(--hm-magenta);
+      background: transparent;
+      border: 1px solid var(--hm-magenta);
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      transition: all 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .registry-close:hover {
+      background: var(--hm-magenta);
+      color: #0a0e0a;
+    }
+
+    .registry-toolbar {
+      display: flex;
+      gap: 1rem;
+      padding: 0.5rem 1rem;
+      background: #0d120d;
+      border-bottom: 1px solid #1a2a1a;
+      font-size: 0.7rem;
+    }
+
+    .registry-toolbar-item {
+      color: #4a7a4a;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .registry-toolbar-value {
+      color: var(--hm-cyan);
+    }
+
+    .registry-content {
+      flex: 1;
+      overflow: auto;
+      padding: 0;
+    }
+
+    .registry-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+
+    .registry-table th {
+      position: sticky;
+      top: 0;
+      background: #0d120d;
+      color: var(--hm-cyan);
+      font-weight: 500;
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--hm-cyan);
+      letter-spacing: 0.1em;
+      font-size: 0.65rem;
+      z-index: 10;
+    }
+
+    .registry-table td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid #1a2a1a;
+      vertical-align: top;
+    }
+
+    .registry-table tr:hover {
+      background: rgba(0, 255, 255, 0.03);
+    }
+
+    .registry-table tr:nth-child(even) {
+      background: rgba(0, 20, 0, 0.3);
+    }
+
+    .registry-table tr:nth-child(even):hover {
+      background: rgba(0, 255, 255, 0.05);
+    }
+
+    .registry-ticker {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: var(--hm-magenta);
+      font-weight: bold;
+    }
+
+    .registry-name {
+      color: #88aa88;
+      font-size: 0.7rem;
+    }
+
+    .registry-designation {
+      color: #4a6a4a;
+      font-size: 0.65rem;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .registry-class {
+      color: var(--hm-cyan);
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+    }
+
+    .registry-tier {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      font-weight: bold;
+      border: 1px solid;
+    }
+
+    .registry-tier.tier-S { color: #ffaa33; border-color: #ffaa33; background: rgba(255, 170, 51, 0.1); }
+    .registry-tier.tier-A { color: #33ff99; border-color: #33ff99; background: rgba(51, 255, 153, 0.1); }
+    .registry-tier.tier-B { color: #4ecdc4; border-color: #4ecdc4; background: rgba(78, 205, 196, 0.1); }
+    .registry-tier.tier-C { color: #888888; border-color: #888888; background: rgba(136, 136, 136, 0.1); }
+    .registry-tier.tier-\\? { color: #ff6b6b; border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+
+    .registry-specialty {
+      color: #6a8a6a;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+    }
+
+    .registry-tagline {
+      color: #88aa88;
+      font-size: 0.7rem;
+      line-height: 1.4;
+      max-width: 300px;
+    }
+
+    .registry-footer {
+      padding: 0.5rem 1rem;
+      background: #0d120d;
+      border-top: 1px solid #1a2a1a;
+      font-size: 0.65rem;
+      color: #4a6a4a;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .registry-footer kbd {
+      background: #1a2a1a;
+      padding: 0.1rem 0.4rem;
+      border-radius: 2px;
+      color: var(--hm-cyan);
+    }
+
+    @media (max-width: 768px) {
+      .registry-terminal {
+        width: 100%;
+        max-width: none;
+        max-height: 100vh;
+        border: none;
+        border-radius: 0;
+      }
+
+      .registry-table {
+        font-size: 0.65rem;
+      }
+
+      .registry-table th,
+      .registry-table td {
+        padding: 0.4rem 0.5rem;
+      }
+
+      .registry-tagline {
+        max-width: 150px;
+        font-size: 0.6rem;
+      }
+
+      .registry-toolbar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1691,6 +1958,7 @@
         </button>
         <button id="openHangarBtn" class="moduleViewer__trigger">HANGAR</button>
         <button id="openDerivativesBtn" class="moduleViewer__trigger">DERIVATIVES</button>
+        <button id="openRegistryBtn" class="moduleViewer__trigger" style="color: var(--hm-cyan);">▤ REGISTRY</button>
         <button id="openPositionsBtn" class="moduleViewer__trigger">POSITIONS</button>
         <button id="openModulesBtn" class="moduleViewer__trigger">MODULES</button>
         <div class="status-item">
@@ -3292,6 +3560,11 @@
         window.location.href = 'ship-select.html';
       });
 
+      // Registry terminal button
+      document.getElementById('openRegistryBtn')?.addEventListener('click', () => {
+        openRegistryTerminal();
+      });
+
       // Derivatives button - go to derivatives console (preserves active ticker)
       document.getElementById('openDerivativesBtn')?.addEventListener('click', () => {
         const ticker = window.Store?.get('activeTicker') || 'RKLB';
@@ -3402,5 +3675,144 @@
 
   <!-- Module Viewer Script -->
   <script src="../js/ui/module-viewer.js?v=20260108"></script>
+
+  <!-- Registry Terminal Modal -->
+  <div class="registry-modal" id="registryModal">
+    <div class="registry-terminal">
+      <div class="registry-header">
+        <div class="registry-title">
+          <span class="registry-title-icon">▤</span>
+          VESSEL REGISTRY // SPACE CAPITAL FLEET DATABASE
+        </div>
+        <div class="registry-meta">v2.1.4 // SECTOR ALPHA</div>
+        <button class="registry-close" id="registryClose" title="Close (ESC)">×</button>
+      </div>
+      <div class="registry-toolbar">
+        <div class="registry-toolbar-item">VESSELS: <span class="registry-toolbar-value" id="registryCount">--</span></div>
+        <div class="registry-toolbar-item">TIERS: <span class="registry-toolbar-value">S/A/B/C/?</span></div>
+        <div class="registry-toolbar-item">SORT: <span class="registry-toolbar-value">TICKER ↑</span></div>
+        <div class="registry-toolbar-item">STATUS: <span class="registry-toolbar-value" style="color: var(--hm-cyan);">ONLINE</span></div>
+      </div>
+      <div class="registry-content">
+        <table class="registry-table">
+          <thead>
+            <tr>
+              <th>TICKER</th>
+              <th>DESIGNATION</th>
+              <th>TIER</th>
+              <th>CLASS</th>
+              <th>SPECIALTY</th>
+              <th>PROFILE</th>
+            </tr>
+          </thead>
+          <tbody id="registryTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="registry-footer">
+        <span>SPACE CAPITAL REGISTRY // FLEET COMMAND SYSTEMS</span>
+        <span><kbd>ESC</kbd> to close · Click row to select vessel</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════════════
+    // REGISTRY TERMINAL - Bloomberg-style ship reference sheet
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    (function() {
+      const REGISTRY_DATA = {
+        ACHR: { name: 'MIDNIGHT', designation: 'AAM-004', class: 'EVTOL', tier: 'B', specialty: 'Air Taxi', tagline: 'Precision carrier class. Silent approach, swift arrival.' },
+        ASTS: { name: 'BLUEBIRD', designation: 'COM-003', class: 'RELAY', tier: 'S', specialty: 'Comms', tagline: 'Communication relay hub. The signal never sleeps.' },
+        BKSY: { name: 'BLACKSKY', designation: 'RCN-006', class: 'RECON', tier: 'B', specialty: 'Intel', tagline: 'Eyes in the dark. Nothing escapes detection.' },
+        COHR: { name: 'PRISM', designation: 'OPT-018', class: 'REFLECTOR', tier: 'A', specialty: 'Optics', tagline: 'Optical specialist. Light is the weapon.' },
+        EVEX: { name: 'HORIZON', designation: 'AAM-009', class: 'TRANSPORT', tier: 'C', specialty: 'Cargo', tagline: 'Troop transport. Delivering the payload.' },
+        GE: { name: 'SPECTRE', designation: 'IND-019', class: 'BOMBER', tier: 'S', specialty: 'Aerospace', tagline: 'Heavy strike platform. Overwhelming force on call.' },
+        GME: { name: 'DIAMOND', designation: 'MEM-010', class: 'DREADNOUGHT', tier: '?', specialty: 'Chaos', tagline: 'Wildcard interceptor. Expect the unexpected.' },
+        JOBY: { name: 'SKYWARD', designation: 'EVT-005', class: 'EVTOL', tier: 'A', specialty: 'Air Mobility', tagline: 'Light assault craft. Speed is survival.' },
+        KTOS: { name: 'KRATOS', designation: 'DEF-012', class: 'FIGHTER', tier: 'A', specialty: 'Defense', tagline: 'Combat superiority fighter. Dominance through firepower.' },
+        LHX: { name: 'HELIX', designation: 'AAM-020', class: 'DRONE', tier: 'A', specialty: 'Electronics', tagline: 'Surveillance drone. Invisible. Omnipresent.' },
+        LUNR: { name: 'ODYSSEY', designation: 'LNR-002', class: 'LANDER', tier: 'A', specialty: 'Lunar Ops', tagline: 'Lunar surface specialist. First boots, lasting impact.' },
+        PL: { name: 'PLANET', designation: 'SAT-008', class: 'SCOUT', tier: 'A', specialty: 'Imaging', tagline: 'Long-range scout. Charting the unknown.' },
+        RDW: { name: 'REDWIRE', designation: 'INF-007', class: 'HAULER', tier: 'B', specialty: 'Infrastructure', tagline: 'Logistics hauler. Supply line lifeline.' },
+        RKLB: { name: 'ELECTRON', designation: 'FSC-001', class: 'FLAGSHIP', tier: 'S', specialty: 'Command', tagline: 'Spearhead command ship. Victory follows in its wake.' },
+        RTX: { name: 'RAYTHEON', designation: 'DEF-021', class: 'OFFICER', tier: 'S', specialty: 'Defense Prime', tagline: 'Officer command vessel. Strategic precision.' }
+      };
+
+      const modal = document.getElementById('registryModal');
+      const closeBtn = document.getElementById('registryClose');
+      const tableBody = document.getElementById('registryTableBody');
+      const countEl = document.getElementById('registryCount');
+
+      function openRegistryTerminal() {
+        // Sort alphabetically by ticker
+        const tickers = Object.keys(REGISTRY_DATA).sort();
+        
+        // Update count
+        countEl.textContent = tickers.length;
+        
+        // Render rows
+        tableBody.innerHTML = tickers.map(ticker => {
+          const ship = REGISTRY_DATA[ticker];
+          return `
+            <tr data-ticker="${ticker}" onclick="selectRegistryShip('${ticker}')">
+              <td>
+                <div class="registry-ticker">${ticker}</div>
+              </td>
+              <td>
+                <div class="registry-name">${ship.name}</div>
+                <div class="registry-designation">${ship.designation}</div>
+              </td>
+              <td>
+                <span class="registry-tier tier-${ship.tier}">${ship.tier}</span>
+              </td>
+              <td>
+                <div class="registry-class">${ship.class}</div>
+              </td>
+              <td>
+                <div class="registry-specialty">${ship.specialty}</div>
+              </td>
+              <td>
+                <div class="registry-tagline">${ship.tagline}</div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeRegistryTerminal() {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      window.selectRegistryShip = function(ticker) {
+        // Set as active and navigate to hangar
+        if (window.Store) {
+          Store.set({ activeTicker: ticker });
+        }
+        closeRegistryTerminal();
+        window.location.href = `hangar.html?ship=${ticker}`;
+      };
+
+      // Close handlers
+      closeBtn.addEventListener('click', closeRegistryTerminal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeRegistryTerminal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+          closeRegistryTerminal();
+        }
+      });
+
+      // Expose for button handler
+      window.openRegistryTerminal = openRegistryTerminal;
+    })();
+  </script>
 </body>
 </html>
