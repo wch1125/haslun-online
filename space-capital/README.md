@@ -1,190 +1,202 @@
-# Procedural Ship Engine v0.2
+# Space Capital — Kitbash Ship System
+
+**Version:** 3.0  
+**Date:** 2026-01-09
+
+---
 
 ## What This Is
 
-A **deterministic** real-time pixel art ship renderer. The same ticker ALWAYS produces the same ship - no randomness, no server storage needed.
+A **mold-based ship rendering system** that uses your real pixel art sprites as base templates, then applies:
 
-**30MB of PNGs → 20KB of code = 99.9% reduction**
+1. **Deterministic palette recoloring** — Each ticker gets unique colors
+2. **Telemetry-driven effects** — Glow, damage, bull/bear indicators
+3. **Block fallback** — Unknown tickers get procedural ships
 
-## Key Principle: Determinism
-
-```
-RKLB will always look like RKLB.
-Telemetry modifies appearance (glow, damage) but not identity.
-```
-
-### How Determinism Works
-
-| Source | Controls |
-|--------|----------|
-| Ticker hash | Blueprint selection (within regime pool) |
-| Ticker letters | Base color palette (R→hull, K→wing, L→accent, B→engine) |
-| Ticker seed | Geometric variations (wing span, nose length) |
-| Seeded PRNG | All "random" effects (jitter, damage sparks, engine flicker) |
-
-### Two Persistence Modes
-
-```js
-// Global canonical (same ship for everyone)
-const engine = new PixelShipEngine();
-// seed = hash("RKLB")
-
-// Per-user canonical (each user has unique fleet)
-const engine = new PixelShipEngine({ userId: 'user_123' });
-// seed = hash("user_123:RKLB")
-```
-
-## Architecture
-
-```
-Ship = Blueprint + Palette + Telemetry Modifiers
-
-Blueprint (geometry)     → from ticker hash + regime
-Palette (colors)         → from ticker letters + signal state glaze
-Modifiers (effects)      → from telemetry (thrust, damage, jitter)
-```
-
-### Blueprint Format
-Each ship is defined as an array of rectangular blocks:
-```js
-// [x, y, width, height, shadeIndex, layer]
-[28, 20, 8, 28, 0, 'hull'],  // Main hull block
-[29, 18, 6, 6, 0, 'accent'], // Cockpit
-[28, 54, 8, 4, 0, 'engine'], // Engine glow
-```
-
-- Coordinates are on a 64x64 grid
-- `shadeIndex` (0-3) indexes into a 4-color palette ramp
-- `layer` determines which palette ramp to use: 'hull', 'accent', 'engine'
-
-### Palette Generation
-Palettes are generated via WatercolorEngine based on telemetry:
-- **signalState** (bull/bear/neutral) → base pigment family
-- **momentum** → engine color temperature
-- **damage** → stress glaze overlay
-- **getDilutionGradient()** → 4-color shading ramp
-
-### Telemetry Modifiers
-- `thrust` (0-1) → engine plume length
-- `damage` (0-1) → missing pixels, spark effects
-- `jitter` (0-1) → positional instability
-- `signalState` → palette selection
-- `momentum` → color temperature shifts
-
-## Files
-
-```
-proc-sprites/
-├── demo.html                           # Interactive demo
-├── README.md                           # This file
-└── js/
-    ├── lib/
-    │   └── watercolor/
-    │       ├── watercolor-engine.js    # Palette generation
-    │       └── pigments.json           # Schmincke pigment data
-    └── render/
-        ├── seed.js                     # Hash + PRNG utilities (~50 lines)
-        └── pixel-ship-engine.js        # Core engine (~450 lines)
-```
-
-## v0.2 Fixes (from ChatGPT review)
-
-### ✅ Bug Fixes
-1. **Cache no longer nuked every animation frame** - `createAnimatedSprite()` bypasses cache instead of clearing it
-2. **All randomness is now seeded** - `Math.random()` replaced with `SeedUtils.getBlockRng()`
-3. **Cache hash includes all factors** - momentum and jitter now included in cache key
-
-### ✅ New Features
-1. **Letter→pigment mapping** - First 4 letters of ticker determine hull/wing/accent/engine colors
-2. **Deterministic blueprint selection** - Ticker hash picks from regime pool consistently
-3. **Geometric params from seed** - Wing span, nose length vary per-ticker but stay stable
-4. **Per-user seed support** - Optional `userId` for unique fleets per player
-
-## Usage
-
-```js
-// Initialize (optional: pass userId for per-user ships)
-const engine = new PixelShipEngine();
-
-// Render a ship - DETERMINISTIC from ticker
-const canvas = engine.renderShip('RKLB', {
-  signalState: 'bull',   // Affects palette tint
-  thrust: 0.7,           // Engine plume length
-  damage: 0.1,           // Missing pixels, sparks
-  momentum: 0.5,         // Engine color temperature
-  regime: 'UPTREND'      // Affects blueprint pool
-}, 64);
-
-// Get ship info (for debugging/display)
-const info = engine.getShipInfo('RKLB', { regime: 'UPTREND' });
-// { ticker: 'RKLB', seed: 0x..., blueprint: 'interceptor', params: {...} }
-
-// Create animated sprite (continuous render loop)
-const animatedCanvas = engine.createAnimatedSprite('RKLB', telemetry, 96);
-document.body.appendChild(animatedCanvas);
-animatedCanvas.stopAnimation();  // Stop when offscreen
-```
-
-## Letter → Color Mapping
-
-Each ticker letter maps to a pigment from the WatercolorEngine:
-
-| Position | Controls | Example (RKLB) |
-|----------|----------|----------------|
-| 1st letter | Hull color | R → pigment[17*7 % 24] |
-| 2nd letter | Wing color | K → pigment[10*11 % 24] |
-| 3rd letter | Accent color | L → pigment[11*13 % 24] |
-| 4th letter | Engine color | B → pigment[1*17 % 24] |
-
-This means:
-- **RKLB** always has the same base colors
-- **AAAA** vs **ZZZZ** look completely different
-- Telemetry only *glazes* over the base (signal state tint, stress overlay)
-
-## Regime → Blueprint Pools
-
-```js
-UPTREND:   ['interceptor', 'scout', 'corvette']
-DOWNTREND: ['dreadnought', 'freighter', 'hauler']
-BREAKOUT:  ['interceptor', 'dreadnought', 'corvette']
-CHOP:      ['drone', 'scout']
-RANGE:     ['freighter', 'corvette', 'hauler', 'scout']
-```
-
-The ticker hash picks consistently from the pool, so RKLB in UPTREND always gets the same blueprint.
+**Result:** High-quality ships that look like your original art, not rectangles.
 
 ---
 
-## FOR CHATGPT: Next Steps
+## Quick Start
 
-The v0.2 implementation addresses all your feedback. Remaining work:
+### 1. Extract to your repo root
 
-### 1. Blueprint Quality
-The 7 blueprints are functional but basic. Consider:
-- More distinctive silhouettes
-- Better pixel proportions
-- More detail blocks for visual interest
+```
+your-repo/
+├── assets/molds/          ← Ship sprite molds
+├── js/render/             ← Engine files
+├── js/sprites/            ← Facade layer
+├── js/lib/watercolor/     ← Palette system
+└── test-molds.html        ← Test page
+```
 
-### 2. Param Tag Coverage
-Currently only `wing-left`, `wing-right`, `nose` tags are handled. Should we add:
-- `pod-left/right` for freighter cargo pods
-- `weapon-left/right` for dreadnought
-- `bridge` for tower height variations
+### 2. Add scripts to your HTML
 
-### 3. Integration Plan
-Ready to integrate into Space Capital:
-- Replace `renderShipCard()` sprite section
-- Update dial selector
-- Test performance at scale
+```html
+<!-- Core -->
+<script src="js/render/seed.js"></script>
+<script src="js/lib/watercolor/watercolor-engine.js"></script>
 
-Please review the updated code and suggest any final refinements!
+<!-- Mold System -->
+<script src="js/render/mold-composer.js"></script>
+<script src="js/render/pixel-ship-engine.js"></script>
+<script src="js/render/shippix-bootstrap.js"></script>
+
+<!-- Optional: Full facade -->
+<script src="js/data/telemetry.js"></script>
+<script src="js/sprites/telemetry-adapter.js"></script>
+<script src="js/sprites/ship-sprite-manager.js"></script>
+```
+
+### 3. Render ships
+
+```javascript
+// Wait for engine
+await ShipPixReady;
+
+// Render to any canvas
+const canvas = document.getElementById('myShip');
+ShipPix.renderToCanvas(canvas, 'RKLB', { thrust: 0.7 }, 128);
+
+// Or use the facade (recommended)
+await ShipSprites.renderToCanvas(canvas, 'RKLB', 128);
+```
 
 ---
 
-## Memory Comparison
+## File Reference
 
-| Approach | Size |
-|----------|------|
-| Current PNGs | ~30MB |
-| Procedural (v0.2) | ~20KB |
-| **Reduction** | **99.93%** |
+### Render Engine (`js/render/`)
+
+| File | Purpose |
+|------|---------|
+| `seed.js` | Deterministic random from ticker |
+| `mold-composer.js` | Loads sprite molds, applies palette tinting |
+| `pixel-ship-engine.js` | Main engine (molds + block fallback) |
+| `shippix-bootstrap.js` | Initializes engine, exposes `ShipPix` |
+
+### Facade (`js/sprites/`)
+
+| File | Purpose |
+|------|---------|
+| `ship-sprite-manager.js` | `ShipSprites` API — UI calls this |
+| `telemetry-adapter.js` | Converts market data → engine format |
+
+### Assets (`assets/molds/`)
+
+| File | Purpose |
+|------|---------|
+| `atlas.json` | Ship metadata (class, traits, palette zones) |
+| `base/*.png` | 16 base sprite molds (256×256) |
+
+---
+
+## API Reference
+
+### ShipPix (Low-level)
+
+```javascript
+// Render to canvas
+ShipPix.renderToCanvas(canvas, ticker, telemetry, size);
+
+// Get ship info
+const info = ShipPix.getShipInfo('RKLB');
+// { shipName, shipClass, className, traits, hasMold, upgrades }
+
+// Check if mold exists
+ShipPix.hasMold('RKLB');  // true
+ShipPix.hasMold('AAPL');  // false (uses block fallback)
+
+// Get available molds
+ShipPix.getAvailableMolds();  // ['RKLB', 'LUNR', ...]
+```
+
+### ShipSprites (High-level Facade)
+
+```javascript
+// Render (auto-gets telemetry)
+await ShipSprites.renderToCanvas(canvas, 'RKLB', 128);
+
+// Render fleet
+await ShipSprites.renderFleet({ RKLB: canvas1, LUNR: canvas2 }, 128);
+
+// Get sprite as data URL
+const sprite = await ShipSprites.getSprite('RKLB');
+img.src = sprite.src;
+```
+
+### Telemetry Format
+
+```javascript
+const telemetry = {
+  signalState: 'bull' | 'bear' | 'neutral',  // Bull/bear glow
+  thrust: 0.0 - 1.0,      // Engine intensity
+  damage: 0.0 - 1.0,      // Damage desaturation + sparks
+  momentum: -1.0 - 1.0,   // Trend direction
+  glow: 0.0 - 1.0,        // Edge neon glow
+};
+```
+
+---
+
+## Updating Fleet + Hangar
+
+### Before (legacy img)
+
+```html
+<img class="ship-sprite-img" src="assets/ships/animated/gifs/RKLB_idle.gif">
+```
+
+### After (mold canvas)
+
+```html
+<canvas class="ship-sprite-canvas" data-ticker="RKLB" width="128" height="128"></canvas>
+
+<script>
+document.querySelectorAll('.ship-sprite-canvas').forEach(async canvas => {
+  const ticker = canvas.dataset.ticker;
+  await ShipSprites.renderToCanvas(canvas, ticker, 128);
+});
+</script>
+```
+
+---
+
+## Console Output (Success)
+
+```
+[MoldComposer] Loaded 16 ship molds
+[PixelShipEngine] Initialized (molds: true)
+[ShipPix] Engine initialized (16 molds loaded) + WatercolorEngine
+[ShipSprites] Module loaded
+```
+
+---
+
+## Future: True Part Kitbashing
+
+Current system uses **whole sprites** as molds. To enable true kitbashing:
+
+1. In Aseprite, split each sprite into layers: hull, wings, cockpit, engine
+2. Export each layer as `molds/hull/RKLB_hull.png`, etc.
+3. Update `atlas.json` parts section with anchor points
+4. MoldComposer will automatically use parts when available
+
+The architecture supports this — just needs the art assets.
+
+---
+
+## Troubleshooting
+
+### Ships not rendering
+- Check console for `[MoldComposer] Loaded X ship molds`
+- Verify `assets/molds/base/*.png` files exist
+- Ensure scripts loaded in correct order
+
+### Wrong colors
+- Telemetry affects palette — try neutral telemetry first
+- Check `signalState` isn't forcing bull/bear tint
+
+### Fallback blocks appearing
+- Ticker doesn't have a mold — add to `atlas.json` + base sprite
+- Or accept block fallback for unknown tickers

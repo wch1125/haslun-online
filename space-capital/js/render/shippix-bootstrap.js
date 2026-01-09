@@ -1,24 +1,26 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * SHIPPIX BOOTSTRAP - Global Procedural Ship Renderer
+ * SPACE CAPITAL - Ship Pixel Bootstrap v2.0
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Provides a single global `window.ShipPix` instance with an async ready
- * promise `window.ShipPixReady` to prevent race conditions with pigment loading.
+ * Initializes the Mold-based PixelShipEngine and exposes it globally.
+ * This is the single entry point for all ship rendering.
  * 
- * Now integrates with SpriteUpgrades for stats-based visual upgrades.
+ * Rendering priority:
+ *   1. MoldComposer (high-quality sprite molds with palette tinting)
+ *   2. BlockRenderer (procedural fallback)
  * 
- * Usage:
- *   // In any page that needs procedural ships:
- *   <script src="../js/render/seed.js"></script>
- *   <script src="../js/lib/watercolor/watercolor-engine.js"></script>
- *   <script src="../js/render/sprite-upgrades.js"></script>
- *   <script src="../js/render/pixel-ship-engine.js"></script>
- *   <script src="../js/render/shippix-bootstrap.js"></script>
+ * Load Order (IMPORTANT):
+ *   <script src="js/render/seed.js"></script>
+ *   <script src="js/lib/watercolor/watercolor-engine.js"></script>
+ *   <script src="js/render/mold-composer.js"></script>
+ *   <script src="js/render/pixel-ship-engine.js"></script>
+ *   <script src="js/render/shippix-bootstrap.js"></script>
  * 
- *   // Then in your UI code:
- *   await window.ShipPixReady;
- *   window.ShipPix.renderToCanvas(canvasEl, ticker, telemetry);
+ * Exposes:
+ *   - window.ShipPix: The initialized engine instance
+ *   - window.ShipPixReady: Promise that resolves when engine is ready
+ *   - window.renderShipToCanvas(canvas, ticker, telemetry, size): Helper
  * 
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -33,7 +35,7 @@
   }
 
   /**
-   * Initialize the engine with pigments loaded
+   * Initialize the engine with molds loaded
    * Returns a promise that resolves to the engine instance
    */
   global.ShipPixReady = (async function initShipPix() {
@@ -44,32 +46,40 @@
         return null;
       }
 
-      if (typeof SeedUtils === 'undefined') {
-        console.warn('[ShipPix] SeedUtils not loaded');
-        return null;
-      }
-
-      // Create WatercolorEngine if available
+      // Create WatercolorEngine if available (for fallback palette)
       let wcEngine = null;
       if (typeof WatercolorEngine !== 'undefined') {
         wcEngine = new WatercolorEngine();
       }
 
       // Create the main engine instance
-      global.ShipPix = new PixelShipEngine({ watercolorEngine: wcEngine });
+      global.ShipPix = new PixelShipEngine({ 
+        watercolorEngine: wcEngine,
+        basePath: 'assets/molds/',
+        preferMolds: true,
+        enableCache: true,
+      });
       
-      // Store reference to available tickers
-      global.ShipPix.tickers = global.TICKER_SHIPS ? Object.keys(global.TICKER_SHIPS) : [];
+      // Initialize engine (loads molds)
+      await global.ShipPix.init();
+      
+      // Check what we have
+      const molds = global.ShipPix.getAvailableMolds();
+      const hasMolds = global.ShipPix.moldComposer?.ready || false;
       
       console.log('[ShipPix] Engine initialized', 
-        wcEngine ? '(with WatercolorEngine)' : '(fallback palette)',
-        `- ${global.ShipPix.tickers.length} ticker-specific ships`
+        hasMolds ? `(${molds.length} molds loaded)` : '(block fallback only)',
+        wcEngine ? '+ WatercolorEngine' : ''
       );
       
       return global.ShipPix;
     } catch (e) {
       console.error('[ShipPix] Initialization failed:', e);
-      return null;
+      
+      // Create fallback engine
+      global.ShipPix = new PixelShipEngine({ preferMolds: false });
+      global.ShipPix.ready = true;
+      return global.ShipPix;
     }
   })();
 
@@ -80,9 +90,10 @@
    * @param {HTMLCanvasElement} canvas - Target canvas element
    * @param {string} ticker - Stock ticker symbol
    * @param {object} telemetry - Telemetry data (regime, signalState, thrust, etc.)
+   * @param {number} size - Canvas size (optional, uses canvas width if not provided)
    * @returns {Promise<boolean>} - True if render succeeded
    */
-  global.renderShipToCanvas = async function(canvas, ticker, telemetry = {}) {
+  global.renderShipToCanvas = async function(canvas, ticker, telemetry = {}, size = null) {
     const engine = await global.ShipPixReady;
     if (!engine) {
       console.warn('[ShipPix] Engine not available, cannot render', ticker);
@@ -95,7 +106,7 @@
     }
 
     try {
-      engine.renderToCanvas(canvas, ticker, telemetry);
+      engine.renderToCanvas(canvas, ticker, telemetry, size);
       return true;
     } catch (e) {
       console.error('[ShipPix] Render failed for', ticker, e);
@@ -122,7 +133,7 @@
     canvas.dataset.ticker = ticker;
     
     try {
-      engine.renderToCanvas(canvas, ticker, telemetry);
+      engine.renderToCanvas(canvas, ticker, telemetry, size);
       return canvas;
     } catch (e) {
       console.error('[ShipPix] Create canvas failed for', ticker, e);
@@ -156,13 +167,18 @@
 
   /**
    * Helper: Convert market stats to telemetry for ship rendering
-   * Uses SpriteUpgrades if available for proper stat normalization
+   * Uses TelemetryAdapter or SpriteUpgrades if available
    * 
    * @param {object} stats - Market statistics (winRate, volatility, etc.)
    * @returns {object} - Telemetry for the engine
    */
   global.statsToTelemetry = function(stats) {
     if (!stats) return {};
+
+    // Use TelemetryAdapter if available
+    if (global.TelemetryAdapter) {
+      return global.TelemetryAdapter.fromMarketStats(stats);
+    }
 
     // Use SpriteUpgrades for proper normalization if available
     if (global.SpriteUpgrades) {
@@ -173,16 +189,23 @@
         damage: 1 - (upgrades.armor?.normalizedValue ?? 0.5),
         momentum: upgrades.wings?.normalizedValue ?? 0.5,
         jitter: upgrades.antenna?.normalizedValue ?? 0.3,
+        glow: upgrades.shield?.normalizedValue ?? 0.5,
       };
     }
 
     // Fallback: simple mapping
+    const todayPnl = stats.todayPnlPct || stats.return_1d || 0;
+    const weekPnl = stats.weekPnlPct || stats.return_1w || 0;
+    const volatility = stats.volatility || 0.03;
+    const drawdown = Math.abs(stats.maxDrawdownPct || stats.drawdown || 10);
+
     return {
-      signalState: (stats.return_1w || 0) > 0 ? 'bull' : 'bear',
-      thrust: 0.5,
-      damage: Math.min(1, Math.abs(stats.maxDrawdownPct || 0) / 20),
-      momentum: Math.max(0, Math.min(1, (stats.return_1m || 0) / 20 + 0.5)),
-      jitter: Math.min(1, (stats.volatility || 0.03) / 0.08),
+      signalState: todayPnl > 1 ? 'bull' : todayPnl < -1 ? 'bear' : 'neutral',
+      thrust: Math.max(0, Math.min(1, 0.5 + weekPnl / 20)),
+      damage: Math.min(0.8, drawdown / 30),
+      momentum: Math.max(0, Math.min(1, 0.5 + todayPnl / 10)),
+      jitter: Math.min(1, volatility / 0.08),
+      glow: Math.max(0.3, Math.min(1, 1 - volatility / 0.1)),
     };
   };
 
@@ -196,10 +219,28 @@
   };
 
   /**
-   * Helper: Check if a ticker has a unique ship design
+   * Helper: Check if a ticker has a mold (high-quality sprite)
    */
-  global.hasUniqueShip = function(ticker) {
-    return global.TICKER_SHIPS && ticker?.toUpperCase() in global.TICKER_SHIPS;
+  global.hasMold = async function(ticker) {
+    const engine = await global.ShipPixReady;
+    if (!engine) return false;
+    return engine.hasMold(ticker);
+  };
+
+  /**
+   * Helper: Get list of tickers with molds
+   */
+  global.getAvailableMolds = async function() {
+    const engine = await global.ShipPixReady;
+    if (!engine) return [];
+    return engine.getAvailableMolds();
+  };
+
+  /**
+   * Legacy compatibility: hasUniqueShip
+   */
+  global.hasUniqueShip = async function(ticker) {
+    return global.hasMold(ticker);
   };
 
 })(typeof window !== 'undefined' ? window : global);

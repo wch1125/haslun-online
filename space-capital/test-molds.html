@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ship Mold Test - Space Capital</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'VT323', 'Courier New', monospace;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #ff0080;
+      text-shadow: 0 0 10px #ff0080;
+      margin-bottom: 20px;
+    }
+    .status {
+      background: #1a1a2e;
+      border: 2px solid #ff0080;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .status.ready { border-color: #00ff80; }
+    .status.error { border-color: #ff4040; }
+    
+    .ship-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .ship-card {
+      background: #1a1a2e;
+      border: 2px solid #333;
+      padding: 15px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    .ship-card:hover {
+      border-color: #ff0080;
+    }
+    .ship-card canvas {
+      display: block;
+      margin: 0 auto 10px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      background: rgba(0,0,0,0.3);
+    }
+    .ship-card .ticker {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ff0080;
+      margin-bottom: 5px;
+    }
+    .ship-card .class {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+    }
+    .ship-card .name {
+      font-size: 11px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .ship-card .mold-status {
+      font-size: 10px;
+      margin-top: 5px;
+      padding: 2px 6px;
+      display: inline-block;
+    }
+    .ship-card .mold-status.has-mold {
+      background: #00ff80;
+      color: #000;
+    }
+    .ship-card .mold-status.no-mold {
+      background: #ff4040;
+      color: #fff;
+    }
+    
+    .controls {
+      margin-bottom: 20px;
+    }
+    .controls button {
+      background: #ff0080;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .controls button:hover {
+      background: #ff40a0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 Ship Mold Test</h1>
+  
+  <div class="status" id="status">
+    Loading engine...
+  </div>
+  
+  <div class="controls">
+    <button onclick="renderAllShips()">Render All Ships</button>
+    <button onclick="testTelemetry()">Test Telemetry Effects</button>
+    <button onclick="clearAll()">Clear</button>
+  </div>
+  
+  <div class="ship-grid" id="shipGrid"></div>
+
+  <!-- Core Dependencies -->
+  <script src="js/render/seed.js"></script>
+  <script src="js/lib/watercolor/watercolor-engine.js"></script>
+  
+  <!-- Mold System -->
+  <script src="js/render/mold-composer.js"></script>
+  <script src="js/render/pixel-ship-engine.js"></script>
+  <script src="js/render/shippix-bootstrap.js"></script>
+  
+  <script>
+    // Test tickers
+    const TICKERS = [
+      'RKLB', 'LUNR', 'JOBY', 'ACHR', 'ASTS', 'BKSY', 'GME', 'EVEX',
+      'GE', 'LHX', 'RTX', 'KTOS', 'PL', 'RDW', 'COHR', 
+      'AAPL', 'TSLA', 'NVDA'  // Test fallback for unknown tickers
+    ];
+    
+    const statusEl = document.getElementById('status');
+    const gridEl = document.getElementById('shipGrid');
+    
+    // Initialize
+    async function init() {
+      try {
+        statusEl.textContent = 'Initializing engine...';
+        
+        const engine = await ShipPixReady;
+        
+        if (engine) {
+          const molds = engine.getAvailableMolds();
+          const hasMolds = engine.moldComposer?.ready || false;
+          
+          statusEl.className = 'status ready';
+          statusEl.innerHTML = `
+            ✅ Engine Ready<br>
+            Molds: ${hasMolds ? molds.length + ' loaded' : 'not available (using blocks)'}<br>
+            Available: ${molds.join(', ') || 'none'}
+          `;
+          
+          // Auto-render
+          renderAllShips();
+        } else {
+          statusEl.className = 'status error';
+          statusEl.textContent = '❌ Engine failed to initialize';
+        }
+      } catch (e) {
+        statusEl.className = 'status error';
+        statusEl.textContent = '❌ Error: ' + e.message;
+        console.error(e);
+      }
+    }
+    
+    // Render all ships
+    async function renderAllShips() {
+      gridEl.innerHTML = '';
+      
+      const engine = await ShipPixReady;
+      if (!engine) return;
+      
+      for (const ticker of TICKERS) {
+        const card = document.createElement('div');
+        card.className = 'ship-card';
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        
+        // Default telemetry
+        const telemetry = {
+          signalState: 'neutral',
+          thrust: 0.5,
+          damage: 0,
+          momentum: 0,
+          glow: 0.5,
+        };
+        
+        // Render
+        const success = engine.renderToCanvas(canvas, ticker, telemetry, 128);
+        
+        // Get ship info
+        const info = engine.getShipInfo(ticker, telemetry);
+        const hasMold = engine.hasMold(ticker);
+        
+        card.innerHTML = `
+          <div class="ticker">${ticker}</div>
+        `;
+        card.appendChild(canvas);
+        card.innerHTML += `
+          <div class="class">${info.className || 'Unknown'}</div>
+          <div class="name">${info.shipName || 'Unnamed'}</div>
+          <div class="mold-status ${hasMold ? 'has-mold' : 'no-mold'}">
+            ${hasMold ? 'MOLD' : 'BLOCK'}
+          </div>
+        `;
+        
+        gridEl.appendChild(card);
+      }
+    }
+    
+    // Test telemetry effects
+    async function testTelemetry() {
+      gridEl.innerHTML = '';
+      
+      const engine = await ShipPixReady;
+      if (!engine) return;
+      
+      const ticker = 'RKLB';
+      const states = [
+        { name: 'Neutral', telemetry: { signalState: 'neutral', thrust: 0.5, damage: 0, glow: 0.5 } },
+        { name: 'Bull Run', telemetry: { signalState: 'bull', thrust: 0.9, damage: 0, glow: 0.8 } },
+        { name: 'Bear Mode', telemetry: { signalState: 'bear', thrust: 0.3, damage: 0.3, glow: 0.3 } },
+        { name: 'Heavy Damage', telemetry: { signalState: 'neutral', thrust: 0.4, damage: 0.7, glow: 0.2 } },
+        { name: 'Full Power', telemetry: { signalState: 'bull', thrust: 1.0, damage: 0, glow: 1.0 } },
+        { name: 'Critical', telemetry: { signalState: 'bear', thrust: 0.1, damage: 0.9, glow: 0.1 } },
+      ];
+      
+      for (const state of states) {
+        const card = document.createElement('div');
+        card.className = 'ship-card';
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        
+        engine.renderToCanvas(canvas, ticker, state.telemetry, 128);
+        
+        card.innerHTML = `<div class="ticker">${ticker}</div>`;
+        card.appendChild(canvas);
+        card.innerHTML += `
+          <div class="class">${state.name}</div>
+          <div class="name">
+            Thrust: ${state.telemetry.thrust.toFixed(1)} | 
+            Damage: ${state.telemetry.damage.toFixed(1)}
+          </div>
+        `;
+        
+        gridEl.appendChild(card);
+      }
+    }
+    
+    function clearAll() {
+      gridEl.innerHTML = '';
+    }
+    
+    // Start
+    init();
+  </script>
+</body>
+</html>

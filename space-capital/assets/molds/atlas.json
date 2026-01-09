@@ -1,0 +1,188 @@
+{
+  "version": "1.0.0",
+  "size": 256,
+  "baseDir": "assets/molds/",
+  
+  "ships": {
+    "ACHR": {
+      "src": "base/ACHR_base.png",
+      "class": "vtol",
+      "traits": ["rotors", "compact", "agile"],
+      "paletteZones": {
+        "hull": { "hueRange": [180, 220], "satRange": [0.3, 0.6] },
+        "accent": { "hueRange": [30, 60], "satRange": [0.6, 0.9] },
+        "glow": { "hueRange": [160, 200], "satRange": [0.8, 1.0] }
+      }
+    },
+    "ASTS": {
+      "src": "base/ASTS_base.png",
+      "class": "satellite",
+      "traits": ["solar", "antenna", "orbital"],
+      "paletteZones": {
+        "hull": { "hueRange": [200, 240], "satRange": [0.2, 0.5] },
+        "accent": { "hueRange": [40, 80], "satRange": [0.7, 1.0] },
+        "glow": { "hueRange": [180, 220], "satRange": [0.8, 1.0] }
+      }
+    },
+    "BKSY": {
+      "src": "base/BKSY_base.png",
+      "class": "satellite",
+      "traits": ["sensor", "stealth", "compact"],
+      "paletteZones": {
+        "hull": { "hueRange": [220, 260], "satRange": [0.2, 0.4] },
+        "accent": { "hueRange": [0, 30], "satRange": [0.6, 0.9] },
+        "glow": { "hueRange": [270, 300], "satRange": [0.7, 1.0] }
+      }
+    },
+    "COHR": {
+      "src": "base/COHR_base.png",
+      "class": "weapon",
+      "traits": ["laser", "precision", "angular"],
+      "paletteZones": {
+        "hull": { "hueRange": [0, 30], "satRange": [0.3, 0.6] },
+        "accent": { "hueRange": [50, 80], "satRange": [0.7, 1.0] },
+        "glow": { "hueRange": [0, 20], "satRange": [0.9, 1.0] }
+      }
+    },
+    "EVEX": {
+      "src": "base/EVEX_base.png",
+      "class": "transport",
+      "traits": ["cargo", "multi-rotor", "heavy"],
+      "paletteZones": {
+        "hull": { "hueRange": [30, 60], "satRange": [0.2, 0.5] },
+        "accent": { "hueRange": [180, 220], "satRange": [0.5, 0.8] },
+        "glow": { "hueRange": [40, 70], "satRange": [0.8, 1.0] }
+      }
+    },
+    "GE": {
+      "src": "base/GE_base.png",
+      "class": "heavy",
+      "traits": ["turbine", "industrial", "massive"],
+      "paletteZones": {
+        "hull": { "hueRange": [200, 230], "satRange": [0.1, 0.4] },
+        "accent": { "hueRange": [30, 60], "satRange": [0.6, 0.9] },
+        "glow": { "hueRange": [180, 210], "satRange": [0.7, 1.0] }
+      }
+    },
+    "GME": {
+      "src": "base/GME_base.png",
+      "class": "heavy",
+      "traits": ["crystalline", "volatile", "hexagonal"],
+      "paletteZones": {
+        "hull": { "hueRange": [280, 320], "satRange": [0.4, 0.7] },
+        "accent": { "hueRange": [120, 160], "satRange": [0.6, 0.9] },
+        "glow": { "hueRange": [300, 340], "satRange": [0.8, 1.0] }
+      }
+    },
+    "JOBY": {
+      "src": "base/JOBY_base.png",
+      "class": "vtol",
+      "traits": ["dual-rotor", "sleek", "civilian"],
+      "paletteZones": {
+        "hull": { "hueRange": [170, 200], "satRange": [0.3, 0.6] },
+        "accent": { "hueRange": [20, 50], "satRange": [0.7, 1.0] },
+        "glow": { "hueRange": [160, 190], "satRange": [0.8, 1.0] }
+      }
+    },
+    "KTOS": {
+      "src": "base/KTOS_base.png",
+      "class": "drone",
+      "traits": ["angular", "stealth", "military"],
+      "paletteZones": {
+        "hull": { "hueRange": [100, 140], "satRange": [0.2, 0.5] },
+        "accent": { "hueRange": [0, 30], "satRange": [0.7, 1.0] },
+        "glow": { "hueRange": [80, 120], "satRange": [0.8, 1.0] }
+      }
+    },
+    "LHX": {
+      "src": "base/LHX_base.png",
+      "class": "drone",
+      "traits": ["x-wing", "sensor", "recon"],
+      "paletteZones": {
+        "hull": { "hueRange": [210, 250], "satRange": [0.2, 0.5] },
+        "accent": { "hueRange": [40, 70], "satRange": [0.6, 0.9] },
+        "glow": { "hueRange": [200, 240], "satRange": [0.7, 1.0] }
+      }
+    },
+    "LUNR": {
+      "src": "base/LUNR_base.png",
+      "class": "scout",
+      "traits": ["wide-wing", "sensor", "explorer"],
+      "paletteZones": {
+        "hull": { "hueRange": [50, 80], "satRange": [0.3, 0.6] },
+        "accent": { "hueRange": [180, 220], "satRange": [0.5, 0.8] },
+        "glow": { "hueRange": [40, 70], "satRange": [0.8, 1.0] }
+      }
+    },
+    "PL": {
+      "src": "base/PL_base.png",
+      "class": "satellite",
+      "traits": ["camera", "compact", "orbital"],
+      "paletteZones": {
+        "hull": { "hueRange": [190, 220], "satRange": [0.2, 0.5] },
+        "accent": { "hueRange": [30, 60], "satRange": [0.6, 0.9] },
+        "glow": { "hueRange": [170, 200], "satRange": [0.8, 1.0] }
+      }
+    },
+    "RDW": {
+      "src": "base/RDW_base.png",
+      "class": "satellite",
+      "traits": ["dish", "comms", "wide"],
+      "paletteZones": {
+        "hull": { "hueRange": [220, 260], "satRange": [0.2, 0.5] },
+        "accent": { "hueRange": [10, 40], "satRange": [0.6, 0.9] },
+        "glow": { "hueRange": [200, 240], "satRange": [0.7, 1.0] }
+      }
+    },
+    "RKLB": {
+      "src": "base/RKLB_base.png",
+      "class": "transport",
+      "traits": ["orbital-bus", "twin-engine", "payload"],
+      "paletteZones": {
+        "hull": { "hueRange": [0, 30], "satRange": [0.2, 0.5] },
+        "accent": { "hueRange": [200, 240], "satRange": [0.5, 0.8] },
+        "glow": { "hueRange": [10, 40], "satRange": [0.8, 1.0] }
+      }
+    },
+    "RTX": {
+      "src": "base/RTX_base.png",
+      "class": "heavy",
+      "traits": ["defense", "hexagonal", "targeting"],
+      "paletteZones": {
+        "hull": { "hueRange": [100, 140], "satRange": [0.1, 0.4] },
+        "accent": { "hueRange": [0, 30], "satRange": [0.7, 1.0] },
+        "glow": { "hueRange": [80, 120], "satRange": [0.8, 1.0] }
+      }
+    },
+    "Unclaimed": {
+      "src": "base/Unclaimed_base.png",
+      "class": "drone",
+      "traits": ["generic", "modular", "basic"],
+      "paletteZones": {
+        "hull": { "hueRange": [0, 360], "satRange": [0.1, 0.3] },
+        "accent": { "hueRange": [0, 360], "satRange": [0.4, 0.6] },
+        "glow": { "hueRange": [180, 220], "satRange": [0.6, 0.9] }
+      }
+    }
+  },
+
+  "parts": {
+    "_comment": "Part-based kitbashing - populate when sprites are manually split",
+    "hull": [],
+    "wings": [],
+    "cockpit": [],
+    "engine": [],
+    "pods": [],
+    "weapons": []
+  },
+
+  "classDefaults": {
+    "vtol": { "baseHue": 180, "engineCount": 2, "hasRotors": true },
+    "satellite": { "baseHue": 220, "engineCount": 0, "hasSolar": true },
+    "transport": { "baseHue": 30, "engineCount": 2, "hasPayload": true },
+    "heavy": { "baseHue": 120, "engineCount": 4, "hasArmor": true },
+    "scout": { "baseHue": 60, "engineCount": 2, "hasSensors": true },
+    "drone": { "baseHue": 200, "engineCount": 1, "isCompact": true },
+    "weapon": { "baseHue": 0, "engineCount": 1, "hasWeapons": true }
+  }
+}
