@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="Aquarelle — A watercolor mixing puzzle">
+  <meta name="theme-color" content="#0D0C0B">
+  
+  <title>AQUARELLE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --void: #0D0C0B;
+      --ink: #F5F2ED;
+      --stone: #3A3835;
+      --ash: #6A665E;
+      --dust: #9A958C;
+      --cream: #F8F6F1;
+      --terracotta: #C4846C;
+      --terracotta-dim: rgba(196, 132, 108, 0.6);
+      --ochre: #B8986B;
+      --sage: #7A9A6D;
+      --water: #6B8A9A;
+      
+      --font-display: 'Cormorant', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --palette-size: 160px;
+      --well-size: 28px;
+      --center-well-size: 40px;
+      --preview-size: 72px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-mono);
+      background: var(--void);
+      color: var(--ink);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Subtle atmosphere - only on mix column */
+    .mix-column::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.03), transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(0,0,0,0.05), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== START SCREEN ===== */
+    .start-screen {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .start-frame {
+      position: relative;
+      padding: 3rem 2.5rem;
+      max-width: 340px;
+      text-align: center;
+    }
+
+    .corner-mark {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--stone);
+      opacity: 0.4;
+    }
+    .corner-mark.tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+    .corner-mark.tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+    .corner-mark.bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+    .corner-mark.br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+    .start-title {
+      font-family: var(--font-display);
+      font-size: 2.75rem;
+      font-weight: 300;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 0.125rem;
+    }
+
+    .start-sub {
+      font-family: var(--font-mono);
+      font-size: 0.5625rem;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 2.5rem;
+    }
+
+    .start-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--stone);
+      margin: 0 auto 2rem;
+    }
+
+    .start-instructions {
+      margin-bottom: 2rem;
+      text-align: left;
+      padding-left: 1rem;
+    }
+
+    .instruction {
+      display: flex;
+      align-items: baseline;
+      gap: 0.875rem;
+      padding: 0.4rem 0;
+      font-size: 0.6875rem;
+      color: var(--dust);
+      letter-spacing: 0.02em;
+    }
+
+    .instruction-num {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--terracotta-dim);
+      min-width: 1.25rem;
+    }
+
+    .high-score {
+      font-size: 0.5625rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 2rem;
+    }
+
+    .high-score span { color: var(--dust); }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.75rem;
+      border: 1px solid var(--stone);
+      border-radius: 0;
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 0.5625rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .btn:hover {
+      background: var(--ink);
+      color: var(--void);
+      border-color: var(--ink);
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--terracotta);
+      border-color: var(--terracotta);
+      color: var(--void);
+    }
+
+    .btn-primary:hover {
+      background: #D4946C;
+      border-color: #D4946C;
+    }
+
+    .btn-primary:disabled {
+      background: var(--stone);
+      border-color: var(--stone);
+      color: var(--ash);
+      cursor: not-allowed;
+    }
+
+    .btn-ghost {
+      border-color: transparent;
+      color: var(--ash);
+    }
+
+    .btn-ghost:hover {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--stone);
+    }
+
+    /* ===== GAME SCREEN ===== */
+    .game-screen {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .game-screen.active { display: flex; }
+
+    /* ===== GAME LAYOUT ===== */
+    .game-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0;
+      background: var(--target-color, var(--void));
+      transition: background 0.3s ease;
+    }
+
+    .palettes-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      gap: 1.5rem;
+      background: linear-gradient(145deg, #1E1D1C 0%, #151413 100%);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      min-width: 200px;
+    }
+
+    @media (max-width: 540px) {
+      .palettes-column {
+        min-width: 160px;
+        padding: 1rem 0.75rem;
+        gap: 1rem;
+      }
+      :root {
+        --palette-size: 130px;
+        --well-size: 22px;
+        --center-well-size: 32px;
+      }
+    }
+
+    .mix-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      gap: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Watermark layer behind mix */
+    .watermark {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 15%;
+      pointer-events: none;
+      opacity: 0.08;
+    }
+
+    .watermark-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.15em;
+      color: #000;
+      line-height: 1;
+    }
+
+    .watermark-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.375rem;
+    }
+
+    .watermark-stat {
+      font-family: var(--font-mono);
+      font-size: clamp(0.5rem, 1.5vw, 0.625rem);
+      letter-spacing: 0.15em;
+      text-transform: lowercase;
+      color: #000;
+    }
+
+    /* ===== CERAMIC PALETTE ===== */
+    .ceramic-palette {
+      position: relative;
+      width: var(--palette-size);
+      height: var(--palette-size);
+    }
+
+    .palette-tray {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 35% 35%, #FFFFFF 0%, transparent 50%),
+        radial-gradient(circle at 65% 65%, rgba(0,0,0,0.08) 0%, transparent 40%),
+        linear-gradient(145deg, #FEFEFE 0%, #F0EDE6 50%, #E8E4DC 100%);
+      box-shadow: 
+        /* Outer shadow for depth */
+        0 8px 24px rgba(0,0,0,0.25),
+        0 2px 8px rgba(0,0,0,0.15),
+        /* Inner rim highlight */
+        inset 0 2px 4px rgba(255,255,255,1),
+        inset 0 -3px 8px rgba(0,0,0,0.1),
+        /* Subtle inner shadow for concave feel */
+        inset 0 0 20px rgba(0,0,0,0.03);
+    }
+
+    /* Rim edge effect */
+    .palette-tray::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.8);
+      border-bottom-color: rgba(0,0,0,0.05);
+      pointer-events: none;
+    }
+
+    .palette-wells {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .palette-well {
+      position: absolute;
+      width: var(--well-size);
+      height: var(--well-size);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      pointer-events: auto;
+      background: transparent;
+      padding: 0;
+      --radius: calc((var(--palette-size) / 2) - (var(--well-size) / 2) - 8px);
+      left: calc(50% + var(--radius) * cos(var(--angle)) - var(--well-size) / 2);
+      top: calc(50% + var(--radius) * sin(var(--angle)) - var(--well-size) / 2);
+      transition: transform 0.08s ease;
+    }
+
+    .palette-well:active { transform: scale(0.9); }
+    .palette-well.selected { transform: scale(1.15); z-index: 2; }
+
+    .well-pigment {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 
+        inset 0 3px 6px rgba(0,0,0,0.25),
+        inset 0 -2px 4px rgba(255,255,255,0.35),
+        inset 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    .palette-well.selected .well-pigment {
+      box-shadow: 
+        inset 0 3px 6px rgba(0,0,0,0.25),
+        inset 0 -2px 4px rgba(255,255,255,0.35),
+        inset 0 0 8px rgba(0,0,0,0.1),
+        0 0 0 2px var(--void),
+        0 0 0 4px rgba(255,255,255,0.7);
+    }
+
+    /* Dilution ring indicator */
+    .dilution-ring {
+      position: absolute;
+      inset: -8px;
+      width: calc(100% + 16px);
+      height: calc(100% + 16px);
+      pointer-events: none;
+      transform: rotate(-90deg);
+    }
+
+    .dilution-track {
+      fill: none;
+      stroke: rgba(255,255,255,0.15);
+      stroke-width: 2;
+    }
+
+    .dilution-fill {
+      fill: none;
+      stroke: rgba(255,255,255,0.8);
+      stroke-width: 2;
+      stroke-dasharray: 125.6; /* 2 * PI * 20 */
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.1s ease;
+    }
+
+    .palette-well.adjusting {
+      transform: scale(1.25);
+      z-index: 10;
+    }
+
+    .palette-well.adjusting .dilution-fill {
+      stroke: var(--terracotta);
+      stroke-width: 3;
+    }
+
+    .center-well {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(var(--center-well-size) * 1.3);
+      height: calc(var(--center-well-size) * 1.3);
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 40% 40%, rgba(255,255,255,0.4) 0%, transparent 50%),
+        linear-gradient(145deg, #E8E4DD 0%, #DDD9D0 100%);
+      box-shadow: 
+        inset 0 4px 12px rgba(0,0,0,0.15),
+        inset 0 -2px 6px rgba(255,255,255,0.5),
+        inset 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .center-well-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      transition: background 0.08s ease;
+    }
+
+    .center-well-inner.filled {
+      box-shadow: 
+        inset 0 3px 8px rgba(0,0,0,0.2),
+        inset 0 -2px 4px rgba(255,255,255,0.25);
+    }
+
+    /* ===== MIX DISPLAY ===== */
+    .mix-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mix-circle-container {
+      position: relative;
+    }
+
+    /* Paper base - always visible underneath */
+    .mix-paper {
+      position: absolute;
+      inset: 0;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #FCFAF5;
+      box-shadow: 
+        0 8px 32px rgba(0,0,0,0.3),
+        0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Glazed color on top */
+    .mix-circle {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow: 
+        inset 0 2px 8px rgba(0,0,0,0.08),
+        inset 0 -2px 6px rgba(255,255,255,0.15);
+      transition: background 0.15s ease;
+    }
+
+    .mix-circle.has-pigment {
+      box-shadow: 
+        inset 0 3px 10px rgba(0,0,0,0.12),
+        inset 0 -2px 6px rgba(255,255,255,0.1);
+    }
+
+    .mix-circle.matched {
+      box-shadow: 
+        inset 0 2px 8px rgba(0,0,0,0.06),
+        inset 0 -2px 6px rgba(255,255,255,0.08);
+    }
+
+    .mix-circle.perfect {
+      animation: perfect-pulse 0.6s ease-out;
+    }
+
+    @keyframes perfect-pulse {
+      0% { 
+        box-shadow: 
+          inset 0 2px 8px rgba(0,0,0,0.06),
+          0 0 0 0 rgba(255,255,255,0.5);
+      }
+      50% { 
+        box-shadow: 
+          inset 0 2px 8px rgba(0,0,0,0.06),
+          0 0 0 24px rgba(255,255,255,0);
+      }
+      100% { 
+        box-shadow: 
+          inset 0 2px 8px rgba(0,0,0,0.06),
+          0 0 0 0 rgba(255,255,255,0);
+      }
+    }
+
+    .mix-label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.7);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .match-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .match-value {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 0.1em;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: color 0.2s ease;
+    }
+
+    .match-value.good { color: rgba(255,255,255,0.9); }
+    .match-value.great { color: rgba(255,255,255,0.95); }
+    .match-value.perfect { color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+
+    .match-hint {
+      font-family: var(--font-display);
+      font-size: 0.625rem;
+      font-style: italic;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ===== ACTIONS ===== */
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .actions .btn { 
+      min-width: 100px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .actions .btn-ghost {
+      background: rgba(0,0,0,0.3);
+      border-color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.8);
+    }
+
+    .actions .btn-ghost:hover {
+      background: rgba(0,0,0,0.5);
+      border-color: rgba(255,255,255,0.4);
+      color: #fff;
+    }
+
+    .actions .btn-primary {
+      background: rgba(255,255,255,0.9);
+      border-color: transparent;
+      color: var(--void);
+    }
+
+    .actions .btn-primary:hover {
+      background: #fff;
+    }
+
+    .actions .btn-primary:disabled {
+      background: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ===== MODALS ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 12, 11, 0.92);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+
+    .modal {
+      position: relative;
+      padding: 2rem 1.5rem;
+      max-width: 280px;
+      width: 90%;
+      text-align: center;
+      border: 1px solid var(--stone);
+    }
+
+    .modal-victory {
+      max-width: 340px;
+      padding: 1.5rem;
+    }
+
+    .modal .corner-mark { opacity: 0.3; }
+
+    .modal-header {
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-icon {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-style: italic;
+      margin-bottom: 0.25rem;
+      color: var(--ash);
+      letter-spacing: 0.15em;
+    }
+
+    .modal-icon.perfect { color: var(--sage); }
+    .modal-icon.great { color: var(--sage); }
+    .modal-icon.good { color: var(--ochre); }
+    .modal-icon.retry { color: var(--ash); }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.125rem;
+    }
+
+    .modal-subtitle {
+      font-size: 0.5625rem;
+      letter-spacing: 0.15em;
+      color: var(--ash);
+    }
+
+    /* Pigment breakdown */
+    .pigment-breakdown {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .paper-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .paper-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #FCFAF5;
+      box-shadow: 
+        0 2px 4px rgba(0,0,0,0.15),
+        inset 0 1px 2px rgba(255,255,255,0.8);
+    }
+
+    .paper-label {
+      font-size: 0.4375rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ash);
+    }
+
+    .pigment-card {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--stone);
+      padding: 0.5rem 0.625rem;
+    }
+
+    .pigment-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.2),
+        inset 0 -1px 2px rgba(255,255,255,0.2);
+    }
+
+    .pigment-info {
+      text-align: left;
+      min-width: 0;
+    }
+
+    .pigment-name {
+      font-family: var(--font-display);
+      font-size: 0.6875rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pigment-props {
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      color: var(--ash);
+      text-transform: uppercase;
+    }
+
+    .mix-operator {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--ash);
+      padding: 0 0.25rem;
+    }
+
+    .result-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .result-swatches {
+      display: flex;
+      gap: 0.375rem;
+    }
+
+    .result-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .result-swatch.target {
+      box-shadow: 
+        0 2px 6px rgba(0,0,0,0.25),
+        inset 0 0 0 2px rgba(255,255,255,0.15);
+    }
+
+    .result-labels {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      color: var(--dust);
+      text-transform: uppercase;
+    }
+
+    .mix-insight {
+      font-family: var(--font-display);
+      font-size: 0.6875rem;
+      font-style: italic;
+      color: var(--dust);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+      min-height: 1.25rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .modal-stars {
+      font-size: 0.75rem;
+      margin-bottom: 0.375rem;
+      letter-spacing: 0.25em;
+    }
+
+    .modal-stars .star { color: var(--stone); }
+    .modal-stars .star.earned { color: var(--ochre); }
+
+    .chain-indicator {
+      font-size: 0.5625rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 0.75rem;
+    }
+
+    .modal-score {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 300;
+      color: var(--ochre);
+      line-height: 1;
+    }
+
+    .modal-score-label {
+      font-size: 0.4375rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 1.25rem;
+    }
+
+    .modal .btn { width: 100%; }
+    .modal .btn + .btn { margin-top: 0.375rem; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (min-width: 700px) {
+      :root {
+        --palette-size: 190px;
+        --well-size: 32px;
+        --center-well-size: 46px;
+        --preview-size: 84px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition-duration: 0.01ms !important; }
+    }
+
+    :focus-visible {
+      outline: 1px solid var(--terracotta);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- START SCREEN -->
+  <div class="start-screen" id="start-screen">
+    <div class="start-frame">
+      <div class="corner-mark tl"></div>
+      <div class="corner-mark tr"></div>
+      <div class="corner-mark bl"></div>
+      <div class="corner-mark br"></div>
+      
+      <h1 class="start-title">Aquarelle</h1>
+      <p class="start-sub">Watercolor Mixing Puzzle</p>
+      
+      <div class="start-divider"></div>
+      
+      <div class="start-instructions">
+        <div class="instruction">
+          <span class="instruction-num">i.</span>
+          <span>Select pigments from the palettes</span>
+        </div>
+        <div class="instruction">
+          <span class="instruction-num">ii.</span>
+          <span>Match the target color by eye</span>
+        </div>
+        <div class="instruction">
+          <span class="instruction-num">iii.</span>
+          <span>Achieve 90% accuracy to advance</span>
+        </div>
+      </div>
+
+      <p class="high-score" id="high-score-display">Best · <span>0</span></p>
+
+      <button class="btn btn-primary" onclick="Aquarelle.startGame()">Begin</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="game-screen" id="game-screen">
+    <main class="game-layout">
+      <div class="palettes-column">
+        <div class="ceramic-palette" id="palette-warm">
+          <div class="palette-tray"></div>
+          <div class="palette-wells"></div>
+          <div class="center-well">
+            <div class="center-well-inner" id="center-well-1"></div>
+          </div>
+        </div>
+        
+        <div class="ceramic-palette" id="palette-cool">
+          <div class="palette-tray"></div>
+          <div class="palette-wells"></div>
+          <div class="center-well">
+            <div class="center-well-inner" id="center-well-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mix-column">
+        <!-- Watermark behind everything -->
+        <div class="watermark">
+          <div class="watermark-title">Aquarelle</div>
+          <div class="watermark-stats">
+            <span class="watermark-stat">Level <span id="level-display">1</span></span>
+            <span class="watermark-stat">Score <span id="score-display">0</span></span>
+          </div>
+        </div>
+
+        <div class="mix-display">
+          <div class="mix-circle-container">
+            <div class="mix-paper"></div>
+            <div class="mix-circle" id="mix-circle"></div>
+          </div>
+          <span class="mix-label">Your Mix</span>
+          
+          <div class="match-display">
+            <div class="match-value" id="match-value">0%</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-ghost" onclick="Aquarelle.skipLevel()">Skip</button>
+          <button class="btn btn-primary" id="submit-btn" onclick="Aquarelle.submitAnswer()" disabled>Submit</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- LEVEL COMPLETE MODAL -->
+  <div class="modal-overlay" id="level-modal">
+    <div class="modal modal-victory">
+      <div class="corner-mark tl"></div>
+      <div class="corner-mark tr"></div>
+      <div class="corner-mark bl"></div>
+      <div class="corner-mark br"></div>
+      
+      <div class="modal-header">
+        <div class="modal-icon" id="modal-icon">ii</div>
+        <div class="modal-title" id="modal-title">Great</div>
+        <div class="modal-subtitle" id="modal-subtitle">85% match</div>
+      </div>
+      
+      <!-- Pigment breakdown: Paper + Pigments = Result -->
+      <div class="pigment-breakdown" id="pigment-breakdown">
+        <!-- Paper base -->
+        <div class="paper-indicator">
+          <div class="paper-swatch"></div>
+          <span class="paper-label">paper</span>
+        </div>
+        
+        <div class="mix-operator">+</div>
+        
+        <div class="pigment-card" id="pigment-card-1">
+          <div class="pigment-swatch" id="pigment-swatch-1"></div>
+          <div class="pigment-info">
+            <div class="pigment-name" id="pigment-name-1">—</div>
+            <div class="pigment-props" id="pigment-props-1"></div>
+          </div>
+        </div>
+        
+        <div class="mix-operator" id="operator-2" style="display:none;">+</div>
+        
+        <div class="pigment-card" id="pigment-card-2" style="display:none;">
+          <div class="pigment-swatch" id="pigment-swatch-2"></div>
+          <div class="pigment-info">
+            <div class="pigment-name" id="pigment-name-2">—</div>
+            <div class="pigment-props" id="pigment-props-2"></div>
+          </div>
+        </div>
+        
+        <div class="mix-operator">=</div>
+        
+        <div class="result-card">
+          <div class="result-swatches">
+            <div class="result-swatch" id="modal-result"></div>
+            <div class="result-swatch target" id="modal-target"></div>
+          </div>
+          <div class="result-labels">
+            <span>yours</span>
+            <span>target</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mix-insight" id="mix-insight"></div>
+
+      <div class="modal-footer">
+        <div class="modal-stars" id="modal-stars">
+          <span class="star">✦</span>
+          <span class="star">✦</span>
+          <span class="star">✦</span>
+        </div>
+        
+        <div class="chain-indicator" id="chain-indicator" style="display: none;"></div>
+
+        <div class="modal-score" id="modal-score">+100</div>
+        <div class="modal-score-label">Points</div>
+
+        <button class="btn btn-primary" onclick="Aquarelle.nextLevel()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME OVER MODAL -->
+  <div class="modal-overlay" id="gameover-modal">
+    <div class="modal">
+      <div class="corner-mark tl"></div>
+      <div class="corner-mark tr"></div>
+      <div class="corner-mark bl"></div>
+      <div class="corner-mark br"></div>
+      
+      <div class="modal-icon">✓</div>
+      <div class="modal-title">Complete</div>
+      <div class="modal-subtitle" id="gameover-subtitle">20 levels</div>
+      
+      <div class="modal-score" id="final-score">0</div>
+      <div class="modal-score-label">Final Score</div>
+
+      <button class="btn btn-primary" onclick="Aquarelle.restartGame()">Play Again</button>
+      <button class="btn btn-ghost" onclick="Aquarelle.goHome()">Exit</button>
+    </div>
+  </div>
+
+  <script src="js/watercolor-engine.js"></script>
+  <script src="js/game.js"></script>
+
+</body>
+</html>
